@@ -162,14 +162,14 @@ const HomeManager = () => {
     const handleDragEnd = (result) => {
         if (!result.destination) return;
 
-        const { source, destination, droppableId } = result;
+        const { source, destination } = result;
 
-        if (droppableId === 'tabs') {
+        if (source.droppableId === 'tabs') {
             const items = Array.from(tabOrder);
             const [reorderedItem] = items.splice(source.index, 1);
             items.splice(destination.index, 0, reorderedItem);
             setFormData(prev => ({ ...prev, tabOrder: items }));
-        } else if (droppableId === 'industries') {
+        } else if (source.droppableId === 'industries') {
             const items = Array.from(formData.industries);
             const [reorderedItem] = items.splice(source.index, 1);
             items.splice(destination.index, 0, reorderedItem);

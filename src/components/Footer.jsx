@@ -32,7 +32,7 @@ const Footer = () => {
                     <div className={styles.footerLogo}>
                         <img src={logoSrc} alt="Instrak Logo" className={styles.logoImg} />
                     </div>
-                    <p>{settings?.siteIdentity?.siteName || content.companyName || defaultContent.companyName}</p>
+                    <p>{settings?.siteIdentity?.siteName ?? (content.companyName || defaultContent.companyName)}</p>
                     <p className={styles.description}>{content.description || defaultContent.description}</p>
                 </div>
 
@@ -56,7 +56,7 @@ const Footer = () => {
 
             <div className={styles.bottom}>
                 <div className="container">
-                    <p>&copy; {new Date().getFullYear()} {settings?.siteIdentity?.siteName || 'Instrak Venture Capital Berhad'}. All rights reserved.</p>
+                    <p>&copy; {new Date().getFullYear()} {settings?.siteIdentity?.siteName ?? 'Instrak Venture Capital'}. All rights reserved.</p>
                 </div>
             </div>
         </footer>

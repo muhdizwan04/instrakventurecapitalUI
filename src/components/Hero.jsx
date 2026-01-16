@@ -34,9 +34,11 @@ const Hero = () => {
     return (
         <section id="home" className={styles.hero}>
             <div className={`container ${styles.container}`}>
-                <div className={styles.companyBadge}>
-                    <span>{settings?.siteIdentity?.siteName || 'Instrak Venture Capital Berhad'}</span>
-                </div>
+                {settings?.siteIdentity?.showHeroBadge !== false && settings?.siteIdentity?.siteName && (
+                    <div className={styles.companyBadge}>
+                        <span>{settings.siteIdentity.siteName}</span>
+                    </div>
+                )}
                 <h1 className={styles.title}>
                     {titleLine1}
                     {titleLine2 && <><br /><span className={styles.highlight}>{titleLine2}</span></>}

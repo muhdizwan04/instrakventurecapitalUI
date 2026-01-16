@@ -71,7 +71,22 @@ const Navbar = () => {
         <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ''} glass`}>
             <div className={`container ${styles.container}`}>
                 <Link to="/" className={styles.logo} onClick={closeAll}>
-                    <img src={logo} alt={settings?.siteIdentity?.siteName || navData?.logo?.alt || 'Instrak Venture Capital'} className={styles.logoImg} />
+                    {settings?.siteIdentity?.logoUrl ? (
+                        <img 
+                            src={settings.siteIdentity.logoUrl} 
+                            alt={settings.siteIdentity.siteName || 'Logo'} 
+                            className={styles.logoImg} 
+                        />
+                    ) : (
+                        <div className={styles.logoText}>
+                            <span className={styles.brand}>
+                                {settings?.siteIdentity?.siteName || 'Instrak Venture Capital'}
+                            </span>
+                            {settings?.siteIdentity?.tagline && (
+                                <span className={styles.tagline}>{settings.siteIdentity.tagline}</span>
+                            )}
+                        </div>
+                    )}
                 </Link>
 
                 <ul className={`${styles.links} ${menuOpen ? styles.active : ''}`}>

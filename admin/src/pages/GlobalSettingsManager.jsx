@@ -9,7 +9,8 @@ const GlobalSettingsManager = () => {
             siteName: 'Instrak Venture Capital Berhad',
             tagline: 'Strategic Capital for Industrial Excellence',
             logoUrl: '/logo.png',
-            faviconUrl: '/favicon.ico'
+            faviconUrl: '/favicon.ico',
+            showHeroBadge: true
         },
         themeColors: {
             primary: '#1A365D',
@@ -159,6 +160,21 @@ const GlobalSettingsManager = () => {
                                 className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
                                 placeholder="/favicon.ico"
                             />
+                        </div>
+                        <div className="md:col-span-2 flex items-center gap-3 bg-blue-50/50 p-4 rounded-lg border border-blue-100">
+                            <input
+                                type="checkbox"
+                                id="showHeroBadge"
+                                checked={formData.siteIdentity.showHeroBadge !== false}
+                                onChange={(e) => handleChange('siteIdentity', 'showHeroBadge', e.target.checked)}
+                                className="w-5 h-5 rounded border-[var(--border-light)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)] cursor-pointer"
+                            />
+                            <label htmlFor="showHeroBadge" className="text-sm font-medium text-[var(--accent-primary)] cursor-pointer">
+                                Show Site Name Badge in Hero section
+                            </label>
+                            <p className="text-xs text-[var(--text-muted)] ml-auto">
+                                If unchecked, the "box" above the main title will be hidden.
+                            </p>
                         </div>
                     </div>
                 </div>

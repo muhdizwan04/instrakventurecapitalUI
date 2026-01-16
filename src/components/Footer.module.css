@@ -1,0 +1,124 @@
+.footer {
+    padding: 80px 0 0;
+    background: #FAFBFC;
+    border-top: 3px solid;
+    border-image: linear-gradient(90deg, #1A365D, #B8860B, #1A365D) 1;
+    position: relative;
+}
+
+/* Professional grid pattern */
+.footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(26, 54, 93, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26, 54, 93, 0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 4rem;
+    padding-bottom: 50px;
+    position: relative;
+    z-index: 1;
+}
+
+.footerLogo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.logoImg {
+    height: 50px;
+    width: auto;
+}
+
+.logoText {
+    display: flex;
+    flex-direction: column;
+}
+
+.brandTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    margin: 0;
+    color: #1A365D;
+    letter-spacing: 0.5px;
+}
+
+.tagline {
+    font-size: 0.7rem;
+    color: #B8860B;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.at {
+    color: #B8860B;
+}
+
+.description {
+    margin-top: 1.5rem;
+    color: #4A5568;
+    max-width: 300px;
+    line-height: 1.7;
+}
+
+.links h4,
+.contact h4 {
+    color: #1A365D;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.links ul li {
+    margin-bottom: 0.8rem;
+}
+
+.links ul li a {
+    color: #4A5568;
+}
+
+.links ul li a:hover {
+    color: #B8860B;
+}
+
+.contact p {
+    color: #4A5568;
+    margin-bottom: 0.5rem;
+}
+
+.email {
+    margin-top: 1rem;
+    color: #1A365D !important;
+    font-weight: 500;
+}
+
+.bottom {
+    padding: 1.5rem 0;
+    border-top: 1px solid rgba(26, 54, 93, 0.1);
+    text-align: center;
+    font-size: 0.85rem;
+    color: #4A5568;
+    background: rgba(26, 54, 93, 0.02);
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+}

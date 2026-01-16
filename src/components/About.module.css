@@ -1,0 +1,81 @@
+.about {
+    padding: var(--section-padding);
+    background: #F5F7FA;
+    position: relative;
+}
+
+/* Professional grid pattern */
+.about::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(26, 54, 93, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26, 54, 93, 0.025) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+}
+
+.content {
+    max-width: 800px;
+    margin-bottom: 4rem;
+    position: relative;
+    z-index: 1;
+}
+
+.mission h3 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #1A365D;
+    font-weight: 700;
+}
+
+.mission p {
+    font-size: 1.25rem;
+    color: #2D3748;
+    line-height: 1.8;
+}
+
+.values {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.valueCard {
+    padding: 2rem;
+    background: #FFFFFF;
+    border-radius: 8px;
+    border: 1px solid rgba(26, 54, 93, 0.1);
+    border-left: 4px solid #1A365D;
+    box-shadow: 0 2px 8px rgba(26, 54, 93, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.valueCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(26, 54, 93, 0.1);
+    border-left-color: #B8860B;
+}
+
+.valueIcon {
+    color: #B8860B;
+    margin-bottom: 1.5rem;
+}
+
+.valueCard h4 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #1A365D;
+    font-weight: 600;
+}
+
+.valueCard p {
+    color: #4A5568;
+    line-height: 1.7;
+}

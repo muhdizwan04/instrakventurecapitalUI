@@ -40,28 +40,6 @@ const HomeManager = () => {
                 variant: "outline"
             }
         ],
-        missionTitle: 'Our Mission',
-        missionText: 'To be the catalyst for sustainable growth in the ASEAN region, bridging the gap between visionary entrepreneurs and strategic capital through disciplined governance and ethical excellence.',
-        foundationValues: [
-            {
-                id: 1,
-                icon: "ShieldCheck",
-                text: "We adhere to the highest standards of corporate governance to ensure long-term stability.",
-                title: "Governance"
-            },
-            {
-                id: 2,
-                icon: "Eye",
-                text: "Open communication and clear reporting are at the heart of everything we do.",
-                title: "Transparency"
-            },
-            {
-                id: 3,
-                icon: "Scale",
-                text: "Honesty and moral principles guide our investment decisions and partnerships.",
-                title: "Integrity"
-            }
-        ],
         servicesSubtitle: "Comprehensive financial solutions tailored for your growth",
         servicesTitle: "Our Portfolio",
         industries: [
@@ -75,7 +53,7 @@ const HomeManager = () => {
             { id: "ind-8", icon: "Cpu", name: "Digital Tech" }
         ],
         // Tab order - can be reordered via drag
-        tabOrder: [ "hero", "services", "foundation", "industries" ]
+        tabOrder: [ "hero", "services", "industries" ]
     };
 
     // Use Supabase content hook
@@ -106,35 +84,6 @@ const HomeManager = () => {
     const handleRemoveButton = (id) => setFormData(prev => ({ ...prev, buttons: prev.buttons.filter(b => b.id !== id) }));
     const handleButtonChange = (id, field, value) => {
         setFormData(prev => ({ ...prev, buttons: prev.buttons.map(b => b.id === id ? { ...b, [field]: value } : b) }));
-    };
-
-    // Value Logic
-    const handleValueChange = (id, field, value) => {
-        setFormData(prev => ({
-            ...prev,
-            foundationValues: prev.foundationValues.map(v => v.id === id ? { ...v, [field]: value } : v)
-        }));
-    };
-
-    const handleAddValue = () => {
-        const newValue = { id: Date.now(), title: 'New Value', text: 'Description of this value...', icon: 'Star' };
-        setFormData(prev => ({ ...prev, foundationValues: [...prev.foundationValues, newValue] }));
-    };
-
-    const handleDeleteValue = (id) => {
-        if (formData.foundationValues.length <= 1) {
-            toast.error('Must have at least one value');
-            return;
-        }
-        setFormData(prev => ({ ...prev, foundationValues: prev.foundationValues.filter(v => v.id !== id) }));
-    };
-
-    const handleValueDragEnd = (result) => {
-        if (!result.destination) return;
-        const items = Array.from(formData.foundationValues);
-        const [reorderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reorderedItem);
-        setFormData(prev => ({ ...prev, foundationValues: items }));
     };
 
     // Services Section Logic - title/subtitle only; individual services managed via Services Manager
@@ -180,12 +129,11 @@ const HomeManager = () => {
     // Tab configuration
     const tabConfig = {
         hero: { label: 'Hero Section', icon: Layout },
-        foundation: { label: 'Our Foundation', icon: Target },
         services: { label: 'Services Section', icon: TrendingUp },
         industries: { label: 'Industries', icon: Building2 },
     };
 
-    const tabOrder = formData.tabOrder || ['hero', 'foundation', 'services', 'industries'];
+    const tabOrder = formData.tabOrder || ['hero', 'services', 'industries'];
 
     // Combined drag handler for both tabs and industries
     const handleDragEnd = (result) => {
@@ -306,29 +254,7 @@ const HomeManager = () => {
                             </div>
                         )}
 
-                        {/* FOUNDATION TAB */}
-                        {activeTab === 'foundation' && (
-                            <div className="glass-card p-6 space-y-6">
-                                <h3 className="text-xl font-bold mb-4">Mission & Values</h3>
-                                <div>
-                                    <label className="label">Mission Statement</label>
-                                    <textarea name="missionText" value={formData.missionText} onChange={handleChange} rows={4} className="input-field" />
-                                </div>
 
-                                <div className="space-y-4 pt-4 border-t border-[var(--border-light)]">
-                                    <h4 className="font-bold text-sm">Core Values</h4>
-                                    {formData.foundationValues.map((val, i) => (
-                                        <div key={val.id} className="p-4 bg-[var(--bg-tertiary)] rounded-lg">
-                                            <div className="flex justify-between mb-2">
-                                                <span className="text-xs font-bold uppercase text-[var(--accent-primary)] opacity-70">Value {i + 1}</span>
-                                            </div>
-                                            <input value={val.title} onChange={(e) => handleValueChange(val.id, 'title', e.target.value)} className="input-field mb-2 font-bold" />
-                                            <textarea value={val.text} onChange={(e) => handleValueChange(val.id, 'text', e.target.value)} rows={2} className="input-field text-sm" />
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
 
                         {/* SERVICES SECTION TAB */}
                         {activeTab === 'services' && (

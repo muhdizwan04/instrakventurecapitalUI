@@ -108,18 +108,11 @@ const ServicesManager = () => {
                 </div>
                 {view === 'list' && (
                     <div className="flex gap-3">
-                        <button
-                            onClick={() => saveContent({ items: services })}
-                            disabled={saving}
-                            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md disabled:opacity-50"
-                        >
+                        <button onClick={() => saveContent({ items: services })} disabled={saving} className="btn-save">
                             {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                             <span>{saving ? 'Saving...' : 'Save All Changes'}</span>
                         </button>
-                        <button
-                            onClick={handleCreate}
-                            className="flex items-center gap-2 px-4 py-2 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#08304e] transition-colors shadow-md"
-                        >
+                        <button onClick={handleCreate} className="btn-add">
                             <Plus size={18} />
                             <span>Add New Service</span>
                         </button>
@@ -264,7 +257,7 @@ const ServicesManager = () => {
                         </div>
 
                         <div className="pt-4 flex justify-end gap-3">
-                            <button type="submit" className="px-6 py-2 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#08304e] shadow-md flex items-center gap-2">
+                            <button type="submit" className="btn-save shadow-md flex items-center gap-2">
                                 <Save size={18} /> Save Service
                             </button>
                         </div>

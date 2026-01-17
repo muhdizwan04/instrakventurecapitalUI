@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Eye, RefreshCw, Info, Plus, Trash2, Layout, Target, Zap, Building2, TrendingUp, Wallet, ShieldCheck, Scale, GripVertical, HelpCircle, Loader2 } from 'lucide-react';
+import { Save, Eye, RefreshCw, Info, Plus, Trash2, Layout, Target, Zap, Building2, TrendingUp, Wallet, ShieldCheck, Scale, GripVertical, HelpCircle, Loader2, FileText } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import toast from 'react-hot-toast';
 import IconPicker from '../components/IconPicker';
@@ -52,8 +52,9 @@ const HomeManager = () => {
             { id: "ind-7", icon: "Factory", name: "Manufacturing" },
             { id: "ind-8", icon: "Cpu", name: "Digital Tech" }
         ],
+        customSections: [],
         // Tab order - can be reordered via drag
-        tabOrder: [ "hero", "services", "industries" ]
+        tabOrder: ["hero", "services", "industries"]
     };
 
     // Use Supabase content hook
@@ -121,13 +122,52 @@ const HomeManager = () => {
         setFormData(prev => ({ ...prev, industries: items }));
     };
 
+    // Custom Sections Logic
+    const handleAddSection = () => {
+        const newId = `custom-${Date.now()}`;
+        // Default style settings included
+        const newSection = {
+            id: newId,
+            title: 'New Custom Section',
+            content: 'Add your content here...',
+            textAlign: 'center',
+            textColor: '#1A365D',
+            bgColor: '#FFFFFF'
+        };
+
+        setFormData(prev => ({
+            ...prev,
+            customSections: [...(prev.customSections || []), newSection],
+            tabOrder: [...prev.tabOrder, newId]
+        }));
+        setActiveTab(newId);
+    };
+
+    const handleDeleteSection = (id) => {
+        if (window.confirm('Are you sure you want to delete this section?')) {
+            setFormData(prev => ({
+                ...prev,
+                customSections: prev.customSections.filter(s => s.id !== id),
+                tabOrder: prev.tabOrder.filter(tid => tid !== id)
+            }));
+            if (activeTab === id) setActiveTab('hero');
+        }
+    };
+
+    const handleCustomSectionChange = (id, field, value) => {
+        setFormData(prev => ({
+            ...prev,
+            customSections: prev.customSections.map(s => s.id === id ? { ...s, [field]: value } : s)
+        }));
+    };
+
     const handleSave = async (e) => {
         e.preventDefault();
         await saveContent(formData);
     };
 
     // Tab configuration
-    const tabConfig = {
+    const staticTabs = {
         hero: { label: 'Hero Section', icon: Layout },
         services: { label: 'Services Section', icon: TrendingUp },
         industries: { label: 'Industries', icon: Building2 },
@@ -159,23 +199,25 @@ const HomeManager = () => {
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <h1 className="text-3xl font-heading text-[var(--accent-primary)] mb-2">Home Page Manager</h1>
-                    <p className="text-[var(--text-secondary)]">Manage content for the main landing page.</p>
+                    <p className="text-[var(--text-secondary)]">Manage content for the main landing page. Drag tabs to reorder sections.</p>
                 </div>
-                {loading ? (
-                    <div className="flex items-center gap-2 px-6 py-2.5 bg-gray-300 text-gray-500 rounded-lg">
-                        <Loader2 size={18} className="animate-spin" />
-                        <span>Loading...</span>
-                    </div>
-                ) : (
-                    <button
-                        onClick={handleSave}
-                        disabled={saving}
-                        className="flex items-center gap-2 px-6 py-2.5 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#08304e] transition-colors shadow-md font-medium disabled:opacity-50"
-                    >
-                        {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-                        <span>{saving ? 'Saving...' : 'Save Changes'}</span>
+                <div className="flex gap-3">
+                    <button onClick={handleAddSection} className="btn-add">
+                        <Plus size={18} />
+                        <span>Add Section</span>
                     </button>
-                )}
+                    {loading ? (
+                        <div className="flex items-center gap-2 px-6 py-2.5 bg-gray-300 text-gray-500 rounded-lg">
+                            <Loader2 size={18} className="animate-spin" />
+                            <span>Loading...</span>
+                        </div>
+                    ) : (
+                        <button onClick={handleSave} disabled={saving} className="btn-save">
+                            {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                            <span>{saving ? 'Saving...' : 'Save Changes'}</span>
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Single DragDropContext for all draggables */}
@@ -185,11 +227,21 @@ const HomeManager = () => {
                         <div
                             ref={provided.innerRef}
                             {...provided.droppableProps}
-                            className="flex gap-2 overflow-x-auto pb-2 border-b border-[var(--border-light)] mb-6"
+                            className="flex gap-2 overflow-x-auto pb-4 border-b border-[var(--border-light)] mb-6 no-scrollbar"
                         >
                             {tabOrder.map((tabId, index) => {
-                                const tab = tabConfig[tabId];
-                                if (!tab) return null;
+                                let label, Icon;
+                                if (staticTabs[tabId]) {
+                                    label = staticTabs[tabId].label;
+                                    Icon = staticTabs[tabId].icon;
+                                } else {
+                                    // Custom Section
+                                    const section = formData.customSections?.find(s => s.id === tabId);
+                                    if (!section) return null; // Filter out unknown/orphaned sections
+                                    label = section.title;
+                                    Icon = FileText;
+                                }
+
                                 return (
                                     <Draggable key={tabId} draggableId={tabId} index={index}>
                                         {(provided, snapshot) => (
@@ -198,14 +250,14 @@ const HomeManager = () => {
                                                 {...provided.draggableProps}
                                                 {...provided.dragHandleProps}
                                                 onClick={() => setActiveTab(tabId)}
-                                                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-colors whitespace-nowrap ${snapshot.isDragging ? 'shadow-lg ring-2 ring-blue-400' : ''} ${activeTab === tabId
+                                                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-colors whitespace-nowrap ${snapshot.isDragging ? 'shadow-lg ring-2 ring-blue-400 z-50' : ''} ${activeTab === tabId
                                                     ? 'bg-[var(--accent-primary)] text-white'
                                                     : 'bg-white border border-gray-200 text-[var(--text-secondary)] hover:bg-gray-50'
                                                     }`}
                                             >
                                                 <GripVertical size={14} className="opacity-40" />
-                                                <tab.icon size={16} />
-                                                {tab.label}
+                                                <Icon size={16} />
+                                                {label}
                                             </button>
                                         )}
                                     </Draggable>
@@ -341,6 +393,314 @@ const HomeManager = () => {
                                 </Droppable>
                             </div>
                         )}
+
+                        {/* CUSTOM SECTIONS TAB */}
+                        {activeTab.startsWith('custom-') && (
+                            <div className="glass-card p-6 space-y-6">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-xl font-bold">Custom Section</h3>
+                                    <button
+                                        onClick={() => handleDeleteSection(activeTab)}
+                                        className="text-red-500 hover:bg-red-50 px-3 py-1.5 rounded text-sm flex items-center gap-2 transition-colors"
+                                    >
+                                        <Trash2 size={16} /> Delete Section
+                                    </button>
+                                </div>
+
+                                {(() => {
+                                    const section = formData.customSections?.find(s => s.id === activeTab);
+                                    if (!section) return <div>Section not found</div>;
+
+                                    // Helper for block management
+                                    const updateSection = (updates) => {
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            customSections: prev.customSections.map(s => s.id === section.id ? { ...s, ...updates } : s)
+                                        }));
+                                    };
+
+                                    const addBlock = (type) => {
+                                        const newBlock = {
+                                            id: Date.now(),
+                                            type, // 'text', 'image', 'button'
+                                            content: type === 'text' ? 'New text block...' : (type === 'button' ? 'Click Me' : ''),
+                                            url: '',
+                                            alt: '',
+                                            link: type === 'button' ? '/contact' : '', // for button
+                                            variant: 'solid', // for button: solid, outline
+                                            align: 'center', // left, center, right
+                                            width: '100%', // for images
+                                            color: '#1A365D' // for text
+                                        };
+                                        const currentBlocks = section.blocks || [];
+                                        updateSection({ blocks: [...currentBlocks, newBlock] });
+                                    };
+
+                                    const updateBlock = (blockId, field, value) => {
+                                        const currentBlocks = section.blocks || [];
+                                        updateSection({
+                                            blocks: currentBlocks.map(b => b.id === blockId ? { ...b, [field]: value } : b)
+                                        });
+                                    };
+
+                                    const removeBlock = (blockId) => {
+                                        const currentBlocks = section.blocks || [];
+                                        updateSection({
+                                            blocks: currentBlocks.filter(b => b.id !== blockId)
+                                        });
+                                    };
+
+                                    const moveBlock = (index, direction) => {
+                                        const currentBlocks = [...(section.blocks || [])];
+                                        if (direction === 'up' && index > 0) {
+                                            [currentBlocks[index], currentBlocks[index - 1]] = [currentBlocks[index - 1], currentBlocks[index]];
+                                        } else if (direction === 'down' && index < currentBlocks.length - 1) {
+                                            [currentBlocks[index], currentBlocks[index + 1]] = [currentBlocks[index + 1], currentBlocks[index]];
+                                        }
+                                        updateSection({ blocks: currentBlocks });
+                                    };
+
+                                    return (
+                                        <>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="label">Section Title</label>
+                                                    <input
+                                                        value={section.title}
+                                                        onChange={(e) => updateSection({ title: e.target.value })}
+                                                        className="input-field"
+                                                        placeholder="Enter section title"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="label">Container Alignment</label>
+                                                    <select
+                                                        value={section.textAlign || 'center'}
+                                                        onChange={(e) => updateSection({ textAlign: e.target.value })}
+                                                        className="input-field"
+                                                    >
+                                                        <option value="left">Left</option>
+                                                        <option value="center">Center</option>
+                                                        <option value="right">Right</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div className="mt-4">
+                                                <label className="label">Section Subtitle (Optional)</label>
+                                                <input
+                                                    value={section.subtitle || ''}
+                                                    onChange={(e) => updateSection({ subtitle: e.target.value })}
+                                                    className="input-field"
+                                                    placeholder="Enter subtitle"
+                                                />
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-4 border-t border-b border-gray-100 py-4 my-2">
+                                                <div>
+                                                    <label className="label">Text Color (Default)</label>
+                                                    <div className="flex items-center gap-2">
+                                                        <input
+                                                            type="color"
+                                                            value={section.textColor || '#1A365D'}
+                                                            onChange={(e) => updateSection({ textColor: e.target.value })}
+                                                            className="h-10 w-16 p-1 rounded border border-gray-200 cursor-pointer"
+                                                        />
+                                                        <span className="text-xs text-gray-500 font-mono">{section.textColor || '#1A365D'}</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className="label">Background Color</label>
+                                                    <div className="flex items-center gap-2">
+                                                        <input
+                                                            type="color"
+                                                            value={section.bgColor || '#FFFFFF'}
+                                                            onChange={(e) => updateSection({ bgColor: e.target.value })}
+                                                            className="h-10 w-16 p-1 rounded border border-gray-200 cursor-pointer"
+                                                        />
+                                                        <span className="text-xs text-gray-500 font-mono">{section.bgColor || '#FFFFFF'}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="mb-6 p-4 bg-gray-50 rounded border border-gray-200">
+                                                <label className="label font-bold mb-2">Background Image Settings</label>
+                                                <div className="space-y-3">
+                                                    <div>
+                                                        <label className="text-xs text-gray-500 block mb-1">Image URL</label>
+                                                        <input
+                                                            value={section.backgroundImage || ''}
+                                                            onChange={(e) => updateSection({ backgroundImage: e.target.value })}
+                                                            className="input-field"
+                                                            placeholder="https://example.com/image.jpg"
+                                                        />
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div>
+                                                            <label className="text-xs text-gray-500 block mb-1">Overlay Opacity ({section.overlayOpacity === undefined ? 0.4 : section.overlayOpacity})</label>
+                                                            <input
+                                                                type="range"
+                                                                min="0"
+                                                                max="1"
+                                                                step="0.1"
+                                                                value={section.overlayOpacity === undefined ? 0.4 : section.overlayOpacity}
+                                                                onChange={(e) => updateSection({ overlayOpacity: parseFloat(e.target.value) })}
+                                                                className="w-full"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-xs text-gray-500 block mb-1">Image Size</label>
+                                                            <select
+                                                                value={section.backgroundSize || 'cover'}
+                                                                onChange={(e) => updateSection({ backgroundSize: e.target.value })}
+                                                                className="input-field py-1"
+                                                            >
+                                                                <option value="cover">Cover (Fill)</option>
+                                                                <option value="contain">Contain (Fit)</option>
+                                                                <option value="auto">Auto (Original)</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="border-t border-gray-200 pt-4">
+                                                <div className="flex justify-between items-center mb-4">
+                                                    <h4 className="font-bold text-lg">Content Blocks</h4>
+                                                    <div className="flex gap-2">
+                                                        <button onClick={() => addBlock('text')} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded flex items-center gap-1 transition-colors">
+                                                            <Plus size={14} /> Text
+                                                        </button>
+                                                        <button onClick={() => addBlock('image')} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded flex items-center gap-1 transition-colors">
+                                                            <Plus size={14} /> Image
+                                                        </button>
+                                                        <button onClick={() => addBlock('button')} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded flex items-center gap-1 transition-colors">
+                                                            <Plus size={14} /> Button
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-4">
+                                                    {(section.blocks || []).length === 0 && (
+                                                        <div className="text-center py-8 bg-gray-50 rounded border border-dashed border-gray-300 text-gray-400 text-sm">
+                                                            No content blocks yet. Add one above.
+                                                            {/* Backward compatibility: Show legacy content if blocks are empty but content exists */}
+                                                            {section.content && (
+                                                                <div className="mt-2 text-orange-500 text-xs bg-orange-50 p-2 inline-block rounded">
+                                                                    Legacy content detected. Add a text block and copy it over to migrate.
+                                                                    <div className="mt-1 font-mono text-left max-w-xs mx-auto overflow-hidden text-ellipsis whitespace-nowrap opacity-50">{section.content}</div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+
+                                                    {(section.blocks || []).map((block, idx) => (
+                                                        <div key={block.id} className="bg-gray-50 p-4 rounded border border-gray-200 relative group">
+                                                            <div className="absolute right-2 top-2 flex gap-1 opacity-100">
+                                                                <button onClick={() => moveBlock(idx, 'up')} disabled={idx === 0} className="p-1 hover:bg-gray-200 rounded disabled:opacity-30"><LucideIcons.ArrowUp size={14} /></button>
+                                                                <button onClick={() => moveBlock(idx, 'down')} disabled={idx === (section.blocks || []).length - 1} className="p-1 hover:bg-gray-200 rounded disabled:opacity-30"><LucideIcons.ArrowDown size={14} /></button>
+                                                                <button onClick={() => removeBlock(block.id)} className="p-1 hover:bg-red-100 text-red-500 rounded ml-2"><Trash2 size={14} /></button>
+                                                            </div>
+
+                                                            <div className="mb-2 uppercase text-[10px] font-bold text-gray-400 tracking-wider">
+                                                                {block.type} Block
+                                                            </div>
+
+                                                            {block.type === 'text' && (
+                                                                <div className="space-y-2">
+                                                                    <textarea
+                                                                        value={block.content}
+                                                                        onChange={(e) => updateBlock(block.id, 'content', e.target.value)}
+                                                                        className="input-field min-h-[100px]"
+                                                                        placeholder="Type your text content..."
+                                                                    />
+                                                                    <div className="flex gap-2">
+                                                                        <select value={block.align || 'left'} onChange={(e) => updateBlock(block.id, 'align', e.target.value)} className="input-field py-1 text-xs w-24">
+                                                                            <option value="left">Left</option>
+                                                                            <option value="center">Center</option>
+                                                                            <option value="justify">Justify</option>
+                                                                            <option value="right">Right</option>
+                                                                        </select>
+                                                                        <div className="flex items-center gap-1 border border-gray-200 rounded px-2 bg-white">
+                                                                            <div className="w-4 h-4 rounded-full border border-gray-200" style={{ backgroundColor: block.color || section.textColor || '#1A365D' }}></div>
+                                                                            <input type="color" value={block.color || section.textColor || '#1A365D'} onChange={(e) => updateBlock(block.id, 'color', e.target.value)} className="opacity-0 w-8 absolute cursor-pointer" />
+                                                                            <span className="text-xs text-gray-500 ml-6">Color</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                            {block.type === 'image' && (
+                                                                <div className="space-y-2">
+                                                                    <input
+                                                                        value={block.url}
+                                                                        onChange={(e) => updateBlock(block.id, 'url', e.target.value)}
+                                                                        className="input-field"
+                                                                        placeholder="Image URL (https://...)"
+                                                                    />
+                                                                    <div className="flex gap-2">
+                                                                        <input
+                                                                            value={block.width || '100%'}
+                                                                            onChange={(e) => updateBlock(block.id, 'width', e.target.value)}
+                                                                            className="input-field py-1 text-xs w-24"
+                                                                            placeholder="Width (e.g. 100%)"
+                                                                        />
+                                                                        <select value={block.align || 'center'} onChange={(e) => updateBlock(block.id, 'align', e.target.value)} className="input-field py-1 text-xs w-24">
+                                                                            <option value="left">Left</option>
+                                                                            <option value="center">Center</option>
+                                                                            <option value="right">Right</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    {block.url && <img src={block.url} alt="preview" className="h-20 object-contain mx-auto bg-white border border-gray-200 rounded p-1" />}
+                                                                </div>
+                                                            )}
+
+                                                            {block.type === 'button' && (
+                                                                <div className="space-y-2">
+                                                                    <div className="flex gap-2">
+                                                                        <input
+                                                                            value={block.content}
+                                                                            onChange={(e) => updateBlock(block.id, 'content', e.target.value)}
+                                                                            className="input-field flex-1"
+                                                                            placeholder="Button Label"
+                                                                        />
+                                                                        <select value={block.variant || 'solid'} onChange={(e) => updateBlock(block.id, 'variant', e.target.value)} className="input-field py-1 text-xs w-24">
+                                                                            <option value="solid">Solid</option>
+                                                                            <option value="outline">Outline</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div className="flex gap-2">
+                                                                        <input
+                                                                            value={block.link}
+                                                                            onChange={(e) => updateBlock(block.id, 'link', e.target.value)}
+                                                                            className="input-field flex-1"
+                                                                            placeholder="Link URL (/page or https://)"
+                                                                        />
+                                                                        <select value={block.align || 'center'} onChange={(e) => updateBlock(block.id, 'align', e.target.value)} className="input-field py-1 text-xs w-24">
+                                                                            <option value="left">Left</option>
+                                                                            <option value="center">Center</option>
+                                                                            <option value="right">Right</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div className="text-center p-2 bg-gray-100 rounded">
+                                                                        <button className={`px-4 py-2 text-sm uppercase tracking-wider font-bold transition-all ${block.variant === 'solid'
+                                                                            ? 'bg-[#1A365D] text-white'
+                                                                            : 'border border-[#1A365D] text-[#1A365D] bg-transparent'
+                                                                            }`}>
+                                                                            {block.content || 'Button'}
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </>
+                                    );
+                                })()}
+                            </div>
+                        )}
                     </div>
 
                     {/* Live Preview Pane */}
@@ -352,26 +712,26 @@ const HomeManager = () => {
 
                             {/* Focused Preview: Only show the currently active section */}
                             {activeTab === 'hero' && (
-                                <div key="hero" className="relative flex flex-col items-center justify-center p-8 shrink-0 text-center min-h-[500px] w-full" style={{ 
+                                <div key="hero" className="relative flex flex-col items-center justify-center p-8 shrink-0 text-center min-h-[500px] w-full" style={{
                                     background: 'linear-gradient(135deg, #F5F7FA 0%, #FFFFFF 50%, #F0F4F8 100%)',
-                                    paddingTop: '40px' 
+                                    paddingTop: '40px'
                                 }}>
                                     <div className="absolute inset-0 opacity-40 select-none pointer-events-none">
                                         <img src={klSkyline} className="w-full h-full object-cover" style={{ filter: 'contrast(1.1) brightness(1.05)' }} alt="bg" />
                                     </div>
-                                    <div className="absolute inset-0 pointer-events-none" style={{ 
+                                    <div className="absolute inset-0 pointer-events-none" style={{
                                         background: 'linear-gradient(160deg, rgba(255, 255, 255, 0.88) 0%, rgba(250, 251, 252, 0.75) 40%, rgba(245, 247, 250, 0.65) 100%)',
                                         zIndex: 1
                                     }} />
-                                    <div className="absolute left-0 top-[20%] bottom-[20%] w-[4px] pointer-events-none hidden md:block" style={{ 
+                                    <div className="absolute left-0 top-[20%] bottom-[20%] w-[4px] pointer-events-none hidden md:block" style={{
                                         background: 'linear-gradient(180deg, transparent, #B8860B 30%, #1A365D 70%, transparent)',
-                                        zIndex: 2 
+                                        zIndex: 2
                                     }} />
                                     <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
-                                        <h1 className="font-bold mb-6 leading-[1.05] text-[#1A365D]" style={{ 
-                                            fontSize: 'clamp(2rem, 5vw, 3.5rem)', 
+                                        <h1 className="font-bold mb-6 leading-[1.05] text-[#1A365D]" style={{
+                                            fontSize: 'clamp(2rem, 5vw, 3.5rem)',
                                             letterSpacing: '-1px',
-                                            fontFamily: 'serif' 
+                                            fontFamily: 'serif'
                                         }}>
                                             {formData.heroTitle.split('\n').map((line, i) => (
                                                 <span key={i}>
@@ -381,7 +741,7 @@ const HomeManager = () => {
                                             ))}
                                         </h1>
                                         <p className="text-[#1A365D] uppercase mb-6 font-medium text-sm md:text-lg" style={{ letterSpacing: '3px' }}>
-                                             {formData.heroSubtitle.split('•').map((part, i, arr) => (
+                                            {formData.heroSubtitle.split('•').map((part, i, arr) => (
                                                 <span key={i}>
                                                     <strong className="text-[#B8860B]">{part.trim()}</strong>
                                                     {i < arr.length - 1 && ' • '}
@@ -394,7 +754,7 @@ const HomeManager = () => {
                                         <div className="flex gap-4 justify-center flex-wrap">
                                             {formData.buttons.map(b => (
                                                 <div key={b.id} className={`px-6 py-3 text-sm font-bold uppercase tracking-wider transition-all cursor-default ${b.variant === 'solid'
-                                                    ? 'bg-[#1A365D] text-white hover:bg-[#08304e]' 
+                                                    ? 'bg-[#1A365D] text-white hover:bg-[#08304e]'
                                                     : 'border border-[#B8860B] text-[#B8860B] bg-transparent'
                                                     }`}
                                                     style={{ minWidth: '160px' }}
@@ -412,7 +772,7 @@ const HomeManager = () => {
                                     <div className="max-w-6xl mx-auto">
                                         <h2 className="text-[#1A365D] font-bold text-center mb-4 text-3xl font-serif">{formData.servicesTitle || 'Our Services'}</h2>
                                         <p className="text-gray-500 text-center mb-12 uppercase tracking-widest text-sm font-semibold">{formData.servicesSubtitle || 'Comprehensive financial solutions'}</p>
-                                        
+
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                                             {['Business Finance Consulting', 'Equity Financing', 'Real Estate Financing', 'REITs'].map((name, i) => (
                                                 <div key={i} className="bg-white p-6 rounded shadow-sm border border-gray-100 flex flex-col gap-4 group hover:shadow-md transition-shadow">
@@ -427,7 +787,7 @@ const HomeManager = () => {
                                             ))}
                                         </div>
                                         <div className="text-center mt-12">
-                                             <span className="text-[#B8860B] font-bold border-b-2 border-[#B8860B] pb-1 uppercase tracking-wider text-xs cursor-pointer">View All Services</span>
+                                            <span className="text-[#B8860B] font-bold border-b-2 border-[#B8860B] pb-1 uppercase tracking-wider text-xs cursor-pointer">View All Services</span>
                                         </div>
                                     </div>
                                 </div>
@@ -453,7 +813,74 @@ const HomeManager = () => {
                                     </div>
                                 </div>
                             )}
-                            
+
+                            {activeTab.startsWith('custom-') && (
+                                <div className="py-16 px-8 min-h-[500px] flex items-center justify-center relative overflow-hidden" style={{
+                                    backgroundColor: (formData.customSections?.find(s => s.id === activeTab)?.bgColor) || '#FFFFFF'
+                                }}>
+                                    {(() => {
+                                        const section = formData.customSections?.find(s => s.id === activeTab);
+                                        if (!section) return <div className="text-gray-400 italic">Select a section to preview</div>;
+
+                                        // Background Image
+                                        const bgImage = section.backgroundImage;
+
+                                        return (
+                                            <>
+                                                {bgImage && (
+                                                    <div className="absolute inset-0 z-0 pointer-events-none">
+                                                        <img src={bgImage} className="w-full h-full object-cover" alt="bg" />
+                                                        <div className="absolute inset-0 bg-black/40"></div>
+                                                    </div>
+                                                )}
+
+                                                <div className="max-w-4xl w-full relative z-10" style={{
+                                                    textAlign: section.textAlign || 'center',
+                                                    color: section.textColor || '#1A365D'
+                                                }}>
+                                                    <h2 className="text-3xl font-bold mb-8" style={{ color: 'inherit' }}>{section.title}</h2>
+
+                                                    {/* Blocks Render */}
+                                                    {(section.blocks?.length > 0) ? (
+                                                        <div className="space-y-6">
+                                                            {section.blocks.map(block => {
+                                                                if (block.type === 'image') {
+                                                                    return (
+                                                                        <div key={block.id} style={{ textAlign: block.align || 'center' }}>
+                                                                            {block.url ? (
+                                                                                <img
+                                                                                    src={block.url}
+                                                                                    alt={block.alt || 'section image'}
+                                                                                    style={{ width: block.width || '100%', maxWidth: '100%', display: 'inline-block' }}
+                                                                                />
+                                                                            ) : (
+                                                                                <div className="bg-gray-100 p-4 border border-dashed rounded text-gray-400 text-sm inline-block">Image Placeholder</div>
+                                                                            )}
+                                                                        </div>
+                                                                    );
+                                                                }
+                                                                // Text block
+                                                                return (
+                                                                    <div key={block.id} className="prose prose-lg max-w-none" style={{
+                                                                        textAlign: block.align || 'left',
+                                                                        color: block.color || 'inherit'
+                                                                    }}>
+                                                                        <div className="whitespace-pre-wrap">{block.content}</div>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    ) : (
+                                                        // Legacy Fallback
+                                                        <div className="whitespace-pre-wrap" style={{ color: 'inherit' }}>{section.content}</div>
+                                                    )}
+                                                </div>
+                                            </>
+                                        );
+                                    })()}
+                                </div>
+                            )}
+
                             <div className="absolute top-2 right-2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded opacity-50 uppercase tracking-widest pointer-events-none">
                                 {activeTab} Preview
                             </div>

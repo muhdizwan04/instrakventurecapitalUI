@@ -145,7 +145,7 @@ const ContactManager = () => {
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#08304e] transition-colors shadow-md font-medium disabled:opacity-50"
+                    className="btn-save"
                 >
                     {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                     <span>{saving ? 'Saving...' : 'Save Changes'}</span>
@@ -242,7 +242,7 @@ const ContactManager = () => {
                         <MapPin className="text-[var(--accent-primary)]" />
                         <h3 className="font-bold text-[var(--accent-primary)]">Contact Information</h3>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {/* Address */}
                         <div>
@@ -250,7 +250,7 @@ const ContactManager = () => {
                                 <label className="font-medium text-[var(--text-primary)]">Address</label>
                                 <button
                                     onClick={handleAddAddressLine}
-                                    className="text-xs bg-[var(--accent-primary)] text-white px-2 py-1 rounded hover:bg-[#08304e]"
+                                    className="btn-add px-2 py-1 text-xs"
                                 >
                                     + Line
                                 </button>
@@ -288,7 +288,7 @@ const ContactManager = () => {
                                 <label className="font-medium text-[var(--text-primary)]">Phones</label>
                                 <button
                                     onClick={handleAddPhone}
-                                    className="text-xs bg-[var(--accent-primary)] text-white px-2 py-1 rounded hover:bg-[#08304e]"
+                                    className="btn-add px-2 py-1 text-xs"
                                 >
                                     + Phone
                                 </button>

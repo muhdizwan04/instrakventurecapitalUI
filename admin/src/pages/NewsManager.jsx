@@ -94,18 +94,11 @@ const NewsManager = () => {
                 <div className="flex gap-3">
                     {view === 'list' && (
                         <>
-                            <button
-                                onClick={handleSaveAll}
-                                disabled={saving}
-                                className="flex items-center gap-2 px-4 py-2 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#08304e] transition-colors shadow-md disabled:opacity-50"
-                            >
+                            <button onClick={handleSaveAll} disabled={saving} className="btn-save">
                                 {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                                 <span>{saving ? 'Saving...' : 'Save All'}</span>
                             </button>
-                            <button
-                                onClick={handleCreate}
-                                className="flex items-center gap-2 px-4 py-2 border border-[var(--accent-primary)] text-[var(--accent-primary)] rounded-lg hover:bg-blue-50 transition-colors"
-                            >
+                            <button onClick={handleCreate} className="btn-add">
                                 <Plus size={18} />
                                 <span>New Article</span>
                             </button>
@@ -243,7 +236,7 @@ const NewsManager = () => {
                                     </div>
                                 </div>
                                 <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border-light)]">
-                                    <button type="submit" className="px-6 py-2 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#08304e] shadow-md flex items-center gap-2"><Save size={18} /> Push to Live</button>
+                                    <button type="submit" className="btn-save shadow-md flex items-center gap-2"><Save size={18} /> Push to Live</button>
                                 </div>
                             </form>
                         </div>

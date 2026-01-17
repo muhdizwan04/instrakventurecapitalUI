@@ -136,7 +136,7 @@ const InvestorsManager = () => {
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#08304e] transition-colors shadow-md font-medium disabled:opacity-50"
+                    className="btn-save"
                 >
                     {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                     <span>{saving ? 'Saving...' : 'Save Changes'}</span>
@@ -152,11 +152,10 @@ const InvestorsManager = () => {
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`px-6 py-3 font-medium transition-colors border-b-2 ${
-                            activeTab === tab.id
+                        className={`px-6 py-3 font-medium transition-colors border-b-2 ${activeTab === tab.id
                                 ? 'border-[var(--accent-primary)] text-[var(--accent-primary)]'
                                 : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                        }`}
+                            }`}
                     >
                         {tab.label}
                     </button>
@@ -224,7 +223,7 @@ const InvestorsManager = () => {
                                     <h3 className="font-bold text-[var(--accent-primary)]">Portfolio Items</h3>
                                     <button
                                         onClick={handleAddPortfolioItem}
-                                        className="text-xs bg-[var(--accent-primary)] text-white px-3 py-1.5 rounded hover:bg-[#08304e] flex items-center gap-1"
+                                        className="btn-add px-3 py-1.5 text-xs"
                                     >
                                         <Plus size={14} />
                                         Add Item
@@ -306,7 +305,7 @@ const InvestorsManager = () => {
                                         <label className="block text-sm font-medium text-[var(--text-secondary)]">Interest Options (Dropdown)</label>
                                         <button
                                             onClick={handleAddInterestOption}
-                                            className="text-xs bg-[var(--accent-primary)] text-white px-3 py-1.5 rounded hover:bg-[#08304e] flex items-center gap-1"
+                                            className="btn-add px-3 py-1.5 text-xs"
                                         >
                                             <Plus size={14} />
                                             Add

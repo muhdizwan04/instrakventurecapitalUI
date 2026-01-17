@@ -102,7 +102,7 @@ const FooterManager = () => {
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 px-6 py-2.5 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#08304e] transition-colors shadow-md font-medium disabled:opacity-50"
+                        className="btn-save"
                     >
                         {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                         <span>{saving ? 'Saving...' : 'Publish Changes'}</span>
@@ -183,12 +183,12 @@ const FooterManager = () => {
                             <h3 className="text-lg font-bold">Quick Links</h3>
                             <button
                                 onClick={handleAddLink}
-                                className="flex items-center gap-1 px-3 py-1.5 text-sm bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#08304e] transition-colors"
+                                className="btn-add px-3 py-1.5 text-sm"
                             >
                                 <Plus size={14} /> Add Link
                             </button>
                         </div>
-                        
+
                         <DragDropContext onDragEnd={handleDragEnd}>
                             <Droppable droppableId="quickLinks">
                                 {(provided) => (

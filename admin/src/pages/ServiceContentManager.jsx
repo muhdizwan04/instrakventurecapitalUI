@@ -342,104 +342,208 @@ const ServiceContentManager = () => {
     return (
         <DragDropContext onDragEnd={handleDragEnd}>
             <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <button
-                    onClick={() => setActiveService(null)}
-                    className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--accent-primary)]"
-                >
-                    <ArrowLeft size={18} /> Back to Services
-                </button>
-                <button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#08304e] transition-colors shadow-md font-medium disabled:opacity-50"
-                >
-                    {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-                    <span>{saving ? 'Saving...' : 'Save Changes'}</span>
-                </button>
-            </div>
+                <div className="flex justify-between items-center">
+                    <button
+                        onClick={() => setActiveService(null)}
+                        className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--accent-primary)]"
+                    >
+                        <ArrowLeft size={18} /> Back to Services
+                    </button>
+                    <button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="btn-save"
+                    >
+                        {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                        <span>{saving ? 'Saving...' : 'Save Changes'}</span>
+                    </button>
+                </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Left Column - Editor */}
-                <div className="glass-card p-6">
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 bg-blue-50 text-[var(--accent-primary)] rounded-lg flex items-center justify-center">
-                            <Icon size={24} />
-                        </div>
-                        <div>
-                            <h1 className="text-2xl font-bold text-[var(--accent-primary)]">{service.title}</h1>
-                            <p className="text-sm text-[var(--text-secondary)]">Edit page content and sections</p>
-                        </div>
-                    </div>
-
-                    {/* Hero Section */}
-                    <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
-                        <h3 className="font-bold text-[var(--text-primary)]">Page Hero</h3>
-                        <div className="grid grid-cols-1 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Page Title</label>
-                                <input
-                                    type="text"
-                                    value={service.title}
-                                    onChange={(e) => handleUpdateService(service.id, 'title', e.target.value)}
-                                    className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
-                                />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Left Column - Editor */}
+                    <div className="glass-card p-6">
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="w-12 h-12 bg-blue-50 text-[var(--accent-primary)] rounded-lg flex items-center justify-center">
+                                <Icon size={24} />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Subtitle</label>
-                                <textarea
-                                    rows={2}
-                                    value={service.subtitle}
-                                    onChange={(e) => handleUpdateService(service.id, 'subtitle', e.target.value)}
-                                    className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
-                                />
+                                <h1 className="text-2xl font-bold text-[var(--accent-primary)]">{service.title}</h1>
+                                <p className="text-sm text-[var(--text-secondary)]">Edit page content and sections</p>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Overview Section */}
-                    <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
-                        <h3 className="font-bold text-[var(--text-primary)]">Overview Section</h3>
-                        <div className="grid grid-cols-1 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Heading</label>
-                                <input
-                                    type="text"
-                                    value={service.overview?.heading || ''}
-                                    onChange={(e) => handleUpdateOverview(service.id, 'heading', e.target.value)}
-                                    className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Description</label>
-                                <textarea
-                                    rows={4}
-                                    value={service.overview?.description || ''}
-                                    onChange={(e) => handleUpdateOverview(service.id, 'description', e.target.value)}
-                                    className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Dynamic Sections based on service type */}
-                    {service.offerings && (
+                        {/* Hero Section */}
                         <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
-                            <div className="flex justify-between items-center">
-                                <h3 className="font-bold text-[var(--text-primary)]">Service Offerings</h3>
-                                <button
-                                    onClick={() => handleAddArrayItem(service.id, 'offerings', { title: 'New Offering', desc: 'Description...' })}
-                                    className="text-xs bg-[var(--accent-primary)] text-white px-3 py-1.5 rounded hover:bg-[#08304e] flex items-center gap-1"
-                                >
-                                    <Plus size={14} /> Add
-                                </button>
+                            <h3 className="font-bold text-[var(--text-primary)]">Page Hero</h3>
+                            <div className="grid grid-cols-1 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Page Title</label>
+                                    <input
+                                        type="text"
+                                        value={service.title}
+                                        onChange={(e) => handleUpdateService(service.id, 'title', e.target.value)}
+                                        className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Subtitle</label>
+                                    <textarea
+                                        rows={2}
+                                        value={service.subtitle}
+                                        onChange={(e) => handleUpdateService(service.id, 'subtitle', e.target.value)}
+                                        className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                                    />
+                                </div>
                             </div>
-                            <div className="space-y-3">
-                                <Droppable droppableId="offerings">
+                        </div>
+
+                        {/* Overview Section */}
+                        <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
+                            <h3 className="font-bold text-[var(--text-primary)]">Overview Section</h3>
+                            <div className="grid grid-cols-1 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Heading</label>
+                                    <input
+                                        type="text"
+                                        value={service.overview?.heading || ''}
+                                        onChange={(e) => handleUpdateOverview(service.id, 'heading', e.target.value)}
+                                        className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Description</label>
+                                    <textarea
+                                        rows={4}
+                                        value={service.overview?.description || ''}
+                                        onChange={(e) => handleUpdateOverview(service.id, 'description', e.target.value)}
+                                        className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Dynamic Sections based on service type */}
+                        {service.offerings && (
+                            <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
+                                <div className="flex justify-between items-center">
+                                    <h3 className="font-bold text-[var(--text-primary)]">Service Offerings</h3>
+                                    <button
+                                        onClick={() => handleAddArrayItem(service.id, 'offerings', { title: 'New Offering', desc: 'Description...' })}
+                                        className="btn-add px-3 py-1.5 text-xs"
+                                    >
+                                        <Plus size={14} /> Add
+                                    </button>
+                                </div>
+                                <div className="space-y-3">
+                                    <Droppable droppableId="offerings">
+                                        {(provided) => (
+                                            <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
+                                                {service.offerings.map((item, index) => (
+                                                    <Draggable key={index} draggableId={`offering-${index}`} index={index}>
+                                                        {(provided, snapshot) => (
+                                                            <div
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                className={`p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 ${snapshot.isDragging ? 'opacity-50' : ''}`}
+                                                            >
+                                                                <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab pt-2">
+                                                                    <GripVertical size={16} />
+                                                                </div>
+                                                                <div className="flex-1 space-y-2">
+                                                                    <input
+                                                                        type="text"
+                                                                        value={item.title}
+                                                                        onChange={(e) => handleUpdateArrayItem(service.id, 'offerings', index, 'title', e.target.value)}
+                                                                        className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium"
+                                                                        placeholder="Title"
+                                                                    />
+                                                                    <textarea
+                                                                        rows={2}
+                                                                        value={item.desc}
+                                                                        onChange={(e) => handleUpdateArrayItem(service.id, 'offerings', index, 'desc', e.target.value)}
+                                                                        className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm"
+                                                                        placeholder="Description"
+                                                                    />
+                                                                </div>
+                                                                <button
+                                                                    onClick={() => handleDeleteArrayItem(service.id, 'offerings', index)}
+                                                                    className="text-gray-400 hover:text-red-500 self-start pt-2"
+                                                                >
+                                                                    <Trash2 size={16} />
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </Draggable>
+                                                ))}
+                                                {provided.placeholder}
+                                            </div>
+                                        )}
+                                    </Droppable>
+                                </div>
+                            </div>
+                        )}
+
+                        {service.process && (
+                            <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
+                                <h3 className="font-bold text-[var(--text-primary)]">Process Steps</h3>
+                                <div className="space-y-3">
+                                    <Droppable droppableId="process">
+                                        {(provided) => (
+                                            <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
+                                                {service.process.map((item, index) => (
+                                                    <Draggable key={index} draggableId={`process-${index}`} index={index}>
+                                                        {(provided, snapshot) => (
+                                                            <div
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                className={`p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 items-center ${snapshot.isDragging ? 'opacity-50' : ''}`}
+                                                            >
+                                                                <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab">
+                                                                    <GripVertical size={16} />
+                                                                </div>
+                                                                <span className="w-10 h-10 bg-[var(--accent-primary)] text-white rounded-full flex items-center justify-center font-bold text-sm shrink-0">{item.step || item.num || index + 1}</span>
+                                                                <div className="flex-1 space-y-2">
+                                                                    <input
+                                                                        type="text"
+                                                                        value={item.title}
+                                                                        onChange={(e) => handleUpdateArrayItem(service.id, 'process', index, 'title', e.target.value)}
+                                                                        className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium"
+                                                                    />
+                                                                    <input
+                                                                        type="text"
+                                                                        value={item.desc}
+                                                                        onChange={(e) => handleUpdateArrayItem(service.id, 'process', index, 'desc', e.target.value)}
+                                                                        className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </Draggable>
+                                                ))}
+                                                {provided.placeholder}
+                                            </div>
+                                        )}
+                                    </Droppable>
+                                </div>
+                            </div>
+                        )}
+
+                        {service.services && (
+                            <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
+                                <div className="flex justify-between items-center">
+                                    <h3 className="font-bold text-[var(--text-primary)]">Sub-Services</h3>
+                                    <button
+                                        onClick={() => handleAddArrayItem(service.id, 'services', { title: 'New Service', desc: 'Description' })}
+                                        className="btn-add px-3 py-1.5 text-xs"
+                                    >
+                                        <Plus size={14} /> Add
+                                    </button>
+                                </div>
+                                <Droppable droppableId="services">
                                     {(provided) => (
                                         <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
-                                            {service.offerings.map((item, index) => (
-                                                <Draggable key={index} draggableId={`offering-${index}`} index={index}>
+                                            {service.services.map((item, index) => (
+                                                <Draggable key={index} draggableId={`service-${index}`} index={index}>
                                                     {(provided, snapshot) => (
                                                         <div
                                                             ref={provided.innerRef}
@@ -453,20 +557,20 @@ const ServiceContentManager = () => {
                                                                 <input
                                                                     type="text"
                                                                     value={item.title}
-                                                                    onChange={(e) => handleUpdateArrayItem(service.id, 'offerings', index, 'title', e.target.value)}
+                                                                    onChange={(e) => handleUpdateArrayItem(service.id, 'services', index, 'title', e.target.value)}
                                                                     className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium"
-                                                                    placeholder="Title"
+                                                                    placeholder="Service Title"
                                                                 />
                                                                 <textarea
                                                                     rows={2}
                                                                     value={item.desc}
-                                                                    onChange={(e) => handleUpdateArrayItem(service.id, 'offerings', index, 'desc', e.target.value)}
+                                                                    onChange={(e) => handleUpdateArrayItem(service.id, 'services', index, 'desc', e.target.value)}
                                                                     className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm"
                                                                     placeholder="Description"
                                                                 />
                                                             </div>
                                                             <button
-                                                                onClick={() => handleDeleteArrayItem(service.id, 'offerings', index)}
+                                                                onClick={() => handleDeleteArrayItem(service.id, 'services', index)}
                                                                 className="text-gray-400 hover:text-red-500 self-start pt-2"
                                                             >
                                                                 <Trash2 size={16} />
@@ -480,18 +584,16 @@ const ServiceContentManager = () => {
                                     )}
                                 </Droppable>
                             </div>
-                        </div>
-                    )}
+                        )}
 
-                    {service.process && (
-                        <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
-                            <h3 className="font-bold text-[var(--text-primary)]">Process Steps</h3>
-                            <div className="space-y-3">
-                                <Droppable droppableId="process">
+                        {service.roadmapStages && (
+                            <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
+                                <h3 className="font-bold text-[var(--text-primary)]">Roadmap Stages</h3>
+                                <Droppable droppableId="roadmapStages">
                                     {(provided) => (
                                         <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
-                                            {service.process.map((item, index) => (
-                                                <Draggable key={index} draggableId={`process-${index}`} index={index}>
+                                            {service.roadmapStages.map((item, index) => (
+                                                <Draggable key={index} draggableId={`stage-${index}`} index={index}>
                                                     {(provided, snapshot) => (
                                                         <div
                                                             ref={provided.innerRef}
@@ -501,19 +603,28 @@ const ServiceContentManager = () => {
                                                             <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab">
                                                                 <GripVertical size={16} />
                                                             </div>
-                                                            <span className="w-10 h-10 bg-[var(--accent-primary)] text-white rounded-full flex items-center justify-center font-bold text-sm shrink-0">{item.step || item.num || index + 1}</span>
-                                                            <div className="flex-1 space-y-2">
+                                                            <span className="w-8 h-8 bg-[var(--accent-primary)] text-white rounded-full flex items-center justify-center font-bold text-xs shrink-0">{item.stage}</span>
+                                                            <div className="flex-1 grid grid-cols-2 gap-2">
                                                                 <input
                                                                     type="text"
                                                                     value={item.title}
-                                                                    onChange={(e) => handleUpdateArrayItem(service.id, 'process', index, 'title', e.target.value)}
-                                                                    className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium"
+                                                                    onChange={(e) => handleUpdateArrayItem(service.id, 'roadmapStages', index, 'title', e.target.value)}
+                                                                    className="px-2 py-1 rounded border border-[var(--border-light)] text-sm font-medium"
+                                                                    placeholder="Stage Title"
                                                                 />
                                                                 <input
                                                                     type="text"
-                                                                    value={item.desc}
-                                                                    onChange={(e) => handleUpdateArrayItem(service.id, 'process', index, 'desc', e.target.value)}
-                                                                    className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm"
+                                                                    value={item.duration}
+                                                                    onChange={(e) => handleUpdateArrayItem(service.id, 'roadmapStages', index, 'duration', e.target.value)}
+                                                                    className="px-2 py-1 rounded border border-[var(--border-light)] text-sm"
+                                                                    placeholder="Duration"
+                                                                />
+                                                                <input
+                                                                    type="text"
+                                                                    value={item.investment}
+                                                                    onChange={(e) => handleUpdateArrayItem(service.id, 'roadmapStages', index, 'investment', e.target.value)}
+                                                                    className="px-2 py-1 rounded border border-[var(--border-light)] text-sm"
+                                                                    placeholder="Investment/Equity"
                                                                 />
                                                             </div>
                                                         </div>
@@ -525,402 +636,291 @@ const ServiceContentManager = () => {
                                     )}
                                 </Droppable>
                             </div>
-                        </div>
-                    )}
-
-                    {service.services && (
-                        <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
-                            <div className="flex justify-between items-center">
-                                <h3 className="font-bold text-[var(--text-primary)]">Sub-Services</h3>
-                                <button
-                                    onClick={() => handleAddArrayItem(service.id, 'services', { title: 'New Service', desc: 'Description' })}
-                                    className="text-xs bg-[var(--accent-primary)] text-white px-3 py-1.5 rounded hover:bg-[#08304e] flex items-center gap-1"
-                                >
-                                    <Plus size={14} /> Add
-                                </button>
-                            </div>
-                            <Droppable droppableId="services">
-                                {(provided) => (
-                                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
-                                        {service.services.map((item, index) => (
-                                            <Draggable key={index} draggableId={`service-${index}`} index={index}>
-                                                {(provided, snapshot) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        className={`p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 ${snapshot.isDragging ? 'opacity-50' : ''}`}
-                                                    >
-                                                        <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab pt-2">
-                                                            <GripVertical size={16} />
-                                                        </div>
-                                                        <div className="flex-1 space-y-2">
-                                                            <input
-                                                                type="text"
-                                                                value={item.title}
-                                                                onChange={(e) => handleUpdateArrayItem(service.id, 'services', index, 'title', e.target.value)}
-                                                                className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium"
-                                                                placeholder="Service Title"
-                                                            />
-                                                            <textarea
-                                                                rows={2}
-                                                                value={item.desc}
-                                                                onChange={(e) => handleUpdateArrayItem(service.id, 'services', index, 'desc', e.target.value)}
-                                                                className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm"
-                                                                placeholder="Description"
-                                                            />
-                                                        </div>
-                                                        <button
-                                                            onClick={() => handleDeleteArrayItem(service.id, 'services', index)}
-                                                            className="text-gray-400 hover:text-red-500 self-start pt-2"
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </div>
-                    )}
-
-                    {service.roadmapStages && (
-                        <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
-                            <h3 className="font-bold text-[var(--text-primary)]">Roadmap Stages</h3>
-                            <Droppable droppableId="roadmapStages">
-                                {(provided) => (
-                                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
-                                        {service.roadmapStages.map((item, index) => (
-                                            <Draggable key={index} draggableId={`stage-${index}`} index={index}>
-                                                {(provided, snapshot) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        className={`p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 items-center ${snapshot.isDragging ? 'opacity-50' : ''}`}
-                                                    >
-                                                        <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab">
-                                                            <GripVertical size={16} />
-                                                        </div>
-                                                        <span className="w-8 h-8 bg-[var(--accent-primary)] text-white rounded-full flex items-center justify-center font-bold text-xs shrink-0">{item.stage}</span>
-                                                        <div className="flex-1 grid grid-cols-2 gap-2">
-                                                            <input
-                                                                type="text"
-                                                                value={item.title}
-                                                                onChange={(e) => handleUpdateArrayItem(service.id, 'roadmapStages', index, 'title', e.target.value)}
-                                                                className="px-2 py-1 rounded border border-[var(--border-light)] text-sm font-medium"
-                                                                placeholder="Stage Title"
-                                                            />
-                                                            <input
-                                                                type="text"
-                                                                value={item.duration}
-                                                                onChange={(e) => handleUpdateArrayItem(service.id, 'roadmapStages', index, 'duration', e.target.value)}
-                                                                className="px-2 py-1 rounded border border-[var(--border-light)] text-sm"
-                                                                placeholder="Duration"
-                                                            />
-                                                            <input
-                                                                type="text"
-                                                                value={item.investment}
-                                                                onChange={(e) => handleUpdateArrayItem(service.id, 'roadmapStages', index, 'investment', e.target.value)}
-                                                                className="px-2 py-1 rounded border border-[var(--border-light)] text-sm"
-                                                                placeholder="Investment/Equity"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </div>
-                    )}
-
-                    {service.eligibleAwarders && (
-                        <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
-                            <h3 className="font-bold text-[var(--text-primary)]">Eligible Contract Awarders</h3>
-                            <Droppable droppableId="eligibleAwarders">
-                                {(provided) => (
-                                    <div {...provided.droppableProps} ref={provided.innerRef} className="grid grid-cols-2 gap-3">
-                                        {service.eligibleAwarders.map((item, index) => (
-                                            <Draggable key={index} draggableId={`eligibleAwarder-${index}`} index={index}>
-                                                {(provided, snapshot) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        className={`p-3 bg-[var(--bg-tertiary)] rounded-lg flex gap-2 ${snapshot.isDragging ? 'opacity-50' : ''}`}
-                                                    >
-                                                        <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab pt-1">
-                                                            <GripVertical size={16} />
-                                                        </div>
-                                                        <div className="flex-1">
-                                                            <input
-                                                                type="text"
-                                                                value={item.title}
-                                                                onChange={(e) => handleUpdateArrayItem(service.id, 'eligibleAwarders', index, 'title', e.target.value)}
-                                                                className="w-full px-2 py-1 rounded border border-[var(--border-light)] text-sm font-medium mb-1"
-                                                            />
-                                                            <input
-                                                                type="text"
-                                                                value={item.desc}
-                                                                onChange={(e) => handleUpdateArrayItem(service.id, 'eligibleAwarders', index, 'desc', e.target.value)}
-                                                                className="w-full px-2 py-1 rounded border border-[var(--border-light)] text-xs"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </div>
-                    )}
-
-                    {service.financingTerms && (
-                        <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
-                            <h3 className="font-bold text-[var(--text-primary)]">Financing Terms</h3>
-                            <Droppable droppableId="financingTerms">
-                                {(provided) => (
-                                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
-                                        {service.financingTerms.map((item, index) => (
-                                            <Draggable key={index} draggableId={`financingTerm-${index}`} index={index}>
-                                                {(provided, snapshot) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        className={`flex gap-2 items-center ${snapshot.isDragging ? 'opacity-50' : ''}`}
-                                                    >
-                                                        <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab">
-                                                            <GripVertical size={16} />
-                                                        </div>
-                                                        <input
-                                                            type="text"
-                                                            value={item.label}
-                                                            onChange={(e) => handleUpdateArrayItem(service.id, 'financingTerms', index, 'label', e.target.value)}
-                                                            className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm"
-                                                        />
-                                                        <input
-                                                            type="text"
-                                                            value={item.value}
-                                                            onChange={(e) => handleUpdateArrayItem(service.id, 'financingTerms', index, 'value', e.target.value)}
-                                                            className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium text-[var(--accent-secondary)]"
-                                                        />
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </div>
-                    )}
-
-                    {service.financingTypes && (
-                        <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
-                            <h3 className="font-bold text-[var(--text-primary)]">Financing Types</h3>
-                            <Droppable droppableId="financingTypes">
-                                {(provided) => (
-                                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
-                                        {service.financingTypes.map((item, index) => (
-                                            <Draggable key={index} draggableId={`fintype-${index}`} index={index}>
-                                                {(provided, snapshot) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        className={`p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 items-center ${snapshot.isDragging ? 'opacity-50' : ''}`}
-                                                    >
-                                                        <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab">
-                                                            <GripVertical size={16} />
-                                                        </div>
-                                                        <div className="flex-1 space-y-2">
-                                                            <input
-                                                                type="text"
-                                                                value={item.title}
-                                                                onChange={(e) => handleUpdateArrayItem(service.id, 'financingTypes', index, 'title', e.target.value)}
-                                                                className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium"
-                                                                placeholder="Title"
-                                                            />
-                                                            <input
-                                                                type="text"
-                                                                value={item.desc}
-                                                                onChange={(e) => handleUpdateArrayItem(service.id, 'financingTypes', index, 'desc', e.target.value)}
-                                                                className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm"
-                                                                placeholder="Description"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </div>
-                    )}
-
-                    {service.propertyTypes && (
-                        <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
-                            <h3 className="font-bold text-[var(--text-primary)]">Property Types</h3>
-                            <Droppable droppableId="propertyTypes">
-                                {(provided) => (
-                                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
-                                        {service.propertyTypes.map((item, index) => (
-                                            <Draggable key={index} draggableId={`proptype-${index}`} index={index}>
-                                                {(provided, snapshot) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        className={`p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 items-center ${snapshot.isDragging ? 'opacity-50' : ''}`}
-                                                    >
-                                                        <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab">
-                                                            <GripVertical size={16} />
-                                                        </div>
-                                                        <div className="flex-1 grid grid-cols-2 gap-2">
-                                                            <input
-                                                                type="text"
-                                                                value={item.type}
-                                                                onChange={(e) => handleUpdateArrayItem(service.id, 'propertyTypes', index, 'type', e.target.value)}
-                                                                className="px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium"
-                                                                placeholder="Type"
-                                                            />
-                                                            <input
-                                                                type="text"
-                                                                value={item.examples}
-                                                                onChange={(e) => handleUpdateArrayItem(service.id, 'propertyTypes', index, 'examples', e.target.value)}
-                                                                className="px-3 py-2 rounded border border-[var(--border-light)] text-sm"
-                                                                placeholder="Examples"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </div>
-                    )}
-
-                    {service.loanTerms && (
-                        <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
-                            <h3 className="font-bold text-[var(--text-primary)]">Loan Terms</h3>
-                            <Droppable droppableId="loanTerms">
-                                {(provided) => (
-                                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
-                                        {service.loanTerms.map((item, index) => (
-                                            <Draggable key={index} draggableId={`loanTerm-${index}`} index={index}>
-                                                {(provided, snapshot) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        className={`flex gap-2 items-center ${snapshot.isDragging ? 'opacity-50' : ''}`}
-                                                    >
-                                                        <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab">
-                                                            <GripVertical size={16} />
-                                                        </div>
-                                                        <input
-                                                            type="text"
-                                                            value={item.label}
-                                                            onChange={(e) => handleUpdateArrayItem(service.id, 'loanTerms', index, 'label', e.target.value)}
-                                                            className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm"
-                                                        />
-                                                        <input
-                                                            type="text"
-                                                            value={item.value}
-                                                            onChange={(e) => handleUpdateArrayItem(service.id, 'loanTerms', index, 'value', e.target.value)}
-                                                            className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium text-[var(--accent-secondary)]"
-                                                        />
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </div>
-                    )}
-
-                    {/* Form Fields Info */}
-                    <div className="space-y-4">
-                        <h3 className="font-bold text-[var(--text-primary)]">Form Fields (Read-only)</h3>
-                        <p className="text-sm text-[var(--text-muted)]">These fields are captured when users submit the form on this page:</p>
-                        <div className="flex flex-wrap gap-2">
-                            {service.formFields?.map((field, index) => (
-                                <span key={index} className="px-3 py-1 bg-[var(--bg-tertiary)] text-sm rounded-full text-[var(--text-secondary)]">{field}</span>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Right Column - Live Preview */}
-                <div className="glass-card p-0 overflow-hidden sticky top-6 max-h-[calc(100vh-120px)] overflow-y-auto">
-                    <div className="bg-gray-100 border-b p-2 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Live Preview</div>
-
-                    {/* Hero Preview */}
-                    <div className="bg-[#F5F7FA] py-8 px-6 text-center border-b-4 border-[#B8860B]">
-                        <h2 className="text-2xl font-bold mb-2 font-heading text-[#1A365D]">{service.title}</h2>
-                        <p className="text-sm text-gray-600">{service.subtitle}</p>
-                    </div>
-
-                    {/* Overview Preview */}
-                    <div className="p-6 bg-white">
-                        <h3 className="text-lg font-bold text-[#1A365D] mb-3">{service.overview?.heading || 'Overview'}</h3>
-                        <p className="text-sm text-gray-600 mb-4 leading-relaxed">{service.overview?.description?.substring(0, 150)}...</p>
-
-                        {service.overview?.highlights && (
-                            <ul className="text-xs text-gray-500 space-y-1">
-                                {service.overview.highlights.slice(0, 3).map((h, i) => (
-                                    <li key={i} className="flex items-center gap-2">
-                                        <span className="text-[#B8860B]">✓</span> {h}
-                                    </li>
-                                ))}
-                            </ul>
                         )}
+
+                        {service.eligibleAwarders && (
+                            <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
+                                <h3 className="font-bold text-[var(--text-primary)]">Eligible Contract Awarders</h3>
+                                <Droppable droppableId="eligibleAwarders">
+                                    {(provided) => (
+                                        <div {...provided.droppableProps} ref={provided.innerRef} className="grid grid-cols-2 gap-3">
+                                            {service.eligibleAwarders.map((item, index) => (
+                                                <Draggable key={index} draggableId={`eligibleAwarder-${index}`} index={index}>
+                                                    {(provided, snapshot) => (
+                                                        <div
+                                                            ref={provided.innerRef}
+                                                            {...provided.draggableProps}
+                                                            className={`p-3 bg-[var(--bg-tertiary)] rounded-lg flex gap-2 ${snapshot.isDragging ? 'opacity-50' : ''}`}
+                                                        >
+                                                            <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab pt-1">
+                                                                <GripVertical size={16} />
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <input
+                                                                    type="text"
+                                                                    value={item.title}
+                                                                    onChange={(e) => handleUpdateArrayItem(service.id, 'eligibleAwarders', index, 'title', e.target.value)}
+                                                                    className="w-full px-2 py-1 rounded border border-[var(--border-light)] text-sm font-medium mb-1"
+                                                                />
+                                                                <input
+                                                                    type="text"
+                                                                    value={item.desc}
+                                                                    onChange={(e) => handleUpdateArrayItem(service.id, 'eligibleAwarders', index, 'desc', e.target.value)}
+                                                                    className="w-full px-2 py-1 rounded border border-[var(--border-light)] text-xs"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ))}
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+                            </div>
+                        )}
+
+                        {service.financingTerms && (
+                            <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
+                                <h3 className="font-bold text-[var(--text-primary)]">Financing Terms</h3>
+                                <Droppable droppableId="financingTerms">
+                                    {(provided) => (
+                                        <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                                            {service.financingTerms.map((item, index) => (
+                                                <Draggable key={index} draggableId={`financingTerm-${index}`} index={index}>
+                                                    {(provided, snapshot) => (
+                                                        <div
+                                                            ref={provided.innerRef}
+                                                            {...provided.draggableProps}
+                                                            className={`flex gap-2 items-center ${snapshot.isDragging ? 'opacity-50' : ''}`}
+                                                        >
+                                                            <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab">
+                                                                <GripVertical size={16} />
+                                                            </div>
+                                                            <input
+                                                                type="text"
+                                                                value={item.label}
+                                                                onChange={(e) => handleUpdateArrayItem(service.id, 'financingTerms', index, 'label', e.target.value)}
+                                                                className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm"
+                                                            />
+                                                            <input
+                                                                type="text"
+                                                                value={item.value}
+                                                                onChange={(e) => handleUpdateArrayItem(service.id, 'financingTerms', index, 'value', e.target.value)}
+                                                                className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium text-[var(--accent-secondary)]"
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ))}
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+                            </div>
+                        )}
+
+                        {service.financingTypes && (
+                            <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
+                                <h3 className="font-bold text-[var(--text-primary)]">Financing Types</h3>
+                                <Droppable droppableId="financingTypes">
+                                    {(provided) => (
+                                        <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
+                                            {service.financingTypes.map((item, index) => (
+                                                <Draggable key={index} draggableId={`fintype-${index}`} index={index}>
+                                                    {(provided, snapshot) => (
+                                                        <div
+                                                            ref={provided.innerRef}
+                                                            {...provided.draggableProps}
+                                                            className={`p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 items-center ${snapshot.isDragging ? 'opacity-50' : ''}`}
+                                                        >
+                                                            <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab">
+                                                                <GripVertical size={16} />
+                                                            </div>
+                                                            <div className="flex-1 space-y-2">
+                                                                <input
+                                                                    type="text"
+                                                                    value={item.title}
+                                                                    onChange={(e) => handleUpdateArrayItem(service.id, 'financingTypes', index, 'title', e.target.value)}
+                                                                    className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium"
+                                                                    placeholder="Title"
+                                                                />
+                                                                <input
+                                                                    type="text"
+                                                                    value={item.desc}
+                                                                    onChange={(e) => handleUpdateArrayItem(service.id, 'financingTypes', index, 'desc', e.target.value)}
+                                                                    className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm"
+                                                                    placeholder="Description"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ))}
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+                            </div>
+                        )}
+
+                        {service.propertyTypes && (
+                            <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
+                                <h3 className="font-bold text-[var(--text-primary)]">Property Types</h3>
+                                <Droppable droppableId="propertyTypes">
+                                    {(provided) => (
+                                        <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
+                                            {service.propertyTypes.map((item, index) => (
+                                                <Draggable key={index} draggableId={`proptype-${index}`} index={index}>
+                                                    {(provided, snapshot) => (
+                                                        <div
+                                                            ref={provided.innerRef}
+                                                            {...provided.draggableProps}
+                                                            className={`p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 items-center ${snapshot.isDragging ? 'opacity-50' : ''}`}
+                                                        >
+                                                            <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab">
+                                                                <GripVertical size={16} />
+                                                            </div>
+                                                            <div className="flex-1 grid grid-cols-2 gap-2">
+                                                                <input
+                                                                    type="text"
+                                                                    value={item.type}
+                                                                    onChange={(e) => handleUpdateArrayItem(service.id, 'propertyTypes', index, 'type', e.target.value)}
+                                                                    className="px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium"
+                                                                    placeholder="Type"
+                                                                />
+                                                                <input
+                                                                    type="text"
+                                                                    value={item.examples}
+                                                                    onChange={(e) => handleUpdateArrayItem(service.id, 'propertyTypes', index, 'examples', e.target.value)}
+                                                                    className="px-3 py-2 rounded border border-[var(--border-light)] text-sm"
+                                                                    placeholder="Examples"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ))}
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+                            </div>
+                        )}
+
+                        {service.loanTerms && (
+                            <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
+                                <h3 className="font-bold text-[var(--text-primary)]">Loan Terms</h3>
+                                <Droppable droppableId="loanTerms">
+                                    {(provided) => (
+                                        <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                                            {service.loanTerms.map((item, index) => (
+                                                <Draggable key={index} draggableId={`loanTerm-${index}`} index={index}>
+                                                    {(provided, snapshot) => (
+                                                        <div
+                                                            ref={provided.innerRef}
+                                                            {...provided.draggableProps}
+                                                            className={`flex gap-2 items-center ${snapshot.isDragging ? 'opacity-50' : ''}`}
+                                                        >
+                                                            <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab">
+                                                                <GripVertical size={16} />
+                                                            </div>
+                                                            <input
+                                                                type="text"
+                                                                value={item.label}
+                                                                onChange={(e) => handleUpdateArrayItem(service.id, 'loanTerms', index, 'label', e.target.value)}
+                                                                className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm"
+                                                            />
+                                                            <input
+                                                                type="text"
+                                                                value={item.value}
+                                                                onChange={(e) => handleUpdateArrayItem(service.id, 'loanTerms', index, 'value', e.target.value)}
+                                                                className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium text-[var(--accent-secondary)]"
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ))}
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+                            </div>
+                        )}
+
+                        {/* Form Fields Info */}
+                        <div className="space-y-4">
+                            <h3 className="font-bold text-[var(--text-primary)]">Form Fields (Read-only)</h3>
+                            <p className="text-sm text-[var(--text-muted)]">These fields are captured when users submit the form on this page:</p>
+                            <div className="flex flex-wrap gap-2">
+                                {service.formFields?.map((field, index) => (
+                                    <span key={index} className="px-3 py-1 bg-[var(--bg-tertiary)] text-sm rounded-full text-[var(--text-secondary)]">{field}</span>
+                                ))}
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Offerings Preview */}
-                    {service.offerings && (
-                        <div className="p-6 bg-[#F5F7FA]">
-                            <h3 className="text-sm font-bold text-[#1A365D] mb-3">What We Offer</h3>
-                            <div className="grid grid-cols-2 gap-2">
-                                {service.offerings.slice(0, 4).map((o, i) => (
-                                    <div key={i} className="bg-white p-2 rounded shadow-sm text-[10px]">
-                                        <div className="font-medium text-[#1A365D]">{o.title}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                    {/* Right Column - Live Preview */}
+                    <div className="glass-card p-0 overflow-hidden sticky top-6 max-h-[calc(100vh-120px)] overflow-y-auto">
+                        <div className="bg-gray-100 border-b p-2 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Live Preview</div>
 
-                    {/* Process Preview */}
-                    {service.process && (
+                        {/* Hero Preview */}
+                        <div className="bg-[#F5F7FA] py-8 px-6 text-center border-b-4 border-[#B8860B]">
+                            <h2 className="text-2xl font-bold mb-2 font-heading text-[#1A365D]">{service.title}</h2>
+                            <p className="text-sm text-gray-600">{service.subtitle}</p>
+                        </div>
+
+                        {/* Overview Preview */}
                         <div className="p-6 bg-white">
-                            <h3 className="text-sm font-bold text-[#1A365D] mb-3">Our Process</h3>
-                            <div className="flex gap-2 flex-wrap">
-                                {service.process.map((p, i) => (
-                                    <div key={i} className="flex items-center gap-1 text-[10px]">
-                                        <span className="w-5 h-5 bg-[#B8860B] text-white rounded-full flex items-center justify-center font-bold">{p.step}</span>
-                                        <span className="text-[#1A365D]">{p.title}</span>
-                                        {i < service.process.length - 1 && <span className="text-gray-300">→</span>}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                            <h3 className="text-lg font-bold text-[#1A365D] mb-3">{service.overview?.heading || 'Overview'}</h3>
+                            <p className="text-sm text-gray-600 mb-4 leading-relaxed">{service.overview?.description?.substring(0, 150)}...</p>
 
-                    <p className="text-[10px] text-center text-gray-400 p-4 bg-gray-50">
-                        Changes sync to client after saving
-                    </p>
+                            {service.overview?.highlights && (
+                                <ul className="text-xs text-gray-500 space-y-1">
+                                    {service.overview.highlights.slice(0, 3).map((h, i) => (
+                                        <li key={i} className="flex items-center gap-2">
+                                            <span className="text-[#B8860B]">✓</span> {h}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+
+                        {/* Offerings Preview */}
+                        {service.offerings && (
+                            <div className="p-6 bg-[#F5F7FA]">
+                                <h3 className="text-sm font-bold text-[#1A365D] mb-3">What We Offer</h3>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {service.offerings.slice(0, 4).map((o, i) => (
+                                        <div key={i} className="bg-white p-2 rounded shadow-sm text-[10px]">
+                                            <div className="font-medium text-[#1A365D]">{o.title}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Process Preview */}
+                        {service.process && (
+                            <div className="p-6 bg-white">
+                                <h3 className="text-sm font-bold text-[#1A365D] mb-3">Our Process</h3>
+                                <div className="flex gap-2 flex-wrap">
+                                    {service.process.map((p, i) => (
+                                        <div key={i} className="flex items-center gap-1 text-[10px]">
+                                            <span className="w-5 h-5 bg-[#B8860B] text-white rounded-full flex items-center justify-center font-bold">{p.step}</span>
+                                            <span className="text-[#1A365D]">{p.title}</span>
+                                            {i < service.process.length - 1 && <span className="text-gray-300">→</span>}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <p className="text-[10px] text-center text-gray-400 p-4 bg-gray-50">
+                            Changes sync to client after saving
+                        </p>
+                    </div>
                 </div>
-            </div>
             </div>
         </DragDropContext>
     );

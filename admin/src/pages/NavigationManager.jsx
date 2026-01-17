@@ -12,22 +12,22 @@ const NavigationManager = () => {
         },
         items: [
             { id: 'nav-1', label: 'Home', link: '/', isDropdown: false, children: [] },
-            { 
-                id: 'nav-2', 
-                label: 'About Us', 
-                link: '/about', 
-                isDropdown: true, 
+            {
+                id: 'nav-2',
+                label: 'About Us',
+                link: '/about',
+                isDropdown: true,
                 children: [
                     { id: 'sub-1', label: 'Mission, Vision & Values', link: '/about#mission' },
                     { id: 'sub-2', label: 'Board of Directors', link: '/about#board' },
                     { id: 'sub-3', label: 'Strategic Partners', link: '/about#partners' }
                 ]
             },
-            { 
-                id: 'nav-3', 
-                label: 'Services', 
-                link: '/services', 
-                isDropdown: true, 
+            {
+                id: 'nav-3',
+                label: 'Services',
+                link: '/services',
+                isDropdown: true,
                 children: [
                     { id: 'sub-4', label: 'Strategic Financing', link: '/services' },
                     { id: 'sub-5', label: 'Institutional Investors', link: '/investors' }
@@ -86,8 +86,8 @@ const NavigationManager = () => {
         const newSubItem = { id: `sub-${Date.now()}`, label: 'New Sub-Link', link: '/' };
         setFormData(prev => ({
             ...prev,
-            items: prev.items.map(item => 
-                item.id === parentId 
+            items: prev.items.map(item =>
+                item.id === parentId
                     ? { ...item, children: [...item.children, newSubItem] }
                     : item
             )
@@ -159,7 +159,7 @@ const NavigationManager = () => {
                 <div className="flex gap-3">
                     <button
                         onClick={handleAddItem}
-                        className="flex items-center gap-2 px-4 py-2 border border-[var(--accent-primary)] text-[var(--accent-primary)] rounded-lg hover:bg-blue-50 transition-colors"
+                        className="btn-add"
                     >
                         <Plus size={18} />
                         <span>Add Nav Item</span>
@@ -167,11 +167,31 @@ const NavigationManager = () => {
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 px-6 py-2.5 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#08304e] transition-colors shadow-md font-medium disabled:opacity-50"
+                        className="btn-save"
                     >
                         {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                         <span>{saving ? 'Saving...' : 'Save Navigation'}</span>
                     </button>
+                </div>
+            </div>
+
+            {/* Live Preview */}
+            <div className="glass-card p-0 overflow-hidden mb-8">
+                <div className="bg-gray-100 p-2 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Navigation Preview</div>
+                <div className="bg-[#1A365D] p-4">
+                    <div className="flex items-center justify-between max-w-6xl mx-auto">
+                        <div className="text-white font-bold">{formData.logo?.alt || 'Logo'}</div>
+                        <div className="flex items-center gap-6">
+                            {formData.items.map(item => (
+                                <div key={item.id} className="relative group">
+                                    <span className={`text-white text-sm ${item.isButton ? 'bg-[#B8860B] px-4 py-2 rounded' : ''} cursor-pointer hover:text-[#B8860B]`}>
+                                        {item.label}
+                                        {item.isDropdown && <ChevronDown size={14} className="inline ml-1" />}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -282,7 +302,7 @@ const NavigationManager = () => {
                                                             <span className="text-sm font-medium text-[var(--text-secondary)]">Dropdown Items</span>
                                                             <button
                                                                 onClick={() => handleAddSubItem(item.id)}
-                                                                className="text-xs bg-[var(--accent-primary)] text-white px-3 py-1.5 rounded hover:bg-[#08304e] flex items-center gap-1"
+                                                                className="btn-add px-3 py-1.5 text-xs"
                                                             >
                                                                 <Plus size={14} />
                                                                 Add Sub-Item
@@ -344,26 +364,6 @@ const NavigationManager = () => {
                         )}
                     </Droppable>
                 </DragDropContext>
-            </div>
-
-            {/* Live Preview */}
-            <div className="glass-card p-0 overflow-hidden">
-                <div className="bg-gray-100 p-2 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Navigation Preview</div>
-                <div className="bg-[#1A365D] p-4">
-                    <div className="flex items-center justify-between max-w-6xl mx-auto">
-                        <div className="text-white font-bold">{formData.logo?.alt || 'Logo'}</div>
-                        <div className="flex items-center gap-6">
-                            {formData.items.map(item => (
-                                <div key={item.id} className="relative group">
-                                    <span className={`text-white text-sm ${item.isButton ? 'bg-[#B8860B] px-4 py-2 rounded' : ''} cursor-pointer hover:text-[#B8860B]`}>
-                                        {item.label}
-                                        {item.isDropdown && <ChevronDown size={14} className="inline ml-1" />}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     );

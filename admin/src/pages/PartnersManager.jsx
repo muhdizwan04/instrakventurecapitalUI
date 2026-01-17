@@ -130,7 +130,7 @@ const PartnersManager = () => {
                         <span>Loading...</span>
                     </div>
                 ) : (
-                    <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#08304e] transition-colors shadow-md font-medium disabled:opacity-50">
+                    <button onClick={handleSave} disabled={saving} className="btn-save">
                         {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                         <span>{saving ? 'Saving...' : 'Save Changes'}</span>
                     </button>
@@ -163,7 +163,9 @@ const PartnersManager = () => {
                         <div className="glass-card p-6 border-l-4 border-l-blue-600">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-xl font-bold text-[var(--accent-primary)] flex items-center gap-2"><Handshake size={20} /> Strategic Partners</h2>
-                                <button onClick={handleAddPartner} className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded hover:bg-blue-100 font-bold flex items-center gap-1"><Plus size={14} /> Add</button>
+                                <button onClick={handleAddPartner} className="btn-add px-3 py-1.5 text-xs">
+                                    <Plus size={14} /> Add
+                                </button>
                             </div>
                             <Droppable droppableId="partners-list">
                                 {(provided) => (
@@ -202,7 +204,9 @@ const PartnersManager = () => {
                         <div className="glass-card p-6 border-l-4 border-l-green-600">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-xl font-bold text-[var(--accent-primary)] flex items-center gap-2"><Building2 size={20} /> Banking Partners</h2>
-                                <button onClick={handleAddBank} className="text-xs bg-green-50 text-green-600 px-3 py-1.5 rounded hover:bg-green-100 font-bold flex items-center gap-1"><Plus size={14} /> Add</button>
+                                <button onClick={handleAddBank} className="btn-add px-3 py-1.5 text-xs">
+                                    <Plus size={14} /> Add
+                                </button>
                             </div>
                             <Droppable droppableId="banks-list">
                                 {(provided) => (
@@ -266,7 +270,9 @@ const PartnersManager = () => {
                         <div className="glass-card p-6 border-l-4 border-l-gray-600">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-xl font-bold text-[var(--accent-primary)] flex items-center gap-2"><LayoutTemplate size={20} /> Custom Sections (Bottom)</h2>
-                                <button onClick={handleAddCustomSection} className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded hover:bg-gray-200 font-bold flex items-center gap-1"><Plus size={14} /> Add Title Section</button>
+                                <button onClick={handleAddCustomSection} className="btn-add px-3 py-1.5 text-xs">
+                                    <Plus size={14} /> Add Title Section
+                                </button>
                             </div>
                             <Droppable droppableId="custom-sections-list">
                                 {(provided) => (

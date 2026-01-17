@@ -33,7 +33,7 @@ const SidebarItem = ({ icon: Icon, label, path }) => {
     return (
         <Link
             to={path}
-            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 group ${active
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 group w-full box-border whitespace-nowrap overflow-hidden ${active
                 ? 'bg-[#1A365D] shadow-md'
                 : 'hover:bg-gray-100'
                 }`}
@@ -76,18 +76,17 @@ const Layout = () => {
     const linkToAdminItem = {
         '/': { icon: Home, label: "Home Page", path: "/home", section: 'Pages' },
         '/mission-vision-values': { icon: User, label: "About Us", path: "/about", section: 'Pages' },
-        '/board-of-directors': { icon: Users, label: "Board of Directors", path: "/board", section: 'Pages' },
-        '/strategic-partners': { icon: Handshake, label: "Partners & Trust", path: "/partners", section: 'Pages' },
+
         '/investors': { icon: DollarSign, label: "Investors", path: "/investors", section: 'Pages' },
         '/services': { icon: Briefcase, label: "Services", path: "/services", section: 'Services' },
         '/latest-news-2': { icon: Newspaper, label: "News & Events", path: "/news", section: 'Content' },
-        '/join-us': { icon: Calendar, label: "Careers", path: "/career", section: 'Content' },
         '/project-listings': { icon: Building2, label: "Project Listing", path: "/projects", section: 'Pages' },
     };
 
     // Other items that might not be in the nav but we want to show
     const fixedAdminItems = {
         '/service-pages': { icon: FileText, label: "Service Pages", path: "/service-pages", section: 'Services' },
+        '/careers': { icon: Calendar, label: "Careers", path: "/career", section: 'Content' },
         '/inquiries': { icon: MessageSquare, label: "Inquiries", path: "/inquiries", section: 'Content' },
     };
 
@@ -133,7 +132,7 @@ const Layout = () => {
 
             {/* Sidebar */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 w-60 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 w-60 shrink-0 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
                     } lg:relative lg:translate-x-0 overflow-y-auto`}
             >
                 {/* Logo */}

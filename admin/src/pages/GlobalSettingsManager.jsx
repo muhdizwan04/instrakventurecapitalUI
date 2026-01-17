@@ -94,7 +94,7 @@ const GlobalSettingsManager = () => {
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#08304e] transition-colors shadow-md font-medium disabled:opacity-50"
+                    className="btn-save"
                 >
                     {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                     <span>{saving ? 'Saving...' : 'Save Settings'}</span>
@@ -107,11 +107,10 @@ const GlobalSettingsManager = () => {
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors border-b-2 ${
-                            activeTab === tab.id
+                        className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors border-b-2 ${activeTab === tab.id
                                 ? 'border-[var(--accent-primary)] text-[var(--accent-primary)]'
                                 : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                        }`}
+                            }`}
                     >
                         <tab.icon size={18} />
                         {tab.label}
@@ -127,7 +126,7 @@ const GlobalSettingsManager = () => {
 
                         <div className="space-y-2">
                             <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Site Logo</label>
-                            <ImageUpload 
+                            <ImageUpload
                                 value={formData.siteIdentity.logoUrl}
                                 onChange={(val) => handleChange('siteIdentity', 'logoUrl', val)}
                                 aspectRatio="16/9"
@@ -137,7 +136,7 @@ const GlobalSettingsManager = () => {
                         </div>
                         <div className="space-y-2">
                             <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Favicon (32x32)</label>
-                            <ImageUpload 
+                            <ImageUpload
                                 value={formData.siteIdentity.faviconUrl}
                                 onChange={(val) => handleChange('siteIdentity', 'faviconUrl', val)}
                                 aspectRatio="1/1"

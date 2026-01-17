@@ -40,15 +40,15 @@ const ProjectListingManager = () => {
     };
 
     const handleCreate = () => {
-        setEditingProject({ 
-            id: Date.now(), 
-            title: '', 
-            location: '', 
-            category: 'Infrastructure', 
-            description: '', 
-            imageUrl: '', 
-            valuation: '', 
-            status: 'Initial Development' 
+        setEditingProject({
+            id: Date.now(),
+            title: '',
+            location: '',
+            category: 'Infrastructure',
+            description: '',
+            imageUrl: '',
+            valuation: '',
+            status: 'Initial Development'
         });
         setView('edit');
     };
@@ -103,18 +103,11 @@ const ProjectListingManager = () => {
                 </div>
                 {view === 'list' && (
                     <div className="flex gap-3">
-                        <button
-                            onClick={handleSaveAll}
-                            disabled={saving}
-                            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md disabled:opacity-50"
-                        >
+                        <button onClick={handleSaveAll} disabled={saving} className="btn-save">
                             {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                             <span>{saving ? 'Saving...' : 'Save Changes'}</span>
                         </button>
-                        <button
-                            onClick={handleCreate}
-                            className="flex items-center gap-2 px-4 py-2 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#08304e] transition-colors shadow-md"
-                        >
+                        <button onClick={handleCreate} className="btn-add">
                             <Plus size={18} />
                             <span>Add New Project</span>
                         </button>
@@ -325,7 +318,7 @@ const ProjectListingManager = () => {
                             </button>
                             <button
                                 type="submit"
-                                className="px-8 py-3 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#08304e] shadow-md flex items-center gap-2 transition-colors font-bold"
+                                className="btn-add px-8 py-3 shadow-md flex items-center gap-2 transition-colors font-bold"
                             >
                                 <Plus size={18} /> Add to List
                             </button>

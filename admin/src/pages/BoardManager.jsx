@@ -82,18 +82,11 @@ const BoardManager = () => {
                     <p className="text-[var(--text-secondary)]">Manage leadership profiles. Drag and drop to reorder.</p>
                 </div>
                 <div className="flex gap-3">
-                    <button
-                        onClick={handleAdd}
-                        className="flex items-center gap-2 px-4 py-2 border border-[var(--border-light)] bg-white text-[var(--text-primary)] rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium"
-                    >
+                    <button onClick={handleAdd} className="btn-add">
                         <Plus size={18} />
                         <span>Add Director</span>
                     </button>
-                    <button
-                        onClick={handleSave}
-                        disabled={saving}
-                        className="flex items-center gap-2 px-6 py-2 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#08304e] transition-colors shadow-md font-medium disabled:opacity-50"
-                    >
+                    <button onClick={handleSave} disabled={saving} className="btn-save">
                         {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                         <span>{saving ? 'Saving...' : 'Save Changes'}</span>
                     </button>

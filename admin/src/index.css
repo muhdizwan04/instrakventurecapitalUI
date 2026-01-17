@@ -4,6 +4,24 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent transition-all duration-200 text-sm;
+  }
+
+  .label {
+    @apply block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2;
+  }
+
+  .btn-save {
+    @apply flex items-center gap-2 px-6 py-2.5 bg-[#22c55e] text-white rounded-lg hover:bg-[#16a34a] transition-all shadow-md font-medium disabled:opacity-50;
+  }
+
+  .btn-add {
+    @apply flex items-center gap-2 px-4 py-2.5 bg-[#1A365D] text-white rounded-lg hover:bg-[#08304e] transition-all shadow-md font-medium;
+  }
+}
+
 :root {
   /* Colors - Premium VVIP Light Theme */
   --bg-primary: #FFFFFF;

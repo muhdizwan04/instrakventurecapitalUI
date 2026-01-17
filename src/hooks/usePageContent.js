@@ -1,54 +1,42 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useQueries } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 
 /**
  * Hook for fetching page content on client-side
  * @param {string} contentId - Unique identifier for the content
- * @param {object} defaultContent - Fallback content if database fetch fails
+ * @param {object} defaultContent - Fallback content if database fetch fails or while loading
  * @param {object} options - Options object
  * @param {boolean} options.forceDefaults - If true, skip database and use defaults
  */
 export const usePageContent = (contentId, defaultContent = {}, options = {}) => {
     const { forceDefaults = false } = options;
-    const [content, setContent] = useState(defaultContent);
-    const [loading, setLoading] = useState(!forceDefaults);
-    const [error, setError] = useState(null);
 
-    useEffect(() => {
-        // Skip database fetch if forceDefaults is true
-        if (forceDefaults) {
-            setLoading(false);
-            return;
-        }
+    const { data: content, isLoading: loading, error } = useQuery({
+        queryKey: ['site_content', contentId],
+        queryFn: async () => {
+            const { data, error: fetchError } = await supabase
+                .from('site_content')
+                .select('content')
+                .eq('id', contentId)
+                .single();
 
-        const fetchContent = async () => {
-            try {
-                const { data, error: fetchError } = await supabase
-                    .from('site_content')
-                    .select('content')
-                    .eq('id', contentId)
-                    .single();
-
-                if (fetchError && fetchError.code !== 'PGRST116') {
-                    throw fetchError;
-                }
-
-                if (data?.content) {
-                    setContent(data.content);
-                }
-            } catch (err) {
-                console.error('Error fetching content:', err);
-                setError(err);
-                // Keep using default content on error
-            } finally {
-                setLoading(false);
+            if (fetchError && fetchError.code !== 'PGRST116') {
+                throw fetchError;
             }
-        };
 
-        fetchContent();
-    }, [contentId, forceDefaults]);
+            return data?.content || defaultContent;
+        },
+        enabled: !forceDefaults,
+        placeholderData: defaultContent, // Show default content immediately while background fetching
+        staleTime: 0, // Disable cache for immediate updates
+        refetchOnWindowFocus: true
+    });
 
-    return { content, loading, error };
+    // If forceDefaults is true, we just return the default content and not loading
+    const finalContent = forceDefaults ? defaultContent : (content || defaultContent);
+    const finalLoading = forceDefaults ? false : loading;
+
+    return { content: finalContent, loading: finalLoading, error };
 };
 
 /**
@@ -57,39 +45,36 @@ export const usePageContent = (contentId, defaultContent = {}, options = {}) => 
  * @param {object} defaults - Object with default content keyed by contentId
  */
 export const useMultipleContent = (contentIds, defaults = {}) => {
-    const [contents, setContents] = useState(defaults);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchAllContent = async () => {
-            try {
+    // using useQueries for parallel fetching with individual caching
+    const queries = useQueries({
+        queries: contentIds.map(id => ({
+            queryKey: ['site_content', id],
+            queryFn: async () => {
                 const { data, error } = await supabase
                     .from('site_content')
-                    .select('id, content')
-                    .in('id', contentIds);
+                    .select('content')
+                    .eq('id', id)
+                    .single();
+                
+                if (error && error.code !== 'PGRST116') throw error;
+                return { id, content: data?.content || defaults[id] };
+            },
+            staleTime: 0,
+        }))
+    });
 
-                if (error) throw error;
-
-                if (data) {
-                    const contentMap = { ...defaults };
-                    data.forEach(item => {
-                        contentMap[item.id] = item.content;
-                    });
-                    setContents(contentMap);
-                }
-            } catch (err) {
-                console.error('Error fetching contents:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (contentIds.length > 0) {
-            fetchAllContent();
+    const isLoading = queries.some(query => query.isLoading);
+    
+    // Construct the result object
+    const contents = { ...defaults };
+    queries.forEach((query, index) => {
+        const id = contentIds[index];
+        if (query.data?.content) {
+            contents[id] = query.data.content;
         }
-    }, [contentIds.join(',')]);
+    });
 
-    return { contents, loading };
+    return { contents, loading: isLoading };
 };
 
 export default usePageContent;

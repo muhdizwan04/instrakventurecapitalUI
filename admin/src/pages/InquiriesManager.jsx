@@ -3,10 +3,122 @@ import {
     Mail, Search, Trash2, RefreshCw, FileDown, CheckCircle, Clock, 
     AlertCircle, Users, Briefcase, FileText, Filter, MoreVertical,
     Phone, Building2, ExternalLink, MessageSquare, X, ChevronDown,
-    Inbox, Send, Archive, Loader2, Eye
+    Inbox, Send, Archive, Loader2, Eye, Calendar, CheckSquare, Square
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { supabase } from '../lib/supabase';
+
+const ExportModal = ({ isOpen, onClose, onExport }) => {
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [columns, setColumns] = useState({
+        date: true,
+        type: true,
+        status: true,
+        name: true,
+        email: true,
+        company: true,
+        phone: true,
+        subject: true,
+        message: true,
+        notes: false
+    });
+
+    if (!isOpen) return null;
+
+    const handleToggle = (col) => {
+        setColumns(prev => ({ ...prev, [col]: !prev[col] }));
+    };
+
+    const handleExport = () => {
+        onExport({ startDate, endDate, columns });
+        onClose();
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+                <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                    <h3 className="font-bold text-gray-800 flex items-center gap-2">
+                        <FileDown size={18} className="text-blue-600" /> Export Inquiries
+                    </h3>
+                    <button onClick={onClose} className="p-1 hover:bg-gray-200 rounded-full text-gray-500">
+                        <X size={18} />
+                    </button>
+                </div>
+                
+                <div className="p-6 space-y-6">
+                    {/* Date Range */}
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Date Range</label>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs text-gray-400 mb-1">Start Date</label>
+                                <div className="relative">
+                                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                                    <input 
+                                        type="date" 
+                                        value={startDate}
+                                        onChange={(e) => setStartDate(e.target.value)}
+                                        className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs text-gray-400 mb-1">End Date</label>
+                                <div className="relative">
+                                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                                    <input 
+                                        type="date" 
+                                        value={endDate}
+                                        onChange={(e) => setEndDate(e.target.value)}
+                                        className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Columns */}
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Include Columns</label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {Object.keys(columns).map(col => (
+                                <button 
+                                    key={col}
+                                    onClick={() => handleToggle(col)}
+                                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm border transition-colors ${
+                                        columns[col] 
+                                        ? 'bg-blue-50 border-blue-200 text-blue-700' 
+                                        : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
+                                    }`}
+                                >
+                                    {columns[col] ? <CheckSquare size={16} /> : <Square size={16} />}
+                                    <span className="capitalize">{col}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
+                    <button 
+                        onClick={onClose}
+                        className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-lg transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        onClick={handleExport}
+                        className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm flex items-center gap-2"
+                    >
+                        <FileDown size={16} /> Export CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const InquiriesManager = () => {
     const [view, setView] = useState('list'); // 'list' | 'kanban'
@@ -17,7 +129,9 @@ const InquiriesManager = () => {
     const [noteInput, setNoteInput] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
     const [filterType, setFilterType] = useState('all');
+
     const [services, setServices] = useState([]);
+    const [showExportModal, setShowExportModal] = useState(false);
 
     const CRM_STATUSES = [
         { id: 'new', label: 'New', color: 'bg-blue-500', lightColor: 'bg-blue-50 text-blue-700 border-blue-200' },
@@ -195,29 +309,63 @@ const InquiriesManager = () => {
     };
 
     const handleExportCSV = () => {
-        const headers = ['Date', 'Type', 'Status', 'Name', 'Email', 'Company', 'Subject'];
-        const csvContent = [
-            headers.join(','),
-            ...filteredInquiries.map(inq => [
-                `"${inq.date}"`,
-                `"${inq.type}"`,
-                `"${inq.status}"`,
-                `"${inq.name}"`,
-                `"${inq.email}"`,
-                `"${inq.metadata?.companyName || ''}"`,
-                `"${inq.subject.replace(/"/g, '""')}"`
-            ].join(','))
-        ].join('\n');
+        setShowExportModal(true);
+    };
+
+    const executeExport = ({ startDate, endDate, columns }) => {
+        // Filter by date range if provided
+        let dataToExport = [...filteredInquiries];
+        
+        if (startDate) {
+            const start = new Date(startDate);
+            start.setHours(0, 0, 0, 0);
+            dataToExport = dataToExport.filter(item => new Date(item.createdAt) >= start);
+        }
+        
+        if (endDate) {
+            const end = new Date(endDate);
+            end.setHours(23, 59, 59, 999);
+            dataToExport = dataToExport.filter(item => new Date(item.createdAt) <= end);
+        }
+
+        if (dataToExport.length === 0) {
+            toast.error('No data found for selected range');
+            return;
+        }
+
+        // Generate CSV content based on selected columns
+        const colMap = {
+            date: { header: 'Timestamp', val: i => `"${new Date(i.createdAt).toLocaleString()}"` }, // Exact timestamp
+            type: { header: 'Type', val: i => `"${i.type}"` },
+            status: { header: 'Status', val: i => `"${i.status}"` },
+            name: { header: 'Name', val: i => `"${i.name}"` },
+            email: { header: 'Email', val: i => `"${i.email}"` },
+            company: { header: 'Company', val: i => `"${i.metadata?.companyName || ''}"` },
+            phone: { header: 'Phone', val: i => `"${i.metadata?.phone || ''}"` },
+            subject: { header: 'Subject', val: i => `"${(i.subject || '').replace(/"/g, '""')}"` },
+            message: { header: 'Message', val: i => `"${(i.message || '').replace(/"/g, '""')}"` },
+            notes: { header: 'Latest Note', val: i => i.metadata?.notes?.[0] ? `"${i.metadata.notes[0].text.replace(/"/g, '""')}"` : '""' }
+        };
+
+        const activeCols = Object.keys(columns).filter(k => columns[k]);
+        const headers = activeCols.map(k => colMap[k].header);
+
+        const csvRows = dataToExport.map(inq => {
+            return activeCols.map(k => colMap[k].val(inq)).join(',');
+        });
+
+        const csvContent = [headers.join(','), ...csvRows].join('\n');
 
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', `inquiries_${new Date().toISOString().split('T')[0]}.csv`);
+        link.setAttribute('download', `inquiries_export_${new Date().toISOString().split('T')[0]}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        toast.success('Export complete');
+        
+        toast.success(`Exported ${dataToExport.length} records`);
     };
 
     const getStatusStyle = (status) => {
@@ -542,6 +690,13 @@ const InquiriesManager = () => {
                     <DetailPanel />
                 </div>
             </div>
+
+            
+            <ExportModal 
+                isOpen={showExportModal} 
+                onClose={() => setShowExportModal(false)} 
+                onExport={executeExport} 
+            />
         </div>
     );
 };

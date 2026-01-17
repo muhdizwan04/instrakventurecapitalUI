@@ -49,8 +49,12 @@ const ImageUpload = ({
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Convert to base64 with compression (0.8 quality for JPEG)
-                    const base64 = canvas.toDataURL('image/jpeg', 0.8);
+                    // Use original file type if it supports transparency, otherwise jpeg
+                    const mimeType = file.type === 'image/png' || file.type === 'image/webp' ? file.type : 'image/jpeg';
+                    const quality = mimeType === 'image/jpeg' ? 0.8 : 1.0; // PNG handles compression differently
+
+                    // Convert to base64
+                    const base64 = canvas.toDataURL(mimeType, quality);
                     resolve(base64);
                 };
                 img.onerror = reject;

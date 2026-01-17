@@ -18,6 +18,7 @@ import {
     DollarSign,
     FileText,
     Newspaper,
+    Building2,
     ExternalLink
 } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
@@ -81,6 +82,7 @@ const Layout = () => {
         '/services': { icon: Briefcase, label: "Services", path: "/services", section: 'Services' },
         '/latest-news-2': { icon: Newspaper, label: "News & Events", path: "/news", section: 'Content' },
         '/join-us': { icon: Calendar, label: "Careers", path: "/career", section: 'Content' },
+        '/project-listings': { icon: Building2, label: "Project Listing", path: "/projects", section: 'Pages' },
     };
 
     // Other items that might not be in the nav but we want to show

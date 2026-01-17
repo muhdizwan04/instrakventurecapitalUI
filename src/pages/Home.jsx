@@ -8,7 +8,6 @@ import { usePageContent } from '../hooks/usePageContent';
 // Map section IDs to components
 const SECTION_COMPONENTS = {
     hero: Hero,
-    foundation: About,
     services: Services,
     industries: Industries,
 };
@@ -16,11 +15,11 @@ const SECTION_COMPONENTS = {
 const Home = () => {
     // Fetch home content including section order
     const { content } = usePageContent('home', { 
-        tabOrder: ['hero', 'foundation', 'services', 'industries'] 
+        tabOrder: ['hero', 'services', 'industries'] 
     });
 
     // Get section order from database or use default
-    const sectionOrder = content.tabOrder || ['hero', 'foundation', 'services', 'industries'];
+    const sectionOrder = content.tabOrder || ['hero', 'services', 'industries'];
 
     return (
         <>

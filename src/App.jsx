@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
+import AboutUs from './pages/AboutUs';
 import MissionVisionValues from './pages/MissionVisionValues';
 import BoardOfDirectors from './pages/BoardOfDirectors';
 import ServicesPage from './pages/Services';
@@ -11,6 +12,7 @@ import JoinUs from './pages/JoinUs';
 import LatestNews from './pages/LatestNews';
 import Contact from './pages/Contact';
 import StrategicPartners from './pages/StrategicPartners';
+import ProjectListing from './pages/ProjectListing';
 
 // Lazy load service detail pages for better performance
 const BusinessFinanceConsulting = lazy(() => import('./pages/BusinessFinanceConsulting'));
@@ -42,6 +44,7 @@ function App() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<AboutUs />} />
           <Route path="/mission-vision-values" element={<MissionVisionValues />} />
           <Route path="/board-of-directors" element={<BoardOfDirectors />} />
           <Route path="/services" element={<ServicesPage />} />
@@ -64,6 +67,7 @@ function App() {
           <Route path="/services/gig" element={<GlobalInvestmentGateway />} />
           <Route path="/services/private-wealth" element={<PrivateWealthInvestment />} />
           <Route path="/services/aum" element={<AssetUnderManagement />} />
+          <Route path="/project-listings" element={<ProjectListing />} />
           <Route path="/strategic-partners" element={<StrategicPartners />} />
         </Routes>
       </Suspense>

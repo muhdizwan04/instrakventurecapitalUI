@@ -15,12 +15,12 @@ const NavigationManager = () => {
             { 
                 id: 'nav-2', 
                 label: 'About Us', 
-                link: '/mission-vision-values', 
+                link: '/about', 
                 isDropdown: true, 
                 children: [
-                    { id: 'sub-1', label: 'Mission, Vision & Values', link: '/mission-vision-values' },
-                    { id: 'sub-2', label: 'Board of Directors', link: '/board-of-directors' },
-                    { id: 'sub-3', label: 'Strategic Partners', link: '/strategic-partners' }
+                    { id: 'sub-1', label: 'Mission, Vision & Values', link: '/about#mission' },
+                    { id: 'sub-2', label: 'Board of Directors', link: '/about#board' },
+                    { id: 'sub-3', label: 'Strategic Partners', link: '/about#partners' }
                 ]
             },
             { 

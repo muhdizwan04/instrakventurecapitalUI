@@ -17,6 +17,7 @@ import FooterManager from './pages/FooterManager';
 import GlobalSettingsManager from './pages/GlobalSettingsManager';
 import NavigationManager from './pages/NavigationManager';
 import InvestorsManager from './pages/InvestorsManager';
+import ProjectListingManager from './pages/ProjectListingManager';
 import { Loader2 } from 'lucide-react';
 
 // Protected Route wrapper component
@@ -64,6 +65,7 @@ function AppRoutes() {
         <Route path="global-settings" element={<GlobalSettingsManager />} />
         <Route path="navigation" element={<NavigationManager />} />
         <Route path="investors" element={<InvestorsManager />} />
+        <Route path="projects" element={<ProjectListingManager />} />
         <Route path="*" element={<div className="p-8">Page Under Construction</div>} />
       </Route>
     </Routes>

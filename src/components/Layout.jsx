@@ -1,41 +1,27 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { usePageContent } from '../hooks/usePageContent';
+import SEO from './SEO';
+import { Helmet } from 'react-helmet-async';
 
 const Layout = ({ children }) => {
   const { content: settings } = usePageContent('global_settings');
 
-  useEffect(() => {
-    if (settings?.themeColors) {
-      const root = document.documentElement;
-      if (settings.themeColors.primary) {
-        root.style.setProperty('--accent-primary', settings.themeColors.primary);
-      }
-      if (settings.themeColors.secondary) {
-        root.style.setProperty('--accent-secondary', settings.themeColors.secondary);
-      }
-      if (settings.themeColors.accent) {
-        root.style.setProperty('--accent-tertiary', settings.themeColors.accent);
-      }
+  const themeStyles = settings?.themeColors ? `
+    :root {
+      --accent-primary: ${settings.themeColors.primary || '#1A365D'};
+      --accent-secondary: ${settings.themeColors.secondary || '#B8860B'};
+      --accent-tertiary: ${settings.themeColors.accent || '#0A74DA'};
     }
-
-    // Update document title and favicon if available
-    if (settings?.siteIdentity) {
-      if (settings.siteIdentity.siteName) {
-        document.title = settings.siteIdentity.siteName;
-      }
-      if (settings.siteIdentity.faviconUrl) {
-        const link = document.querySelector("link[rel~='icon']");
-        if (link) {
-          link.href = settings.siteIdentity.faviconUrl;
-        }
-      }
-    }
-  }, [settings]);
+  ` : '';
 
   return (
     <div className="layout">
+      <Helmet>
+        <style>{themeStyles}</style>
+      </Helmet>
+      <SEO />
       <Navbar />
       <main>{children}</main>
       <Footer />

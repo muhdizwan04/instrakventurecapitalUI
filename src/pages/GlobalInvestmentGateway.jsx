@@ -81,10 +81,27 @@ const GlobalInvestmentGateway = () => {
 
     // Dynamic site name replacement
     const siteName = settings?.siteIdentity?.siteName || 'Instrak Venture Capital Berhad';
-    const dynamicSubtitle = (content.subtitle || defaultContent.subtitle).replace('Instrak Venture Capital Berhad', siteName);
-    const dynamicOverview = (content.executiveOverview || defaultContent.executiveOverview).replace('Instrak Venture Capital Berhad', siteName);
-    const dynamicOverviewFinal = dynamicOverview.replace('IVC', settings?.siteIdentity?.siteName ? settings.siteIdentity.siteName.split(' ').map(w => w[0]).join('') : 'IVC');
-    const dynamicValueProposition = content.valueProposition.map(item => item.replace('IVC', settings?.siteIdentity?.siteName ? settings.siteIdentity.siteName.split(' ').map(w => w[0]).join('') : 'IVC'));
+    
+    // Safety checks for strings
+    const rawSubtitle = content.subtitle || defaultContent.subtitle || '';
+    const dynamicSubtitle = typeof rawSubtitle === 'string' ? rawSubtitle.replace('Instrak Venture Capital Berhad', siteName) : '';
+
+    const rawOverview = content.executiveOverview || defaultContent.executiveOverview || '';
+    const dynamicOverview = typeof rawOverview === 'string' ? rawOverview.replace('Instrak Venture Capital Berhad', siteName) : '';
+    
+    const acronym = settings?.siteIdentity?.siteName ? settings.siteIdentity.siteName.split(' ').map(w => w[0]).join('') : 'IVC';
+    const dynamicOverviewFinal = dynamicOverview.replace('IVC', acronym);
+
+    // Safety check for Arrays (Prevent Crash on Null)
+    const safeEligibility = Array.isArray(content.eligibility) ? content.eligibility : defaultContent.eligibility;
+    const safeTiers = Array.isArray(content.subscriptionTiers) ? content.subscriptionTiers : defaultContent.subscriptionTiers;
+
+    // Safety check for valueProposition array
+    const rawValueProp = Array.isArray(content.valueProposition) ? content.valueProposition : defaultContent.valueProposition;
+    const dynamicValueProposition = rawValueProp.map(item => {
+        if (typeof item !== 'string') return '';
+        return item.replace('IVC', acronym);
+    });
 
     const labelStyle = { display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#1A365D', fontSize: '0.9rem' };
     const inputStyle = { width: '100%', padding: '0.9rem', border: '1px solid #E2E8F0', borderRadius: '8px', fontSize: '1rem', color: '#1A365D', background: '#FFFFFF', transition: 'border-color 0.2s' };
@@ -151,7 +168,7 @@ const GlobalInvestmentGateway = () => {
                         <div>
                             <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', color: '#1A365D' }}>Eligibility Requirements</h2>
                             <ul style={{ listStyle: 'none', padding: 0 }}>
-                                {content.eligibility.map((item, i) => (
+                                {safeEligibility.map((item, i) => (
                                     <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '1rem', color: '#4A5568', lineHeight: '1.6' }}>
                                         <CheckCircle size={20} color="#B8860B" style={{ marginTop: '2px', flexShrink: 0 }} />
                                         {item}
@@ -184,7 +201,7 @@ const GlobalInvestmentGateway = () => {
                 <div className="container">
                     <h2 className="section-title">Subscription Model</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem', marginBottom: '2rem' }}>
-                        {content.subscriptionTiers.map((tier, i) => (
+                        {safeTiers.map((tier, i) => (
                             <div key={i} style={{
                                 background: i === 2 ? 'linear-gradient(135deg, #1A365D 0%, #0F2942 100%)' : '#F5F7FA',
                                 padding: '2rem',
@@ -195,7 +212,7 @@ const GlobalInvestmentGateway = () => {
                                 <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>{tier.tier}</h3>
                                 <p style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1.5rem', color: i === 2 ? '#B8860B' : '#B8860B' }}>{tier.price}</p>
                                 <ul style={{ listStyle: 'none', padding: 0 }}>
-                                    {tier.features.map((feature, j) => (
+                                    {(tier.features || []).map((feature, j) => (
                                         <li key={j} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', fontSize: '0.9rem', color: i === 2 ? 'rgba(255,255,255,0.9)' : '#4A5568' }}>
                                             <CheckCircle size={16} color={i === 2 ? '#B8860B' : '#22C55E'} />
                                             {feature}

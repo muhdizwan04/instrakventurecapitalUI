@@ -13,7 +13,7 @@ const Hero = () => {
         heroDescription: 'Providing foundational governance and integrity essential for scaling visionary industrial leaders across the ASEAN region.',
         buttons: [
             { id: 1, text: 'Strategic Services', link: '/services', variant: 'solid' },
-            { id: 2, text: 'Our Foundation →', link: '/mission-vision-values', variant: 'outline' }
+            { id: 2, text: 'Potential Project Listing', link: '/project-listings', variant: 'outline' }
         ]
     };
 
@@ -34,11 +34,7 @@ const Hero = () => {
     return (
         <section id="home" className={styles.hero}>
             <div className={`container ${styles.container}`}>
-                {settings?.siteIdentity?.showHeroBadge !== false && settings?.siteIdentity?.siteName && (
-                    <div className={styles.companyBadge}>
-                        <span>{settings.siteIdentity.siteName}</span>
-                    </div>
-                )}
+
                 <h1 className={styles.title}>
                     {titleLine1}
                     {titleLine2 && <><br /><span className={styles.highlight}>{titleLine2}</span></>}

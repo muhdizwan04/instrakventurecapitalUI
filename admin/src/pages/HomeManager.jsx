@@ -14,7 +14,8 @@ const AVAILABLE_ROUTES = [
     { label: 'Latest News', path: '/latest-news-2' },
     { label: 'Contact Us', path: '/contact' },
     { label: 'Join Us', path: '/join-us' },
-    { label: 'Board of Directors', path: '/board-of-directors' }
+    { label: 'Board of Directors', path: '/board-of-directors' },
+    { label: 'Project Listing', path: '/project-listings' }
 ];
 
 const HomeManager = () => {
@@ -22,35 +23,59 @@ const HomeManager = () => {
 
     // Default content structure
     const defaultFormData = {
-        heroTitle: 'We Help To Grow\nYour Business',
+        heroTitle: 'Your Venture\nCapital Partners',
         heroSubtitle: 'Governance • Transparency • Integrity',
         heroDescription: 'Providing foundational governance and integrity essential for scaling visionary industrial leaders across the ASEAN region.',
         buttons: [
-            { id: 1, text: 'Strategic Services', link: '/services', variant: 'solid' },
-            { id: 2, text: 'Our Foundation →', link: '/mission-vision-values', variant: 'outline' }
+            {
+                id: 1,
+                link: "/investors",
+                text: "Register as Investor ",
+                variant: "solid"
+            },
+            {
+                id: 2,
+                link: "/project-listings",
+                text: "Potential Project Listing",
+                variant: "outline"
+            }
         ],
         missionTitle: 'Our Mission',
         missionText: 'To be the catalyst for sustainable growth in the ASEAN region, bridging the gap between visionary entrepreneurs and strategic capital through disciplined governance and ethical excellence.',
         foundationValues: [
-            { id: 1, title: 'Governance', text: 'We adhere to the highest standards of corporate governance to ensure long-term stability.', icon: 'ShieldCheck' },
-            { id: 2, title: 'Transparency', text: 'Open communication and clear reporting are at the heart of everything we do.', icon: 'Eye' },
-            { id: 3, title: 'Integrity', text: 'Honesty and moral principles guide our investment decisions and partnerships.', icon: 'Scale' }
+            {
+                id: 1,
+                icon: "ShieldCheck",
+                text: "We adhere to the highest standards of corporate governance to ensure long-term stability.",
+                title: "Governance"
+            },
+            {
+                id: 2,
+                icon: "Eye",
+                text: "Open communication and clear reporting are at the heart of everything we do.",
+                title: "Transparency"
+            },
+            {
+                id: 3,
+                icon: "Scale",
+                text: "Honesty and moral principles guide our investment decisions and partnerships.",
+                title: "Integrity"
+            }
         ],
-        // Note: Services are managed via separate 'home_services' content ID
-        servicesTitle: 'Our Services',
-        servicesSubtitle: 'Comprehensive financial solutions tailored for your growth',
+        servicesSubtitle: "Comprehensive financial solutions tailored for your growth",
+        servicesTitle: "Our Portfolio",
         industries: [
-            { id: 'ind-1', name: 'Oil and Gas', icon: 'Fuel' },
-            { id: 'ind-2', name: 'Education', icon: 'GraduationCap' },
-            { id: 'ind-3', name: 'Automotive', icon: 'Car' },
-            { id: 'ind-4', name: 'Construction', icon: 'HardHat' },
-            { id: 'ind-5', name: 'Property Dev', icon: 'Building' },
-            { id: 'ind-6', name: 'Logistics', icon: 'Truck' },
-            { id: 'ind-7', name: 'Manufacturing', icon: 'Factory' },
-            { id: 'ind-8', name: 'Digital Tech', icon: 'Cpu' }
+            { id: "ind-1", icon: "Fuel", name: "Oil and Gas" },
+            { id: "ind-2", icon: "GraduationCap", name: "Education" },
+            { id: "ind-3", icon: "Car", name: "Automotive" },
+            { id: "ind-4", icon: "HardHat", name: "Construction" },
+            { id: "ind-5", icon: "Building", name: "Property Dev" },
+            { id: "ind-6", icon: "Truck", name: "Logistics" },
+            { id: "ind-7", icon: "Factory", name: "Manufacturing" },
+            { id: "ind-8", icon: "Cpu", name: "Digital Tech" }
         ],
         // Tab order - can be reordered via drag
-        tabOrder: ['hero', 'foundation', 'services', 'industries']
+        tabOrder: [ "hero", "services", "foundation", "industries" ]
     };
 
     // Use Supabase content hook
@@ -58,11 +83,15 @@ const HomeManager = () => {
     const [formData, setFormData] = useState(defaultFormData);
 
     // Load content from Supabase when available
+    const [isInitialized, setIsInitialized] = useState(false);
+
+    // Load content from Supabase when available
     useEffect(() => {
-        if (content && !loading) {
+        if (content && !loading && !isInitialized) {
             setFormData(prev => ({ ...prev, ...content }));
+            setIsInitialized(true);
         }
-    }, [content, loading]);
+    }, [content, loading, isInitialized]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -389,119 +418,122 @@ const HomeManager = () => {
                     </div>
 
                     {/* Live Preview Pane */}
-                    <div className="glass-card p-6 bg-[var(--bg-tertiary)] h-fit sticky top-24">
-                        <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--text-muted)] mb-4">Live Preview</h3>
+                    <div className="glass-card p-6 bg-[var(--bg-tertiary)] h-fit">
+                        <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--text-muted)] mb-6">Live Preview</h3>
 
-                        {/* Preview Container: Scrollable mock viewport */}
+                        {/* Preview Container: Focused View Only */}
                         <div className="bg-white rounded-xl shadow-lg border border-[var(--border-light)] h-[600px] overflow-y-auto no-scrollbar relative w-full select-none">
 
-                            {tabOrder.map((sectionId) => {
-                                if (sectionId === 'hero') {
-                                    return (
-                                        <div key="hero" className="h-[350px] relative flex flex-col items-center justify-center p-8 shrink-0 text-center" style={{ background: 'linear-gradient(135deg, #F5F7FA 0%, #FFFFFF 50%, #F0F4F8 100%)' }}>
-                                            {/* Background image with overlay - like client */}
-                                            <div className="absolute inset-0 opacity-40 bg-cover bg-center" style={{ backgroundImage: `url(${klSkyline})` }} />
-                                            <div className="absolute inset-0" style={{ background: 'linear-gradient(160deg, rgba(255,255,255,0.88) 0%, rgba(250,251,252,0.75) 40%, rgba(245,247,250,0.65) 100%)' }} />
-                                            {/* Left accent bar */}
-                                            <div className="absolute left-0 top-[20%] bottom-[20%] w-[3px]" style={{ background: 'linear-gradient(180deg, transparent, #B8860B 30%, #1A365D 70%, transparent)' }} />
-
-                                            <div className="relative z-10 max-w-lg mx-auto flex flex-col items-center">
-                                                {/* Company Badge */}
-                                                <div className="inline-block px-3 py-1.5 mb-4 text-[8px] font-semibold tracking-[2px] uppercase text-[#1A365D] border border-[#1A365D]/20 rounded bg-[#1A365D]/5">
-                                                    Instrak Venture Capital Berhad
+                            {/* Focused Preview: Only show the currently active section */}
+                            {activeTab === 'hero' && (
+                                <div key="hero" className="relative flex flex-col items-center justify-center p-8 shrink-0 text-center min-h-[500px] w-full" style={{ 
+                                    background: 'linear-gradient(135deg, #F5F7FA 0%, #FFFFFF 50%, #F0F4F8 100%)',
+                                    paddingTop: '40px' 
+                                }}>
+                                    <div className="absolute inset-0 opacity-40 select-none pointer-events-none">
+                                        <img src={klSkyline} className="w-full h-full object-cover" style={{ filter: 'contrast(1.1) brightness(1.05)' }} alt="bg" />
+                                    </div>
+                                    <div className="absolute inset-0 pointer-events-none" style={{ 
+                                        background: 'linear-gradient(160deg, rgba(255, 255, 255, 0.88) 0%, rgba(250, 251, 252, 0.75) 40%, rgba(245, 247, 250, 0.65) 100%)',
+                                        zIndex: 1
+                                    }} />
+                                    <div className="absolute left-0 top-[20%] bottom-[20%] w-[4px] pointer-events-none hidden md:block" style={{ 
+                                        background: 'linear-gradient(180deg, transparent, #B8860B 30%, #1A365D 70%, transparent)',
+                                        zIndex: 2 
+                                    }} />
+                                    <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
+                                        <h1 className="font-bold mb-6 leading-[1.05] text-[#1A365D]" style={{ 
+                                            fontSize: 'clamp(2rem, 5vw, 3.5rem)', 
+                                            letterSpacing: '-1px',
+                                            fontFamily: 'serif' 
+                                        }}>
+                                            {formData.heroTitle.split('\n').map((line, i) => (
+                                                <span key={i}>
+                                                    {i === 1 ? <span className="text-[#B8860B] block mt-2">{line}</span> : line}
+                                                    {i === 0 && <br />}
+                                                </span>
+                                            ))}
+                                        </h1>
+                                        <p className="text-[#1A365D] uppercase mb-6 font-medium text-sm md:text-lg" style={{ letterSpacing: '3px' }}>
+                                             {formData.heroSubtitle.split('•').map((part, i, arr) => (
+                                                <span key={i}>
+                                                    <strong className="text-[#B8860B]">{part.trim()}</strong>
+                                                    {i < arr.length - 1 && ' • '}
+                                                </span>
+                                            ))}
+                                        </p>
+                                        <p className="text-[#4A5568] mb-10 max-w-xl mx-auto leading-loose text-sm md:text-base">
+                                            {formData.heroDescription}
+                                        </p>
+                                        <div className="flex gap-4 justify-center flex-wrap">
+                                            {formData.buttons.map(b => (
+                                                <div key={b.id} className={`px-6 py-3 text-sm font-bold uppercase tracking-wider transition-all cursor-default ${b.variant === 'solid'
+                                                    ? 'bg-[#1A365D] text-white hover:bg-[#08304e]' 
+                                                    : 'border border-[#B8860B] text-[#B8860B] bg-transparent'
+                                                    }`}
+                                                    style={{ minWidth: '160px' }}
+                                                >
+                                                    {b.text}
                                                 </div>
-                                                {/* Title */}
-                                                <h1 className="text-3xl font-bold mb-2 leading-tight text-[#1A365D]" style={{ fontFamily: 'var(--font-heading)' }}>
-                                                    {formData.heroTitle.split('\n').map((line, i) => (
-                                                        <span key={i}>
-                                                            {i === 1 ? <span className="text-[#B8860B] block">{line}</span> : line}
-                                                            {i === 0 && <br />}
-                                                        </span>
-                                                    ))}
-                                                </h1>
-                                                {/* Subtitle */}
-                                                <p className="text-[10px] tracking-[3px] uppercase mb-3 text-[#1A365D]">
-                                                    <span className="text-[#B8860B]">Governance</span> • <span className="text-[#B8860B]">Transparency</span> • <span className="text-[#B8860B]">Integrity</span>
-                                                </p>
-                                                {/* Description */}
-                                                <p className="text-[10px] text-[#4A5568] mb-5 max-w-md mx-auto leading-relaxed">{formData.heroDescription}</p>
-                                                {/* Buttons */}
-                                                <div className="flex gap-3 justify-center">
-                                                    {formData.buttons.map(b => (
-                                                        <div key={b.id} className={`px-4 py-2 text-[10px] font-bold rounded transition-all ${b.variant === 'solid'
-                                                            ? 'bg-[#B8860B] text-white shadow-md'
-                                                            : 'border-2 border-[#B8860B] text-[#B8860B] bg-white'
-                                                            }`}>
-                                                            {b.text}
-                                                        </div>
-                                                    ))}
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'services' && (
+                                <div key="services" className="py-8 px-8 bg-[#F8FAFC] shrink-0 border-t border-gray-100 min-h-[500px]">
+                                    <div className="max-w-6xl mx-auto">
+                                        <h2 className="text-[#1A365D] font-bold text-center mb-4 text-3xl font-serif">{formData.servicesTitle || 'Our Services'}</h2>
+                                        <p className="text-gray-500 text-center mb-12 uppercase tracking-widest text-sm font-semibold">{formData.servicesSubtitle || 'Comprehensive financial solutions'}</p>
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                                            {['Business Finance Consulting', 'Equity Financing', 'Real Estate Financing', 'REITs'].map((name, i) => (
+                                                <div key={i} className="bg-white p-6 rounded shadow-sm border border-gray-100 flex flex-col gap-4 group hover:shadow-md transition-shadow">
+                                                    <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center text-[#B8860B]">
+                                                        <LucideIcons.Briefcase size={24} />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="font-bold text-[#1A365D] mb-2 text-lg">{name}</h4>
+                                                        <p className="text-sm text-gray-500 leading-relaxed">Financial strategy, forecasting, budgeting...</p>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            ))}
                                         </div>
-                                    );
-                                }
-
-                                if (sectionId === 'foundation') {
-                                    return (
-                                        <div key="foundation" className="p-8 bg-white shrink-0">
-                                            <h4 className="text-[#1A365D] font-bold text-center mb-6">Our Foundation</h4>
-                                            <div className="grid grid-cols-1 gap-4 text-center">
-                                                {formData.foundationValues.map((v) => (
-                                                    <div key={v.id} className="p-4 bg-gray-50 rounded">
-                                                        <h5 className="font-bold text-[#1A365D] text-sm mb-1">{v.title}</h5>
-                                                        <p className="text-[10px] text-gray-600">{v.text}</p>
-                                                    </div>
-                                                ))}
-                                            </div>
+                                        <div className="text-center mt-12">
+                                             <span className="text-[#B8860B] font-bold border-b-2 border-[#B8860B] pb-1 uppercase tracking-wider text-xs cursor-pointer">View All Services</span>
                                         </div>
-                                    );
-                                }
+                                    </div>
+                                </div>
+                            )}
 
-                                if (sectionId === 'services') {
-                                    return (
-                                        <div key="services" className="p-8 bg-[#FAFBFC] shrink-0 border-t border-gray-100">
-                                            <h4 className="text-[#1A365D] font-bold text-center mb-2">{formData.servicesTitle || 'Our Services'}</h4>
-                                            <p className="text-[9px] text-gray-500 text-center mb-4">{formData.servicesSubtitle || 'Comprehensive financial solutions'}</p>
-                                            <div className="grid grid-cols-2 gap-2">
-                                                {['Virtual CFO', 'Equity Financing', 'Real Estate', 'REITs', 'M&A', 'AUM'].map((name, i) => (
-                                                    <div key={i} className="p-2 bg-white shadow-sm border border-gray-100 rounded flex items-center gap-2">
-                                                        <div className="w-6 h-6 bg-gradient-to-br from-[#1A365D]/10 to-[#B8860B]/10 rounded flex items-center justify-center">
-                                                            <LucideIcons.Briefcase size={10} className="text-[#B8860B]" />
+                            {activeTab === 'industries' && (
+                                <div key="industries" className="py-8 px-8 bg-white shrink-0 border-t border-gray-100 min-h-[500px]">
+                                    <div className="max-w-6xl mx-auto">
+                                        <h2 className="text-[#1A365D] font-bold text-center mb-12 text-3xl font-serif">Focus Industries</h2>
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                                            {formData.industries.slice(0, 6).map((ind) => {
+                                                const Icon = LucideIcons[ind.icon] || LucideIcons.Building2;
+                                                return (
+                                                    <div key={ind.id} className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg hover:bg-[var(--accent-primary)] hover:text-white transition-colors group cursor-default">
+                                                        <div className="text-[var(--accent-primary)] group-hover:text-white mb-4 transition-colors">
+                                                            <Icon size={32} />
                                                         </div>
-                                                        <span className="text-[8px] font-medium">{name}</span>
+                                                        <span className="font-bold text-center">{ind.name}</span>
                                                     </div>
-                                                ))}
-                                            </div>
-                                            <p className="text-[8px] text-center text-gray-400 mt-2">+ 6 more services</p>
+                                                );
+                                            })}
                                         </div>
-                                    );
-                                }
-
-                                if (sectionId === 'industries') {
-                                    return (
-                                        <div key="industries" className="p-8 bg-white shrink-0 border-t border-gray-100">
-                                            <h4 className="text-[#1A365D] font-bold text-center mb-6">Focus Industries</h4>
-                                            <div className="grid grid-cols-4 gap-2">
-                                                {formData.industries.map((ind) => {
-                                                    const Icon = LucideIcons[ind.icon] || LucideIcons.Building2;
-                                                    return (
-                                                        <div key={ind.id} className="flex flex-col items-center justify-center p-2 bg-gray-50 rounded">
-                                                            <div className="text-[#1A365D] mb-1 scale-75">
-                                                                <Icon size={16} />
-                                                            </div>
-                                                            <span className="text-[8px] font-bold text-center">{ind.name}</span>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    );
-                                }
-                                return null;
-                            })}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            <div className="absolute top-2 right-2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded opacity-50 uppercase tracking-widest pointer-events-none">
+                                {activeTab} Preview
+                            </div>
+                            <p className="text-center text-xs text-[var(--text-muted)] mt-4 p-4">Preview updates live as you type</p>
 
                         </div>
-                        <p className="text-center text-xs text-[var(--text-muted)] mt-2">Scroll inside preview to see all sections</p>
                     </div>
                 </div>
             </DragDropContext>

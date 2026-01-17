@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Save, Palette, Globe, Image as ImageIcon, Settings, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
+import ImageUpload from '../components/ImageUpload';
 
 const GlobalSettingsManager = () => {
     const defaultData = {
@@ -123,59 +124,28 @@ const GlobalSettingsManager = () => {
                 <div className="glass-card p-8 animate-in fade-in duration-300">
                     <h3 className="font-bold text-[var(--accent-primary)] mb-6 text-lg">Site Identity</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Site Name</label>
-                            <input
-                                type="text"
-                                value={formData.siteIdentity.siteName}
-                                onChange={(e) => handleChange('siteIdentity', 'siteName', e.target.value)}
-                                className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Tagline</label>
-                            <input
-                                type="text"
-                                value={formData.siteIdentity.tagline}
-                                onChange={(e) => handleChange('siteIdentity', 'tagline', e.target.value)}
-                                className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Logo URL</label>
-                            <input
-                                type="text"
+
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Site Logo</label>
+                            <ImageUpload 
                                 value={formData.siteIdentity.logoUrl}
-                                onChange={(e) => handleChange('siteIdentity', 'logoUrl', e.target.value)}
-                                className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
-                                placeholder="/logo.png or https://..."
+                                onChange={(val) => handleChange('siteIdentity', 'logoUrl', val)}
+                                aspectRatio="16/9"
+                                className="w-full"
                             />
+                            <p className="text-[10px] text-[var(--text-muted)]">Upload a transparent PNG for best results.</p>
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Favicon URL</label>
-                            <input
-                                type="text"
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Favicon (32x32)</label>
+                            <ImageUpload 
                                 value={formData.siteIdentity.faviconUrl}
-                                onChange={(e) => handleChange('siteIdentity', 'faviconUrl', e.target.value)}
-                                className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
-                                placeholder="/favicon.ico"
+                                onChange={(val) => handleChange('siteIdentity', 'faviconUrl', val)}
+                                aspectRatio="1/1"
+                                className="w-32"
                             />
+                            <p className="text-[10px] text-[var(--text-muted)]">Appears in browser tabs.</p>
                         </div>
-                        <div className="md:col-span-2 flex items-center gap-3 bg-blue-50/50 p-4 rounded-lg border border-blue-100">
-                            <input
-                                type="checkbox"
-                                id="showHeroBadge"
-                                checked={formData.siteIdentity.showHeroBadge !== false}
-                                onChange={(e) => handleChange('siteIdentity', 'showHeroBadge', e.target.checked)}
-                                className="w-5 h-5 rounded border-[var(--border-light)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)] cursor-pointer"
-                            />
-                            <label htmlFor="showHeroBadge" className="text-sm font-medium text-[var(--accent-primary)] cursor-pointer">
-                                Show Site Name Badge in Hero section
-                            </label>
-                            <p className="text-xs text-[var(--text-muted)] ml-auto">
-                                If unchecked, the "box" above the main title will be hidden.
-                            </p>
-                        </div>
+
                     </div>
                 </div>
             )}

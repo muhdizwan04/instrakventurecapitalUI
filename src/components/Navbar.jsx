@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Navbar.module.css';
-import logo from '../assets/logo.png';
 import { usePageContent } from '../hooks/usePageContent';
-import { ChevronDown } from 'lucide-react';
 
 const Navbar = () => {
-    const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
 
@@ -18,12 +15,12 @@ const Navbar = () => {
             {
                 id: 'nav-2',
                 label: 'About Us',
-                link: '/mission-vision-values',
+                link: '/about',
                 isDropdown: true,
                 children: [
-                    { id: 'sub-1', label: 'Mission, Vision & Values', link: '/mission-vision-values' },
-                    { id: 'sub-2', label: 'Board of Directors', link: '/board-of-directors' },
-                    { id: 'sub-3', label: 'Strategic Partners', link: '/strategic-partners' }
+                    { id: 'sub-1', label: 'Mission, Vision & Values', link: '/about#mission' },
+                    { id: 'sub-2', label: 'Board of Directors', link: '/about#board' },
+                    { id: 'sub-3', label: 'Strategic Partners', link: '/about#partners' }
                 ]
             },
             {
@@ -42,22 +39,10 @@ const Navbar = () => {
         ]
     };
 
-    const { content: navData, loading } = usePageContent('navigation', defaultNav);
+    const { content: navData } = usePageContent('navigation', defaultNav);
     const { content: settings } = usePageContent('global_settings');
 
-    useEffect(() => {
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 50);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
     const toggleMenu = () => setMenuOpen(!menuOpen);
-
-    const handleDropdownClick = (itemId) => {
-        setOpenDropdown(openDropdown === itemId ? null : itemId);
-    };
 
     const closeAll = () => {
         setMenuOpen(false);
@@ -65,10 +50,26 @@ const Navbar = () => {
     };
 
     // Use loaded data or defaults
-    const items = navData?.items || defaultNav.items;
+    const rawItems = navData?.items || defaultNav.items;
+    
+    // FORCE UPDATE: Ensure About Us links point to the consolidated page
+    const items = rawItems.map(item => {
+        if (item.label === 'About Us' || item.id === 'nav-2') {
+            return {
+                ...item,
+                link: '/about',
+                children: [
+                    { id: 'sub-1', label: 'Mission, Vision & Values', link: '/about#mission' },
+                    { id: 'sub-2', label: 'Board of Directors', link: '/about#board' },
+                    { id: 'sub-3', label: 'Strategic Partners', link: '/about#partners' }
+                ]
+            };
+        }
+        return item;
+    });
 
     return (
-        <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ''} glass`}>
+        <nav className={`${styles.nav} glass`}>
             <div className={`container ${styles.container}`}>
                 <Link to="/" className={styles.logo} onClick={closeAll}>
                     {settings?.siteIdentity?.logoUrl ? (

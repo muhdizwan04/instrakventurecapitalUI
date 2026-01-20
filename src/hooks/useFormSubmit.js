@@ -20,22 +20,21 @@ export const useFormSubmit = (formType) => {
         setSuccess(false);
 
         try {
+            // Get current user if any
+            const { data: { user } } = await supabase.auth.getUser();
+
             const { error } = await supabase.from('inquiries').insert({
                 type: formType,
-                name: formData.name || formData.fullName || formData.founderName || formData.contactPerson || '',
+                user_id: user?.id || null,
+                name: formData.name || formData.fullName || formData.founderName || formData.contactPerson || formData.legalName || formData.primaryContact || '',
                 email: formData.email || '',
                 phone: formData.phone || null,
-                company_name: formData.companyName || formData.company || null,
-                subject: formData.subject || `${formType.charAt(0).toUpperCase() + formType.slice(1)} Inquiry`,
-                message: formData.message || formData.needs || formData.description || formData.companyOverview || formData.projectDescription || null,
+                company_name: formData.companyName || formData.company || formData.legalName || null,
+                subject: formData.subject || `${formType.toUpperCase().replace('_', ' ')} Inquiry`,
+                message: formData.message || formData.needs || formData.description || formData.companyOverview || formData.projectDescription || 'No description provided',
                 metadata: {
                     ...metadata,
-                    // Flatten any remaining form fields into metadata
-                    ...Object.fromEntries(
-                        Object.entries(formData).filter(([key]) => 
-                            !['name', 'fullName', 'founderName', 'contactPerson', 'email', 'phone', 'companyName', 'company', 'subject', 'message', 'needs', 'description', 'companyOverview', 'projectDescription'].includes(key)
-                        )
-                    )
+                    ...formData // Store everything in metadata for safety
                 }
             });
 

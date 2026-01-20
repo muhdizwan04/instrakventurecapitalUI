@@ -18,7 +18,7 @@ export const usePageContent = (contentId, defaultContent = {}, options = {}) => 
                 .from('site_content')
                 .select('content')
                 .eq('id', contentId)
-                .single();
+                .maybeSingle();
 
             if (fetchError && fetchError.code !== 'PGRST116') {
                 throw fetchError;
@@ -54,7 +54,7 @@ export const useMultipleContent = (contentIds, defaults = {}) => {
                     .from('site_content')
                     .select('content')
                     .eq('id', id)
-                    .single();
+                    .maybeSingle();
                 
                 if (error && error.code !== 'PGRST116') throw error;
                 return { id, content: data?.content || defaults[id] };

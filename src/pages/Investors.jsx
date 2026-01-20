@@ -4,13 +4,14 @@ import { useFormSubmit } from '../hooks/useFormSubmit';
 import { usePageContent } from '../hooks/usePageContent';
 import { Toaster } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
+import ProtectedFormSection from '../components/ProtectedFormSection';
 
 const Investors = () => {
     // Default content
     const defaultContent = {
         pageHero: {
-            title: 'For Investors',
-            subtitle: 'Exclusive opportunities for institutional growth and wealth preservation through strategic capital.'
+            title: 'FOR INVESTORS',
+            subtitle: ''
         },
         mainContent: {
             headline: 'The Institutional Advantage',
@@ -99,7 +100,7 @@ const Investors = () => {
             <Toaster position="top-right" />
             <PageHero
                 title={pageHero.title}
-                subtitle={pageHero.subtitle}
+                subtitle=""
             />
             <div className="container" style={{ padding: '80px 20px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '4rem', alignItems: 'start' }}>
@@ -123,7 +124,8 @@ const Investors = () => {
 
                     <div className="glass-card" style={{ padding: '3rem', background: '#FFFFFF', border: '1px solid rgba(26, 54, 93, 0.12)', boxShadow: '0 4px 20px rgba(26, 54, 93, 0.08)' }}>
                         <h3 style={{ marginBottom: '2rem', color: '#1A365D' }}>{formSettings.title}</h3>
-                        <form onSubmit={handleSubmit}>
+                        <ProtectedFormSection serviceName="Investor Relations">
+                            <form onSubmit={handleSubmit}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
                                 <div>
                                     <label style={labelStyle}>First Name</label>
@@ -169,7 +171,8 @@ const Investors = () => {
                             <button className="btn-solid" type="submit" style={{ width: '100%', opacity: loading ? 0.7 : 1 }} disabled={loading}>
                                 {loading ? 'Submitting...' : formSettings.submitButtonText}
                             </button>
-                        </form>
+                            </form>
+                        </ProtectedFormSection>
                     </div>
                 </div>
             </div>

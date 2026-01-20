@@ -7,11 +7,22 @@ const PrivateWealthInvestment = () => {
     return (
         <div className="page-wrapper">
             <PageHero
-                title="Private Wealth Investment"
-                subtitle="The Luxury Dubai — Exclusive private wealth investment opportunities in premium real estate."
+                title="PRIVATE WEALTH INVESTMENT"
+                subtitle=""
             />
 
-            <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>
+            {/* Introduction */}
+            <section style={{ padding: '80px 20px 40px', background: '#FFFFFF' }}>
+                <div className="container">
+                    <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
+                         <p style={{ fontSize: '1.15rem', color: '#4A5568', lineHeight: '1.9' }}>
+                            The Luxury Dubai — Exclusive private wealth investment opportunities in premium real estate.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section style={{ padding: '40px 20px 80px', background: '#FFFFFF' }}>
                 <div className="container">
                     <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
                         <div style={{ width: '80px', height: '80px', background: 'linear-gradient(135deg, #1A365D 0%, #B8860B 100%)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem' }}>

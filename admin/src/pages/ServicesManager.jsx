@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Search, Briefcase, ArrowLeft, Save, Wallet, TrendingUp, Building2, Shield, Landmark, BarChart, FileText, Globe, Loader2, GripVertical, Coins, Gem, Users, ShieldCheck, PieChart, BarChart3 } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, Briefcase, ArrowLeft, Save, Wallet, TrendingUp, Building2, Shield, Landmark, BarChart, FileText, Globe, Loader2, GripVertical, Coins, Gem, Users, ShieldCheck, PieChart, BarChart3, Settings } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
@@ -28,18 +28,18 @@ const ServicesManager = () => {
     const [editingService, setEditingService] = useState(null);
 
     const defaultServices = [
-        { id: 1, title: 'Business Finance Consulting (Virtual CFO)', summary: 'Financial strategy & forecasting, budgeting & cash flow management, profitability analysis & cost control, investment readiness & capital structuring, financial risk assessment & mitigation, KPI setting & performance monitoring, and board/investor reporting & stakeholder communication.', icon: 'Briefcase', link: '/services/virtual-cfo', linkText: 'Learn More' },
-        { id: 2, title: 'Equity Financing (EF)', summary: 'Strategic capital injection through equity investment for high-growth companies seeking expansion and market leadership.', icon: 'TrendingUp', link: '/services/equity-financing', linkText: 'Learn More' },
-        { id: 3, title: 'Real Estate Financing (REF)', summary: 'Funding for high-yield property developments and real estate acquisitions.', icon: 'Building2', link: '/services/real-estate-financing', linkText: 'Learn More' },
-        { id: 4, title: 'Real Estate Investment Trust (REITs)', summary: 'Service details available upon request.', icon: 'Landmark', link: '/services/reits', linkText: 'Learn More' },
-        { id: 5, title: 'Share Financing (SF)', summary: 'Service details available upon request.', icon: 'BarChart3', link: '/services/share-financing', linkText: 'Learn More' },
-        { id: 6, title: 'Merger & Acquisition (M&A)', summary: 'Service details available upon request.', icon: 'Users', link: '/services/merger-acquisition', linkText: 'Learn More' },
-        { id: 7, title: 'Tokenization', summary: 'Service details available upon request.', icon: 'Coins', link: '/services/tokenization', linkText: 'Learn More' },
-        { id: 8, title: 'Asset Insurance (AI)', summary: 'Service details available upon request.', icon: 'Shield', link: '/services/asset-insurance', linkText: 'Learn More' },
-        { id: 9, title: 'Private Placement Life Insurance (PPLI)', summary: 'Service details available upon request.', icon: 'ShieldCheck', link: '/services/ppli', linkText: 'Learn More' },
-        { id: 10, title: 'Global Investment Gateway (GIG)', summary: 'An exclusive, subscription-based gateway for qualified companies to gain structured access to global investors and strategic partners through IVC\'s international network.', icon: 'Globe', link: '/services/gig', linkText: 'Learn More' },
-        { id: 11, title: 'Private Wealth Investment (The Luxury Dubai)', summary: 'Service details available upon request.', icon: 'Gem', link: '/services/private-wealth', linkText: 'Learn More' },
-        { id: 12, title: 'Asset Under Management (AUM)', summary: 'Exclusive AUM mandates for corporations, institutional investors, family offices, and ultra-high-net-worth principals—mandate-driven, disciplined, and globally informed, with transparency and governance at the core.', icon: 'PieChart', link: '/services/aum', linkText: 'Learn More' }
+        { id: 1, title: 'Business Finance Consulting (Virtual CFO)', summary: 'Financial strategy & forecasting, budgeting & cash flow management, profitability analysis & cost control, investment readiness & capital structuring, financial risk assessment & mitigation, KPI setting & performance monitoring, and board/investor reporting & stakeholder communication.', icon: 'Briefcase', link: '/services/virtual-cfo', linkText: 'Learn More', fields: [] },
+        { id: 2, title: 'Equity Financing (EF)', summary: 'Strategic capital injection through equity investment for high-growth companies seeking expansion and market leadership.', icon: 'TrendingUp', link: '/services/equity-financing', linkText: 'Learn More', fields: [] },
+        { id: 3, title: 'Real Estate Financing (REF)', summary: 'Funding for high-yield property developments and real estate acquisitions.', icon: 'Building2', link: '/services/real-estate-financing', linkText: 'Learn More', fields: [] },
+        { id: 4, title: 'Real Estate Investment Trust (REITs)', summary: 'Service details available upon request.', icon: 'Landmark', link: '/services/reits', linkText: 'Learn More', fields: [] },
+        { id: 5, title: 'Share Financing (SF)', summary: 'Service details available upon request.', icon: 'BarChart3', link: '/services/share-financing', linkText: 'Learn More', fields: [] },
+        { id: 6, title: 'Merger & Acquisition (M&A)', summary: 'Service details available upon request.', icon: 'Users', link: '/services/merger-acquisition', linkText: 'Learn More', fields: [] },
+        { id: 7, title: 'Tokenization', summary: 'Service details available upon request.', icon: 'Coins', link: '/services/tokenization', linkText: 'Learn More', fields: [] },
+        { id: 8, title: 'Asset Insurance (AI)', summary: 'Service details available upon request.', icon: 'Shield', link: '/services/asset-insurance', linkText: 'Learn More', fields: [] },
+        { id: 9, title: 'Private Placement Life Insurance (PPLI)', summary: 'Service details available upon request.', icon: 'ShieldCheck', link: '/services/ppli', linkText: 'Learn More', fields: [] },
+        { id: 10, title: 'Global Investment Gateway (GIG)', summary: 'An exclusive, subscription-based gateway for qualified companies to gain structured access to global investors and strategic partners through IVC\'s international network.', icon: 'Globe', link: '/services/gig', linkText: 'Learn More', fields: [] },
+        { id: 11, title: 'Private Wealth Investment (The Luxury Dubai)', summary: 'Service details available upon request.', icon: 'Gem', link: '/services/private-wealth', linkText: 'Learn More', fields: [] },
+        { id: 12, title: 'Asset Under Management (AUM)', summary: 'Exclusive AUM mandates for corporations, institutional investors, family offices, and ultra-high-net-worth principals—mandate-driven, disciplined, and globally informed, with transparency and governance at the core.', icon: 'PieChart', link: '/services/aum', linkText: 'Learn More', fields: [] }
     ];
 
     const { content, loading, saving, saveContent } = useContent('services', { items: defaultServices });
@@ -52,24 +52,25 @@ const ServicesManager = () => {
     }, [content, loading]);
 
     const handleEdit = (service) => {
-        setEditingService(service);
+        setEditingService({ ...service });
         setView('edit');
     };
 
     const handleCreate = () => {
-        setEditingService({ id: Date.now(), title: '', summary: '', icon: 'Briefcase', link: '', linkText: 'Learn More' });
+        setEditingService({ id: Date.now(), title: '', summary: '', icon: 'Briefcase', link: '', linkText: 'Learn More', fields: [] });
         setView('edit');
     };
 
     const handleDelete = (id) => {
         if (window.confirm('Are you sure you want to delete this service?')) {
-            setServices(prev => prev.filter(s => s.id !== id));
-            toast.success('Service deleted.');
+            const updated = services.filter(s => s.id !== id);
+            setServices(updated);
+            saveContent({ items: updated });
         }
     };
 
     const handleSave = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         if (editingService) {
             let updatedServices;
             const existing = services.find(s => s.id === editingService.id);
@@ -93,7 +94,6 @@ const ServicesManager = () => {
         saveContent({ items: items });
     };
 
-    // Helper to render icon
     const renderIcon = (iconName) => {
         const Icon = ICON_MAP[iconName] || Briefcase;
         return <Icon size={24} />;
@@ -178,90 +178,76 @@ const ServicesManager = () => {
                     </div>
                 </div>
             ) : (
-                <div className="max-w-3xl mx-auto glass-card p-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                    <button onClick={() => setView('list')} className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--accent-primary)] mb-6">
-                        <ArrowLeft size={18} /> <span>Back to List</span>
-                    </button>
-
-                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                        <Edit2 size={24} className="text-[var(--accent-secondary)]" />
-                        {editingService.id && services.find(s => s.id === editingService.id) ? 'Edit Service' : 'New Service'}
-                    </h2>
-
-                    <form onSubmit={handleSave} className="space-y-6">
-                        <div>
-                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Service Title</label>
-                            <input
-                                type="text"
-                                value={editingService.title}
-                                onChange={e => setEditingService({ ...editingService, title: e.target.value })}
-                                className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Icon Symbol</label>
-                            <div className="grid grid-cols-5 md:grid-cols-9 gap-2">
-                                {Object.keys(ICON_MAP).map((iconName) => {
-                                    const Icon = ICON_MAP[iconName];
-                                    const isSelected = editingService.icon === iconName;
-                                    return (
-                                        <button
-                                            key={iconName}
-                                            type="button"
-                                            onClick={() => setEditingService({ ...editingService, icon: iconName })}
-                                            className={`p-3 rounded-lg flex items-center justify-center transition-all ${isSelected ? 'bg-[var(--accent-primary)] text-white shadow-md scale-105' : 'bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-gray-200'}`}
-                                            title={iconName}
-                                        >
-                                            <Icon size={20} />
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                            <p className="text-xs text-[var(--text-muted)] mt-2">Select an icon that best represents this service.</p>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Summary</label>
-                            <textarea
-                                value={editingService.summary}
-                                onChange={e => setEditingService({ ...editingService, summary: e.target.value })}
-                                rows={3}
-                                className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Page Link (URL)</label>
-                                <input
-                                    type="text"
-                                    value={editingService.link || ''}
-                                    onChange={e => setEditingService({ ...editingService, link: e.target.value })}
-                                    placeholder="/service-page-url"
-                                    className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
-                                />
-                                <p className="text-xs text-[var(--text-muted)] mt-1">e.g. /business-finance-consulting</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Button Text</label>
-                                <input
-                                    type="text"
-                                    value={editingService.linkText || 'Learn More'}
-                                    onChange={e => setEditingService({ ...editingService, linkText: e.target.value })}
-                                    placeholder="Learn More"
-                                    className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="pt-4 flex justify-end gap-3">
-                            <button type="submit" className="btn-save shadow-md flex items-center gap-2">
-                                <Save size={18} /> Save Service
+                <div className="max-w-5xl mx-auto glass-card p-0 animate-in fade-in slide-in-from-bottom-4 duration-300 overflow-hidden">
+                    <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-gray-50 bg-opacity-50">
+                        <div className="flex items-center gap-4">
+                            <button onClick={() => setView('list')} className="p-2 text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-white rounded-lg transition-all shadow-sm border border-transparent hover:border-gray-200">
+                                <ArrowLeft size={18} />
                             </button>
+                            <div>
+                                <h2 className="text-2xl font-bold text-[var(--text-primary)]">
+                                    {editingService.id && services.find(s => s.id === editingService.id) ? 'Edit Service' : 'New Service'}
+                                </h2>
+                                <p className="text-sm text-[var(--text-secondary)]">{editingService.title || 'Service Details'}</p>
+                            </div>
                         </div>
-                    </form>
+                        <button onClick={handleSave} className="btn-save shadow-md flex items-center gap-2">
+                            <Save size={18} /> <span>Save Changes</span>
+                        </button>
+                    </div>
+
+                    <div className="p-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Service Title</label>
+                                    <input
+                                        type="text"
+                                        value={editingService.title}
+                                        onChange={(e) => setEditingService({ ...editingService, title: e.target.value })}
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent transition-all"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Summary Description</label>
+                                    <textarea
+                                        value={editingService.summary}
+                                        onChange={(e) => setEditingService({ ...editingService, summary: e.target.value })}
+                                        rows={4}
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent transition-all"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Icon Name (Lucide)</label>
+                                    <div className="grid grid-cols-5 gap-2">
+                                        {Object.keys(ICON_MAP).map((iconName) => {
+                                            const Icon = ICON_MAP[iconName];
+                                            const isSelected = editingService.icon === iconName;
+                                            return (
+                                                <button
+                                                    key={iconName}
+                                                    type="button"
+                                                    onClick={() => setEditingService({ ...editingService, icon: iconName })}
+                                                    className={`p-2 rounded-lg flex items-center justify-center transition-all ${isSelected ? 'bg-[var(--accent-primary)] text-white shadow-md' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                                                >
+                                                    <Icon size={18} />
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                                <div className="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                                    <p className="text-xs text-gray-500 leading-relaxed">
+                                        <strong>Note:</strong> This section only manages the service card shown on the homepage and navigation.
+                                        To edit the full page content or inquiry form, use the 
+                                        <span className="text-[var(--accent-primary)] font-semibold mx-1">Service Pages Manager</span>.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

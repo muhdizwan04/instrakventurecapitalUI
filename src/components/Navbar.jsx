@@ -39,8 +39,16 @@ const Navbar = () => {
         ]
     };
 
+    const defaultGlobalSettings = {
+        siteIdentity: {
+            logoUrl: '/logo.png',
+            siteName: 'Instrak Venture Capital',
+            tagline: ''
+        }
+    };
+
     const { content: navData } = usePageContent('navigation', defaultNav);
-    const { content: settings } = usePageContent('global_settings');
+    const { content: settings } = usePageContent('global_settings', defaultGlobalSettings);
 
     const toggleMenu = () => setMenuOpen(!menuOpen);
 

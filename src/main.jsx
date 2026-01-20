@@ -6,6 +6,7 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { HelmetProvider } from 'react-helmet-async';
+import { AuthProvider } from './context/AuthContext';
 import './index.css'
 import App from './App.jsx'
 
@@ -44,7 +45,9 @@ createRoot(document.getElementById('root')).render(
       <HelmetProvider>
         <HydrationWrapper>
           <BrowserRouter>
-            <App />
+            <AuthProvider>
+              <App />
+            </AuthProvider>
           </BrowserRouter>
           <ReactQueryDevtools initialIsOpen={false} />
         </HydrationWrapper>

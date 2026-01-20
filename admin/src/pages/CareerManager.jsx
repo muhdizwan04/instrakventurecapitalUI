@@ -42,7 +42,7 @@ const CareerManager = () => {
         ],
         jobs: [
             { id: 1, title: 'Senior Financial Analyst', location: 'Kuala Lumpur', type: 'Full-time', summary: 'Seeking an experienced analyst for our equity team.' },
-            { id: 2, title: 'Legal Counsel', location: 'Singapore', type: 'Contract', summary: 'Corporate law specialist needed for contract financing.' },
+            { id: 2, title: 'Legal Counsel', location: 'Singapore', type: 'Contract', summary: 'Corporate law specialist needed for corporate financing.' },
             { id: 3, title: 'Investment Manager', location: 'Jakarta', type: 'Full-time', summary: 'Leading our expansion into Indonesian markets.' },
         ],
         applications: [

@@ -6,8 +6,8 @@ import projectPlaceholder from '../assets/project-placeholder.png';
 
 const ProjectListing = () => {
     const defaultContent = {
-        title: 'Strategic Project Listings',
-        subtitle: 'Exclusive access to high-potential industrial and infrastructure developments across the ASEAN region.',
+        title: 'STRATEGIC PROJECT LISTINGS',
+        subtitle: '',
         projects: [
             {
                 id: 1,
@@ -57,20 +57,22 @@ const ProjectListing = () => {
                     }}>
                         {title}
                     </h1>
-                    <p style={{ 
-                        fontSize: '1.25rem', 
-                        maxWidth: '800px', 
-                        margin: '0 auto', 
-                        lineHeight: '1.6', 
-                        color: 'rgba(255,255,255,0.9)' 
-                    }}>
-                        {subtitle}
-                    </p>
                 </div>
             </div>
 
+            {/* Introduction */}
+            <section style={{ padding: '80px 20px 40px', background: '#FFFFFF' }}>
+                <div className="container">
+                    <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
+                        <p style={{ fontSize: '1.15rem', color: '#4A5568', lineHeight: '1.9' }}>
+                            Exclusive access to high-potential industrial and infrastructure developments across the ASEAN region.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
             {/* Project List */}
-            <section style={{ padding: '80px 20px', background: '#F8FAFC' }}>
+            <section style={{ padding: '40px 20px 80px', background: '#F8FAFC' }}>
                 <div className="container">
                     <div style={{ display: 'grid', gap: '3rem' }}>
                         {projects.map((project, i) => (

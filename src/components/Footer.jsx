@@ -20,10 +20,17 @@ const Footer = () => {
         ]
     };
 
+    const defaultGlobalSettings = {
+        siteIdentity: {
+            logoUrl: logo,
+            siteName: 'Instrak Venture Capital Berhad'
+        }
+    };
+
     const { content } = usePageContent('footer', defaultContent);
-    const { content: settings } = usePageContent('global_settings');
+    const { content: settings } = usePageContent('global_settings', defaultGlobalSettings);
     const addressLines = (content.address || defaultContent.address).split('\n');
-    const logoSrc = content.logo || logo; // Use admin logo if available, else default
+    const logoSrc = settings?.siteIdentity?.logoUrl || content.logo || logo;
 
     return (
         <footer id="contact" className={styles.footer}>

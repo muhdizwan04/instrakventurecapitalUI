@@ -88,6 +88,7 @@ const Layout = () => {
         '/service-pages': { icon: FileText, label: "Service Pages", path: "/service-pages", section: 'Services' },
         '/careers': { icon: Calendar, label: "Careers", path: "/career", section: 'Content' },
         '/inquiries': { icon: MessageSquare, label: "Inquiries", path: "/inquiries", section: 'Content' },
+        '/users': { icon: Users, label: "Registered Users", path: "/users", section: 'Content' },
     };
 
     // Group items by section

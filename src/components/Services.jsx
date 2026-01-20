@@ -9,7 +9,7 @@ const ICON_MAP = { TrendingUp, Wallet, ShieldCheck, PieChart, Briefcase, Buildin
 const Services = () => {
     const defaultServices = [
         { id: 1, title: 'Business Finance Consulting (Virtual CFO)', summary: 'Financial strategy & forecasting, budgeting & cash flow management, profitability analysis & cost control.', icon: 'Briefcase', link: '/services/virtual-cfo' },
-        { id: 2, title: 'Contract Financing (CF)', summary: 'Liquidity solutions for businesses with secured government or corporate contracts.', icon: 'FileText', link: '/services/contract-financing' },
+        { id: 1, title: 'Business Finance Consulting (Virtual CFO)', summary: 'Financial strategy & forecasting, budgeting & cash flow management, profitability analysis & cost control.', icon: 'Briefcase', link: '/services/virtual-cfo' },
         { id: 3, title: 'Equity Financing (EF)', summary: 'Strategic capital injection through equity investment for high-growth companies.', icon: 'TrendingUp', link: '/services/equity-financing' },
         { id: 4, title: 'Real Estate Financing (REF)', summary: 'Funding for high-yield property developments and real estate acquisitions.', icon: 'Building2', link: '/services/real-estate-financing' },
         { id: 5, title: 'Real Estate Investment Trust (REITs)', summary: 'Institutional-grade real estate investment opportunities.', icon: 'Landmark', link: '/services/reits' },

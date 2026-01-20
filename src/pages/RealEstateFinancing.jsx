@@ -3,6 +3,7 @@ import PageHero from '../components/PageHero';
 import { Building2, Landmark, Home, Factory, CheckCircle } from 'lucide-react';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { Toaster } from 'react-hot-toast';
+import ProtectedFormSection from '../components/ProtectedFormSection';
 
 const RealEstateFinancing = () => {
     const [formData, setFormData] = useState({
@@ -45,12 +46,23 @@ const RealEstateFinancing = () => {
     return (
         <div className="page-wrapper">
             <PageHero 
-                title="Real Estate Financing" 
-                subtitle="Funding for high-yield property developments and real estate acquisitions."
+                title="REAL ESTATE FINANCING" 
+                subtitle=""
             />
+
+            {/* Introduction */}
+            <section style={{ padding: '80px 20px 40px', background: '#FFFFFF' }}>
+                <div className="container">
+                    <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
+                        <p style={{ fontSize: '1.15rem', color: '#4A5568', lineHeight: '1.9' }}>
+                           Funding for high-yield property developments and real estate acquisitions. We provide comprehensive financing solutions for new developments, bridge financing, and acquisition equity.
+                        </p>
+                    </div>
+                </div>
+            </section>
             
             {/* Financing Types */}
-            <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>
+            <section style={{ padding: '40px 20px 80px', background: '#FFFFFF' }}>
                 <div className="container">
                     <h2 className="section-title">Financing Solutions</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
@@ -110,7 +122,8 @@ const RealEstateFinancing = () => {
                             Have a real estate project that needs financing? Let's discuss how we can help.
                         </p>
                         <div style={{ background: '#FFFFFF', padding: '2.5rem', borderRadius: '12px', border: '1px solid rgba(26, 54, 93, 0.1)', boxShadow: '0 4px 20px rgba(26, 54, 93, 0.08)' }}>
-                            <form onSubmit={handleSubmit}>
+                            <ProtectedFormSection serviceName="Real Estate Financing">
+                                <form onSubmit={handleSubmit}>
                                 <Toaster position="top-right" />
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
                                     <div>
@@ -173,6 +186,7 @@ const RealEstateFinancing = () => {
                                 </div>
                                 <button className="btn-solid" type="submit" style={{ width: '100%', opacity: loading ? 0.7 : 1 }} disabled={loading}>{loading ? 'Submitting...' : 'Submit Project'}</button>
                             </form>
+                            </ProtectedFormSection>
                         </div>
                     </div>
                 </div>

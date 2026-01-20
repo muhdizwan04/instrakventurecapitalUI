@@ -25,7 +25,7 @@ const GlobalSettingsManager = () => {
             metaTitleTemplate: '%s | Instrak Venture Capital',
             metaDescription: 'Instrak Venture Capital Berhad - Strategic financing solutions for industrial growth in ASEAN.',
             ogImage: '/og-image.jpg',
-            keywords: 'venture capital, financing, Malaysia, ASEAN, industrial, equity, contract financing'
+            keywords: 'venture capital, financing, Malaysia, ASEAN, industrial, equity'
         },
     };
 

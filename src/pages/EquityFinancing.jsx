@@ -3,6 +3,7 @@ import PageHero from '../components/PageHero';
 import { TrendingUp, Users, Search, Briefcase, Target, CheckCircle, ArrowRight, DollarSign, PieChart, Clock } from 'lucide-react';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { Toaster } from 'react-hot-toast';
+import ProtectedFormSection from '../components/ProtectedFormSection';
 
 const EquityFinancing = () => {
     const [formData, setFormData] = useState({
@@ -79,12 +80,23 @@ const EquityFinancing = () => {
     return (
         <div className="page-wrapper">
             <PageHero 
-                title="Equity Financing & M&A" 
-                subtitle="Strategic growth through equity investment and merger assistance."
+                title="EQUITY FINANCING & M&A" 
+                subtitle=""
             />
+
+            {/* Introduction */}
+            <section style={{ padding: '80px 20px 40px', background: '#FFFFFF' }}>
+                <div className="container">
+                    <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
+                        <p style={{ fontSize: '1.15rem', color: '#4A5568', lineHeight: '1.9' }}>
+                            Strategic growth through equity investment and merger assistance. We facilitate strategic capital injection up to USD 100 Million for high-growth companies and provide expert guidance through complex M&A transactions and negotiations.
+                        </p>
+                    </div>
+                </div>
+            </section>
             
             {/* Services */}
-            <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>
+            <section style={{ padding: '40px 20px 80px', background: '#FFFFFF' }}>
                 <div className="container">
                     <h2 className="section-title">Our Services</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
@@ -268,7 +280,8 @@ const EquityFinancing = () => {
                             Interested in equity partnership or M&A advisory? Send your Letter of Intent (LOI) to begin the process.
                         </p>
                         <div style={{ background: '#FFFFFF', padding: '2.5rem', borderRadius: '12px', border: '1px solid rgba(26, 54, 93, 0.1)', boxShadow: '0 4px 20px rgba(26, 54, 93, 0.08)' }}>
-                            <form onSubmit={handleSubmit}>
+                            <ProtectedFormSection serviceName="Equity Financing">
+                                <form onSubmit={handleSubmit}>
                                 <Toaster position="top-right" />
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
                                     <div>
@@ -327,6 +340,7 @@ const EquityFinancing = () => {
                                     Or email directly to: <a href="mailto:kahar@instrakventurecapital.com" style={{ color: '#B8860B', fontWeight: '600' }}>kahar@instrakventurecapital.com</a>
                                 </p>
                             </form>
+                            </ProtectedFormSection>
                         </div>
                     </div>
                 </div>

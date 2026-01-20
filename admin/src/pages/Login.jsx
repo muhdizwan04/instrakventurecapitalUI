@@ -37,18 +37,7 @@ const Login = () => {
             </div>
 
             <div className="w-full max-w-md p-8 relative z-10">
-                {/* Brand Header */}
-                <div className="text-center mb-10 animate-in fade-in slide-in-from-top duration-700">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[var(--accent-primary)] text-white mb-6 shadow-xl shadow-[var(--accent-primary)]/20 rotate-3 transform transition-transform hover:rotate-0">
-                        <ShieldCheck size={32} />
-                    </div>
-                    <h1 className="text-4xl font-heading font-extrabold text-[var(--accent-primary)] mb-2 tracking-tight">
-                        INSTRAK<span className="text-[var(--accent-secondary)]">VC</span>
-                    </h1>
-                    <p className="text-[var(--text-muted)] font-medium tracking-widest uppercase text-xs">
-                        Administrative Authority
-                    </p>
-                </div>
+
 
                 {/* Login Card */}
                 <div className="glass-card shadow-2xl border-white/50 animate-in fade-in zoom-in duration-500">

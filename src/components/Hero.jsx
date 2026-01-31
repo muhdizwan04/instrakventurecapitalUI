@@ -8,11 +8,11 @@ import klSkyline from '../assets/kl-skyline.png';
 const Hero = () => {
     // Default content - used while loading and as fallback
     const defaultContent = {
-        heroTitle: 'We Help To Grow\nYour Business',
+        heroTitle: 'Your Venture\nCapital Partner',
         heroSubtitle: 'Governance • Transparency • Integrity',
         heroDescription: 'Providing foundational governance and integrity essential for scaling visionary industrial leaders across the ASEAN region.',
         buttons: [
-            { id: 1, text: 'Strategic Services', link: '/services', variant: 'solid' },
+            { id: 1, text: 'Register as Investor', link: '/register', variant: 'solid' },
             { id: 2, text: 'Potential Project Listing', link: '/project-listings', variant: 'outline' }
         ]
     };

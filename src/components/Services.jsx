@@ -29,10 +29,10 @@ const Services = () => {
 
     // Fetch section title/subtitle from home settings
     const { content: homeContent } = usePageContent('home', {
-        servicesTitle: 'Our Services',
+        servicesTitle: 'Our Portfolio',
         servicesSubtitle: 'Comprehensive financial solutions tailored for your growth'
     });
-    const title = homeContent.servicesTitle || 'Our Services';
+    const title = homeContent.servicesTitle || 'Our Portfolio';
     const subtitle = homeContent.servicesSubtitle || 'Comprehensive financial solutions tailored for your growth';
 
     return (

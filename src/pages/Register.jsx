@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLoading } from '../context/LoadingContext';
 import { Eye, EyeOff, Lock, Mail, User, Building2, Phone, Loader2 } from 'lucide-react';
 import styles from './Login.module.css';
 
@@ -20,6 +21,7 @@ const Register = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { signup } = useAuth();
+    const { showLoading, hideLoading } = useLoading();
 
     const from = location.state?.from?.pathname || '/';
 
@@ -42,6 +44,7 @@ const Register = () => {
         }
 
         setLoading(true);
+        showLoading('Creating your account...');
 
         try {
             await signup(formData.email, formData.password, {
@@ -49,8 +52,10 @@ const Register = () => {
                 company_name: formData.companyName,
                 phone: formData.phone
             });
+            hideLoading();
             setRegistrationSuccess(true);
         } catch (err) {
+            hideLoading();
             console.error('Registration error:', err);
             setError(err.message || 'Failed to create account');
         } finally {

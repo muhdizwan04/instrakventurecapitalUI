@@ -7,9 +7,9 @@ import { usePageContent } from '../hooks/usePageContent';
 const Footer = () => {
     const defaultContent = {
         logo: '',
-        companyName: 'Instrak Venture Capital Berhad (1411516-U)',
-        description: 'Providing strategic funding and governance for the next generation of industry leaders through institutional excellence.',
-        address: 'Level 27 Penthouse, Centrepoint North\nMid Valley City\n59200 Kuala Lumpur, Malaysia',
+        companyName: 'Instrak Venture Capital Berhad',
+        description: 'Disclaimer Testing for disclaimer placement',
+        address: 'Level 23, Menara Exchange 106,\nTun Razak Exchange (TRX),\n55188 Kuala Lumpur, Malaysia\n\n1005 & 1006, Ontario Tower,\nBusiness Bay, Dubai,\nUnited Arab Emirates',
         email: 'admin@instrakventurecapital.com',
         quickLinks: [
             { label: 'Home', url: '/' },

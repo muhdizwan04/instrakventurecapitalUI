@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLoading } from '../context/LoadingContext';
 import { Eye, EyeOff, Lock, Mail, Loader2 } from 'lucide-react';
 import styles from './Login.module.css';
 
@@ -13,6 +14,7 @@ const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { login } = useAuth();
+    const { showLoading, hideLoading } = useLoading();
 
     // Get the page user was trying to access
     const from = location.state?.from?.pathname || '/';
@@ -21,11 +23,14 @@ const Login = () => {
         e.preventDefault();
         setError('');
         setLoading(true);
+        showLoading('Signing in...');
 
         try {
             await login(email, password);
+            hideLoading();
             navigate(from, { replace: true });
         } catch (err) {
+            hideLoading();
             console.error('Login error:', err);
             setError(err.message || 'Invalid email or password');
         } finally {

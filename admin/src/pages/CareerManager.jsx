@@ -3,8 +3,7 @@ import { Plus, Edit2, Trash2, Search, Briefcase, ArrowLeft, ArrowRight, Save, Ma
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
-import StyleControls from '../components/StyleControls';
-import PreviewPageHero from '../components/PreviewPageHero';
+
 
 const CareerManager = () => {
     const [activeTab, setActiveTab] = useState('sections'); // 'sections', 'jobs', 'applications'
@@ -14,7 +13,7 @@ const CareerManager = () => {
     const [previewMode, setPreviewMode] = useState('desktop');
 
     // For Sections Management
-    const [activeSection, setActiveSection] = useState(null);
+
 
     const defaultData = {
         sections: [
@@ -45,11 +44,7 @@ const CareerManager = () => {
             { id: 2, title: 'Legal Counsel', location: 'Singapore', type: 'Contract', summary: 'Corporate law specialist needed for corporate financing.' },
             { id: 3, title: 'Investment Manager', location: 'Jakarta', type: 'Full-time', summary: 'Leading our expansion into Indonesian markets.' },
         ],
-        applications: [
-            { id: 1, name: 'Alice Tan', email: 'alice@example.com', job: 'Senior Financial Analyst', date: '2024-03-10', status: 'New' },
-            { id: 2, name: 'David Lee', email: 'david.l@gmail.com', job: 'Global Application', date: '2024-03-09', status: 'Reviewed' },
-            { id: 3, name: 'Siti Aminah', email: 'siti@yahoo.com', job: 'Legal Counsel', date: '2024-03-08', status: 'Interviewing' },
-        ]
+        applications: []
     };
 
     const { content, loading, saving, saveContent } = useContent('career', defaultData);
@@ -98,38 +93,13 @@ const CareerManager = () => {
     };
 
     // --- SECTIONS MANAGERS ---
-    const handleDragEnd = (result) => {
-        if (!result.destination) return;
-        const items = Array.from(sections);
-        const [reorderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reorderedItem);
-        setSections(items);
-    };
+
 
     const updateSection = (id, updates) => {
         setSections(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
     };
 
-    const addCustomSection = () => {
-        setSections(prev => [...prev, {
-            id: `custom-${Date.now()}`,
-            type: 'custom',
-            title: 'New Section',
-            content: '',
-            styles: { textAlign: 'left', textColor: '#1A365D', bgColor: '#FFFFFF' }
-        }]);
-    };
 
-    const deleteSection = (id) => {
-        if (['hero', 'intro', 'jobs'].includes(id)) {
-            toast.error("Cannot delete core sections.");
-            return;
-        }
-        if (window.confirm("Delete this section?")) {
-            setSections(prev => prev.filter(s => s.id !== id));
-            if (activeSection === id) setActiveSection(null);
-        }
-    };
 
     // --- JOB MANAGERS ---
     const filteredJobs = useMemo(() => {
@@ -183,73 +153,80 @@ const CareerManager = () => {
         );
     }, [applications, searchQuery]);
 
+    const deleteApplication = async (appId) => {
+        if (!window.confirm('Are you sure you want to delete this application?')) return;
+        const updated = applications.filter(app => app.id !== appId);
+        setApplications(updated);
+        await saveContent({ sections, jobs, applications: updated });
+        toast.success('Application deleted');
+    };
+
     // --- EDITORS ---
     const renderSectionEditor = (section) => {
-        if (!section) return <div className="text-center text-gray-400 mt-10">Select a section to edit</div>;
+        if (!section) return null;
 
         return (
-            <div className="space-y-4 animate-in fade-in">
-                <StyleControls section={section} onUpdate={(updates) => updateSection(section.id, updates)} />
+            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm space-y-4">
+                <h3 className="text-lg font-bold text-gray-800 border-b border-gray-100 pb-3 capitalize flex items-center gap-2">
+                    <Edit size={16} className="text-[var(--accent-primary)]" />
+                    {section.title || section.id} Content
+                </h3>
 
-                <div>
-                    <label className="label">Section Title</label>
-                    <input
-                        value={section.title || ''}
-                        onChange={(e) => updateSection(section.id, { title: e.target.value })}
-                        className="input-field"
-                    />
-                </div>
-
-                {section.type === 'hero' && (
+                <div className="space-y-4">
                     <div>
-                        <label className="label">Subtitle</label>
+                        <label className="label">Section Title</label>
                         <input
-                            value={section.subtitle || ''}
-                            onChange={(e) => updateSection(section.id, { subtitle: e.target.value })}
+                            value={section.title || ''}
+                            onChange={(e) => updateSection(section.id, { title: e.target.value })}
                             className="input-field"
                         />
                     </div>
-                )}
 
-                {section.type === 'intro' && (
-                    <>
+                    {section.type === 'hero' && (
                         <div>
-                            <label className="label">Description</label>
-                            <textarea
-                                rows={5}
-                                value={section.description || ''}
-                                onChange={(e) => updateSection(section.id, { description: e.target.value })}
-                                className="input-field"
-                            />
-                        </div>
-                        <div>
-                            <label className="label">Contact Email</label>
+                            <label className="label">Subtitle</label>
                             <input
-                                value={section.email || ''}
-                                onChange={(e) => updateSection(section.id, { email: e.target.value })}
+                                value={section.subtitle || ''}
+                                onChange={(e) => updateSection(section.id, { subtitle: e.target.value })}
                                 className="input-field"
                             />
                         </div>
-                    </>
-                )}
+                    )}
 
-                {section.type === 'custom' && (
-                    <div>
-                        <label className="label">Content (Markdown supported)</label>
-                        <textarea
-                            rows={8}
-                            value={section.content || ''}
-                            onChange={(e) => updateSection(section.id, { content: e.target.value })}
-                            className="input-field font-mono text-sm"
-                        />
-                    </div>
-                )}
+                    {section.type === 'intro' && (
+                        <>
+                            <div>
+                                <label className="label">Description</label>
+                                <textarea
+                                    rows={5}
+                                    value={section.description || ''}
+                                    onChange={(e) => updateSection(section.id, { description: e.target.value })}
+                                    className="input-field"
+                                />
+                            </div>
+                            <div>
+                                <label className="label">Contact Email</label>
+                                <input
+                                    value={section.email || ''}
+                                    onChange={(e) => updateSection(section.id, { email: e.target.value })}
+                                    className="input-field"
+                                />
+                            </div>
+                        </>
+                    )}
 
-                {section.type === 'jobs' && (
-                    <div className="p-4 bg-blue-50 text-blue-800 rounded-lg text-sm">
-                        Content for this section is managed in the <strong>Job Postings</strong> tab.
-                    </div>
-                )}
+                    {section.type === 'custom' && (
+                        <div>
+                            <label className="label">Content (Markdown supported)</label>
+                            <textarea
+                                rows={8}
+                                value={section.content || ''}
+                                onChange={(e) => updateSection(section.id, { content: e.target.value })}
+                                className="input-field font-mono text-sm"
+                            />
+                        </div>
+                    )}
+                </div>
             </div>
         );
     };
@@ -304,12 +281,7 @@ const CareerManager = () => {
                     <p className="text-[var(--text-secondary)]">Manage page layout, job openings, and applications.</p>
                 </div>
                 <div className="flex gap-3">
-                    {activeTab === 'sections' && (
-                        <button onClick={addCustomSection} className="btn-add">
-                            <Plus size={18} />
-                            <span>Add Section</span>
-                        </button>
-                    )}
+
                     <button onClick={handleSaveGlobal} disabled={saving} className="btn-save">
                         {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                         <span>{saving ? 'Saving...' : 'Save All Changes'}</span>
@@ -320,7 +292,7 @@ const CareerManager = () => {
             {/* Tabs */}
             <div className="flex gap-2 mb-6 overflow-x-auto no-scrollbar pb-2">
                 {[
-                    { id: 'sections', label: 'Page Layout', icon: LayoutTemplate },
+                    { id: 'sections', label: 'Page Content', icon: FileText },
                     { id: 'jobs', label: 'Job Postings', icon: Briefcase },
                     { id: 'applications', label: 'Applications', icon: Users },
                 ].map(tab => (
@@ -348,190 +320,16 @@ const CareerManager = () => {
 
                 {/* 1. SECTIONS TAB (Split View) */}
                 {activeTab === 'sections' && (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 flex-1 min-h-0">
-                        {/* LEFT COLUMN: List & Editor */}
-                        <div className="min-w-0 flex flex-col gap-6 h-full">
-                            {/* Horizontal Draggable List */}
-                            <div className="glass-card p-4 shrink-0 bg-white shadow-sm border border-gray-100">
-                                <DragDropContext onDragEnd={handleDragEnd}>
-                                    <Droppable droppableId="career-sections" direction="horizontal">
-                                        {(provided) => (
-                                            <div {...provided.droppableProps} ref={provided.innerRef} className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                                                {sections.map((section, index) => (
-                                                    <Draggable key={section.id} draggableId={section.id} index={index}>
-                                                        {(provided, snapshot) => (
-                                                            <div
-                                                                ref={provided.innerRef}
-                                                                {...provided.draggableProps}
-                                                                {...provided.dragHandleProps}
-                                                                onClick={() => setActiveSection(section.id)}
-                                                                className={`
-                                                                    flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer whitespace-nowrap transition-all select-none text-sm
-                                                                    ${activeSection === section.id
-                                                                        ? 'bg-[var(--accent-primary)] text-white border-[var(--accent-primary)] shadow-md'
-                                                                        : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]'}
-                                                                    ${snapshot.isDragging ? 'shadow-lg ring-2 ring-[var(--accent-primary)] z-50' : ''}
-                                                                `}
-                                                            >
-                                                                <GripVertical size={12} className={activeSection === section.id ? 'text-white/50' : 'text-gray-300'} />
-                                                                <span className="font-medium">{section.title}</span>
-                                                                {section.type === 'custom' && (
-                                                                    <button
-                                                                        onClick={(e) => { e.stopPropagation(); deleteSection(section.id); }}
-                                                                        className={`ml-1 p-1 rounded-full hover:bg-white/20 ${activeSection === section.id ? 'text-white' : 'text-gray-400 hover:text-red-500'}`}
-                                                                    >
-                                                                        <Trash2 size={12} />
-                                                                    </button>
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                    </Draggable>
-                                                ))}
-                                                {provided.placeholder}
-                                            </div>
-                                        )}
-                                    </Droppable>
-                                </DragDropContext>
-                            </div>
-
-                            {/* Editor Area */}
-                            <div className="glass-card flex-1 flex flex-col min-h-0 bg-white shadow-sm border border-gray-100 overflow-hidden">
-                                <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                                    <h2 className="font-heading text-lg text-[var(--accent-primary)] flex items-center gap-2">
-                                        <Edit size={16} />
-                                        {sections.find(s => s.id === activeSection)?.title || 'Edit Section'}
-                                    </h2>
-                                </div>
-                                <div className="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white">
-                                    {renderSectionEditor(sections.find(s => s.id === activeSection))}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* RIGHT COLUMN: Live Preview */}
-                        <div className="glass-card p-6 bg-[var(--bg-tertiary)] h-fit min-w-0">
-                            <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--text-muted)] mb-6">Live Preview</h3>
-
-                            <div className="bg-white rounded-xl shadow-lg border border-[var(--border-light)] h-[600px] overflow-y-auto no-scrollbar relative w-full select-none overflow-x-hidden">
-                                {sections.map(section => {
-                                    const isActive = activeSection === section.id;
-                                    const styles = section.styles || {};
-                                    const commonStyle = {
-                                        backgroundColor: styles.bgColor || 'transparent',
-                                        color: styles.textColor || 'inherit',
-                                        textAlign: styles.textAlign || 'left',
-                                        backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
-                                        backgroundSize: styles.backgroundSize || 'cover',
-                                        backgroundPosition: 'center',
-                                        position: 'relative',
-                                        width: '100%',
-                                        overflow: 'hidden'
-                                    };
-
-                                    const overlay = styles.backgroundImage && (
-                                        <div style={{
-                                            position: 'absolute', inset: 0, background: 'black',
-                                            opacity: styles.overlayOpacity || 0, zIndex: 0, pointerEvents: 'none'
-                                        }} />
-                                    );
-
-                                    const contentWrapper = (
-                                        <div className="relative z-10 w-full">
-                                            {section.type === 'hero' && (
-                                                <PreviewPageHero
-                                                    title={section.title}
-                                                    subtitle={section.subtitle}
-                                                    style={{ background: 'transparent' }}
-                                                />
-                                            )}
-
-                                            {section.type === 'intro' && (
-                                                <div style={{ position: 'relative', zIndex: 1, padding: '60px 20px', width: '100%', maxWidth: '1000px', margin: '0 auto' }}>
-                                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem', alignItems: 'center' }}>
-                                                        <div style={{ textAlign: styles.textAlign || 'left', minWidth: 0 }}>
-                                                            <h2 style={{ fontSize: '2rem', marginBottom: '1rem', color: styles.textColor || '#1A365D', lineHeight: '1.2' }}>{section.title}</h2>
-                                                            <p style={{ color: styles.textColor ? styles.textColor : '#4A5568', fontSize: '1rem', lineHeight: '1.6', marginBottom: '1.5rem', whiteSpace: 'pre-wrap', opacity: styles.textColor ? 0.9 : 1 }}>
-                                                                {section.description}
-                                                            </p>
-                                                            {section.email && (
-                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: styles.textColor || '#D97706', fontWeight: 'bold', fontSize: '0.9rem' }}>
-                                                                    <Mail size={16} />
-                                                                    <span>{section.email}</span>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                        <div className="glass-card" style={{ height: '240px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #F5F7FA 0%, #FFFFFF 100%)', borderRadius: '16px', border: '1px border-[var(--border-light)]', padding: '1.5rem' }}>
-                                                            <p style={{ fontStyle: 'italic', color: '#B8860B', textAlign: 'center', fontSize: '1.1rem' }}>"Integrity is the bedrock of our institutional success."</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {section.type === 'jobs' && (
-                                                <div style={{ position: 'relative', zIndex: 1, padding: '60px 20px', width: '100%', maxWidth: '1000px', margin: '0 auto' }}>
-                                                    <div style={{ marginBottom: '3rem' }}>
-                                                        <h2 style={{ fontSize: '1.75rem', marginBottom: '0.5rem', color: styles.textColor || '#1A365D', textAlign: styles.textAlign || 'center' }}>{section.title}</h2>
-                                                        <p style={{ color: styles.textColor ? styles.textColor : '#4A5568', opacity: 0.8, textAlign: styles.textAlign || 'center', fontSize: '0.9rem' }}>Current opportunities at Instrak Venture Capital</p>
-                                                    </div>
-
-                                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
-                                                        {(jobs.length > 0 ? jobs : [1, 2]).map((job, i) => (
-                                                            <div key={i} className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm">
-                                                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                                                                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(26, 54, 93, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1A365D' }}>
-                                                                        <Briefcase size={20} />
-                                                                    </div>
-                                                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                                                        <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: '#1A365D', fontWeight: 'bold', truncate: true }}>{job.title || 'Job Title'}</h3>
-                                                                        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem', flexWrap: 'wrap', fontSize: '0.8rem', color: '#64748B' }}>
-                                                                            <span className="flex items-center gap-1"><MapPin size={12} /> {job.location || 'Remote'}</span>
-                                                                            <span className="flex items-center gap-1"><Clock size={12} /> {job.type || 'Full-time'}</span>
-                                                                        </div>
-                                                                        <p style={{ color: '#64748B', fontSize: '0.85rem', lineHeight: '1.5', marginBottom: '1rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{job.summary || 'Short job description goes here...'}</p>
-                                                                        <div style={{ color: '#B8860B', fontWeight: '600', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                                                            Read More <ArrowRight size={14} />
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {section.type === 'custom' && (
-                                                <div style={{ padding: '40px 20px', width: '100%', maxWidth: '800px', margin: '0 auto' }}>
-                                                    {section.title && <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: styles.textColor || '#1A365D' }}>{section.title}</h2>}
-                                                    <div style={{ lineHeight: '1.6', fontSize: '0.95rem', whiteSpace: 'pre-wrap' }}>
-                                                        {section.content || <span className="text-gray-400 italic">No content...</span>}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-
-                                    return (
-                                        <div
-                                            key={section.id}
-                                            onClick={() => setActiveSection(section.id)}
-                                            className={`
-                                                relative cursor-pointer transition-all border-2
-                                                ${isActive ? 'border-[var(--accent-primary)] z-10' : 'border-transparent hover:border-gray-100'}
-                                            `}
-                                            style={commonStyle}
-                                        >
-                                            {overlay}
-                                            {contentWrapper}
-
-                                            {isActive && (
-                                                <div className="absolute top-2 right-2 bg-[var(--accent-primary)] text-white text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold z-50 pointer-events-none shadow-sm">
-                                                    Active
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                    <div className="flex-1 overflow-y-auto min-h-0 bg-transparent">
+                        <div className="w-full space-y-8 pb-10">
+                            {sections
+                                .filter(s => s.type !== 'jobs')
+                                .map(section => (
+                                    <div key={section.id} className="animate-in fade-in slide-in-from-bottom-2">
+                                        {renderSectionEditor(section)}
+                                    </div>
+                                ))
+                            }
                         </div>
                     </div>
                 )}
@@ -632,6 +430,12 @@ const CareerManager = () => {
                                         </span>
                                         <button onClick={() => toast.success(`Downloading ${app.name}'s resume...`)} className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border-light)] rounded hover:bg-[var(--bg-tertiary)] text-sm transition-colors">
                                             <Download size={14} /> Resume
+                                        </button>
+                                        <button 
+                                            onClick={() => deleteApplication(app.id)} 
+                                            className="flex items-center gap-1 px-3 py-1.5 border border-red-200 text-red-600 rounded hover:bg-red-50 text-sm transition-colors"
+                                        >
+                                            <Trash2 size={14} /> Delete
                                         </button>
                                     </div>
                                 </div>

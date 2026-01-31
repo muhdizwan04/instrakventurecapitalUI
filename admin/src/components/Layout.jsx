@@ -78,15 +78,15 @@ const Layout = () => {
         '/mission-vision-values': { icon: User, label: "About Us", path: "/about", section: 'Pages' },
 
         '/investors': { icon: DollarSign, label: "Investors", path: "/investors", section: 'Pages' },
-        '/services': { icon: Briefcase, label: "Services", path: "/services", section: 'Services' },
-        '/latest-news-2': { icon: Newspaper, label: "News & Events", path: "/news", section: 'Content' },
+        '/services': { icon: Briefcase, label: "Services", path: "/services", section: 'Pages' },
+        '/latest-news-2': { icon: Newspaper, label: "News & Events", path: "/news", section: 'Pages' },
         '/project-listings': { icon: Building2, label: "Project Listing", path: "/projects", section: 'Pages' },
     };
 
     // Other items that might not be in the nav but we want to show
     const fixedAdminItems = {
         '/service-pages': { icon: FileText, label: "Service Pages", path: "/service-pages", section: 'Services' },
-        '/careers': { icon: Calendar, label: "Careers", path: "/career", section: 'Content' },
+        '/careers': { icon: Calendar, label: "Careers", path: "/career", section: 'Pages' },
         '/inquiries': { icon: MessageSquare, label: "Inquiries", path: "/inquiries", section: 'Content' },
         '/users': { icon: Users, label: "Registered Users", path: "/users", section: 'Content' },
     };
@@ -145,6 +145,11 @@ const Layout = () => {
                 <nav className="p-2 space-y-0.5">
                     <SidebarItem icon={LayoutDashboard} label="Dashboard" path="/" />
 
+                    <SectionDivider label="Content" />
+                    {getItemsBySection('Content').map(item => (
+                        <SidebarItem key={item.path} icon={item.icon} label={item.label} path={item.path} />
+                    ))}
+
                     <SectionDivider label="Settings" />
                     <SidebarItem icon={Settings} label="Global Settings" path="/global-settings" />
                     <SidebarItem icon={Navigation} label="Navigation Menu" path="/navigation" />
@@ -157,11 +162,6 @@ const Layout = () => {
 
                     <SectionDivider label="Services" />
                     {getItemsBySection('Services').map(item => (
-                        <SidebarItem key={item.path} icon={item.icon} label={item.label} path={item.path} />
-                    ))}
-
-                    <SectionDivider label="Content" />
-                    {getItemsBySection('Content').map(item => (
                         <SidebarItem key={item.path} icon={item.icon} label={item.label} path={item.path} />
                     ))}
 

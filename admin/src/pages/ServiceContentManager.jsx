@@ -400,7 +400,7 @@ const ServiceContentManager = () => {
 
             {activeTab === 'content' ? (
                 <DragDropContext onDragEnd={handleDragEnd}>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
                         {/* Left Column - Editor */}
                         <div className="glass-card p-6">
                             <div className="flex items-center gap-4 mb-6">
@@ -614,21 +614,6 @@ const ServiceContentManager = () => {
                                     </div>
                                 )}
                                 
-                                <div className="mt-8 pt-8 border-t border-gray-100">
-                                    <h3 className="font-bold text-gray-400 uppercase tracking-widest text-xs mb-4">Live Preview</h3>
-                                    {/* Simplified Preview */}
-                                    <div className="border border-gray-100 rounded-lg overflow-hidden shadow-sm">
-                                        <div className="bg-[#F5F7FA] py-6 px-4 text-center border-b-2 border-[#B8860B]">
-                                            <h2 className="text-lg font-bold mb-1 font-heading text-[#1A365D]">{service.title}</h2>
-                                        </div>
-                                        <div className="px-4 py-3 bg-white text-center border-b border-gray-50">
-                                            <p className="text-[10px] text-gray-800 leading-relaxed font-medium">{service.introduction || 'No introduction text set.'}</p>
-                                        </div>
-                                        <div className="p-4 bg-gray-50 text-[10px] text-gray-500 italic">
-                                            <p className="line-clamp-3">{service.overview?.description}</p>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>

@@ -43,7 +43,8 @@ export const useContent = (contentId, defaultContent = {}, options = {}) => {
         }
     };
 
-    const saveContent = async (newContent = content) => {
+    const saveContent = async (newContent = content, options = {}) => {
+        const { silent = false } = options;
         setSaving(true);
         try {
             const { error } = await supabase
@@ -57,11 +58,11 @@ export const useContent = (contentId, defaultContent = {}, options = {}) => {
             if (error) throw error;
 
             setContent(newContent);
-            toast.success('Changes saved successfully!');
+            if (!silent) toast.success('Changes saved successfully!');
             return true;
         } catch (err) {
             console.error('Error saving content:', err);
-            toast.error('Failed to save changes');
+            if (!silent) toast.error('Failed to save changes');
             return false;
         } finally {
             setSaving(false);

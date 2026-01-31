@@ -34,7 +34,7 @@ const AboutUs = () => {
     const { content: boardContent } = usePageContent('board', { directors: defaultDirectors });
     const directors = boardContent.directors || defaultDirectors;
 
-    // 3. Partners Content (Source of Truth for Partners & Trust)
+    // 3. Partners Content (Source of Truth for Partners & Milestone)
     const defaultPartners = {
         partners: [{
             id: 'p-1', category: 'Insurance Partner', name: 'Chubb International Insurance', logo: '',
@@ -53,20 +53,16 @@ const AboutUs = () => {
                 description: 'International banking partner for offshore fund management via INSTRAK Project Management Services Est.'
             }
         ],
-        trustContent: {
-            title: 'Governance & Compliance',
-            description: 'All fund management and investment activities are conducted under strict regulatory oversight and compliance with Malaysian financial regulations.',
-            regulators: [
-                { id: 1, title: 'Securities Commission', subtitle: 'Malaysia (SC)' },
-                { id: 2, title: 'Central Bank', subtitle: 'Bank Negara Malaysia' },
-                { id: 3, title: 'Trade Credit Insurance', subtitle: 'Fund Protection' }
-            ]
+        milestone: {
+            headline: 'USD 1 Billion',
+            subtitle: 'Investment Commitment Signed',
+            description: 'INSTRAK Venture Capital Berhad has secured strategic investment commitments to support project financing and high-growth equity investments across the ASEAN region.'
         }
     };
     const { content: partnersContent } = usePageContent('partners', defaultPartners);
     const partners = partnersContent.partners || defaultPartners.partners;
     const banks = partnersContent.banks || defaultPartners.banks;
-    const trustContent = partnersContent.trustContent || defaultPartners.trustContent;
+    const milestone = partnersContent.milestone || defaultPartners.milestone;
 
     // --- Static Constants ---
     const highlights = [
@@ -375,11 +371,11 @@ const AboutUs = () => {
                                 </div>
 
                                 <Award size={64} style={{ color: '#D4AF37', margin: '0 auto 2rem' }} />
-                                <h2 style={{ fontSize: '3.5rem', fontFamily: 'var(--font-heading)', color: '#FFFFFF', marginBottom: '1rem' }}>USD 1 Billion</h2>
-                                <p style={{ fontSize: '1.5rem', color: '#D4AF37', marginBottom: '2rem' }}>Investment Commitment Signed</p>
+                                <h2 style={{ fontSize: '3.5rem', fontFamily: 'var(--font-heading)', color: '#FFFFFF', marginBottom: '1rem' }}>{milestone.headline}</h2>
+                                <p style={{ fontSize: '1.5rem', color: '#D4AF37', marginBottom: '2rem' }}>{milestone.subtitle}</p>
                                 <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', width: '100px', margin: '0 auto 2rem' }}></div>
                                 <p style={{ fontSize: '1.1rem', lineHeight: '1.8', opacity: 0.8, maxWidth: '700px', margin: '0 auto' }}>
-                                    INSTRAK Venture Capital Berhad has secured strategic investment commitments to support project financing and high-growth equity investments across the ASEAN region.
+                                    {milestone.description}
                                 </p>
                             </div>
                         </div>
@@ -434,50 +430,7 @@ const AboutUs = () => {
         );
     };
 
-    const renderTrust = (section) => {
-        const styles = section.styles || {};
-        return (
-            <section key={section.id} style={{
-                background: styles.bgColor || '#F1F5F9',
-                padding: '60px 0',
-                backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
-                backgroundSize: styles.backgroundSize || 'cover',
-                backgroundPosition: 'center',
-                position: 'relative',
-                textAlign: styles.textAlign || 'center'
-            }}>
-                {styles.backgroundImage && (
-                    <div style={{
-                        position: 'absolute', inset: 0, background: 'black',
-                        opacity: styles.overlayOpacity !== undefined ? styles.overlayOpacity : 0.4,
-                        zIndex: 0, pointerEvents: 'none'
-                    }} />
-                )}
-                <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-                    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                        <h3 style={{ fontSize: '1.25rem', color: styles.textColor || '#1A365D', marginBottom: '1rem' }}>{section.title || trustContent.title}</h3>
-                        <p style={{ color: styles.textColor ? styles.textColor : '#64748B', opacity: styles.textColor ? 0.8 : 1, marginBottom: '2rem', lineHeight: '1.6' }}>{trustContent.description}</p>
 
-                        <div style={{ display: 'flex', justifyContent: styles.textAlign === 'left' ? 'flex-start' : (styles.textAlign === 'right' ? 'flex-end' : 'center'), gap: '1rem', flexWrap: 'wrap' }}>
-                            {trustContent.regulators.map((reg, i) => (
-                                <span key={i} style={{
-                                    padding: '0.5rem 1.5rem',
-                                    background: 'white',
-                                    borderRadius: '30px',
-                                    border: '1px solid #CBD5E1',
-                                    color: '#475569',
-                                    fontWeight: '600',
-                                    fontSize: '0.9rem'
-                                }}>
-                                    {reg.title}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </section>
-        );
-    };
 
     const renderCustom = (section) => {
         const styles = section.styles || {};
@@ -514,7 +467,7 @@ const AboutUs = () => {
         'mission': renderMission,
         'board': renderBoard,
         'partners': renderPartners,
-        'trust': renderTrust,
+        'milestone': renderPartners, // Milestone is rendered within partners section
         'custom': renderCustom
     };
 

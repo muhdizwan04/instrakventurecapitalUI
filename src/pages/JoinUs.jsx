@@ -44,6 +44,7 @@ const JoinUs = () => {
                 <PageHero
                     title={section.title}
                     subtitle={section.subtitle}
+                    textColor={styles.textColor || (styles.bgColor === '#1A365D' ? '#FFFFFF' : undefined)}
                     style={{ background: 'transparent', position: 'relative', zIndex: 1 }}
                 />
             </div>

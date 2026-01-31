@@ -162,9 +162,9 @@ const InvestorsManager = () => {
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
                 {/* Left Column - Editor */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className=" space-y-6">
                     {activeTab === 'content' && (
                         <>
                             {/* Page Hero */}
@@ -333,33 +333,6 @@ const InvestorsManager = () => {
                             </div>
                         </div>
                     )}
-                </div>
-
-                {/* Right Column - Preview */}
-                <div className="glass-card p-0 overflow-hidden sticky top-6 max-h-[calc(100vh-120px)] overflow-y-auto">
-                    <div className="bg-gray-100 p-2 text-center text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center justify-center gap-2">
-                        <Eye size={14} />
-                        Live Preview
-                    </div>
-                    <div className="bg-[#F5F7FA] p-6 border-b-4 border-[#B8860B] text-center">
-                        <h2 className="text-xl font-bold text-[#1A365D] mb-2">{formData.pageHero.title}</h2>
-                        <p className="text-sm text-gray-600">{formData.pageHero.subtitle}</p>
-                    </div>
-                    <div className="p-6 bg-white">
-                        <h3 className="text-lg font-bold text-[#1A365D] mb-3">{formData.mainContent.headline}</h3>
-                        <p className="text-sm text-gray-600 mb-4 leading-relaxed">{formData.mainContent.description.substring(0, 120)}...</p>
-                        <div className="bg-[#F5F7FA] p-4 rounded-lg">
-                            <h4 className="text-sm font-bold text-[#B8860B] mb-2">{formData.portfolioSection.title}</h4>
-                            <ul className="space-y-2">
-                                {formData.portfolioSection.items.slice(0, 5).map(item => (
-                                    <li key={item.id} className="flex items-center gap-2 text-xs text-gray-600">
-                                        <div className="w-2 h-2 bg-[#1A365D] rounded-full"></div>
-                                        {item.text}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

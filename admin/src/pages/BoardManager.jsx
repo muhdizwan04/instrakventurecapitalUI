@@ -93,9 +93,9 @@ const BoardManager = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1  gap-8">
                 {/* Editor Column - 2/3 width */}
-                <div className="lg:col-span-2">
+                <div className="">
                     <DragDropContext onDragEnd={handleDragEnd}>
                         <Droppable droppableId="board-list" direction="horizontal">
                             {(provided) => (
@@ -165,47 +165,6 @@ const BoardManager = () => {
                             )}
                         </Droppable>
                     </DragDropContext>
-                </div>
-
-                {/* Live Preview Column - 1/3 width */}
-                <div className="lg:col-span-1">
-                    <div className="glass-card p-4 bg-[var(--bg-tertiary)] sticky top-8">
-                        <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--text-muted)] mb-4">Live Preview</h3>
-
-                        {/* Preview Header */}
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-                            <div className="bg-[#F5F7FA] text-[#1A365D] p-4 text-center border-b-4 border-[#B8860B]">
-                                <h4 className="font-heading font-bold text-lg">Board of Directors</h4>
-                                <p className="text-xs text-gray-600 mt-1">Guided by seasoned leaders</p>
-                            </div>
-
-                            {/* Preview Cards */}
-                            <div className="p-4 space-y-3 max-h-[500px] overflow-y-auto bg-white">
-                                {directors.slice(0, 4).map((d) => (
-                                    <div key={d.id} className="flex items-center gap-3 p-2 bg-[#F5F7FA] rounded-lg border border-gray-100">
-                                        <div className="w-12 h-14 bg-gray-200 rounded overflow-hidden flex-shrink-0 border border-[#B8860B]/30">
-                                            {d.image || DEFAULT_IMAGES[d.id] ? (
-                                                <img src={d.image || DEFAULT_IMAGES[d.id]} alt={d.name} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full bg-gradient-to-br from-[#1A365D] to-[#2D5A8B] flex items-center justify-center text-white text-xs font-bold">{d.name?.charAt(0)}</div>
-                                            )}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h5 className="font-bold text-xs text-[#1A365D] truncate">{d.name}</h5>
-                                            <p className="text-[10px] text-[#B8860B] truncate">{d.role}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                                {directors.length > 4 && (
-                                    <p className="text-center text-xs text-gray-400">+{directors.length - 4} more directors</p>
-                                )}
-                            </div>
-                        </div>
-
-                        <p className="text-[10px] text-center text-gray-400 mt-3">
-                            Changes sync to client after saving
-                        </p>
-                    </div>
                 </div>
             </div>
         </div>

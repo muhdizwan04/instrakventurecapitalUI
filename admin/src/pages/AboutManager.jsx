@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, ShieldCheck, Eye, Scale, Plus, Trash2, Loader2, GripVertical, Target, Users, Handshake, Edit, Building2, Type, LayoutTemplate, Star, Lightbulb, Square } from 'lucide-react';
+import { Save, ShieldCheck, Eye, Scale, Plus, Trash2, Loader2, GripVertical, Target, Users, Handshake, Edit, Building2, Type, LayoutTemplate, Star, Lightbulb, Square, Award } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
@@ -8,102 +8,7 @@ import PreviewPageHero from '../components/PreviewPageHero';
 import ImageUpload from '../components/ImageUpload';
 import * as AllIcons from 'lucide-react'; // Rename to avoid confusion
 
-import SharedStyleControls from '../components/StyleControls';
-const StyleControls = ({ section, onUpdate }) => {
-    const styles = section.styles || {};
-    const handleChange = (field, value) => {
-        onUpdate({ styles: { ...styles, [field]: value } });
-    };
-
-    return (
-        <div className="mb-6 bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-            <h4 className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 pb-2 border-b border-gray-100">
-                <Edit size={14} /> Section Styling
-            </h4>
-
-            <div className="space-y-4">
-                {/* Visual Settings */}
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Text Align</label>
-                        <select
-                            value={styles.textAlign || 'left'}
-                            onChange={(e) => handleChange('textAlign', e.target.value)}
-                            className="input-field text-xs py-1.5"
-                        >
-                            <option value="left">Left</option>
-                            <option value="center">Center</option>
-                            <option value="justify">Justify</option>
-                            <option value="right">Right</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Text Color</label>
-                        <div className="flex items-center gap-2 border border-gray-200 rounded px-2 bg-gray-50 h-[34px]">
-                            <div className="w-4 h-4 rounded-full border border-gray-300 shadow-sm" style={{ backgroundColor: styles.textColor || '#1A365D' }}></div>
-                            <input
-                                type="color"
-                                value={styles.textColor || '#1A365D'}
-                                onChange={(e) => handleChange('textColor', e.target.value)}
-                                className="opacity-0 absolute w-8 cursor-pointer"
-                            />
-                            <span className="text-xs text-gray-500 font-mono flex-1 text-right">{styles.textColor || '#1A365D'}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Background</label>
-                        <div className="flex items-center gap-2 border border-gray-200 rounded px-2 bg-gray-50 h-[34px]">
-                            <div className="w-4 h-4 rounded-full border border-gray-300 shadow-sm" style={{ backgroundColor: styles.bgColor || '#FFFFFF' }}></div>
-                            <input
-                                type="color"
-                                value={styles.bgColor || '#FFFFFF'}
-                                onChange={(e) => handleChange('bgColor', e.target.value)}
-                                className="opacity-0 absolute w-8 cursor-pointer"
-                            />
-                            <span className="text-xs text-gray-500 font-mono flex-1 text-right">{styles.bgColor || '#FFFFFF'}</span>
-                        </div>
-                    </div>
-                    <div>
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Overlay Opacity</label>
-                        <div className="flex items-center gap-2 h-[34px]">
-                            <input
-                                type="range" min="0" max="1" step="0.1"
-                                value={styles.overlayOpacity !== undefined ? styles.overlayOpacity : 0}
-                                onChange={(e) => handleChange('overlayOpacity', parseFloat(e.target.value))}
-                                className="flex-1 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                            />
-                            <span className="text-xs font-mono w-8 text-right">{styles.overlayOpacity !== undefined ? styles.overlayOpacity : 0}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Background Image</label>
-                    <div className="flex gap-2">
-                        <input
-                            value={styles.backgroundImage || ''}
-                            onChange={(e) => handleChange('backgroundImage', e.target.value)}
-                            className="input-field text-xs"
-                            placeholder="Image URL (https://...)"
-                        />
-                        <select
-                            value={styles.backgroundSize || 'cover'}
-                            onChange={(e) => handleChange('backgroundSize', e.target.value)}
-                            className="input-field text-xs w-24 py-1.5"
-                        >
-                            <option value="cover">Cover</option>
-                            <option value="contain">Contain</option>
-                            <option value="auto">Auto</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
+// Style controls removed for simplicity - content only
 
 
 
@@ -128,7 +33,7 @@ const AboutManager = () => {
                 id: 'mission',
                 type: 'mission',
                 missionTitle: 'Our Mission',
-                missionText: 'To be the catalyst for sustainable growth in the ASEAN region, bridging the gap between visionary entrepreneurs and strategic capital through disciplined governance and ethical excellence.',
+                missionText: 'To be the catalyst for sustainable growth in the GLOBAL region, bridging the gap between visionary entrepreneurs and strategic capital through disciplined governance and ethical excellence.',
                 visionTitle: 'Our Vision',
                 visionText: 'To set the benchmark for venture capital integrity, becoming the trusted partner of choice for institutional investors and high-growth industrial leaders worldwide.',
                 values: [
@@ -138,8 +43,8 @@ const AboutManager = () => {
                 ]
             },
             { id: 'board', type: 'board', title: 'Board of Directors', subtitle: 'Guided by seasoned leaders with a commitment to integrity.' },
-            { id: 'partners', type: 'partners', title: 'Strategic Partners', subtitle: 'Collaborating with world-class institutions.' },
-            { id: 'trust', type: 'trust', title: 'Governance & Compliance', subtitle: 'Strict regulatory oversight and compliance.' }
+            { id: 'milestone', type: 'milestone', title: 'Investment Milestone' },
+            { id: 'partners', type: 'partners', title: 'Strategic Partners', subtitle: 'Collaborating with world-class institutions.' }
         ]
     };
 
@@ -153,15 +58,13 @@ const AboutManager = () => {
     const defaultPartnersData = {
         partners: [{ id: 'p-1', name: 'Chubb International Insurance', category: 'Insurance Partner', description: 'Global insurance coverage for fund protection and trade credit insurance.', partnership: 'Protection of funds through comprehensive insurance policies', logo: 'https://companieslogo.com/img/orig/CB-90768b55.png?t=1632720960' }],
         banks: [
-            { id: 'b-1', name: 'Maybank Berhad', role: 'Origin Bank & Trustees', swift: 'MBBEMYKL (MT103)', branch: 'Mid Valley Branch', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Maybank_Logo.svg/2560px-Maybank_Logo.svg.png' }
+            { id: 'b-1', name: 'Maybank Berhad', role: 'Origin Bank & Trustees', swift: 'MBBEMYKL (MT103)', branch: 'Mid Valley Branch', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Maybank_Logo.svg/2560px-Maybank_Logo.svg.png' },
+            { id: 'b-2', name: 'Emirates Islamic Bank', role: 'Nominated Trustees Bank', location: 'Dubai, UAE', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/ea/Emirates_Islamic_Logo.png' }
         ],
-        trustContent: {
-            title: 'Governance & Compliance',
-            description: 'All fund management and investment activities are conducted under strict regulatory oversight and compliance.',
-            regulators: [
-                { id: 1, title: 'Securities Commission', subtitle: 'Malaysia (SC)' },
-                { id: 2, title: 'Central Bank', subtitle: 'Bank Negara Malaysia' }
-            ]
+        milestone: {
+            headline: 'USD 1 Billion',
+            subtitle: 'Investment Commitment Signed',
+            description: 'INSTRAK Venture Capital Berhad has secured strategic investment commitments to support project financing and high-growth equity investments across the ASEAN region.'
         }
     };
 
@@ -180,22 +83,25 @@ const AboutManager = () => {
     // Partners State
     const [partners, setPartners] = useState(defaultPartnersData.partners);
     const [banks, setBanks] = useState(defaultPartnersData.banks);
-    const [trustContent, setTrustContent] = useState(defaultPartnersData.trustContent);
+    const [milestone, setMilestone] = useState(defaultPartnersData.milestone);
 
     // --- EFFECTS ---
     useEffect(() => {
         if (content?.sections && !loading) {
             // Ensure every section has an ID and required fields to prevent breakage
-            let sanitizedSections = content.sections.map((s, i) => ({
-                ...s,
-                id: s.id || `section-${i}-${Date.now()}`,
-                type: s.type || 'custom',
-                title: s.title || s.missionTitle || 'Untitled Section',
-                styles: s.styles || { textAlign: 'left', textColor: '#1A365D', bgColor: '#FFFFFF' }
-            }));
+            let sanitizedSections = content.sections
+                // Filter out old 'trust' sections (replaced by 'milestone')
+                .filter(s => s.type !== 'trust' && s.id !== 'trust')
+                .map((s, i) => ({
+                    ...s,
+                    id: s.id || `section-${i}-${Date.now()}`,
+                    type: s.type || 'custom',
+                    title: s.title || s.missionTitle || 'Untitled Section',
+                    styles: s.styles || { textAlign: 'left', textColor: '#1A365D', bgColor: '#FFFFFF' }
+                }));
 
-            // Ensure mandatory sections (hero, mission, board, partners, trust) exist
-            const requiredIds = ['hero', 'mission', 'board', 'partners', 'trust'];
+            // Ensure mandatory sections exist
+            const requiredIds = ['hero', 'mission', 'board', 'milestone', 'partners'];
             requiredIds.forEach(reqId => {
                 if (!sanitizedSections.find(s => s.id === reqId)) {
                     const defaultSec = defaultData.sections.find(s => s.id === reqId);
@@ -219,7 +125,7 @@ const AboutManager = () => {
         if (partnersContent && !partnersLoading) {
             if (partnersContent.partners) setPartners(partnersContent.partners);
             if (partnersContent.banks) setBanks(partnersContent.banks);
-            if (partnersContent.trustContent) setTrustContent(partnersContent.trustContent);
+            if (partnersContent.milestone) setMilestone(partnersContent.milestone);
         }
     }, [partnersContent, partnersLoading]);
 
@@ -299,9 +205,9 @@ const AboutManager = () => {
     const handleSave = async () => {
         try {
             await Promise.all([
-                saveContent({ sections }),
-                saveBoard({ directors }),
-                savePartners({ partners, banks, trustContent })
+                saveContent({ sections }, { silent: true }),
+                saveBoard({ directors }, { silent: true }),
+                savePartners({ partners, banks, milestone }, { silent: true })
             ]);
             toast.success('All changes saved successfully!');
         } catch (error) {
@@ -310,14 +216,14 @@ const AboutManager = () => {
         }
     };
 
-    // Trust Handler
-    const handleUpdateTrust = (field, value) => setTrustContent(prev => ({ ...prev, [field]: value }));
+    // Milestone Handler
+    const handleUpdateMilestone = (field, value) => setMilestone(prev => ({ ...prev, [field]: value }));
 
     // -- Sub-Editors -- //
 
     const renderHeroEditor = (section) => (
         <div className="space-y-6">
-            <SharedStyleControls section={section} onUpdate={(updates) => updateSection(section.id, updates)} />
+
             <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
                 <h3 className="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
                     <LayoutTemplate size={16} /> Header Section
@@ -347,7 +253,7 @@ const AboutManager = () => {
 
     const renderMissionEditor = (section) => (
         <div className="space-y-8">
-            <SharedStyleControls section={section} onUpdate={(updates) => updateSection(section.id, updates)} />
+
             {/* Mission & Vision Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100">
@@ -472,7 +378,7 @@ const AboutManager = () => {
 
     const renderBoardEditor = (section) => (
         <div className="space-y-6">
-            <SharedStyleControls section={section} onUpdate={(updates) => updateSection(section.id, updates)} />
+
             <div className="flex justify-between items-center mb-4 bg-white py-2 border-b border-gray-100">
                 <div>
                     <h3 className="font-bold text-[var(--accent-primary)] flex items-center gap-2">
@@ -524,7 +430,7 @@ const AboutManager = () => {
 
     const renderPartnersEditor = (section) => (
         <div className="space-y-10">
-            <SharedStyleControls section={section} onUpdate={(updates) => updateSection(section.id, updates)} />
+
             {/* Partners List */}
             <div>
                 <div className="flex justify-between items-center mb-4 bg-white py-2 border-b border-gray-100">
@@ -616,31 +522,42 @@ const AboutManager = () => {
         </div>
     );
 
-    const renderTrustEditor = (section) => (
+    const renderMilestoneEditor = (section) => (
         <div className="space-y-6">
-            <SharedStyleControls section={section} onUpdate={(updates) => updateSection(section.id, updates)} />
-            <div className="p-6 bg-white border border-gray-200 rounded-xl shadow-sm">
-                <div className="flex items-center gap-2 mb-4 text-[var(--accent-primary)] border-b border-gray-100 pb-2">
-                    <ShieldCheck size={20} />
-                    <h3 className="font-bold text-base">Governance Content</h3>
+            <div className="p-6 bg-[#0A2540] border border-gray-700 rounded-xl shadow-sm text-white">
+                <div className="flex items-center gap-2 mb-4 text-[#D4AF37] border-b border-gray-600 pb-2">
+                    <Award size={20} />
+                    <h3 className="font-bold text-base">Investment Milestone</h3>
                 </div>
                 <div className="space-y-4">
                     <div>
-                        <label className="label">Section Title</label>
-                        <input value={trustContent.title} onChange={e => handleUpdateTrust('title', e.target.value)} className="input-field font-bold text-lg" />
+                        <label className="label text-gray-300">Headline (e.g., USD 1 Billion)</label>
+                        <input 
+                            value={milestone.headline || ''} 
+                            onChange={e => handleUpdateMilestone('headline', e.target.value)} 
+                            className="input-field font-heading font-bold text-2xl text-[#1A365D]" 
+                            placeholder="USD 1 Billion"
+                        />
                     </div>
                     <div>
-                        <label className="label">Description</label>
-                        <textarea value={trustContent.description} onChange={e => handleUpdateTrust('description', e.target.value)} className="input-field text-sm" rows={5} />
+                        <label className="label text-gray-300">Subtitle</label>
+                        <input 
+                            value={milestone.subtitle || ''} 
+                            onChange={e => handleUpdateMilestone('subtitle', e.target.value)} 
+                            className="input-field text-[#D4AF37]" 
+                            placeholder="Investment Commitment Signed"
+                        />
                     </div>
-                </div>
-            </div>
-
-            <div className="bg-amber-50 p-4 rounded-lg flex gap-3 text-sm text-amber-800 border border-amber-100">
-                <ShieldCheck className="shrink-0 mt-0.5" size={18} />
-                <div>
-                    <p className="font-bold mb-1">Compliance Regulators</p>
-                    <p className="opacity-80">Regulator names and logos are managed globally to ensure compliance across all pages.</p>
+                    <div>
+                        <label className="label text-gray-300">Description</label>
+                        <textarea 
+                            value={milestone.description || ''} 
+                            onChange={e => handleUpdateMilestone('description', e.target.value)} 
+                            className="input-field text-sm" 
+                            rows={4}
+                            placeholder="INSTRAK Venture Capital Berhad has secured strategic investment..."
+                        />
+                    </div>
                 </div>
             </div>
         </div>
@@ -649,7 +566,7 @@ const AboutManager = () => {
 
     const renderCustomEditor = (section) => (
         <div className="space-y-6">
-            <SharedStyleControls section={section} onUpdate={(updates) => updateSection(section.id, updates)} />
+
             <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
                 <h3 className="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
                     <Edit size={16} /> Custom Section Editor
@@ -694,8 +611,8 @@ const AboutManager = () => {
             case 'hero': return renderHeroEditor(section);
             case 'mission': return renderMissionEditor(section);
             case 'board': return renderBoardEditor(section);
+            case 'milestone': return renderMilestoneEditor(section);
             case 'partners': return renderPartnersEditor(section);
-            case 'trust': return renderTrustEditor(section);
             case 'custom': return renderCustomEditor(section);
             default: return renderPlaceholderEditor(section);
         }
@@ -706,8 +623,8 @@ const AboutManager = () => {
             case 'hero': return <LayoutTemplate size={18} />;
             case 'mission': return <Target size={18} />;
             case 'board': return <Users size={18} />;
+            case 'milestone': return <Award size={18} />;
             case 'partners': return <Handshake size={18} />;
-            case 'trust': return <ShieldCheck size={18} />;
             case 'custom': return <Lightbulb size={18} />;
             default: return <Square size={18} />;
         }
@@ -815,10 +732,10 @@ const AboutManager = () => {
                     </Droppable>
                 </div>
 
-                {/* SPLIT VIEW CONTENT */}
-                <div className="flex gap-6 flex-1 min-h-0">
-                    {/* LEFT: EDITOR (50%) */}
-                    <div className="flex-1 min-w-0 glass-card p-0 flex flex-col overflow-hidden bg-white shadow-sm">
+                {/* EDITOR CONTENT */}
+                <div className="flex-1 min-h-0">
+                    {/* EDITOR */}
+                    <div className="h-full glass-card p-0 flex flex-col overflow-hidden bg-white shadow-sm">
                         {(() => {
                             const activeSectionData = sections.find(s => s.id === activeSection);
                             if (activeSectionData) {
@@ -851,280 +768,6 @@ const AboutManager = () => {
                                 </div>
                             );
                         })()}
-                    </div>
-
-                    {/* RIGHT: LIVE PREVIEW (50%) */}
-                    <div className="flex-1 min-w-0 glass-card p-0 flex flex-col overflow-hidden bg-white shadow-xl ring-1 ring-gray-200">
-                        <div className="p-3 border-b border-gray-100 bg-gray-50 flex justify-between items-center shrink-0">
-                            <h3 className="font-bold text-gray-700 flex items-center gap-2 text-sm">
-                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                Live Preview
-                            </h3>
-                            <div className="flex items-center gap-2">
-                                <span className="text-[10px] text-gray-400 font-mono bg-white px-2 py-1 rounded border">DESKTOP</span>
-                            </div>
-                        </div>
-
-                        {/* Preview Scroll Area */}
-                        <div className="flex-1 overflow-y-auto custom-scrollbar bg-white relative">
-                            <div className="preview-content min-h-full">
-                                {sections.map(section => {
-                                    const isActive = activeSection === section.id;
-                                    // Highlight the active section in the preview
-                                    const activeStyle = isActive
-                                        ? { boxShadow: '0 0 0 2px var(--accent-primary) inset', position: 'relative', zIndex: 10 }
-                                        : { opacity: activeSection ? 0.3 : 1, filter: activeSection ? 'grayscale(1)' : 'none', transition: 'all 0.3s ease' };
-
-                                    const styles = section.styles || {};
-                                    const containerStyle = {
-                                        ...activeStyle,
-                                        backgroundColor: styles.bgColor || 'transparent',
-                                        color: styles.textColor || 'inherit',
-                                        textAlign: styles.textAlign || 'left',
-                                        backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : 'none',
-                                        backgroundSize: styles.backgroundSize || 'cover',
-                                        backgroundPosition: 'center',
-                                        position: 'relative',
-                                        overflow: 'hidden'
-                                    };
-
-                                    return (
-                                        <div key={section.id}
-                                            onClick={() => setActiveSection(section.id)}
-                                            className="cursor-pointer transition-all duration-200 hover:opacity-100 hover:filter-none"
-                                            style={containerStyle}
-                                        >
-                                            {/* Overlay for opacity */}
-                                            {styles.backgroundImage && (
-                                                <div
-                                                    style={{
-                                                        position: 'absolute', inset: 0, background: 'black',
-                                                        opacity: styles.overlayOpacity !== undefined ? styles.overlayOpacity : 0.4,
-                                                        zIndex: 0,
-                                                        pointerEvents: 'none'
-                                                    }}
-                                                />
-                                            )}
-
-                                            {/* Content Wrapper to ensure text is above overlay */}
-                                            <div style={{ position: 'relative', zIndex: 1 }}>
-                                                {section.type === 'hero' && (
-                                                    <PreviewPageHero
-                                                        title={section.title}
-                                                        subtitle={section.subtitle}
-                                                        style={{ background: 'transparent' }}
-                                                    />
-                                                )}
-                                                {section.type === 'mission' && (
-                                                    <div style={{ padding: '80px 20px', backgroundColor: styles.bgColor || 'transparent', backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined, backgroundSize: styles.backgroundSize || 'cover', backgroundPosition: 'center', position: 'relative' }}>
-                                                        <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-                                                            {/* Mission Statement Card */}
-                                                            <div style={{
-                                                                background: 'linear-gradient(135deg, #1A365D 0%, #0F2445 100%)',
-                                                                borderRadius: '24px',
-                                                                padding: '4rem',
-                                                                color: 'white',
-                                                                position: 'relative',
-                                                                overflow: 'hidden',
-                                                                boxShadow: '0 20px 40px rgba(10, 37, 64, 0.15)',
-                                                                marginBottom: '4rem'
-                                                            }}>
-                                                                {/* Decorative Background Element */}
-                                                                <div style={{ position: 'absolute', top: '-10%', right: '-5%', opacity: 0.05, transform: 'scale(1.5)' }}>
-                                                                    <AllIcons.Globe size={400} />
-                                                                </div>
-
-                                                                <div style={{ position: 'relative', zIndex: 10, maxWidth: '800px' }}>
-                                                                    <h6 style={{ color: '#D4AF37', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold', marginBottom: '1rem' }}>Our Purpose</h6>
-                                                                    <h2 style={{ fontSize: '2.5rem', marginBottom: '1.5rem', lineHeight: '1.2', color: '#FFFFFF' }}>{section.missionTitle || 'Our Mission'}</h2>
-                                                                    <p style={{ fontSize: '1.25rem', lineHeight: '1.8', opacity: 0.9, marginBottom: '2rem' }}>
-                                                                        {section.missionText}
-                                                                    </p>
-
-                                                                    <div style={{ height: '1px', background: 'rgba(255,255,255,0.2)', margin: '2rem 0' }}></div>
-
-                                                                    <h3 style={{ fontSize: '1.5rem', color: '#D4AF37', marginBottom: '1rem' }}>{section.visionTitle || 'Our Vision'}</h3>
-                                                                    <p style={{ fontSize: '1.1rem', lineHeight: '1.8', opacity: 0.8 }}>
-                                                                        {section.visionText}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Core Values Grid */}
-                                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-                                                                {(section.values || []).map((v, i) => {
-                                                                    const IconComponent = AllIcons[v.icon] || AllIcons.ShieldCheck;
-                                                                    return (
-                                                                        <div key={i} className="glass-card" style={{
-                                                                            padding: '2.5rem',
-                                                                            background: 'white',
-                                                                            borderTop: '4px solid #D4AF37',
-                                                                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
-                                                                        }}>
-                                                                            <div style={{
-                                                                                width: '60px', height: '60px',
-                                                                                background: 'rgba(212, 175, 55, 0.1)',
-                                                                                borderRadius: '12px',
-                                                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                                                marginBottom: '1.5rem',
-                                                                                color: '#D4AF37'
-                                                                            }}>
-                                                                                <IconComponent size={30} />
-                                                                            </div>
-                                                                            <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: '#1A365D', fontWeight: 'bold' }}>{v.title}</h3>
-                                                                            <p style={{ color: '#64748B', lineHeight: '1.7' }}>{v.text}</p>
-                                                                        </div>
-                                                                    );
-                                                                })}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                                {section.type === 'board' && (
-                                                    <div style={{ padding: '100px 0', background: styles.bgColor || '#F8FAFC', position: 'relative' }}>
-                                                        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px', position: 'relative', zIndex: 1 }}>
-                                                            <div style={{ textAlign: styles.textAlign || 'center', marginBottom: '4rem' }}>
-                                                                <h6 style={{ color: '#D4AF37', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>Leadership</h6>
-                                                                <h2 style={{ fontSize: '2.25rem', fontWeight: 'bold', marginTop: '0.5rem', color: styles.textColor || '#1A365D' }}>{section.title || 'Board of Directors'}</h2>
-                                                                <p style={{ maxWidth: '600px', margin: '1rem auto 0', color: styles.textColor ? styles.textColor : '#64748B', opacity: styles.textColor ? 0.8 : 1 }}>
-                                                                    {section.subtitle || 'Guided by seasoned leaders with a commitment to integrity, compliance, and industrial excellence.'}
-                                                                </p>
-                                                            </div>
-
-                                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2.5rem' }}>
-                                                                {directors.map((d, i) => (
-                                                                    <div key={i} className="glass-card" style={{
-                                                                        background: 'white',
-                                                                        overflow: 'hidden',
-                                                                        border: 'none',
-                                                                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
-                                                                        borderRadius: '1rem',
-                                                                        textAlign: 'left'
-                                                                    }}>
-                                                                        <div style={{
-                                                                            height: '280px',
-                                                                            background: 'linear-gradient(to bottom, #F1F5F9 0%, #E2E8F0 100%)',
-                                                                            display: 'flex', alignItems: 'flex-end', justifyContent: 'center', position: 'relative'
-                                                                        }}>
-                                                                            {d.image || DEFAULT_IMAGES[d.id] ? (
-                                                                                <img src={d.image || DEFAULT_IMAGES[d.id]} alt={d.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }} />
-                                                                            ) : (
-                                                                                <div style={{ textAlign: 'center', paddingBottom: '2rem', opacity: 0.4 }}>
-                                                                                    <AllIcons.User size={80} color="#1A365D" />
-                                                                                </div>
-                                                                            )}
-                                                                            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '4px', background: '#D4AF37' }}></div>
-                                                                        </div>
-                                                                        <div style={{ padding: '2rem' }}>
-                                                                            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: '#1A365D', fontWeight: 'bold' }}>{d.name}</h3>
-                                                                            <p style={{ color: '#D4AF37', fontWeight: '600', fontSize: '0.75rem', letterSpacing: '0.5px', textTransform: 'uppercase' }}>{d.role}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                                {section.type === 'partners' && (
-                                                    <div style={{ backgroundColor: styles.bgColor || 'transparent', position: 'relative' }}>
-                                                        {/* Highlights & Tombstone (Mock Visuals for context) */}
-                                                        <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', padding: '1rem' }}>
-                                                            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', opacity: 0.6, transform: 'scale(0.8)' }}>
-                                                                {[
-                                                                    { icon: <AllIcons.Shield size={24} />, title: 'USD 1 Billion', desc: 'Committed Capital' },
-                                                                    { icon: <AllIcons.Handshake size={24} />, title: 'Fund Protection', desc: 'Chubb International' },
-                                                                    { icon: <AllIcons.Building2 size={24} />, title: 'Trustee Managed', desc: 'Maybank Trustees' },
-                                                                    { icon: <AllIcons.Globe size={24} />, title: 'Global Reach', desc: 'Dubai / Intl.' },
-                                                                ].map((item, i) => (
-                                                                    <div key={i} style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '1rem', borderRight: '1px solid #eee' }}>
-                                                                        <div style={{ color: '#D4AF37' }}>{item.icon}</div>
-                                                                        <div><div style={{ fontWeight: 'bold', color: '#1A365D' }}>{item.title}</div></div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Tombstone Mock */}
-                                                        <section style={{ padding: '40px 0', background: '#0A2540', color: 'white', textAlign: 'center', marginBottom: '40px' }}>
-                                                            <div style={{ border: '2px solid rgba(212, 175, 55, 0.3)', padding: '2rem', maxWidth: '400px', margin: '0 auto' }}>
-                                                                <AllIcons.Award size={32} style={{ color: '#D4AF37', margin: '0 auto 1rem' }} />
-                                                                <h2 style={{ fontSize: '1.5rem', color: '#FFFFFF' }}>USD 1 Billion</h2>
-                                                                <p style={{ color: '#D4AF37' }}>Investment Commitment Signed</p>
-                                                            </div>
-                                                        </section>
-
-                                                        {/* Partners Content */}
-                                                        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px 80px' }}>
-                                                            <div style={{ textAlign: styles.textAlign || 'center', marginBottom: '4rem' }}>
-                                                                <h2 style={{ fontSize: '2.25rem', color: styles.textColor || '#1A365D', fontWeight: 'bold' }}>{section.title || 'Strategic Banking & Insurance'}</h2>
-                                                                {section.subtitle && <p className="mt-2" style={{ color: styles.textColor ? styles.textColor : '#6b7280', opacity: styles.textColor ? 0.8 : 1 }}>{section.subtitle}</p>}
-                                                            </div>
-
-                                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
-                                                                {partners.map((partner, i) => (
-                                                                    <div key={partner.id} style={{ border: '1px solid #E2E8F0', borderRadius: '16px', padding: '3rem', position: 'relative', background: 'white', textAlign: 'left' }}>
-                                                                        <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}><AllIcons.ShieldCheck size={24} color="#D4AF37" /></div>
-                                                                        <h3 style={{ fontSize: '1.5rem', color: '#1A365D', fontWeight: 'bold', marginBottom: '0.5rem' }}>{partner.name}</h3>
-                                                                        <span style={{ display: 'inline-block', background: '#F0F9FF', color: '#0369A1', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600', marginBottom: '2rem' }}>
-                                                                            {partner.category}
-                                                                        </span>
-                                                                        <p style={{ color: '#475569', marginBottom: '1.5rem', lineHeight: '1.6' }}>{partner.description}</p>
-                                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#0F172A', fontWeight: '500' }}>
-                                                                            <AllIcons.CheckCircle2 size={18} color="#16A34A" />
-                                                                            <span>{partner.partnership}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-
-                                                                {banks.map((bank, i) => (
-                                                                    <div key={bank.id} style={{ border: '1px solid #E2E8F0', borderRadius: '16px', padding: '3rem', position: 'relative', background: 'white', textAlign: 'left' }}>
-                                                                        <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}><AllIcons.Building2 size={24} color="#D4AF37" /></div>
-                                                                        <h3 style={{ fontSize: '1.5rem', color: '#1A365D', fontWeight: 'bold', marginBottom: '0.5rem' }}>{bank.name}</h3>
-                                                                        <span style={{ display: 'inline-block', background: '#F0FDF4', color: '#166534', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600', marginBottom: '2rem' }}>
-                                                                            {bank.role}
-                                                                        </span>
-                                                                        <p style={{ color: '#475569', marginBottom: '1.5rem', lineHeight: '1.6' }}>{bank.description}</p>
-                                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                                                            {bank.branch && <div style={{ fontSize: '0.9rem', color: '#64748B' }}>📍 {bank.branch}</div>}
-                                                                            {bank.location && <div style={{ fontSize: '0.9rem', color: '#64748B' }}>📍 {bank.location}</div>}
-                                                                            {bank.swift && <div style={{ fontSize: '0.9rem', color: '#64748B' }}>🌐 SWIFT: {bank.swift}</div>}
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                                {section.type === 'trust' && (
-                                                    <div style={{ padding: '60px 20px', background: 'transparent', textAlign: 'center' }}>
-                                                        <h2 style={{ fontSize: '1.8rem', color: '#1A365D', marginBottom: '20px' }}>{trustContent.title}</h2>
-                                                        <p style={{ maxWidth: '600px', margin: '0 auto 30px auto', color: '#666' }}>{trustContent.description}</p>
-                                                        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
-                                                            {trustContent.regulators.map(r => (
-                                                                <div key={r.id} style={{ background: '#F5F7FA', padding: '10px 20px', borderRadius: '4px' }}>
-                                                                    <div style={{ fontWeight: 'bold', color: '#1A365D', fontSize: '0.8rem' }}>{r.title}</div>
-                                                                    <div style={{ fontSize: '0.7rem', color: '#888' }}>{r.subtitle}</div>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                                {section.type === 'custom' && (
-                                                    <div style={{ padding: '60px 20px', background: 'transparent' }}>
-                                                        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-                                                            {section.title && <h2 style={{ fontSize: '1.8rem', marginBottom: '1.5rem', color: '#1A365D' }}>{section.title}</h2>}
-                                                            <div style={{ color: '#4A5568', lineHeight: '1.7', whiteSpace: 'pre-wrap', textAlign: 'left' }}>
-                                                                {section.content}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
                     </div>
                 </div>
 

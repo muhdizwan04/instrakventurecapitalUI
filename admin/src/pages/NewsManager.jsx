@@ -134,9 +134,9 @@ const NewsManager = () => {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
                 {/* Left Column - Articles List */}
-                <div className="lg:col-span-2">
+                <div className="">
 
                     {view === 'list' ? (
                         <div className="glass-card p-0 overflow-hidden">
@@ -242,42 +242,6 @@ const NewsManager = () => {
                         </div>
                     )}
                 </div>
-
-                {/* Right Column - Live Preview */}
-                {view === 'list' && (
-                    <div className="glass-card p-0 overflow-hidden sticky top-6 max-h-[calc(100vh-180px)] overflow-y-auto">
-                        <div className="bg-gray-100 border-b p-2 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Live Preview</div>
-
-                        <div className="bg-[#F5F7FA] py-6 px-4 text-center border-b-4 border-[#B8860B]">
-                            <h3 className="text-lg font-bold mb-1 font-heading text-[#1A365D]">{pageHeader.title}</h3>
-                            <p className="text-xs text-gray-600">{pageHeader.subtitle}</p>
-                        </div>
-
-                        <div className="p-4 space-y-3 bg-white">
-                            {news.slice(0, 3).map((article, i) => (
-                                <div key={i} className="bg-[#F5F7FA] rounded-lg p-3">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Calendar size={12} className="text-[#B8860B]" />
-                                        <span className="text-[10px] text-gray-500">{article.date}</span>
-                                        <span className="ml-auto px-2 py-0.5 bg-[#1A365D] text-white rounded text-[8px] uppercase">{article.category}</span>
-                                    </div>
-                                    <h4 className="text-sm font-bold text-[#1A365D] mb-1">{article.title}</h4>
-                                    <p className="text-[10px] text-gray-600 line-clamp-2">{article.summary}</p>
-                                </div>
-                            ))}
-                            {news.length > 3 && (
-                                <p className="text-center text-xs text-gray-400">+{news.length - 3} more articles</p>
-                            )}
-                            {news.length === 0 && (
-                                <p className="text-center text-xs text-gray-400 py-4">No articles yet</p>
-                            )}
-                        </div>
-
-                        <p className="text-[10px] text-center text-gray-400 p-3 bg-gray-50">
-                            Changes sync to client after saving
-                        </p>
-                    </div>
-                )}
             </div>
         </div>
     );

@@ -13,7 +13,7 @@ const Footer = () => {
         email: 'admin@instrakventurecapital.com',
         quickLinks: [
             { label: 'Home', url: '/' },
-            { label: 'About Us', url: '/mission-vision-values' },
+            { label: 'About Us', url: '/about' },
             { label: 'Services', url: '/services' },
             { label: 'News', url: '/latest-news-2' },
             { label: 'Contact Us', url: '/contact' }

@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Navbar.module.css';
 import { usePageContent } from '../hooks/usePageContent';
+import { useAuth } from '../context/AuthContext';
+import { User, LogOut } from 'lucide-react';
 
 const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
+    const { user, logout } = useAuth();
 
     // Default navigation structure
     const defaultNav = {
@@ -131,6 +134,43 @@ const Navbar = () => {
                             )}
                         </li>
                     ))}
+
+                    {/* Profile Menu - Only visible when logged in */}
+                    {user && (
+                        <li className={styles.hasDropdown}>
+                            <div className={styles.parentLink} style={{ cursor: 'pointer', gap: '0.5rem' }}>
+                                <div className={styles.avatar}>
+                                    <User size={18} />
+                                </div>
+                                <span>Account</span>
+                            </div>
+                            <ul className={`${styles.dropdown} ${styles.profileDropdown}`}>
+                                <li className={styles.userInfo}>
+                                    <span className={styles.userLabel}>Signed in as</span>
+                                    <span className={styles.userEmail} title={user.email}>{user.email}</span>
+                                </li>
+                                <li>
+                                    <button 
+                                        onClick={async () => {
+                                            console.log('Logout button clicked');
+                                            try {
+                                                closeAll();
+                                                await logout();
+                                                console.log('Logout successful');
+                                                window.location.href = '/'; // Force redirect to landing page to refresh state
+                                            } catch (error) {
+                                                console.error('Logout failed:', error);
+                                            }
+                                        }}
+                                        className={styles.logoutBtn}
+                                    >
+                                        <LogOut size={16} />
+                                        Logout
+                                    </button>
+                                </li>
+                            </ul>
+                        </li>
+                    )}
                 </ul>
 
                 <div className={styles.mobileMenu} onClick={toggleMenu}>

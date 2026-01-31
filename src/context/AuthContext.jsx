@@ -118,9 +118,23 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-        setClientProfile(null);
+        console.log('[AuthContext] Logout called');
+        try {
+            // Race signOut against a 2-second timeout to prevent hanging
+            const { error } = await Promise.race([
+                supabase.auth.signOut(),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Logout timed out')), 2000))
+            ]);
+            
+            if (error) throw error;
+        } catch (error) {
+            console.error('[AuthContext] Logout error:', error);
+        } finally {
+            // Always clear local state
+            setClientProfile(null);
+            setUser(null); 
+            // We manually clear user here just in case onAuthStateChange doesn't fire on error
+        }
     };
 
     // isClient = user exists AND has a client profile (not an admin)

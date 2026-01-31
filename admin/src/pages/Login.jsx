@@ -22,7 +22,13 @@ const Login = () => {
             navigate('/');
         } catch (err) {
             console.error('Login error:', err);
-            setError(err.message || 'Invalid email or password');
+            let message = err.message || 'Invalid email or password';
+            if (message.includes('AbortError') || message.includes('Failed to fetch')) {
+                message = 'Network error: Unable to connect to authentication server.';
+            } else if (message.includes('timed out')) {
+                message = 'Connection timed out. Please check your internet.';
+            }
+            setError(message);
         } finally {
             setLoading(false);
         }

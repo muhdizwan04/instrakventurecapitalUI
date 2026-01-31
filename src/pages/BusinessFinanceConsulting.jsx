@@ -84,7 +84,7 @@ const BusinessFinanceConsulting = () => {
                 <div className="container">
                     <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
                         <p style={{ fontSize: '1.15rem', color: '#4A5568', lineHeight: '1.9' }}>
-                            {content.introduction || 'Dedicated finance leadership to support funding readiness, reporting discipline, and decision-making—without the overhead of a full-time in-house CFO. We provide strategic financial oversight tailored to your business needs.'}
+                            {pageContent.introduction || 'Dedicated finance leadership to support funding readiness, reporting discipline, and decision-making—without the overhead of a full-time in-house CFO. We provide strategic financial oversight tailored to your business needs.'}
                         </p>
                     </div>
                 </div>

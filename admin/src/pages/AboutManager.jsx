@@ -1062,7 +1062,7 @@ const AboutManager = () => {
 
                                                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
                                                                 {partners.map((partner, i) => (
-                                                                    <div key={i} style={{ border: '1px solid #E2E8F0', borderRadius: '16px', padding: '3rem', position: 'relative', background: 'white', textAlign: 'left' }}>
+                                                                    <div key={partner.id} style={{ border: '1px solid #E2E8F0', borderRadius: '16px', padding: '3rem', position: 'relative', background: 'white', textAlign: 'left' }}>
                                                                         <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}><AllIcons.ShieldCheck size={24} color="#D4AF37" /></div>
                                                                         <h3 style={{ fontSize: '1.5rem', color: '#1A365D', fontWeight: 'bold', marginBottom: '0.5rem' }}>{partner.name}</h3>
                                                                         <span style={{ display: 'inline-block', background: '#F0F9FF', color: '#0369A1', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600', marginBottom: '2rem' }}>
@@ -1077,7 +1077,7 @@ const AboutManager = () => {
                                                                 ))}
 
                                                                 {banks.map((bank, i) => (
-                                                                    <div key={i} style={{ border: '1px solid #E2E8F0', borderRadius: '16px', padding: '3rem', position: 'relative', background: 'white', textAlign: 'left' }}>
+                                                                    <div key={bank.id} style={{ border: '1px solid #E2E8F0', borderRadius: '16px', padding: '3rem', position: 'relative', background: 'white', textAlign: 'left' }}>
                                                                         <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}><AllIcons.Building2 size={24} color="#D4AF37" /></div>
                                                                         <h3 style={{ fontSize: '1.5rem', color: '#1A365D', fontWeight: 'bold', marginBottom: '0.5rem' }}>{bank.name}</h3>
                                                                         <span style={{ display: 'inline-block', background: '#F0FDF4', color: '#166534', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600', marginBottom: '2rem' }}>

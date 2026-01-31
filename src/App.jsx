@@ -1,12 +1,10 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import ScrollToTop from './components/ScrollToTop';
 import { AuthProvider } from './context/AuthContext';
 import Home from './pages/Home';
 import AboutUs from './pages/AboutUs';
-import MissionVisionValues from './pages/MissionVisionValues';
-import BoardOfDirectors from './pages/BoardOfDirectors';
 import ServicesPage from './pages/Services';
 import Investors from './pages/Investors';
 import JoinUs from './pages/JoinUs';
@@ -49,8 +47,8 @@ const MainLayout = () => (
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<AboutUs />} />
-        <Route path="/mission-vision-values" element={<MissionVisionValues />} />
-        <Route path="/board-of-directors" element={<BoardOfDirectors />} />
+        <Route path="/mission-vision-values" element={<Navigate to="/about#mission" replace />} />
+        <Route path="/board-of-directors" element={<Navigate to="/about#board" replace />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/investors" element={<Investors />} />
         <Route path="/join-us" element={<JoinUs />} />

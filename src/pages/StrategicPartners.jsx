@@ -208,25 +208,7 @@ const StrategicPartners = () => {
                 </div>
             </section>
 
-            {/* Governance */}
-            <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>
-                <div className="container">
-                    <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-                        <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', color: '#1A365D' }}>{trustContent.title}</h2>
-                        <p style={{ color: '#4A5568', lineHeight: '1.8', marginBottom: '2rem' }}>
-                            {trustContent.description}
-                        </p>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
-                            {trustContent.regulators.map((reg, i) => (
-                                <div key={reg.id || i} style={{ padding: '1.5rem', background: '#F5F7FA', borderRadius: '8px' }}>
-                                    <h4 style={{ color: '#1A365D', marginBottom: '0.5rem' }}>{reg.title}</h4>
-                                    <p style={{ color: '#4A5568', fontSize: '0.85rem' }}>{reg.subtitle}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </section>
+
 
             {/* Custom Sections */}
             {customSections.length > 0 && (

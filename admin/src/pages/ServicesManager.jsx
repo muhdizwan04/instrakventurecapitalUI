@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Search, Briefcase, ArrowLeft, Save, Wallet, TrendingUp, Building2, Shield, Landmark, BarChart, FileText, Globe, Loader2, GripVertical, Coins, Gem, Users, ShieldCheck, PieChart, BarChart3, Settings } from 'lucide-react';
+import { Plus, Edit2, Trash2, Briefcase, Save, Wallet, TrendingUp, Building2, Shield, Landmark, BarChart, FileText, Globe, Loader2, GripVertical, Coins, Gem, Users, ShieldCheck, PieChart, BarChart3, X, ChevronRight, Settings } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
@@ -24,8 +24,7 @@ const ICON_MAP = {
 };
 
 const ServicesManager = () => {
-    const [view, setView] = useState('list');
-    const [editingService, setEditingService] = useState(null);
+    const [selectedService, setSelectedService] = useState(null);
 
     const defaultServices = [
         { id: 1, title: 'Business Finance Consulting (Virtual CFO)', summary: 'Financial strategy & forecasting, budgeting & cash flow management, profitability analysis & cost control, investment readiness & capital structuring, financial risk assessment & mitigation, KPI setting & performance monitoring, and board/investor reporting & stakeholder communication.', icon: 'Briefcase', link: '/services/virtual-cfo', linkText: 'Learn More', fields: [] },
@@ -48,40 +47,41 @@ const ServicesManager = () => {
     useEffect(() => {
         if (content?.items && !loading) {
             setServices(content.items);
+            if (!selectedService && content.items.length > 0) {
+                setSelectedService(content.items[0]);
+            }
         }
     }, [content, loading]);
 
-    const handleEdit = (service) => {
-        setEditingService({ ...service });
-        setView('edit');
-    };
-
     const handleCreate = () => {
-        setEditingService({ id: Date.now(), title: '', summary: '', icon: 'Briefcase', link: '', linkText: 'Learn More', fields: [] });
-        setView('edit');
+        const newService = { id: Date.now(), title: 'New Service', summary: '', icon: 'Briefcase', link: '', linkText: 'Learn More', fields: [] };
+        const updated = [...services, newService];
+        setServices(updated);
+        setSelectedService(newService);
+        toast.success('New service created');
     };
 
     const handleDelete = (id) => {
         if (window.confirm('Are you sure you want to delete this service?')) {
             const updated = services.filter(s => s.id !== id);
             setServices(updated);
+            if (selectedService?.id === id) {
+                setSelectedService(updated[0] || null);
+            }
             saveContent({ items: updated });
+            toast.success('Service deleted');
         }
     };
 
-    const handleSave = async (e) => {
-        if (e) e.preventDefault();
-        if (editingService) {
-            let updatedServices;
-            const existing = services.find(s => s.id === editingService.id);
-            if (existing) {
-                updatedServices = services.map(s => s.id === editingService.id ? editingService : s);
-            } else {
-                updatedServices = [...services, editingService];
-            }
-            setServices(updatedServices);
-            await saveContent({ items: updatedServices });
-            setView('list');
+    const handleSave = async () => {
+        await saveContent({ items: services });
+        toast.success('Services saved!');
+    };
+
+    const handleUpdateService = (id, field, value) => {
+        setServices(prev => prev.map(s => s.id === id ? { ...s, [field]: value } : s));
+        if (selectedService?.id === id) {
+            setSelectedService(prev => ({ ...prev, [field]: value }));
         }
     };
 
@@ -91,81 +91,83 @@ const ServicesManager = () => {
         const [reorderedItem] = items.splice(result.source.index, 1);
         items.splice(result.destination.index, 0, reorderedItem);
         setServices(items);
-        saveContent({ items: items });
     };
 
-    const renderIcon = (iconName) => {
+    const renderIcon = (iconName, size = 20) => {
         const Icon = ICON_MAP[iconName] || Briefcase;
-        return <Icon size={24} />;
+        return <Icon size={size} />;
     };
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-3xl font-heading text-[var(--accent-primary)] mb-2">Services Manager</h1>
-                    <p className="text-[var(--text-secondary)]">Manage your service offerings and details.</p>
-                </div>
-                {view === 'list' && (
-                    <div className="flex gap-3">
-                        <button onClick={() => saveContent({ items: services })} disabled={saving} className="btn-save">
-                            {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-                            <span>{saving ? 'Saving...' : 'Save All Changes'}</span>
-                        </button>
-                        <button onClick={handleCreate} className="btn-add">
-                            <Plus size={18} />
-                            <span>Add New Service</span>
-                        </button>
+        <div className="h-[calc(100vh-80px)] flex flex-col">
+            {/* Compact Header */}
+            <div className="shrink-0 bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-50 rounded-lg text-[var(--accent-primary)]">
+                        <Settings size={20} />
                     </div>
-                )}
+                    <div>
+                        <h1 className="text-xl font-heading text-[var(--accent-primary)] font-bold">Services Manager</h1>
+                        <p className="text-xs text-gray-400">{services.length} services</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button onClick={handleCreate} className="flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-xs font-bold border border-blue-100">
+                        <Plus size={16} /> Add Service
+                    </button>
+                    <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-5 py-2 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#0f294d] transition-colors shadow-md text-xs font-bold disabled:opacity-50">
+                        {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                        {saving ? 'Saving...' : 'Save Changes'}
+                    </button>
+                </div>
             </div>
 
-            {view === 'list' ? (
-                <div className="glass-card p-0 overflow-hidden">
-                    <div className="p-4 border-b border-[var(--border-light)] bg-[var(--bg-tertiary)] bg-opacity-30 flex items-center gap-4">
-                        <div className="relative flex-1 max-w-md">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--text-muted)]" size={18} />
-                            <input
-                                type="text"
-                                placeholder="Search services..."
-                                className="w-full pl-10 pr-4 py-2 rounded-lg border border-[var(--border-light)] focus:ring-1 focus:ring-[var(--accent-primary)] outline-none"
-                            />
-                        </div>
+            {/* Main Content: Split Panel */}
+            <div className="flex-1 flex min-h-0">
+                {/* Left Panel: Service List */}
+                <div className="w-80 shrink-0 border-r border-gray-200 bg-gray-50/50 flex flex-col">
+                    <div className="p-3 border-b border-gray-100 bg-white">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Drag to Reorder</p>
                     </div>
-
-                    <div className="divide-y divide-[var(--border-light)]">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar">
                         <DragDropContext onDragEnd={handleDragEnd}>
-                            <Droppable droppableId="services">
+                            <Droppable droppableId="services-list">
                                 {(provided) => (
-                                    <div {...provided.droppableProps} ref={provided.innerRef}>
+                                    <div {...provided.droppableProps} ref={provided.innerRef} className="p-2 space-y-1">
                                         {services.map((service, index) => (
                                             <Draggable key={service.id} draggableId={service.id.toString()} index={index}>
                                                 {(provided, snapshot) => (
                                                     <div
                                                         ref={provided.innerRef}
                                                         {...provided.draggableProps}
-                                                        className={`p-6 flex items-center justify-between transition-colors group ${snapshot.isDragging ? 'bg-blue-50 shadow-lg z-10' : 'hover:bg-[var(--bg-secondary)]'}`}
+                                                        onClick={() => setSelectedService(service)}
+                                                        className={`p-3 rounded-lg cursor-pointer transition-all group flex items-center gap-3 ${
+                                                            selectedService?.id === service.id 
+                                                                ? 'bg-white shadow-md border border-blue-200 ring-1 ring-blue-100' 
+                                                                : snapshot.isDragging 
+                                                                    ? 'bg-white shadow-lg' 
+                                                                    : 'hover:bg-white border border-transparent hover:border-gray-200'
+                                                        }`}
                                                     >
-                                                        <div className="flex items-center gap-4">
-                                                            <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab p-1">
-                                                                <GripVertical size={20} />
-                                                            </div>
-                                                            <div className="w-12 h-12 bg-blue-50 text-[var(--accent-primary)] rounded-lg flex items-center justify-center">
-                                                                {renderIcon(service.icon)}
-                                                            </div>
-                                                            <div>
-                                                                <h3 className="font-bold text-[var(--text-primary)] text-lg">{service.title}</h3>
-                                                                <p className="text-[var(--text-secondary)] text-sm line-clamp-1">{service.summary}</p>
-                                                            </div>
+                                                        <div {...provided.dragHandleProps} className="text-gray-300 hover:text-gray-500 cursor-grab">
+                                                            <GripVertical size={16} />
                                                         </div>
-                                                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <button onClick={() => handleEdit(service)} className="p-2 text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-blue-50 rounded-lg">
-                                                                <Edit2 size={18} />
-                                                            </button>
-                                                            <button onClick={() => handleDelete(service.id)} className="p-2 text-[var(--text-secondary)] hover:text-red-500 hover:bg-red-50 rounded-lg">
-                                                                <Trash2 size={18} />
-                                                            </button>
+                                                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                                                            selectedService?.id === service.id 
+                                                                ? 'bg-[var(--accent-primary)] text-white' 
+                                                                : 'bg-gray-100 text-gray-500'
+                                                        }`}>
+                                                            {renderIcon(service.icon, 18)}
                                                         </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className={`font-bold text-sm truncate ${
+                                                                selectedService?.id === service.id ? 'text-[var(--accent-primary)]' : 'text-gray-700'
+                                                            }`}>
+                                                                {service.title}
+                                                            </p>
+                                                            <p className="text-[10px] text-gray-400 truncate">{service.summary || 'No description'}</p>
+                                                        </div>
+                                                        <ChevronRight size={14} className={`text-gray-300 shrink-0 ${selectedService?.id === service.id ? 'text-blue-400' : ''}`} />
                                                     </div>
                                                 )}
                                             </Draggable>
@@ -177,79 +179,121 @@ const ServicesManager = () => {
                         </DragDropContext>
                     </div>
                 </div>
-            ) : (
-                <div className="max-w-5xl mx-auto glass-card p-0 animate-in fade-in slide-in-from-bottom-4 duration-300 overflow-hidden">
-                    <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-gray-50 bg-opacity-50">
-                        <div className="flex items-center gap-4">
-                            <button onClick={() => setView('list')} className="p-2 text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-white rounded-lg transition-all shadow-sm border border-transparent hover:border-gray-200">
-                                <ArrowLeft size={18} />
-                            </button>
-                            <div>
-                                <h2 className="text-2xl font-bold text-[var(--text-primary)]">
-                                    {editingService.id && services.find(s => s.id === editingService.id) ? 'Edit Service' : 'New Service'}
-                                </h2>
-                                <p className="text-sm text-[var(--text-secondary)]">{editingService.title || 'Service Details'}</p>
-                            </div>
-                        </div>
-                        <button onClick={handleSave} className="btn-save shadow-md flex items-center gap-2">
-                            <Save size={18} /> <span>Save Changes</span>
-                        </button>
-                    </div>
 
-                    <div className="p-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Service Title</label>
-                                    <input
-                                        type="text"
-                                        value={editingService.title}
-                                        onChange={(e) => setEditingService({ ...editingService, title: e.target.value })}
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent transition-all"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Summary Description</label>
-                                    <textarea
-                                        value={editingService.summary}
-                                        onChange={(e) => setEditingService({ ...editingService, summary: e.target.value })}
-                                        rows={4}
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent transition-all"
-                                    />
-                                </div>
-                            </div>
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Icon Name (Lucide)</label>
-                                    <div className="grid grid-cols-5 gap-2">
-                                        {Object.keys(ICON_MAP).map((iconName) => {
-                                            const Icon = ICON_MAP[iconName];
-                                            const isSelected = editingService.icon === iconName;
-                                            return (
-                                                <button
-                                                    key={iconName}
-                                                    type="button"
-                                                    onClick={() => setEditingService({ ...editingService, icon: iconName })}
-                                                    className={`p-2 rounded-lg flex items-center justify-center transition-all ${isSelected ? 'bg-[var(--accent-primary)] text-white shadow-md' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
-                                                >
-                                                    <Icon size={18} />
-                                                </button>
-                                            );
-                                        })}
+                {/* Right Panel: Editor */}
+                <div className="flex-1 flex flex-col bg-white min-w-0">
+                    {selectedService ? (
+                        <>
+                            {/* Editor Header */}
+                            <div className="shrink-0 px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                    <div className="p-2 bg-[var(--accent-primary)] text-white rounded-lg">
+                                        {renderIcon(selectedService.icon, 20)}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <input
+                                            value={selectedService.title}
+                                            onChange={(e) => handleUpdateService(selectedService.id, 'title', e.target.value)}
+                                            className="text-lg font-heading text-gray-800 font-bold bg-transparent border-0 focus:ring-0 focus:outline-none w-full hover:bg-white focus:bg-white px-2 py-1 rounded-lg transition-colors -ml-2"
+                                            placeholder="Service Title"
+                                        />
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 pl-2">Service Card</span>
                                     </div>
                                 </div>
-                                <div className="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                                    <p className="text-xs text-gray-500 leading-relaxed">
-                                        <strong>Note:</strong> This section only manages the service card shown on the homepage and navigation.
-                                        To edit the full page content or inquiry form, use the 
-                                        <span className="text-[var(--accent-primary)] font-semibold mx-1">Service Pages Manager</span>.
-                                    </p>
+                                <button 
+                                    onClick={() => handleDelete(selectedService.id)} 
+                                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Delete Service"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+
+                            {/* Editor Content */}
+                            <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                                <div className="max-w-3xl space-y-6">
+                                    {/* Summary */}
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Summary Description</label>
+                                        <textarea
+                                            value={selectedService.summary}
+                                            onChange={(e) => handleUpdateService(selectedService.id, 'summary', e.target.value)}
+                                            rows={4}
+                                            className="input-field text-sm"
+                                            placeholder="Brief description of this service..."
+                                        />
+                                        <p className="text-[10px] text-gray-400 mt-1">This appears on the homepage service cards.</p>
+                                    </div>
+
+                                    {/* Icon Picker */}
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Icon</label>
+                                        <div className="grid grid-cols-8 gap-2">
+                                            {Object.keys(ICON_MAP).map((iconName) => {
+                                                const Icon = ICON_MAP[iconName];
+                                                const isSelected = selectedService.icon === iconName;
+                                                return (
+                                                    <button
+                                                        key={iconName}
+                                                        type="button"
+                                                        onClick={() => handleUpdateService(selectedService.id, 'icon', iconName)}
+                                                        className={`p-3 rounded-lg flex items-center justify-center transition-all ${isSelected ? 'bg-[var(--accent-primary)] text-white shadow-md ring-2 ring-offset-2 ring-[var(--accent-primary)]' : 'bg-gray-50 text-gray-500 hover:bg-gray-100 border border-gray-100'}`}
+                                                        title={iconName}
+                                                    >
+                                                        <Icon size={20} />
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* Link Settings */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Page URL Slug</label>
+                                            <input
+                                                value={selectedService.link || ''}
+                                                onChange={(e) => handleUpdateService(selectedService.id, 'link', e.target.value)}
+                                                className="input-field text-sm font-mono"
+                                                placeholder="/services/your-service"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Button Text</label>
+                                            <input
+                                                value={selectedService.linkText || 'Learn More'}
+                                                onChange={(e) => handleUpdateService(selectedService.id, 'linkText', e.target.value)}
+                                                className="input-field text-sm"
+                                                placeholder="Learn More"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Info Note */}
+                                    <div className="p-4 bg-amber-50 rounded-xl border border-amber-100 flex items-start gap-3">
+                                        <FileText size={18} className="text-amber-500 shrink-0 mt-0.5" />
+                                        <div>
+                                            <p className="text-xs text-amber-700 font-medium">Note</p>
+                                            <p className="text-xs text-amber-600">
+                                                This section manages the service card displayed on the homepage and navigation. 
+                                                To edit the full page content or inquiry form, use the <strong>Service Pages Manager</strong>.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                        </>
+                    ) : (
+                        <div className="flex-1 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                <Briefcase size={20} />
+                            </div>
+                            <p className="text-sm font-medium text-gray-500">Select a service from the list to edit</p>
+                            <p className="text-xs text-gray-400 mt-1">Or click "Add Service" to create a new one</p>
                         </div>
-                    </div>
+                    )}
                 </div>
-            )}
+            </div>
         </div>
     );
 };

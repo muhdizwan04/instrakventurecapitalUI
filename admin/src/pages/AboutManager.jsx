@@ -163,24 +163,33 @@ const AboutManager = () => {
     // --- SUB-EDITORS HANDLERS ---
 
     // Board Handlers
-    const handleAddDirector = () => setDirectors([...directors, { id: `dir-${Date.now()}`, name: 'New Director', role: 'Role', image: '', bio: '' }]);
-    const handleUpdateDirector = (id, field, value) => setDirectors(directors.map(d => d.id === id ? { ...d, [field]: value } : d));
-    const handleDeleteDirector = (id) => { if (confirm('Remove director?')) setDirectors(directors.filter(d => d.id !== id)); };
+    const handleAddDirector = () => {
+        const newDirector = { id: `dir-${Date.now()}`, name: 'New Director', role: 'Role', image: '', bio: '' };
+        setDirectors(prev => [...prev, newDirector]);
+        toast.success('New director added');
+    };
+    const handleUpdateDirector = (id, field, value) => setDirectors(prev => prev.map(d => d.id === id ? { ...d, [field]: value } : d));
+    const handleDeleteDirector = (id) => { 
+        if (window.confirm('Remove director?')) {
+            setDirectors(prev => prev.filter(d => d.id !== id));
+            toast.success('Director removed');
+        }
+    };
 
     // Partner Handlers
-    const handleAddPartner = () => setPartners([...partners, { id: `p-${Date.now()}`, name: 'New Partner', category: 'Category', description: 'Desc', partnership: 'Details', logo: '' }]);
-    const handleUpdatePartner = (id, field, value) => setPartners(partners.map(p => p.id === id ? { ...p, [field]: value } : p));
-    const handleDeletePartner = (id) => { if (confirm('Remove partner?')) setPartners(partners.filter(p => p.id !== id)); };
+    const handleAddPartner = () => setPartners(prev => [...prev, { id: `p-${Date.now()}`, name: 'New Partner', category: 'Category', description: 'Desc', partnership: 'Details', logo: '' }]);
+    const handleUpdatePartner = (id, field, value) => setPartners(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p));
+    const handleDeletePartner = (id) => { if (window.confirm('Remove partner?')) setPartners(prev => prev.filter(p => p.id !== id)); };
 
     // Bank Handlers
-    const handleAddBank = () => setBanks([...banks, { id: `b-${Date.now()}`, name: 'New Bank', role: 'Role', swift: '', branch: '', logo: '' }]);
-    const handleUpdateBank = (id, field, value) => setBanks(banks.map(b => b.id === id ? { ...b, [field]: value } : b));
-    const handleDeleteBank = (id) => { if (confirm('Remove bank?')) setBanks(banks.filter(b => b.id !== id)); };
+    const handleAddBank = () => setBanks(prev => [...prev, { id: `b-${Date.now()}`, name: 'New Bank', role: 'Role', swift: '', branch: '', logo: '' }]);
+    const handleUpdateBank = (id, field, value) => setBanks(prev => prev.map(b => b.id === id ? { ...b, [field]: value } : b));
+    const handleDeleteBank = (id) => { if (window.confirm('Remove bank?')) setBanks(prev => prev.filter(b => b.id !== id)); };
 
 
     // --- HELPER HANDLERS ---
     const updateSection = (id, updates) => {
-        setSections(sections.map(s => s.id === id ? { ...s, ...updates } : s));
+        setSections(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
     };
 
     const addCustomSection = () => {
@@ -191,13 +200,13 @@ const AboutManager = () => {
             content: 'Enter content here...',
             icon: 'Lightbulb'
         };
-        setSections([...sections, newSection]);
+        setSections(prev => [...prev, newSection]);
         setActiveSection(newSection.id);
     };
 
     const removeSection = (id) => {
-        if (confirm('Are you sure you want to remove this section?')) {
-            setSections(sections.filter(s => s.id !== id));
+        if (window.confirm('Are you sure you want to remove this section?')) {
+            setSections(prev => prev.filter(s => s.id !== id));
             if (activeSection === id) setActiveSection(sections[0]?.id || null);
         }
     };
@@ -378,42 +387,69 @@ const AboutManager = () => {
 
     const renderBoardEditor = (section) => (
         <div className="space-y-6">
-
-            <div className="flex justify-between items-center mb-4 bg-white py-2 border-b border-gray-100">
-                <div>
-                    <h3 className="font-bold text-[var(--accent-primary)] flex items-center gap-2">
-                        <Users size={18} /> Board of Directors
-                    </h3>
-                    <p className="text-xs text-gray-500">Drag items to reorder</p>
-                </div>
-                <button onClick={handleAddDirector} className="btn-secondary text-xs py-1.5 px-3 flex items-center gap-2">
-                    <Plus size={14} /> Add Director
-                </button>
+            <div className="flex items-center px-1">
+                <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Drag items to reorder</p>
             </div>
 
-            <Droppable droppableId="board-list">
+            <Droppable droppableId="board-list" direction="horizontal">
                 {(provided) => (
-                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-4">
+                    <div {...provided.droppableProps} ref={provided.innerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {directors.map((director, index) => (
                             <Draggable key={director.id} draggableId={director.id} index={index}>
                                 {(provided, snapshot) => (
-                                    <div ref={provided.innerRef} {...provided.draggableProps} className={`p-4 bg-white border border-[var(--border-light)] rounded-xl relative group transition-all ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-[var(--accent-primary)] rotate-1 z-50' : 'hover:shadow-md hover:border-blue-200'}`}>
-                                        <div className="absolute top-3 right-3 flex gap-1 z-10">
-                                            <div {...provided.dragHandleProps} className="text-gray-300 hover:text-[var(--accent-primary)] cursor-grab p-1.5 rounded hover:bg-gray-100"><GripVertical size={16} /></div>
-                                            <button onClick={() => handleDeleteDirector(director.id)} className="text-gray-300 hover:text-red-500 p-1.5 rounded hover:bg-red-50"><Trash2 size={16} /></button>
+                                    <div 
+                                        ref={provided.innerRef} 
+                                        {...provided.draggableProps} 
+                                        className={`p-4 bg-white border border-gray-200 rounded-xl relative group transition-all h-full
+                                            ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-[var(--accent-primary)] rotate-1 z-50' : 'hover:shadow-md hover:border-blue-200'}`}
+                                    >
+                                        <div className="absolute top-2 right-2 flex gap-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div {...provided.dragHandleProps} className="text-gray-400 hover:text-[var(--accent-primary)] cursor-grab p-1 rounded hover:bg-white shadow-sm bg-white/80"><GripVertical size={14} /></div>
+                                            <button 
+                                                onClick={() => handleDeleteDirector(director.id)} 
+                                                className="text-gray-400 hover:text-red-500 p-1 rounded hover:bg-red-50 shadow-sm bg-white/80"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
                                         </div>
-                                        <div className="flex gap-4">
-                                            <div className="w-20 shrink-0">
-                                                <ImageUpload value={director.image} onChange={(url) => handleUpdateDirector(director.id, 'image', url)} folder="directors" aspectRatio="3/4" />
+
+                                        <div className="flex flex-row gap-4 h-full">
+                                            <div className="w-32 shrink-0">
+                                                <div className="aspect-[3/4] rounded-lg overflow-hidden shadow-sm border border-gray-100 bg-gray-50 flex items-center justify-center">
+                                                    <ImageUpload 
+                                                        value={director.image} 
+                                                        onChange={(url) => handleUpdateDirector(director.id, 'image', url)} 
+                                                        folder="directors" 
+                                                        aspectRatio="3/4" 
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className="flex-1 space-y-3 min-w-0 pr-8">
+                                            <div className="flex-1 min-w-0 flex flex-col gap-2">
                                                 <div>
                                                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Name</label>
-                                                    <input value={director.name} onChange={(e) => handleUpdateDirector(director.id, 'name', e.target.value)} className="input-field font-bold text-[#1A365D]" placeholder="Director Name" />
+                                                    <input 
+                                                        value={director.name} 
+                                                        onChange={(e) => handleUpdateDirector(director.id, 'name', e.target.value)} 
+                                                        className="input-field font-heading font-bold text-[var(--accent-primary)] text-sm py-1" 
+                                                        placeholder="Name" 
+                                                    />
                                                 </div>
                                                 <div>
                                                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Role</label>
-                                                    <input value={director.role} onChange={(e) => handleUpdateDirector(director.id, 'role', e.target.value)} className="input-field text-xs text-[#B8860B] font-bold" placeholder="Role / Position" />
+                                                    <input 
+                                                        value={director.role} 
+                                                        onChange={(e) => handleUpdateDirector(director.id, 'role', e.target.value)} 
+                                                        className="input-field text-xs text-[#B8860B] font-bold py-1" 
+                                                        placeholder="Role" 
+                                                    />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <textarea 
+                                                        value={director.bio || ''} 
+                                                        onChange={(e) => handleUpdateDirector(director.id, 'bio', e.target.value)} 
+                                                        className="input-field text-xs text-gray-600 h-full min-h-[60px] resize-none py-1" 
+                                                        placeholder="Bio..." 
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -430,16 +466,10 @@ const AboutManager = () => {
 
     const renderPartnersEditor = (section) => (
         <div className="space-y-10">
-
             {/* Partners List */}
             <div>
-                <div className="flex justify-between items-center mb-4 bg-white py-2 border-b border-gray-100">
-                    <h3 className="font-bold text-[var(--accent-primary)] flex items-center gap-2">
-                        <Handshake size={18} /> Strategic Partners
-                    </h3>
-                    <button onClick={handleAddPartner} className="btn-secondary text-xs py-1.5 px-3 flex items-center gap-2">
-                        <Plus size={14} /> Add Partner
-                    </button>
+                <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
+                    <h3 className="font-bold text-[var(--accent-primary)] text-sm uppercase tracking-wider">Strategic Partners</h3>
                 </div>
                 <Droppable droppableId="partners-list">
                     {(provided) => (
@@ -479,13 +509,8 @@ const AboutManager = () => {
 
             {/* Banks List */}
             <div>
-                <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
-                    <h3 className="font-bold text-green-700 flex items-center gap-2">
-                        <Building2 size={18} /> Banking Partners
-                    </h3>
-                    <button onClick={handleAddBank} className="text-xs bg-green-50 text-green-600 border border-green-200 px-3 py-1.5 rounded-lg font-bold hover:bg-green-100 flex items-center gap-2">
-                        <Plus size={14} /> Add Bank
-                    </button>
+                 <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
+                    <h3 className="font-bold text-green-700 text-sm uppercase tracking-wider">Banking Partners</h3>
                 </div>
                 <Droppable droppableId="banks-list">
                     {(provided) => (
@@ -524,39 +549,55 @@ const AboutManager = () => {
 
     const renderMilestoneEditor = (section) => (
         <div className="space-y-6">
-            <div className="p-6 bg-[#0A2540] border border-gray-700 rounded-xl shadow-sm text-white">
-                <div className="flex items-center gap-2 mb-4 text-[#D4AF37] border-b border-gray-600 pb-2">
-                    <Award size={20} />
-                    <h3 className="font-bold text-base">Investment Milestone</h3>
-                </div>
+            {/* Milestone Content */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="space-y-4">
                     <div>
-                        <label className="label text-gray-300">Headline (e.g., USD 1 Billion)</label>
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Headline</label>
                         <input 
                             value={milestone.headline || ''} 
                             onChange={e => handleUpdateMilestone('headline', e.target.value)} 
-                            className="input-field font-heading font-bold text-2xl text-[#1A365D]" 
-                            placeholder="USD 1 Billion"
+                            className="input-field font-heading font-bold text-2xl text-[var(--accent-primary)]" 
+                            placeholder="e.g., USD 1 Billion"
                         />
+                        <p className="text-[10px] text-gray-400 mt-1">The main figure or achievement to highlight.</p>
                     </div>
                     <div>
-                        <label className="label text-gray-300">Subtitle</label>
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Subtitle</label>
                         <input 
                             value={milestone.subtitle || ''} 
                             onChange={e => handleUpdateMilestone('subtitle', e.target.value)} 
-                            className="input-field text-[#D4AF37]" 
-                            placeholder="Investment Commitment Signed"
+                            className="input-field text-[#B8860B] font-bold" 
+                            placeholder="e.g., Investment Commitment Signed"
                         />
                     </div>
                     <div>
-                        <label className="label text-gray-300">Description</label>
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Description</label>
                         <textarea 
                             value={milestone.description || ''} 
                             onChange={e => handleUpdateMilestone('description', e.target.value)} 
-                            className="input-field text-sm" 
-                            rows={4}
-                            placeholder="INSTRAK Venture Capital Berhad has secured strategic investment..."
+                            className="input-field text-sm text-gray-600" 
+                            rows={5}
+                            placeholder="Describe this achievement..."
                         />
+                    </div>
+                </div>
+
+                {/* Preview Card */}
+                <div className="hidden lg:block">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Preview</label>
+                    <div className="p-6 bg-gradient-to-br from-[#0A2540] to-[#1A365D] rounded-xl shadow-lg text-white">
+                        <div className="text-center">
+                            <p className="text-4xl font-heading font-bold text-white mb-2">
+                                {milestone.headline || 'USD 1 Billion'}
+                            </p>
+                            <p className="text-[#D4AF37] font-bold text-sm uppercase tracking-wider">
+                                {milestone.subtitle || 'Investment Commitment Signed'}
+                            </p>
+                            <p className="text-gray-300 text-xs mt-4 leading-relaxed line-clamp-3">
+                                {milestone.description || 'Description will appear here...'}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -696,75 +737,103 @@ const AboutManager = () => {
     return (
         <div className="space-y-4 h-[calc(100vh-100px)] flex flex-col">
             <DragDropContext onDragEnd={handleDragEnd}>
-                <div className="flex justify-between items-center shrink-0">
-                    <div>
-                        <h1 className="text-3xl font-heading text-[var(--accent-primary)] mb-1">About Us Manager</h1>
-                        <p className="text-[var(--text-secondary)]">Manage content blocks and preview changes in real-time.</p>
+                {/* COMPACT HEADER & TABS */}
+                <div className="shrink-0 bg-white border-b border-gray-200 sticky top-0 z-20">
+                    <div className="flex items-center justify-between px-1 py-2 gap-4">
+                        {/* Tabs Container */}
+                        <div className="flex-1 min-w-0 overflow-x-auto no-scrollbar">
+                           <Droppable droppableId="about-tabs" direction="horizontal">
+                                {(provided) => (
+                                    <div
+                                        ref={provided.innerRef}
+                                        {...provided.droppableProps}
+                                        className="flex gap-1"
+                                    >
+                                        {sections.map((section, index) => (
+                                            <Draggable key={section.id} draggableId={section.id} index={index}>
+                                                {(provided, snapshot) => renderTab(section, provided, snapshot)}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </div>
+                                )}
+                            </Droppable>
+                        </div>
                     </div>
-                    <div className="flex gap-3">
-                        <button onClick={addCustomSection} className="btn-add">
-                            <Plus size={18} /> Add Section
-                        </button>
-                        <button onClick={handleSave} disabled={saving} className="btn-save">
-                            {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-                            {saving ? 'Saving...' : 'Save Changes'}
-                        </button>
-                    </div>
-                </div>
-
-                {/* TAB BAR */}
-                <div className="shrink-0 border-b border-gray-200">
-                    <Droppable droppableId="about-tabs" direction="horizontal">
-                        {(provided) => (
-                            <div
-                                ref={provided.innerRef}
-                                {...provided.droppableProps}
-                                className="flex gap-1 overflow-x-auto no-scrollbar px-1 pt-2"
-                            >
-                                {sections.map((section, index) => (
-                                    <Draggable key={section.id} draggableId={section.id} index={index}>
-                                        {(provided, snapshot) => renderTab(section, provided, snapshot)}
-                                    </Draggable>
-                                ))}
-                                {provided.placeholder}
-                            </div>
-                        )}
-                    </Droppable>
                 </div>
 
                 {/* EDITOR CONTENT */}
-                <div className="flex-1 min-h-0">
-                    {/* EDITOR */}
-                    <div className="h-full glass-card p-0 flex flex-col overflow-hidden bg-white shadow-sm">
+                <div className="flex-1 min-h-0 bg-gray-50/50">
+                    <div className="h-full flex flex-col w-full"> 
                         {(() => {
                             const activeSectionData = sections.find(s => s.id === activeSection);
                             if (activeSectionData) {
                                 return (
-                                    <>
-                                        <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                                            <div>
-                                                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Editing Section</span>
-                                                <h2 className="text-xl font-heading text-[var(--accent-primary)] truncate">
-                                                    {activeSectionData.title || activeSectionData.missionTitle || 'Untitled Section'}
-                                                </h2>
+                                    <div className="flex-1 overflow-y-auto custom-scrollbar relative">
+                                        {/* CONSOLIDATED STICKY HEADER */}
+                                        <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-6 py-4 flex items-center justify-between shadow-sm">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-gray-50 rounded-lg text-[var(--accent-primary)]">
+                                                    {getIcon(activeSectionData.type)}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <input
+                                                        value={activeSectionData.title || activeSectionData.missionTitle || ''}
+                                                        onChange={(e) => updateSection(activeSectionData.id, { title: e.target.value })}
+                                                        className="text-lg font-heading text-gray-800 font-bold leading-tight bg-transparent border-0 focus:ring-0 focus:outline-none w-full hover:bg-gray-50 focus:bg-gray-50 px-2 py-1 rounded-lg transition-colors -ml-2"
+                                                        placeholder="Section Title"
+                                                    />
+                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 pl-2">
+                                                        {activeSectionData.type}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold uppercase rounded-full tracking-wider border border-blue-100">
-                                                {activeSectionData.type}
+
+                                            <div className="flex items-center gap-3">
+                                                {/* SECTION SPECIFIC ADD ACTIONS */}
+                                                {activeSectionData.type === 'board' && (
+                                                    <button onClick={handleAddDirector} className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-xs font-bold border border-blue-100">
+                                                        <Plus size={14} /> Add Director
+                                                    </button>
+                                                )}
+                                                {activeSectionData.type === 'partners' && (
+                                                    <div className="flex gap-2">
+                                                        <button onClick={handleAddPartner} className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-xs font-bold border border-blue-100">
+                                                            <Plus size={14} /> Add Partner
+                                                        </button>
+                                                        <button onClick={handleAddBank} className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors text-xs font-bold border border-green-100">
+                                                            <Plus size={14} /> Add Bank
+                                                        </button>
+                                                    </div>
+                                                )}
+
+                                                <div className="w-px h-6 bg-gray-100 mx-1" />
+
+                                                {/* GLOBAL ACTIONS */}
+                                                <button onClick={addCustomSection} className="p-2 text-gray-500 hover:text-[var(--accent-primary)] hover:bg-gray-50 rounded-lg transition-colors border border-gray-100" title="Add New Section">
+                                                    <Plus size={18} />
+                                                </button>
+                                                <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-6 py-2 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[#0f294d] transition-colors shadow-md text-xs font-bold disabled:opacity-50">
+                                                    {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                                                    {saving ? 'Saving...' : 'Save Changes'}
+                                                </button>
                                             </div>
                                         </div>
-                                        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-                                            {getEditor(activeSectionData)}
+
+                                        <div className="p-6">
+                                            <div className="bg-white rounded-xl">
+                                                {getEditor(activeSectionData)}
+                                            </div>
                                         </div>
-                                    </>
+                                    </div>
                                 );
                             }
                             return (
                                 <div className="flex-1 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
-                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                        <Edit size={24} />
+                                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                        <Edit size={20} />
                                     </div>
-                                    <h3 className="text-lg font-bold text-gray-600 mb-2">Select a Section</h3>
-                                    <p className="text-sm">Click a tab above to start editing.</p>
+                                    <p className="text-sm font-medium text-gray-500">Select a section from the top bar to edit</p>
                                 </div>
                             );
                         })()}

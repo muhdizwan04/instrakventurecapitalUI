@@ -1,7 +1,9 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import Layout from './components/Layout';
 import ScrollToTop from './components/ScrollToTop';
+import PageTransition from './components/PageTransition';
 import { AuthProvider } from './context/AuthContext';
 import Home from './pages/Home';
 import AboutUs from './pages/AboutUs';
@@ -40,41 +42,45 @@ const PageLoader = () => (
 );
 
 // Main content with Layout
-const MainLayout = () => (
-  <Layout>
-    <ScrollToTop />
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<AboutUs />} />
-        <Route path="/mission-vision-values" element={<Navigate to="/about#mission" replace />} />
-        <Route path="/board-of-directors" element={<Navigate to="/about#board" replace />} />
-        <Route path="/services" element={<ServicesPage />} />
-        <Route path="/investors" element={<Investors />} />
-        <Route path="/join-us" element={<JoinUs />} />
-        <Route path="/latest-news-2" element={<LatestNews />} />
-        <Route path="/contact" element={<Contact />} />
-        {/* Service Detail Pages */}
-        <Route path="/services/virtual-cfo" element={<BusinessFinanceConsulting />} />
-        <Route path="/services/business-finance-consulting" element={<BusinessFinanceConsulting />} />
-        <Route path="/services/business-finance-consulting" element={<BusinessFinanceConsulting />} />
-        <Route path="/services/equity-financing" element={<EquityFinancing />} />
-        <Route path="/services/real-estate-financing" element={<RealEstateFinancing />} />
-        <Route path="/services/reits" element={<REITs />} />
-        <Route path="/services/share-financing" element={<ShareFinancing />} />
-        <Route path="/services/merger-acquisition" element={<MergerAcquisition />} />
-        <Route path="/services/tokenization" element={<Tokenization />} />
-        <Route path="/services/asset-insurance" element={<AssetInsurance />} />
-        <Route path="/services/ppli" element={<PPLI />} />
-        <Route path="/services/gig" element={<GlobalInvestmentGateway />} />
-        <Route path="/services/private-wealth" element={<PrivateWealthInvestment />} />
-        <Route path="/services/aum" element={<AssetUnderManagement />} />
-        <Route path="/project-listings" element={<ProjectListing />} />
-        <Route path="/strategic-partners" element={<StrategicPartners />} />
-      </Routes>
-    </Suspense>
-  </Layout>
-);
+const MainLayout = () => {
+  const location = useLocation();
+  return (
+    <Layout>
+      <ScrollToTop />
+      <Suspense fallback={<PageLoader />}>
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+            <Route path="/about" element={<PageTransition><AboutUs /></PageTransition>} />
+            <Route path="/mission-vision-values" element={<Navigate to="/about#mission" replace />} />
+            <Route path="/board-of-directors" element={<Navigate to="/about#board" replace />} />
+            <Route path="/services" element={<PageTransition><ServicesPage /></PageTransition>} />
+            <Route path="/investors" element={<PageTransition><Investors /></PageTransition>} />
+            <Route path="/join-us" element={<PageTransition><JoinUs /></PageTransition>} />
+            <Route path="/latest-news-2" element={<PageTransition><LatestNews /></PageTransition>} />
+            <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+            {/* Service Detail Pages */}
+            <Route path="/services/virtual-cfo" element={<PageTransition><BusinessFinanceConsulting /></PageTransition>} />
+            <Route path="/services/business-finance-consulting" element={<PageTransition><BusinessFinanceConsulting /></PageTransition>} />
+            <Route path="/services/equity-financing" element={<PageTransition><EquityFinancing /></PageTransition>} />
+            <Route path="/services/real-estate-financing" element={<PageTransition><RealEstateFinancing /></PageTransition>} />
+            <Route path="/services/reits" element={<PageTransition><REITs /></PageTransition>} />
+            <Route path="/services/share-financing" element={<PageTransition><ShareFinancing /></PageTransition>} />
+            <Route path="/services/merger-acquisition" element={<PageTransition><MergerAcquisition /></PageTransition>} />
+            <Route path="/services/tokenization" element={<PageTransition><Tokenization /></PageTransition>} />
+            <Route path="/services/asset-insurance" element={<PageTransition><AssetInsurance /></PageTransition>} />
+            <Route path="/services/ppli" element={<PageTransition><PPLI /></PageTransition>} />
+            <Route path="/services/gig" element={<PageTransition><GlobalInvestmentGateway /></PageTransition>} />
+            <Route path="/services/private-wealth" element={<PageTransition><PrivateWealthInvestment /></PageTransition>} />
+            <Route path="/services/aum" element={<PageTransition><AssetUnderManagement /></PageTransition>} />
+            <Route path="/project-listings" element={<PageTransition><ProjectListing /></PageTransition>} />
+            <Route path="/strategic-partners" element={<PageTransition><StrategicPartners /></PageTransition>} />
+          </Routes>
+        </AnimatePresence>
+      </Suspense>
+    </Layout>
+  );
+};
 
 function App() {
   return (

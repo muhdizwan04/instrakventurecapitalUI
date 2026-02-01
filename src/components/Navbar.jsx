@@ -4,6 +4,7 @@ import styles from './Navbar.module.css';
 import { usePageContent } from '../hooks/usePageContent';
 import { useAuth } from '../context/AuthContext';
 import { User, LogOut } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -91,11 +92,23 @@ const Navbar = () => {
                         />
                     ) : (
                         <div className={styles.logoText}>
-                            <span className={styles.brand}>
+                            <motion.span 
+                                className={styles.brand}
+                                initial={{ opacity: 0, letterSpacing: '-0.02em', y: 5 }}
+                                animate={{ opacity: 1, letterSpacing: '0.02em', y: 0 }}
+                                transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1.0] }}
+                            >
                                 {settings?.siteIdentity?.siteName || 'Instrak Venture Capital'}
-                            </span>
+                            </motion.span>
                             {settings?.siteIdentity?.tagline && (
-                                <span className={styles.tagline}>{settings.siteIdentity.tagline}</span>
+                                <motion.span 
+                                    className={styles.tagline}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.8, delay: 0.4 }}
+                                >
+                                    {settings.siteIdentity.tagline}
+                                </motion.span>
                             )}
                         </div>
                     )}

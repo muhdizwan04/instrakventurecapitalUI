@@ -3,6 +3,7 @@ import { usePageContent } from '../hooks/usePageContent';
 import { Layout, Building2, MapPin, Calendar, ArrowRight, TrendingUp, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import projectPlaceholder from '../assets/project-placeholder.png';
+import ScrollReveal from '../components/ScrollReveal';
 
 const ProjectListing = () => {
     const defaultContent = {
@@ -76,16 +77,17 @@ const ProjectListing = () => {
                 <div className="container">
                     <div style={{ display: 'grid', gap: '3rem' }}>
                         {projects.map((project, i) => (
-                            <div key={i} className="glass-card" style={{ 
-                                display: 'grid', 
-                                gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
-                                gap: '0', 
-                                overflow: 'hidden', 
-                                borderRadius: '20px',
-                                border: '1px solid rgba(26, 54, 93, 0.1)',
-                                background: '#FFFFFF',
-                                boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
-                            }}>
+                            <ScrollReveal key={i} staggerIndex={i} width="100%">
+                                <div className="glass-card" style={{ 
+                                    display: 'grid', 
+                                    gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
+                                    gap: '0', 
+                                    overflow: 'hidden', 
+                                    borderRadius: '20px',
+                                    border: '1px solid rgba(26, 54, 93, 0.1)',
+                                    background: '#FFFFFF',
+                                    boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
+                                }}>
                                 {/* Project Image */}
                                 <div style={{ position: 'relative', height: '100%', minHeight: '300px' }}>
                                     <img 
@@ -140,7 +142,8 @@ const ProjectListing = () => {
                                         Inquire About Project <ArrowRight size={18} />
                                     </Link>
                                 </div>
-                            </div>
+                                </div>
+                            </ScrollReveal>
                         ))}
                     </div>
                 </div>

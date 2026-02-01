@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useRef, Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Hero.module.css';
 import { usePageContent } from '../hooks/usePageContent';
-
+import { motion, useScroll, useTransform } from 'framer-motion';
 import klSkyline from '../assets/kl-skyline.png';
 
+
+
 const Hero = () => {
+    const ref = useRef(null);
+    const { scrollYProgress } = useScroll({
+        target: ref,
+        offset: ["start start", "end start"]
+    });
+    const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+    const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+
     // Default content - used while loading and as fallback
     const defaultContent = {
         heroTitle: 'Your Venture\nCapital Partner',
@@ -31,26 +41,63 @@ const Hero = () => {
 
     const buttons = content.buttons || defaultContent.buttons;
 
+    const staggerContainer = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.2,
+                delayChildren: 0.3
+            }
+        }
+    };
+
+    const itemVariant = {
+        hidden: { opacity: 0, y: 30 },
+        show: { 
+            opacity: 1, 
+            y: 0,
+            transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1.0] }
+        }
+    };
+
     return (
-        <section id="home" className={styles.hero}>
-            <div className={`container ${styles.container}`}>
+        <section id="home" className={styles.hero} ref={ref}>
+
+
+            {/* Content Layer - Positioned above 3D */}
+            <motion.div 
+                className={`container ${styles.container}`}
+                variants={staggerContainer}
+                initial="hidden"
+                animate="show"
+            >
 
                 <h1 className={styles.title}>
-                    {titleLine1}
-                    {titleLine2 && <><br /><span className={styles.highlight}>{titleLine2}</span></>}
+                    <motion.span className="block" variants={itemVariant}>
+                        {titleLine1}
+                    </motion.span>
+                    {titleLine2 && (
+                        <motion.span className="block" variants={itemVariant}>
+                            <span className={styles.highlight}>{titleLine2}</span>
+                        </motion.span>
+                    )}
                 </h1>
-                <p className={styles.subtitle}>
+                
+                <motion.p className={styles.subtitle} variants={itemVariant}>
                     {subtitleParts.map((part, i) => (
                         <React.Fragment key={i}>
                             <strong>{part}</strong>
                             {i < subtitleParts.length - 1 && ' • '}
                         </React.Fragment>
                     ))}
-                </p>
-                <p className={styles.description}>
+                </motion.p>
+                
+                <motion.p className={styles.description} variants={itemVariant}>
                     {content.heroDescription || defaultContent.heroDescription}
-                </p>
-                <div className={styles.cta}>
+                </motion.p>
+                
+                <motion.div className={styles.cta} variants={itemVariant}>
                     {buttons.map(btn => (
                         <Link
                             key={btn.id}
@@ -60,20 +107,17 @@ const Hero = () => {
                             {btn.text}
                         </Link>
                     ))}
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
 
-            <div className={styles.background}>
+            {/* Background with KL Skyline */}
+            <motion.div className={styles.background} style={{ y, opacity }}>
                 <img src={klSkyline} alt="Kuala Lumpur Skyline" className={styles.bgImage} />
                 <div className={styles.overlay}></div>
-                <div className={styles.gradient1}></div>
-                <div className={styles.gradient2}></div>
-                <div className={styles.gradient3}></div>
-            </div>
+                <div className={styles.gradientOverlay}></div>
+            </motion.div>
         </section>
     );
 };
 
 export default Hero;
-
-

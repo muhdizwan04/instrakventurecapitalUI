@@ -65,12 +65,7 @@ const AboutUs = () => {
     const milestone = partnersContent.milestone || defaultPartners.milestone;
 
     // --- Static Constants ---
-    const highlights = [
-        { icon: <Shield size={24} />, title: 'USD 1 Billion', desc: 'Committed Capital' },
-        { icon: <Handshake size={24} />, title: 'Fund Protection', desc: 'Chubb International' },
-        { icon: <Building2 size={24} />, title: 'Trustee Managed', desc: 'Maybank Trustees' },
-        { icon: <Globe size={24} />, title: 'Global Reach', desc: 'Dubai / Intl.' },
-    ];
+
 
     // --- Data Prep: Ensure we have a sections list ---
     let sections;
@@ -325,32 +320,7 @@ const AboutUs = () => {
                 )}
 
                 <div style={{ position: 'relative', zIndex: 1 }}>
-                    {/* 3a. Key Highlights Strip */}
-                    <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E2E8F0' }}>
-                        <div className="container">
-                            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
-                                {highlights.map((item, i) => (
-                                    <div key={i} style={{
-                                        flex: 1,
-                                        minWidth: '200px',
-                                        padding: '2.5rem 2rem',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '1rem',
-                                        borderRight: i !== highlights.length - 1 ? '1px solid #F1F5F9' : 'none',
-                                        borderBottom: '1px solid transparent' // Placeholder for mobile wrap
-                                    }}>
-                                        <div style={{ color: '#D4AF37' }}>{item.icon}</div>
-                                        <div>
-                                            <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#1A365D' }}>{item.title}</div>
-                                            <div style={{ fontSize: '0.85rem', color: '#64748B' }}>{item.desc}</div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+
 
                     {/* 3b. Investment Feature (Deal Tombstone Style) */}
                     <section style={{ padding: '80px 0', background: '#0A2540', color: 'white', position: 'relative' }}>

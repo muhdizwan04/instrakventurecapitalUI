@@ -5,6 +5,7 @@ import { useFormSubmit } from '../hooks/useFormSubmit';
 import { Toaster } from 'react-hot-toast';
 import ProtectedFormSection from '../components/ProtectedFormSection';
 import DynamicServiceForm from '../components/DynamicServiceForm';
+import UniversalSection from '../components/UniversalSection';
 import { usePageContent } from '../hooks/usePageContent';
 
 const RealEstateFinancing = () => {
@@ -134,6 +135,11 @@ const RealEstateFinancing = () => {
                     </div>
                 </div>
             </section>
+
+            {/* Dynamic Sections from Admin */}
+            {(pageContent.sections || []).map((section, idx) => (
+                <UniversalSection key={section.id || idx} section={section} />
+            ))}
 
             {/* Project Submission Form */}
             <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>

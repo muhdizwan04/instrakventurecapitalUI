@@ -687,6 +687,191 @@ const ServiceContentManager = () => {
                                     </div>
                                 </div>
                             )}
+
+                            {/* Modular Sections Area */}
+                            <div className="space-y-6 pt-6">
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <h3 className="text-xl font-bold text-[var(--text-primary)]">Advanced Layout Sections</h3>
+                                        <p className="text-xs text-gray-500">Add accordions, grids, or custom text blocks to further detail this service.</p>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            const newSection = {
+                                                id: `sec-${Date.now()}`,
+                                                title: 'New Section',
+                                                subtitle: '',
+                                                type: 'custom',
+                                                items: [],
+                                                styles: { layoutType: 'standard', textAlign: 'left' }
+                                            };
+                                            handleUpdateService(service.id, 'sections', [...(service.sections || []), newSection]);
+                                        }}
+                                        className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                                    >
+                                        <Plus size={14} /> Add Advanced Section
+                                    </button>
+                                </div>
+
+                                <div className="space-y-8">
+                                    {(service.sections || []).map((section, sIdx) => (
+                                        <div key={section.id} className="p-6 bg-white rounded-xl border-2 border-dashed border-gray-200 relative group">
+                                            {/* Section Controls */}
+                                            <div className="absolute -top-3 right-4 flex gap-2">
+                                                <button
+                                                    onClick={() => {
+                                                        const newSections = service.sections.filter(s => s.id !== section.id);
+                                                        handleUpdateService(service.id, 'sections', newSections);
+                                                    }}
+                                                    className="p-1.5 bg-red-50 text-red-500 rounded-md hover:bg-red-100 border border-red-100"
+                                                    title="Delete Section"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="text-[10px] font-bold uppercase text-gray-400">Section Title</label>
+                                                        <input
+                                                            value={section.title}
+                                                            onChange={(e) => {
+                                                                const newSections = [...service.sections];
+                                                                newSections[sIdx] = { ...section, title: e.target.value };
+                                                                handleUpdateService(service.id, 'sections', newSections);
+                                                            }}
+                                                            className="w-full px-3 py-2 text-sm font-bold border rounded-lg"
+                                                            placeholder="e.g. Key Features"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-[10px] font-bold uppercase text-gray-400">Layout Type</label>
+                                                        <select
+                                                            value={section.styles?.layoutType || 'standard'}
+                                                            onChange={(e) => {
+                                                                const newSections = [...service.sections];
+                                                                newSections[sIdx] = { ...section, styles: { ...section.styles, layoutType: e.target.value } };
+                                                                handleUpdateService(service.id, 'sections', newSections);
+                                                            }}
+                                                            className="w-full px-3 py-2 text-sm border rounded-lg bg-gray-50"
+                                                        >
+                                                            <option value="standard">Standard (Text/HTML)</option>
+                                                            <option value="list">Professional List</option>
+                                                            <option value="grid">Feature Grid</option>
+                                                            <option value="cards">Interactive Cards</option>
+                                                            <option value="accordion">Accordion (Collapse)</option>
+                                                            <option value="image-grid">Premium Image Grid</option>
+                                                            <option value="icon-group">Icon Connectivity Group</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <label className="text-[10px] font-bold uppercase text-gray-400">Subtitle (Optional)</label>
+                                                    <input
+                                                        value={section.subtitle}
+                                                        onChange={(e) => {
+                                                            const newSections = [...service.sections];
+                                                            newSections[sIdx] = { ...section, subtitle: e.target.value };
+                                                            handleUpdateService(service.id, 'sections', newSections);
+                                                        }}
+                                                        className="w-full px-3 py-1.5 text-xs border rounded-lg"
+                                                        placeholder="Small descriptive text below title"
+                                                    />
+                                                </div>
+
+                                                {/* Content Editor based on Layout */}
+                                                {(section.styles?.layoutType === 'standard' || !section.styles?.layoutType) ? (
+                                                    <div>
+                                                        <label className="text-[10px] font-bold uppercase text-gray-400">Content (HTML/Markdown)</label>
+                                                        <textarea
+                                                            rows={6}
+                                                            value={section.content || ''}
+                                                            onChange={(e) => {
+                                                                const newSections = [...service.sections];
+                                                                newSections[sIdx] = { ...section, content: e.target.value };
+                                                                handleUpdateService(service.id, 'sections', newSections);
+                                                            }}
+                                                            className="w-full px-3 py-2 text-xs font-mono border rounded-lg"
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <div className="space-y-3">
+                                                        <div className="flex justify-between items-center">
+                                                            <label className="text-[10px] font-bold uppercase text-gray-400">Structured Items</label>
+                                                            <button
+                                                                onClick={() => {
+                                                                    const newItem = { id: Date.now(), title: 'New Item', description: '', icon: 'CheckCircle' };
+                                                                    const newSections = [...service.sections];
+                                                                    newSections[sIdx] = { ...section, items: [...(section.items || []), newItem] };
+                                                                    handleUpdateService(service.id, 'sections', newSections);
+                                                                }}
+                                                                className="text-[10px] bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors"
+                                                            >
+                                                                + Add Item
+                                                            </button>
+                                                        </div>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                            {(section.items || []).map((item, iIdx) => (
+                                                                <div key={item.id || iIdx} className="p-3 bg-gray-50 rounded-lg border border-gray-100 flex gap-3 relative group/item">
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            const newItems = section.items.filter((_, i) => i !== iIdx);
+                                                                            const newSections = [...service.sections];
+                                                                            newSections[sIdx] = { ...section, items: newItems };
+                                                                            handleUpdateService(service.id, 'sections', newSections);
+                                                                        }}
+                                                                        className="absolute top-1 right-1 text-gray-300 hover:text-red-500 opacity-0 group-hover/item:opacity-100 transition-opacity"
+                                                                    >
+                                                                        <Trash2 size={12} />
+                                                                    </button>
+                                                                    <div className="flex flex-col gap-1">
+                                                                        <div className="w-8 h-8 bg-white border rounded flex items-center justify-center text-gray-400">
+                                                                            <Settings2 size={14} />
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="flex-1 space-y-1">
+                                                                        <input
+                                                                            value={item.title}
+                                                                            onChange={(e) => {
+                                                                                const newItems = [...section.items];
+                                                                                newItems[iIdx] = { ...item, title: e.target.value };
+                                                                                const newSections = [...service.sections];
+                                                                                newSections[sIdx] = { ...section, items: newItems };
+                                                                                handleUpdateService(service.id, 'sections', newSections);
+                                                                            }}
+                                                                            className="w-full px-2 py-1 text-xs font-bold border-b bg-transparent"
+                                                                            placeholder="Item Title"
+                                                                        />
+                                                                        <textarea
+                                                                            value={item.description}
+                                                                            onChange={(e) => {
+                                                                                const newItems = [...section.items];
+                                                                                newItems[iIdx] = { ...item, description: e.target.value };
+                                                                                const newSections = [...service.sections];
+                                                                                newSections[sIdx] = { ...section, items: newItems };
+                                                                                handleUpdateService(service.id, 'sections', newSections);
+                                                                            }}
+                                                                            className="w-full px-2 py-1 text-[10px] bg-transparent resize-none h-10"
+                                                                            placeholder="Brief description..."
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {(service.sections || []).length === 0 && (
+                                        <div className="text-center py-10 bg-gray-50 rounded-xl border border-dashed text-gray-400 text-sm">
+                                            No advanced layout sections added yet.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
                         {/* Right Column - Live Preview and other lists */}

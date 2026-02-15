@@ -2,6 +2,8 @@ import React from 'react';
 import PageHero from '../components/PageHero';
 import { ShieldCheck, Eye, Scale, User, Shield, Handshake, Building2, Globe, Award, CheckCircle2 } from 'lucide-react';
 import { usePageContent } from '../hooks/usePageContent';
+import { motion } from 'framer-motion';
+import UniversalSection from '../components/UniversalSection';
 
 // --- Icon Map for Dynamic Content ---
 const ICON_MAP = { ShieldCheck, Eye, Scale };
@@ -14,9 +16,57 @@ const AboutUs = () => {
         sections: [
             { id: 'hero', type: 'hero', title: 'Mission, Vision & Values', subtitle: 'The foundational pillars of Instrak Venture Capital Berhad.' },
             { id: 'mission', type: 'mission' },
-            { id: 'board', type: 'board' },
+            {
+                id: 'philosophy',
+                type: 'custom',
+                title: 'Our Strategic Philosophy',
+                subtitle: 'The principles that guide our investment and advisory mandates.',
+                items: [
+                    { id: 'phil-1', title: 'Institutional Rigour', description: 'Decisions guided by robust governance and analytical frameworks.', icon: 'Shield' },
+                    { id: 'phil-2', title: 'Global Insight', description: 'Access to diverse markets, alternative investments, and strategic opportunities.', icon: 'Globe' },
+                    { id: 'phil-3', title: 'Tailored Solutions', description: 'Portfolios designed to reflect objectives, risk appetite, and time horizon.', icon: 'Target' },
+                    { id: 'phil-4', title: 'Alignment of Interests', description: 'Mandate structures ensure client objectives remain central.', icon: 'Users' }
+                ],
+                styles: { layoutType: 'mindmap', textAlign: 'center', textColor: '#1A365D', bgColor: '#F8FAFC' }
+            },
+            { id: 'board', type: 'board', title: 'Board of Directors', subtitle: 'Guided by seasoned leaders with a commitment to integrity, compliance, and industrial excellence.' },
+            {
+                id: 'operating-model',
+                type: 'custom',
+                title: 'Our Operating Model',
+                subtitle: 'IVC functions through a mandate-based engagement structure.',
+                items: [
+                    { id: 'op-1', title: 'Evaluated internally' },
+                    { id: 'op-2', title: 'Structurally designed' },
+                    { id: 'op-3', title: 'Risk-assessed' },
+                    { id: 'op-4', title: 'Legally documented' },
+                    { id: 'op-5', title: 'Monitored through institutional reporting protocols' }
+                ],
+                styles: { layoutType: 'boxed-group', textAlign: 'left', textColor: '#1A365D', bgColor: '#FFFFFF', groupTitle: 'OPERATIONAL PROTOCOLS' }
+            },
+            {
+                id: 'capital-corridor',
+                type: 'custom',
+                title: 'Our Global Capital Corridor',
+                subtitle: 'IVC specializes in cross-border capital structuring across key financial regions:',
+                items: [
+                    { id: 'cap-1', title: 'Asia', description: 'Regional growth hub', icon: 'Globe' },
+                    { id: 'cap-2', title: 'Middle East', description: 'Strategic capital hub', icon: 'Globe' },
+                    { id: 'cap-3', title: 'Europe', description: 'Institutional investment hub', icon: 'Globe' },
+                    { id: 'cap-4', title: 'United States', description: 'Global financial hub', icon: 'Globe' }
+                ],
+                styles: { layoutType: 'grid', textAlign: 'center', textColor: '#1A365D', bgColor: '#F8FAFC' }
+            },
             { id: 'partners', type: 'partners' },
-            { id: 'trust', type: 'trust' }
+            { id: 'milestone', type: 'milestone' },
+            {
+                id: 'closing',
+                type: 'custom',
+                title: 'Committed to Strategic Excellence',
+                subtitle: 'Instrak Venture Capital Berhad remains dedicated to bridging the gap between visionary potential and strategic capital.',
+                content: 'Our commitment to excellence, integrity, and sustainable growth drives every partnership we forge. We invite you to join us in shaping the future of global industry.',
+                styles: { layoutType: 'standard', textAlign: 'center', textColor: '#1A365D', bgColor: '#FFFFFF' }
+            }
         ]
     };
     const { content: aboutContent } = usePageContent('about', defaultAbout);
@@ -93,6 +143,16 @@ const AboutUs = () => {
         ];
     }
 
+    // --- Animation Variants ---
+    const sectionVariants = {
+        hidden: { opacity: 0, y: 30 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.8, ease: "easeOut" }
+        }
+    };
+
     // --- Renderers ---
 
     const renderHero = (section) => {
@@ -124,109 +184,23 @@ const AboutUs = () => {
     const renderMission = (section) => {
         const styles = section.styles || {};
         return (
-            <section key={section.id} id="mission" style={{
-                padding: '100px 0',
-                scrollMarginTop: '60px',
-                backgroundColor: styles.bgColor || 'transparent',
-                backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
-                backgroundSize: styles.backgroundSize || 'cover',
-                backgroundPosition: 'center',
-                position: 'relative'
-            }}>
-                {styles.backgroundImage && (
-                    <div style={{
-                        position: 'absolute', inset: 0, background: 'black',
-                        opacity: styles.overlayOpacity !== undefined ? styles.overlayOpacity : 0.4,
-                        zIndex: 0, pointerEvents: 'none'
-                    }} />
-                )}
-                <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-                    {/* Mission Statement */}
-                    <div style={{
-                        background: 'linear-gradient(135deg, #1A365D 0%, #0F2445 100%)',
-                        borderRadius: '24px',
-                        padding: '4rem',
-                        color: 'white',
-                        position: 'relative',
-                        overflow: 'hidden',
-                        boxShadow: '0 20px 40px rgba(10, 37, 64, 0.15)',
-                        marginBottom: '4rem'
-                    }}>
-                        {/* Decorative Background Element */}
-                        <div style={{ position: 'absolute', top: '-10%', right: '-5%', opacity: 0.05, transform: 'scale(1.5)' }}>
-                            <Globe size={400} />
-                        </div>
-
-                        <div style={{ position: 'relative', zIndex: 10, maxWidth: '800px' }}>
-                            <h6 style={{ color: '#D4AF37', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold', marginBottom: '1rem' }}>Our Purpose</h6>
-                            <h2 style={{ fontSize: '2.5rem', marginBottom: '1.5rem', lineHeight: '1.2', color: '#FFFFFF' }}>{section.missionTitle || 'Our Mission'}</h2>
-                            <p style={{ fontSize: '1.25rem', lineHeight: '1.8', opacity: 0.9, marginBottom: '2rem' }}>
-                                {section.missionText}
-                            </p>
-
-                            <div style={{ height: '1px', background: 'rgba(255,255,255,0.2)', margin: '2rem 0' }}></div>
-
-                            <h3 style={{ fontSize: '1.5rem', color: '#D4AF37', marginBottom: '1rem' }}>{section.visionTitle || 'Our Vision'}</h3>
-                            <p style={{ fontSize: '1.1rem', lineHeight: '1.8', opacity: 0.8 }}>
-                                {section.visionText}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Core Values Grid */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-                        {(section.values || []).map((v, i) => {
-                            const IconComponent = ICON_MAP[v.icon] || ShieldCheck;
-                            return (
-                                <div key={i} className="glass-card" style={{
-                                    padding: '2.5rem',
-                                    background: 'white',
-                                    borderTop: '4px solid #D4AF37',
-                                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                                    cursor: 'default'
-                                }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(-10px)';
-                                        e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.1)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }}
-                                >
-                                    <div style={{
-                                        width: '60px', height: '60px',
-                                        background: 'rgba(212, 175, 55, 0.1)',
-                                        borderRadius: '12px',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        marginBottom: '1.5rem',
-                                        color: '#D4AF37'
-                                    }}>
-                                        <IconComponent size={30} />
-                                    </div>
-                                    <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: '#1A365D' }}>{v.title}</h3>
-                                    <p style={{ color: '#64748B', lineHeight: '1.7' }}>{v.text}</p>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
-        );
-    };
-
-    const renderBoard = (section) => {
-        const styles = section.styles || {};
-        return (
-            <section key={section.id} id="board" style={{
-                padding: '100px 0',
-                background: styles.bgColor || '#F8FAFC',
-                scrollMarginTop: '60px',
-                backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
-                backgroundSize: styles.backgroundSize || 'cover',
-                backgroundPosition: 'center',
-                position: 'relative'
-            }}>
+            <motion.section
+                key={section.id}
+                id="mission"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                variants={sectionVariants}
+                style={{
+                    padding: '100px 0',
+                    scrollMarginTop: '60px',
+                    backgroundColor: styles.bgColor || 'transparent',
+                    backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
+                    backgroundSize: styles.backgroundSize || 'cover',
+                    backgroundPosition: 'center',
+                    position: 'relative'
+                }}
+            >
                 {styles.backgroundImage && (
                     <div style={{
                         position: 'absolute', inset: 0, background: 'black',
@@ -235,6 +209,68 @@ const AboutUs = () => {
                     }} />
                 )}
                 <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: styles.textAlign || 'left' }}>
+                    {/* Mission Statement */}
+                    <div className="luxury-glass luxury-border-gold overflow-hidden" style={{
+                        borderRadius: '24px',
+                        padding: '4rem',
+                        color: styles.textColor || '#1A365D',
+                        position: 'relative',
+                        boxShadow: 'var(--shadow-lg)',
+                        marginBottom: '4rem'
+                    }}>
+                        {/* Decorative Background Element */}
+                        <div style={{ position: 'absolute', top: '-10%', right: '-5%', opacity: 0.03, transform: 'scale(1.5)', pointerEvents: 'none' }}>
+                            <Globe size={400} color="var(--accent-primary)" />
+                        </div>
+
+                        <div style={{ position: 'relative', zIndex: 10, maxWidth: '800px' }}>
+                            <h6 style={{ color: 'var(--accent-secondary)', textTransform: 'uppercase', letterSpacing: '3px', fontWeight: '800', fontSize: '0.8rem', marginBottom: '1.5rem' }}>Our institutional Mandate</h6>
+                            <h2 style={{ fontSize: '3rem', marginBottom: '2rem', lineHeight: '1.1', color: 'var(--accent-primary)', fontWeight: '900' }}>{section.missionTitle || 'Our Mission'}</h2>
+                            <p style={{ fontSize: '1.25rem', lineHeight: '1.8', color: 'var(--text-secondary)', marginBottom: '3rem', fontWeight: '500' }}>
+                                {section.missionText}
+                            </p>
+
+                            <div style={{ height: '2px', background: 'var(--gradient-gold)', width: '80px', margin: '3rem 0' }}></div>
+
+                            <h3 style={{ fontSize: '1.75rem', color: 'var(--accent-primary)', marginBottom: '1.5rem', fontWeight: '700' }}>{section.visionTitle || 'Our Vision'}</h3>
+                            <p style={{ fontSize: '1.1rem', lineHeight: '1.9', color: 'var(--text-secondary)', opacity: 0.9 }}>
+                                {section.visionText}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </motion.section>
+        );
+    };
+
+    const renderBoard = (section) => {
+        const styles = section.styles || {};
+        return (
+            <motion.section
+                key={section.id}
+                id="board"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                variants={sectionVariants}
+                style={{
+                    padding: '100px 0',
+                    background: styles.bgColor || '#F8FAFC',
+                    scrollMarginTop: '60px',
+                    backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
+                    backgroundSize: styles.backgroundSize || 'cover',
+                    backgroundPosition: 'center',
+                    position: 'relative'
+                }}
+            >
+                {styles.backgroundImage && (
+                    <div style={{
+                        position: 'absolute', inset: 0, background: 'black',
+                        opacity: styles.overlayOpacity !== undefined ? styles.overlayOpacity : 0.4,
+                        zIndex: 0, pointerEvents: 'none'
+                    }} />
+                )}
+                <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: styles.textAlign || 'center' }}>
                     <div style={{ textAlign: styles.textAlign || 'center', marginBottom: '4rem' }}>
                         <h6 style={{ color: '#D4AF37', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>Leadership</h6>
                         <h2 className="section-title" style={{ marginTop: '0.5rem', color: styles.textColor || '#1A365D' }}>{section.title || 'Board of Directors'}</h2>
@@ -247,69 +283,71 @@ const AboutUs = () => {
                         {directors.map((d, i) => (
                             <div
                                 key={i}
-                                className="glass-card"
+                                className="luxury-glass luxury-border-gold group"
                                 style={{
-                                    background: 'white',
                                     overflow: 'hidden',
-                                    border: 'none',
-                                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
-                                    transition: 'all 0.3s ease',
-                                    textAlign: 'left' // Keep card content left aligned
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-5px)';
-                                    e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.05)';
+                                    borderRadius: '24px',
+                                    transition: 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)',
+                                    textAlign: 'left'
                                 }}
                             >
                                 <div style={{
-                                    height: '280px',
-                                    background: 'linear-gradient(to bottom, #F1F5F9 0%, #E2E8F0 100%)',
+                                    height: '320px',
+                                    background: 'linear-gradient(to bottom, #F8FAFC, #E2E8F0)',
                                     display: 'flex',
                                     alignItems: 'flex-end',
                                     justifyContent: 'center',
-                                    position: 'relative'
+                                    position: 'relative',
+                                    overflow: 'hidden'
                                 }}>
                                     {d.image ? (
                                         <img
                                             src={d.image}
                                             alt={d.name}
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }}
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', transition: 'transform 0.8s ease' }}
+                                            className="group-hover:scale-110"
                                         />
                                     ) : (
-                                        <div style={{ textAlign: 'center', paddingBottom: '2rem', opacity: 0.4 }}>
-                                            <User size={80} color="#1A365D" />
+                                        <div style={{ textAlign: 'center', paddingBottom: '3rem', opacity: 0.2 }}>
+                                            <User size={100} color="var(--accent-primary)" />
                                         </div>
                                     )}
-                                    {/* Gold Accent Line */}
-                                    <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '4px', background: '#D4AF37' }}></div>
+                                    {/* Gold Accent Overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
-                                <div style={{ padding: '2rem' }}>
-                                    <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: '#1A365D', fontWeight: 'bold' }}>{d.name}</h3>
-                                    <p style={{ color: '#D4AF37', fontWeight: '600', fontSize: '0.75rem', letterSpacing: '0.5px', textTransform: 'uppercase' }}>{d.role}</p>
+                                <div style={{ padding: '2rem', position: 'relative' }}>
+                                    <h3 style={{ fontSize: '1.35rem', marginBottom: '0.5rem', color: 'var(--accent-primary)', fontWeight: '800', letterSpacing: '-0.01em' }}>{d.name}</h3>
+                                    <p style={{ color: 'var(--accent-secondary)', fontWeight: '700', fontSize: '0.85rem', letterSpacing: '1px', textTransform: 'uppercase' }}>{d.role}</p>
+                                    <div style={{ marginTop: '1.5rem', width: '40px', height: '2px', background: 'var(--gradient-gold)', transition: 'width 0.4s ease' }} className="group-hover:width-[100px]"></div>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
-            </section>
+            </motion.section>
         );
     };
 
     const renderPartners = (section) => {
         const styles = section.styles || {};
         return (
-            <div key={section.id} id="partners" style={{
-                scrollMarginTop: '80px',
-                backgroundColor: styles.bgColor || 'transparent',
-                backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
-                backgroundSize: styles.backgroundSize || 'cover',
-                backgroundPosition: 'center',
-                position: 'relative'
-            }}>
+            <motion.div
+                key={section.id}
+                id="partners"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                variants={sectionVariants}
+                style={{
+                    paddingBottom: '100px',
+                    scrollMarginTop: '80px',
+                    backgroundColor: styles.bgColor || 'transparent',
+                    backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
+                    backgroundSize: styles.backgroundSize || 'cover',
+                    backgroundPosition: 'center',
+                    position: 'relative'
+                }}
+            >
                 {/* Background Overlay for the whole section */}
                 {styles.backgroundImage && (
                     <div style={{
@@ -396,40 +434,12 @@ const AboutUs = () => {
                         </div>
                     </section>
                 </div>
-            </div>
+            </motion.div>
         );
     };
 
 
 
-    const renderCustom = (section) => {
-        const styles = section.styles || {};
-        return (
-            <section key={section.id} style={{
-                padding: '80px 20px',
-                background: styles.bgColor || '#FFFFFF',
-                backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
-                backgroundSize: styles.backgroundSize || 'cover',
-                backgroundPosition: 'center',
-                position: 'relative'
-            }}>
-                {styles.backgroundImage && (
-                    <div style={{
-                        position: 'absolute', inset: 0, background: 'black',
-                        opacity: styles.overlayOpacity !== undefined ? styles.overlayOpacity : 0.4,
-                        zIndex: 0, pointerEvents: 'none'
-                    }} />
-                )}
-                <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-                    <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: styles.textAlign || 'center' }}>
-                        <h2 style={{ fontSize: '2rem', marginBottom: '1rem', color: styles.textColor || '#1A365D' }}>{section.title}</h2>
-                        {section.subtitle && <p className="text-xl opacity-90 mb-6" style={{ color: styles.textColor || 'inherit' }}>{section.subtitle}</p>}
-                        <div style={{ color: styles.textColor || '#4A5568', lineHeight: '1.8', whiteSpace: 'pre-wrap', textAlign: styles.textAlign || 'left' }}>{section.content}</div>
-                    </div>
-                </div>
-            </section>
-        );
-    };
 
     // Renderer Map
     const renderers = {
@@ -438,8 +448,10 @@ const AboutUs = () => {
         'board': renderBoard,
         'partners': renderPartners,
         'milestone': renderPartners, // Milestone is rendered within partners section
-        'custom': renderCustom
+        'custom': (section) => <UniversalSection key={section.id} section={section} />
     };
+
+    const renderCustom = (section) => <UniversalSection key={section.id} section={section} />;
 
     return (
         <div className="page-wrapper bg-gray-50">

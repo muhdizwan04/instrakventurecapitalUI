@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import ProtectedFormSection from '../components/ProtectedFormSection';
 import DynamicServiceForm from '../components/DynamicServiceForm';
+import UniversalSection from '../components/UniversalSection';
 
 const BusinessFinanceConsulting = () => {
     const [formData, setFormData] = useState({
@@ -157,6 +158,11 @@ const BusinessFinanceConsulting = () => {
                     </div>
                 </div>
             </section>
+
+            {/* Dynamic Sections from Admin */}
+            {(pageContent.sections || []).map((section, idx) => (
+                <UniversalSection key={section.id || idx} section={section} />
+            ))}
 
             {/* CTA Section */}
             <section style={{ padding: '60px 20px', background: 'linear-gradient(135deg, #1A365D 0%, #0F2942 100%)' }}>

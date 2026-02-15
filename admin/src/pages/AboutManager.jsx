@@ -8,11 +8,6 @@ import PreviewPageHero from '../components/PreviewPageHero';
 import ImageUpload from '../components/ImageUpload';
 import * as AllIcons from 'lucide-react'; // Rename to avoid confusion
 
-// Style controls removed for simplicity - content only
-
-
-
-
 // Default director images from client assets
 const DEFAULT_IMAGES = {
     'dir-1': '/src/assets/directors/Picture3.png',
@@ -22,6 +17,194 @@ const DEFAULT_IMAGES = {
     'dir-5': '/src/assets/directors/Picture6.png',
     'dir-6': '/src/assets/directors/Picture7.png',
     'dir-7': '/src/assets/directors/Picture8.png',
+};
+
+const DESIGN_PRESETS = {
+    luxury: {
+        name: 'VVIP Luxury',
+        styles: { bgColor: '#FFFFFF', textColor: '#1A365D', layoutType: 'cards', textAlign: 'center' }
+    },
+    institutional: {
+        name: 'Institutional Navy',
+        styles: { bgColor: '#0A2540', textColor: '#FFFFFF', layoutType: 'grid', textAlign: 'left', overlayOpacity: 0.8 }
+    },
+    glass: {
+        name: 'Modern Glass',
+        styles: { bgColor: '#F8FAFC', textColor: '#1A365D', layoutType: 'list', textAlign: 'center' }
+    },
+    mindmap: {
+        name: 'VVIP Mind Map',
+        styles: { bgColor: '#FFFFFF', textColor: '#1A365D', layoutType: 'mindmap', textAlign: 'center' }
+    },
+    boxed: {
+        name: 'Tactical Boxed Group',
+        styles: { bgColor: '#FFFFFF', textColor: '#1A365D', layoutType: 'boxed-group', textAlign: 'left', groupTitle: 'OPERATIONAL PROTOCOLS' }
+    }
+};
+
+const SectionStyleEditor = ({ section, onUpdate }) => {
+    const styles = section.styles || { textAlign: 'left', textColor: '#1A365D', bgColor: '#FFFFFF' };
+
+    const updateStyle = (field, value) => {
+        onUpdate(section.id, { styles: { ...styles, [field]: value } });
+    };
+
+    const applyPreset = (presetKey) => {
+        const preset = DESIGN_PRESETS[presetKey];
+        if (preset) {
+            onUpdate(section.id, { styles: { ...styles, ...preset.styles } });
+            toast.success(`Applied ${preset.name} style`);
+        }
+    };
+
+    return (
+        <div className="space-y-6 animate-in fade-in duration-300">
+            {/* Design Presets - PRO Feature */}
+            <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 mb-6">
+                <h3 className="text-xs font-bold text-blue-700 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <Star size={14} className="fill-blue-500" /> Design Presets
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                    {Object.entries(DESIGN_PRESETS).map(([key, preset]) => (
+                        <button
+                            key={key}
+                            onClick={() => applyPreset(key)}
+                            className="px-4 py-2 bg-white border border-blue-200 rounded-lg text-sm font-bold text-blue-700 hover:bg-blue-600 hover:text-white transition-all shadow-sm hover:shadow-md"
+                        >
+                            {preset.name}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Background Controls */}
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-4">
+                    <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                        <LayoutTemplate size={16} className="text-blue-500" /> Background & Layout
+                    </h3>
+
+                    <div>
+                        <label className="label">Background Color</label>
+                        <div className="flex gap-2">
+                            <input
+                                type="color"
+                                value={styles.bgColor || '#FFFFFF'}
+                                onChange={(e) => updateStyle('bgColor', e.target.value)}
+                                className="w-10 h-10 rounded border border-gray-200 cursor-pointer"
+                            />
+                            <input
+                                type="text"
+                                value={styles.bgColor || '#FFFFFF'}
+                                onChange={(e) => updateStyle('bgColor', e.target.value)}
+                                className="input-field flex-1 font-mono text-xs"
+                                placeholder="#FFFFFF"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="label">Background Image URL</label>
+                        <ImageUpload
+                            value={styles.backgroundImage || ''}
+                            onChange={(url) => updateStyle('backgroundImage', url)}
+                            folder="backgrounds"
+                        />
+                    </div>
+
+                    {styles.backgroundImage && (
+                        <div className="space-y-3 pt-2">
+                            <div>
+                                <label className="label">Overlay Opacity ({Math.round((styles.overlayOpacity || 0.4) * 100)}%)</label>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="1"
+                                    step="0.05"
+                                    value={styles.overlayOpacity !== undefined ? styles.overlayOpacity : 0.4}
+                                    onChange={(e) => updateStyle('overlayOpacity', parseFloat(e.target.value))}
+                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                />
+                            </div>
+                            <div>
+                                <label className="label">Background Size</label>
+                                <select
+                                    value={styles.backgroundSize || 'cover'}
+                                    onChange={(e) => updateStyle('backgroundSize', e.target.value)}
+                                    className="input-field"
+                                >
+                                    <option value="cover">Cover</option>
+                                    <option value="contain">Contain</option>
+                                    <option value="auto">Auto</option>
+                                </select>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Typography, Alignment & Layout */}
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-4">
+                    <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                        <Type size={16} className="text-purple-500" /> Layout & Typography
+                    </h3>
+
+                    <div>
+                        <label className="label">Layout Type</label>
+                        <select
+                            value={styles.layoutType || 'standard'}
+                            onChange={(e) => updateStyle('layoutType', e.target.value)}
+                            className="input-field"
+                        >
+                            <option value="standard">Standard (Text)</option>
+                            <option value="list">Professional List</option>
+                            <option value="grid">Feature Grid</option>
+                            <option value="cards">Interactive Cards</option>
+                            <option value="mind-map">Conceptual Mind Map (VVIP)</option>
+                            <option value="boxed-group">Command Box (Strategic)</option>
+                            <option value="accordion">Accordion (Collapse)</option>
+                            <option value="image-grid">Premium Image Grid</option>
+                            <option value="icon-group">Icon Connectivity Group</option>
+                        </select>
+                        <p className="text-[10px] text-gray-400 mt-1 italic">
+                            {['list', 'grid', 'cards', 'accordion', 'image-grid', 'icon-group'].includes(styles.layoutType)
+                                ? "Manage structured items in the Content tab."
+                                : "Content renders as standard text/HTML."}
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="label">Text Color</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="color"
+                                    value={styles.textColor || '#1A365D'}
+                                    onChange={(e) => updateStyle('textColor', e.target.value)}
+                                    className="w-10 h-10 rounded border border-gray-200 cursor-pointer"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="label">Text Alignment</label>
+                            <div className="flex bg-white p-1 rounded-lg border border-gray-200">
+                                {['left', 'center', 'right'].map((align) => (
+                                    <button
+                                        key={align}
+                                        onClick={() => updateStyle('textAlign', align)}
+                                        className={`flex-1 py-2 rounded-md text-xs font-bold capitalize transition-all
+                                            ${styles.textAlign === align ? 'bg-blue-500 text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                                    >
+                                        {align}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 const AboutManager = () => {
@@ -43,8 +226,58 @@ const AboutManager = () => {
                 ]
             },
             { id: 'board', type: 'board', title: 'Board of Directors', subtitle: 'Guided by seasoned leaders with a commitment to integrity.' },
+            {
+                id: 'philosophy',
+                type: 'custom',
+                title: 'Our Strategic Philosophy',
+                subtitle: 'The principles that guide our investment and advisory mandates.',
+                items: [
+                    { id: 'phil-1', title: 'Institutional Rigour', description: 'Decisions guided by robust governance and analytical frameworks.', icon: 'Shield' },
+                    { id: 'phil-2', title: 'Global Insight', description: 'Access to diverse markets, alternative investments, and strategic opportunities.', icon: 'Globe' },
+                    { id: 'phil-3', title: 'Tailored Solutions', description: 'Portfolios designed to reflect objectives, risk appetite, and time horizon.', icon: 'Target' },
+                    { id: 'phil-4', title: 'Alignment of Interests', description: 'Mandate structures ensure client objectives remain central.', icon: 'Users' }
+                ],
+                styles: { layoutType: 'icon-group', textAlign: 'center', textColor: '#1A365D', bgColor: '#F8FAFC' }
+            },
+            {
+                id: 'operating-model',
+                type: 'custom',
+                title: 'Our Operating Model',
+                subtitle: 'IVC functions through a mandate-based engagement structure.',
+                content: '- Evaluated internally\n- Structurally designed\n- Risk-assessed\n- Legally documented\n- Monitored through institutional reporting protocols\n\nThis approach ensures discipline, confidentiality, and long-term capital alignment.',
+                items: [
+                    { id: 'op-1', title: 'Evaluated internally' },
+                    { id: 'op-2', title: 'Structurally designed' },
+                    { id: 'op-3', title: 'Risk-assessed' },
+                    { id: 'op-4', title: 'Legally documented' },
+                    { id: 'op-5', title: 'Monitored through institutional reporting protocols' }
+                ],
+                styles: { layoutType: 'list', textAlign: 'left', textColor: '#1A365D', bgColor: '#FFFFFF' }
+            },
+            {
+                id: 'capital-corridor',
+                type: 'custom',
+                title: 'Our Global Capital Corridor',
+                subtitle: 'IVC specializes in cross-border capital structuring across key financial regions:',
+                content: '- Asia: Regional growth hub\n- Middle East: Strategic capital hub\n- Europe: Institutional investment hub\n- United States: Global financial hub',
+                items: [
+                    { id: 'cap-1', title: 'Asia', description: 'Regional growth hub', icon: 'Globe' },
+                    { id: 'cap-2', title: 'Middle East', description: 'Strategic capital hub', icon: 'Globe' },
+                    { id: 'cap-3', title: 'Europe', description: 'Institutional investment hub', icon: 'Globe' },
+                    { id: 'cap-4', title: 'United States', description: 'Global financial hub', icon: 'Globe' }
+                ],
+                styles: { layoutType: 'grid', textAlign: 'center', textColor: '#1A365D', bgColor: '#F8FAFC' }
+            },
             { id: 'milestone', type: 'milestone', title: 'Investment Milestone' },
-            { id: 'partners', type: 'partners', title: 'Strategic Partners', subtitle: 'Collaborating with world-class institutions.' }
+            { id: 'partners', type: 'partners', title: 'Strategic Partners', subtitle: 'Collaborating with world-class institutions.' },
+            {
+                id: 'closing',
+                type: 'custom',
+                title: 'Committed to Strategic Excellence',
+                subtitle: 'Instrak Venture Capital Berhad remains dedicated to bridging the gap between visionary potential and strategic capital.',
+                content: 'Our commitment to excellence, integrity, and sustainable growth drives every partnership we forge. We invite you to join us in shaping the future of global industry.',
+                styles: { layoutType: 'standard', textAlign: 'center', textColor: '#1A365D', bgColor: '#FFFFFF' }
+            }
         ]
     };
 
@@ -76,6 +309,7 @@ const AboutManager = () => {
     // --- STATE ---
     const [sections, setSections] = useState(defaultData.sections);
     const [activeSection, setActiveSection] = useState(null);
+    const [editorTab, setEditorTab] = useState('content'); // 'content' or 'design'
 
     // Board State
     const [directors, setDirectors] = useState(defaultBoardData.directors);
@@ -101,7 +335,7 @@ const AboutManager = () => {
                 }));
 
             // Ensure mandatory sections exist
-            const requiredIds = ['hero', 'mission', 'board', 'milestone', 'partners'];
+            const requiredIds = ['hero', 'mission', 'philosophy', 'board', 'operating-model', 'capital-corridor', 'milestone', 'partners', 'closing'];
             requiredIds.forEach(reqId => {
                 if (!sanitizedSections.find(s => s.id === reqId)) {
                     const defaultSec = defaultData.sections.find(s => s.id === reqId);
@@ -169,7 +403,7 @@ const AboutManager = () => {
         toast.success('New director added');
     };
     const handleUpdateDirector = (id, field, value) => setDirectors(prev => prev.map(d => d.id === id ? { ...d, [field]: value } : d));
-    const handleDeleteDirector = (id) => { 
+    const handleDeleteDirector = (id) => {
         if (window.confirm('Remove director?')) {
             setDirectors(prev => prev.filter(d => d.id !== id));
             toast.success('Director removed');
@@ -232,7 +466,6 @@ const AboutManager = () => {
 
     const renderHeroEditor = (section) => (
         <div className="space-y-6">
-
             <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
                 <h3 className="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
                     <LayoutTemplate size={16} /> Header Section
@@ -262,8 +495,6 @@ const AboutManager = () => {
 
     const renderMissionEditor = (section) => (
         <div className="space-y-8">
-
-            {/* Mission & Vision Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100">
                     <div className="flex items-center gap-2 mb-3 text-[var(--accent-primary)]">
@@ -310,7 +541,6 @@ const AboutManager = () => {
                 </div>
             </div>
 
-            {/* Core Values */}
             <div>
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="font-bold text-gray-700 flex items-center gap-2">
@@ -385,6 +615,168 @@ const AboutManager = () => {
         </div>
     );
 
+    const renderCustomEditor = (section) => (
+        <div className="space-y-6">
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                        <Edit size={16} /> Custom Section Editor
+                    </h3>
+                    {section.styles?.layoutType !== 'standard' && (
+                        <button
+                            onClick={() => {
+                                const newItem = { id: Date.now(), title: 'New Item', description: '', icon: 'CheckCircle', image: '', tags: '' };
+                                updateSection(section.id, { items: [...(section.items || []), newItem] });
+                            }}
+                            className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                        >
+                            <Plus size={14} /> Add Structured Item
+                        </button>
+                    )}
+                </div>
+
+                <div className="space-y-4">
+                    <div>
+                        <label className="label">Section Title</label>
+                        <input
+                            value={section.title || ''}
+                            onChange={(e) => updateSection(section.id, { title: e.target.value })}
+                            className="input-field font-bold text-lg"
+                        />
+                    </div>
+                    <div>
+                        <label className="label">Subtitle (Optional)</label>
+                        <input
+                            value={section.subtitle || ''}
+                            onChange={(e) => updateSection(section.id, { subtitle: e.target.value })}
+                            className="input-field"
+                            placeholder="Brief description below the title..."
+                        />
+                    </div>
+
+                    {section.styles?.layoutType === 'boxed-group' && (
+                        <div className="animate-in slide-in-from-left duration-300">
+                            <label className="label text-blue-600 font-bold uppercase tracking-wider text-[10px]">Box Group Header</label>
+                            <input
+                                value={section.groupTitle || ''}
+                                onChange={(e) => updateSection(section.id, { groupTitle: e.target.value })}
+                                className="input-field border-blue-200 bg-blue-50/20 font-bold"
+                                placeholder="e.g. STRATEGIC PILLARS"
+                            />
+                        </div>
+                    )}
+
+                    {section.styles?.layoutType === 'standard' || !section.styles?.layoutType ? (
+                        <div>
+                            <label className="label">Legacy Content (HTML/Text)</label>
+                            <textarea
+                                rows={10}
+                                value={section.content || ''}
+                                onChange={(e) => updateSection(section.id, { content: e.target.value })}
+                                className="input-field font-mono text-sm"
+                                placeholder="Enter text or HTML..."
+                            />
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            <label className="label">Structured Items</label>
+                            <DragDropContext onDragEnd={(result) => {
+                                if (!result.destination) return;
+                                const items = Array.from(section.items || []);
+                                const [reorderedItem] = items.splice(result.source.index, 1);
+                                items.splice(result.destination.index, 0, reorderedItem);
+                                updateSection(section.id, { items });
+                            }}>
+                                <Droppable droppableId={`items-${section.id}`}>
+                                    {(provided) => (
+                                        <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
+                                            {(section.items || []).map((item, idx) => (
+                                                <div key={item.id || idx} className="p-4 bg-white rounded-xl border border-gray-200 shadow-sm relative group">
+                                                    <div className="flex gap-4">
+                                                        <div className="flex flex-col gap-2 shrink-0">
+                                                            <IconPicker
+                                                                value={item.icon || 'CheckCircle'}
+                                                                onChange={(icon) => {
+                                                                    const newItems = [...section.items];
+                                                                    newItems[idx] = { ...item, icon };
+                                                                    updateSection(section.id, { items: newItems });
+                                                                }}
+                                                            />
+                                                            <div className="w-16 h-16 bg-gray-50 border rounded-lg overflow-hidden">
+                                                                <ImageUpload
+                                                                    value={item.image}
+                                                                    onChange={(url) => {
+                                                                        const newItems = [...section.items];
+                                                                        newItems[idx] = { ...item, image: url };
+                                                                        updateSection(section.id, { items: newItems });
+                                                                    }}
+                                                                    folder="sections"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex-1 space-y-2">
+                                                            <div className="flex gap-2">
+                                                                <input
+                                                                    value={item.title}
+                                                                    onChange={(e) => {
+                                                                        const newItems = [...section.items];
+                                                                        newItems[idx] = { ...item, title: e.target.value };
+                                                                        updateSection(section.id, { items: newItems });
+                                                                    }}
+                                                                    className="input-field font-bold py-1"
+                                                                    placeholder="Item Title"
+                                                                />
+                                                                <button
+                                                                    onClick={() => {
+                                                                        const newItems = section.items.filter((_, i) => i !== idx);
+                                                                        updateSection(section.id, { items: newItems });
+                                                                    }}
+                                                                    className="text-gray-300 hover:text-red-500"
+                                                                >
+                                                                    <Trash2 size={16} />
+                                                                </button>
+                                                            </div>
+                                                            <textarea
+                                                                value={item.description}
+                                                                onChange={(e) => {
+                                                                    const newItems = [...section.items];
+                                                                    newItems[idx] = { ...item, description: e.target.value };
+                                                                    updateSection(section.id, { items: newItems });
+                                                                }}
+                                                                className="input-field text-xs h-16"
+                                                                placeholder="Short description..."
+                                                            />
+                                                            <input
+                                                                value={item.tags || ''}
+                                                                onChange={(e) => {
+                                                                    const newItems = [...section.items];
+                                                                    newItems[idx] = { ...item, tags: e.target.value };
+                                                                    updateSection(section.id, { items: newItems });
+                                                                }}
+                                                                className="input-field text-[10px] py-1 font-mono"
+                                                                placeholder="Tags (comma separated for Image Grid)..."
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+                            </DragDropContext>
+                            {(!section.items || section.items.length === 0) && (
+                                <div className="text-center p-8 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-gray-400">
+                                    No items added. Click "Add Structured Item" to begin.
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+
     const renderBoardEditor = (section) => (
         <div className="space-y-6">
             <div className="flex items-center px-1">
@@ -397,16 +789,16 @@ const AboutManager = () => {
                         {directors.map((director, index) => (
                             <Draggable key={director.id} draggableId={director.id} index={index}>
                                 {(provided, snapshot) => (
-                                    <div 
-                                        ref={provided.innerRef} 
-                                        {...provided.draggableProps} 
+                                    <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
                                         className={`p-4 bg-white border border-gray-200 rounded-xl relative group transition-all h-full
                                             ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-[var(--accent-primary)] rotate-1 z-50' : 'hover:shadow-md hover:border-blue-200'}`}
                                     >
                                         <div className="absolute top-2 right-2 flex gap-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <div {...provided.dragHandleProps} className="text-gray-400 hover:text-[var(--accent-primary)] cursor-grab p-1 rounded hover:bg-white shadow-sm bg-white/80"><GripVertical size={14} /></div>
-                                            <button 
-                                                onClick={() => handleDeleteDirector(director.id)} 
+                                            <button
+                                                onClick={() => handleDeleteDirector(director.id)}
                                                 className="text-gray-400 hover:text-red-500 p-1 rounded hover:bg-red-50 shadow-sm bg-white/80"
                                             >
                                                 <Trash2 size={14} />
@@ -416,39 +808,39 @@ const AboutManager = () => {
                                         <div className="flex flex-row gap-4 h-full">
                                             <div className="w-32 shrink-0">
                                                 <div className="aspect-[3/4] rounded-lg overflow-hidden shadow-sm border border-gray-100 bg-gray-50 flex items-center justify-center">
-                                                    <ImageUpload 
-                                                        value={director.image} 
-                                                        onChange={(url) => handleUpdateDirector(director.id, 'image', url)} 
-                                                        folder="directors" 
-                                                        aspectRatio="3/4" 
+                                                    <ImageUpload
+                                                        value={director.image}
+                                                        onChange={(url) => handleUpdateDirector(director.id, 'image', url)}
+                                                        folder="directors"
+                                                        aspectRatio="3/4"
                                                     />
                                                 </div>
                                             </div>
                                             <div className="flex-1 min-w-0 flex flex-col gap-2">
                                                 <div>
                                                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Name</label>
-                                                    <input 
-                                                        value={director.name} 
-                                                        onChange={(e) => handleUpdateDirector(director.id, 'name', e.target.value)} 
-                                                        className="input-field font-heading font-bold text-[var(--accent-primary)] text-sm py-1" 
-                                                        placeholder="Name" 
+                                                    <input
+                                                        value={director.name}
+                                                        onChange={(e) => handleUpdateDirector(director.id, 'name', e.target.value)}
+                                                        className="input-field font-heading font-bold text-[var(--accent-primary)] text-sm py-1"
+                                                        placeholder="Name"
                                                     />
                                                 </div>
                                                 <div>
                                                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Role</label>
-                                                    <input 
-                                                        value={director.role} 
-                                                        onChange={(e) => handleUpdateDirector(director.id, 'role', e.target.value)} 
-                                                        className="input-field text-xs text-[#B8860B] font-bold py-1" 
-                                                        placeholder="Role" 
+                                                    <input
+                                                        value={director.role}
+                                                        onChange={(e) => handleUpdateDirector(director.id, 'role', e.target.value)}
+                                                        className="input-field text-xs text-[#B8860B] font-bold py-1"
+                                                        placeholder="Role"
                                                     />
                                                 </div>
                                                 <div className="flex-1">
-                                                    <textarea 
-                                                        value={director.bio || ''} 
-                                                        onChange={(e) => handleUpdateDirector(director.id, 'bio', e.target.value)} 
-                                                        className="input-field text-xs text-gray-600 h-full min-h-[60px] resize-none py-1" 
-                                                        placeholder="Bio..." 
+                                                    <textarea
+                                                        value={director.bio || ''}
+                                                        onChange={(e) => handleUpdateDirector(director.id, 'bio', e.target.value)}
+                                                        className="input-field text-xs text-gray-600 h-full min-h-[60px] resize-none py-1"
+                                                        placeholder="Bio..."
                                                     />
                                                 </div>
                                             </div>
@@ -509,7 +901,7 @@ const AboutManager = () => {
 
             {/* Banks List */}
             <div>
-                 <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
+                <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
                     <h3 className="font-bold text-green-700 text-sm uppercase tracking-wider">Banking Partners</h3>
                 </div>
                 <Droppable droppableId="banks-list">
@@ -554,29 +946,29 @@ const AboutManager = () => {
                 <div className="space-y-4">
                     <div>
                         <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Headline</label>
-                        <input 
-                            value={milestone.headline || ''} 
-                            onChange={e => handleUpdateMilestone('headline', e.target.value)} 
-                            className="input-field font-heading font-bold text-2xl text-[var(--accent-primary)]" 
+                        <input
+                            value={milestone.headline || ''}
+                            onChange={e => handleUpdateMilestone('headline', e.target.value)}
+                            className="input-field font-heading font-bold text-2xl text-[var(--accent-primary)]"
                             placeholder="e.g., USD 1 Billion"
                         />
                         <p className="text-[10px] text-gray-400 mt-1">The main figure or achievement to highlight.</p>
                     </div>
                     <div>
                         <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Subtitle</label>
-                        <input 
-                            value={milestone.subtitle || ''} 
-                            onChange={e => handleUpdateMilestone('subtitle', e.target.value)} 
-                            className="input-field text-[#B8860B] font-bold" 
+                        <input
+                            value={milestone.subtitle || ''}
+                            onChange={e => handleUpdateMilestone('subtitle', e.target.value)}
+                            className="input-field text-[#B8860B] font-bold"
                             placeholder="e.g., Investment Commitment Signed"
                         />
                     </div>
                     <div>
                         <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Description</label>
-                        <textarea 
-                            value={milestone.description || ''} 
-                            onChange={e => handleUpdateMilestone('description', e.target.value)} 
-                            className="input-field text-sm text-gray-600" 
+                        <textarea
+                            value={milestone.description || ''}
+                            onChange={e => handleUpdateMilestone('description', e.target.value)}
+                            className="input-field text-sm text-gray-600"
                             rows={5}
                             placeholder="Describe this achievement..."
                         />
@@ -605,40 +997,6 @@ const AboutManager = () => {
     );
 
 
-    const renderCustomEditor = (section) => (
-        <div className="space-y-6">
-
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                <h3 className="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
-                    <Edit size={16} /> Custom Section Editor
-                </h3>
-                <div className="space-y-4">
-                    <div>
-                        <label className="label">Section Title</label>
-                        <input
-                            value={section.title || ''}
-                            onChange={(e) => updateSection(section.id, { title: e.target.value })}
-                            className="input-field font-bold text-lg"
-                        />
-                    </div>
-                    <div>
-                        <label className="label">Content</label>
-                        <textarea
-                            rows={10}
-                            value={section.content || ''}
-                            onChange={(e) => updateSection(section.id, { content: e.target.value })}
-                            className="input-field font-mono text-sm"
-                            placeholder="Enter text or HTML..."
-                        />
-                    </div>
-                    <div className="p-3 bg-yellow-50 text-yellow-800 text-xs rounded border border-yellow-100 flex gap-2">
-                        <Lightbulb size={16} className="shrink-0" />
-                        <p>You can use Markdown or basic HTML tags for rich text formatting in the content area.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
 
     const renderPlaceholderEditor = (section) => (
         <div className="text-center p-12 text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
@@ -742,7 +1100,7 @@ const AboutManager = () => {
                     <div className="flex items-center justify-between px-1 py-2 gap-4">
                         {/* Tabs Container */}
                         <div className="flex-1 min-w-0 overflow-x-auto no-scrollbar">
-                           <Droppable droppableId="about-tabs" direction="horizontal">
+                            <Droppable droppableId="about-tabs" direction="horizontal">
                                 {(provided) => (
                                     <div
                                         ref={provided.innerRef}
@@ -764,7 +1122,7 @@ const AboutManager = () => {
 
                 {/* EDITOR CONTENT */}
                 <div className="flex-1 min-h-0 bg-gray-50/50">
-                    <div className="h-full flex flex-col w-full"> 
+                    <div className="h-full flex flex-col w-full">
                         {(() => {
                             const activeSectionData = sections.find(s => s.id === activeSection);
                             if (activeSectionData) {
@@ -821,8 +1179,26 @@ const AboutManager = () => {
                                         </div>
 
                                         <div className="p-6">
+                                            {/* CONTENT / DESIGN TOGGLE */}
+                                            <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl mb-6 w-fit border border-gray-200">
+                                                <button
+                                                    onClick={() => setEditorTab('content')}
+                                                    className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all
+                                                        ${editorTab === 'content' ? 'bg-white text-[var(--accent-primary)] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                                >
+                                                    <Edit size={14} /> Content Editor
+                                                </button>
+                                                <button
+                                                    onClick={() => setEditorTab('design')}
+                                                    className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all
+                                                        ${editorTab === 'design' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                                >
+                                                    <LayoutTemplate size={14} /> Design & Styles
+                                                </button>
+                                            </div>
+
                                             <div className="bg-white rounded-xl">
-                                                {getEditor(activeSectionData)}
+                                                {editorTab === 'content' ? getEditor(activeSectionData) : <SectionStyleEditor section={activeSectionData} onUpdate={updateSection} />}
                                             </div>
                                         </div>
                                     </div>

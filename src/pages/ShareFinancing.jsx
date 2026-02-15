@@ -1,13 +1,45 @@
 import React from 'react';
 import PageHero from '../components/PageHero';
-import { Link } from 'react-router-dom';
-import { BarChart3, ArrowRight } from 'lucide-react';
+import { BarChart3, Shield, Globe, Users, Target, CheckCircle } from 'lucide-react';
+import { usePageContent } from '../hooks/usePageContent';
+import ProtectedFormSection from '../components/ProtectedFormSection';
+import DynamicServiceForm from '../components/DynamicServiceForm';
 
 const ShareFinancing = () => {
+    // Fetch content from admin
+    const { content: servicePages } = usePageContent('service_pages', { pages: [] });
+    const serviceData = servicePages.pages?.find(p => p.id === 'share-financing');
+
+    // Default data as fallback
+    const defaultData = {
+        title: 'SHARE FINANCING (SF)',
+        subtitle: 'Strategic share financing solutions for shareholders and institutional investors.',
+        introduction: 'Strategic share financing solutions for shareholders and institutional investors. Unlock liquidity from your equity holdings through our structured share financing solutions, designed for scalability and capital efficiency.',
+        overview: {
+            heading: 'Strategic Share Financing',
+            description: 'Unlock liquidity from your equity holdings through our structured share financing solutions.'
+        },
+        services: [
+            { icon: <BarChart3 />, title: 'Stock Loans', desc: 'Secure financing using publicly traded shares as collateral.' },
+            { icon: <Shield />, title: 'Asset Protection', desc: 'Maintain market exposure while accessing immediate capital.' },
+            { icon: <Globe />, title: 'Global Markets', desc: 'Support for multiple major stock exchanges worldwide.' },
+            { icon: <Users />, title: 'Institutional Terms', desc: 'Tailored solutions for major shareholders and institutions.' },
+        ]
+    };
+
+    const pageContent = serviceData || defaultData;
+    const title = pageContent.title || defaultData.title;
+    const introduction = pageContent.introduction || pageContent.subtitle || defaultData.introduction;
+    const overview = pageContent.overview || defaultData.overview;
+    const services = (pageContent.services || defaultData.services).map((s, i) => ({
+        ...s,
+        icon: defaultData.services[i]?.icon || <CheckCircle />
+    }));
+
     return (
         <div className="page-wrapper">
             <PageHero
-                title="SHARE FINANCING (SF)"
+                title={title}
                 subtitle=""
             />
 
@@ -15,26 +47,44 @@ const ShareFinancing = () => {
             <section style={{ padding: '80px 20px 40px', background: '#FFFFFF' }}>
                 <div className="container">
                     <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
-                         <p style={{ fontSize: '1.15rem', color: '#4A5568', lineHeight: '1.9' }}>
-                            Strategic share financing solutions for shareholders and institutional investors.
+                        <p style={{ fontSize: '1.15rem', color: '#4A5568', lineHeight: '1.9' }}>
+                            {introduction}
                         </p>
                     </div>
                 </div>
             </section>
 
+            {/* Overview / Services */}
             <section style={{ padding: '40px 20px 80px', background: '#FFFFFF' }}>
                 <div className="container">
-                    <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
-                        <div style={{ width: '80px', height: '80px', background: 'linear-gradient(135deg, #1A365D 0%, #B8860B 100%)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem' }}>
-                            <BarChart3 size={40} color="#FFFFFF" />
+                    <h2 className="section-title">{overview.heading}</h2>
+                    <p style={{ textAlign: 'center', color: '#4A5568', marginBottom: '3rem', maxWidth: '700px', margin: '0 auto 3rem' }}>
+                        {overview.description}
+                    </p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+                        {services.map((service, i) => (
+                            <div key={i} className="glass-card">
+                                <div style={{ color: '#B8860B', marginBottom: '1rem' }}>{service.icon}</div>
+                                <h4 style={{ marginBottom: '0.75rem', color: '#1A365D' }}>{service.title}</h4>
+                                <p style={{ color: '#4A5568', fontSize: '0.95rem' }}>{service.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Form Section */}
+            <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
+                <div className="container">
+                    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+                        <div style={{ background: '#FFFFFF', padding: '2.5rem', borderRadius: '12px', border: '1px solid rgba(26, 54, 93, 0.1)', boxShadow: '0 4px 20px rgba(26, 54, 93, 0.08)' }}>
+                            <ProtectedFormSection serviceName="Share Financing">
+                                <DynamicServiceForm
+                                    serviceId="share-financing"
+                                    title="Inquire About Share Financing"
+                                />
+                            </ProtectedFormSection>
                         </div>
-                        <h2 style={{ fontSize: '1.8rem', marginBottom: '1.5rem', color: '#1A365D' }}>Coming Soon</h2>
-                        <p style={{ fontSize: '1.1rem', color: '#4A5568', lineHeight: '1.8', marginBottom: '2rem' }}>
-                            Service details available upon request. Contact our team to learn more about our Share Financing (SF) solutions.
-                        </p>
-                        <Link to="/contact" className="btn-solid" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                            Contact Us <ArrowRight size={18} />
-                        </Link>
                     </div>
                 </div>
             </section>

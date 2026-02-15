@@ -4,13 +4,20 @@ import { TrendingUp, Users, Search, Briefcase, Target, CheckCircle, ArrowRight, 
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { Toaster } from 'react-hot-toast';
 import ProtectedFormSection from '../components/ProtectedFormSection';
+import DynamicServiceForm from '../components/DynamicServiceForm';
+import { usePageContent } from '../hooks/usePageContent';
 
 const EquityFinancing = () => {
+    // Fetch content from admin
+    const { content: servicePages } = usePageContent('service_pages', { pages: [] });
+    const serviceData = servicePages.pages?.find(p => p.id === 'equity-financing');
+
     const [formData, setFormData] = useState({
         companyName: '', industrySector: '', founderName: '', email: '',
         annualRevenue: '', fundingSought: '', lookingFor: '', companyOverview: '', pitchDeckUrl: ''
     });
     const { submitForm, loading } = useFormSubmit('equity');
+
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -21,66 +28,56 @@ const EquityFinancing = () => {
         }, { industrySector: formData.industrySector, annualRevenue: formData.annualRevenue, fundingSought: formData.fundingSought, lookingFor: formData.lookingFor, pitchDeckUrl: formData.pitchDeckUrl });
         if (submitted) setFormData({ companyName: '', industrySector: '', founderName: '', email: '', annualRevenue: '', fundingSought: '', lookingFor: '', companyOverview: '', pitchDeckUrl: '' });
     };
-    const services = [
-        { icon: <TrendingUp />, title: 'Equity Investment', desc: 'Strategic capital injection up to USD 100 Million for high-growth companies.' },
-        { icon: <Users />, title: 'Merger & Acquisition', desc: 'Expert guidance through complex M&A transactions and negotiations.' },
-        { icon: <Search />, title: 'Due Diligence', desc: 'Comprehensive financial and operational analysis for informed decisions.' },
-        { icon: <Briefcase />, title: 'IPO Preparation', desc: 'Preparation and advisory for Initial Public Offering listing.' },
-    ];
 
-    const roadmapStages = [
-        { 
-            stage: '1', 
-            title: 'Due Diligence', 
-            duration: '3-6 Months',
-            items: ['Due Diligence Work', 'Master Planning', 'Opening of Offshore Account', 'Overall Financial Analysis', 'Restructuring Existing Processes'],
-            investment: 'Min. USD 110,000'
+    // Default data as fallback
+    const defaultData = {
+        title: 'Equity Financing (EF)',
+        subtitle: 'Strategic growth through equity investment and merger assistance.',
+        introduction: 'Strategic growth through equity investment and merger assistance. We facilitate strategic capital injection up to USD 100 Million for high-growth companies and provide expert guidance through complex M&A transactions and negotiations.',
+        overview: {
+            heading: 'Funding Roadmap 2022-2025',
+            description: 'Our structured 5-stage equity financing roadmap guides companies from due diligence to IPO exit strategy.'
         },
-        { 
-            stage: '2', 
-            title: 'M&A Environment', 
-            duration: '24 Months',
-            items: ['Mergers & Acquisition Environment', 'Review Business Plan', 'Debts Consolidation Account', 'Pitching Readiness to Selected VCs'],
-            investment: 'USD 124,000'
-        },
-        { 
-            stage: '3', 
-            title: 'Funding Readiness', 
-            duration: 'Upon Approval',
-            items: ['Funding Readiness up to USD 100 Million', '10% Service Fee on Approved Amount', '30-40% Equity Holding by IVCB'],
-            investment: '35% Equity'
-        },
-        { 
-            stage: '4', 
-            title: 'Performance Monitoring', 
-            duration: '2 Years',
-            items: ['IVCB will service client within 2 years', 'Progress and update on performance', 'Risk management and monitoring'],
-            investment: 'Ongoing'
-        },
-        { 
-            stage: '5', 
-            title: 'Exit Strategy', 
-            duration: 'Target',
-            items: ['At least 6x revenue from capital generated (USD 600M)', 'Preparation of IPO Listing', 'Exit Strategy upon IPO Listed'],
-            investment: 'IPO Ready'
-        },
-    ];
+        services: [
+            { icon: <TrendingUp />, title: 'Equity Investment', desc: 'Strategic capital injection up to USD 100 Million for high-growth companies.' },
+            { icon: <Users />, title: 'Merger & Acquisition', desc: 'Expert guidance through complex M&A transactions and negotiations.' },
+            { icon: <Search />, title: 'Due Diligence', desc: 'Comprehensive financial and operational analysis for informed decisions.' },
+            { icon: <Briefcase />, title: 'IPO Preparation', desc: 'Preparation and advisory for Initial Public Offering listing.' },
+        ],
+        roadmapStages: [
+            { stage: '1', title: 'Due Diligence', duration: '3-6 Months', investment: 'Min. USD 110,000', items: ['Due Diligence Work', 'Master Planning', 'Opening of Offshore Account', 'Overall Financial Analysis', 'Restructuring Existing Processes'] },
+            { stage: '2', title: 'M&A Environment', duration: '24 Months', investment: 'USD 124,000', items: ['Mergers & Acquisition Environment', 'Review Business Plan', 'Debts Consolidation Account', 'Pitching Readiness to Selected VCs'] },
+            { stage: '3', title: 'Funding Readiness', duration: 'Upon Approval', investment: '35% Equity', items: ['Funding Readiness up to USD 100 Million', '10% Service Fee on Approved Amount', '30-40% Equity Holding by IVCB'] },
+            { stage: '4', title: 'Performance Monitoring', duration: '2 Years', investment: 'Ongoing', items: ['IVCB will service client within 2 years', 'Progress and update on performance', 'Risk management and monitoring'] },
+            { stage: '5', title: 'Exit Strategy', duration: 'Target', investment: 'IPO Ready', items: ['At least 6x revenue from capital generated (USD 600M)', 'Preparation of IPO Listing', 'Exit Strategy upon IPO Listed'] }
+        ],
+        financingTerms: [
+            { label: 'Facility Line', value: 'USD 100 Million' },
+            { label: 'Equity Split', value: '60% Investee / 40% IVCB' },
+            { label: 'Margin Financing', value: 'Up to 80%' },
+            { label: 'Maximum Tenure', value: '5 Years' },
+            { label: 'Service Fee', value: '10% on Approval' },
+            { label: 'Target Revenue', value: '6x Capital (USD 600M)' },
+        ],
+        sectors: ['Oil & Gas', 'Property Development', 'Education', 'Logistics', 'Automotive', 'Manufacturing', 'Construction', 'Digital Technology']
+    };
 
-    const financingTerms = [
-        { label: 'Facility Line', value: 'USD 100 Million' },
-        { label: 'Equity Split', value: '60% Investee / 40% IVCB' },
-        { label: 'Margin Financing', value: 'Up to 80%' },
-        { label: 'Maximum Tenure', value: '5 Years' },
-        { label: 'Service Fee', value: '10% on Approval' },
-        { label: 'Target Revenue', value: '6x Capital (USD 600M)' },
-    ];
-
-    const sectors = ['Oil & Gas', 'Property Development', 'Education', 'Logistics', 'Automotive', 'Manufacturing', 'Construction', 'Digital Technology'];
+    const pageContent = serviceData || defaultData;
+    const title = pageContent.title || defaultData.title;
+    const introduction = pageContent.introduction || pageContent.subtitle || defaultData.introduction;
+    const services = (pageContent.services || defaultData.services).map((s, i) => ({
+        ...s,
+        icon: defaultData.services[i]?.icon || <Briefcase />
+    }));
+    const roadmapStages = pageContent.roadmapStages || defaultData.roadmapStages;
+    const financingTerms = pageContent.financingTerms || defaultData.financingTerms;
+    const sectors = pageContent.sectors || defaultData.sectors;
+    const overview = pageContent.overview || defaultData.overview;
 
     return (
         <div className="page-wrapper">
-            <PageHero 
-                title="EQUITY FINANCING & M&A" 
+            <PageHero
+                title={title}
                 subtitle=""
             />
 
@@ -89,12 +86,12 @@ const EquityFinancing = () => {
                 <div className="container">
                     <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
                         <p style={{ fontSize: '1.15rem', color: '#4A5568', lineHeight: '1.9' }}>
-                            Strategic growth through equity investment and merger assistance. We facilitate strategic capital injection up to USD 100 Million for high-growth companies and provide expert guidance through complex M&A transactions and negotiations.
+                            {introduction}
                         </p>
                     </div>
                 </div>
             </section>
-            
+
             {/* Services */}
             <section style={{ padding: '40px 20px 80px', background: '#FFFFFF' }}>
                 <div className="container">
@@ -114,30 +111,30 @@ const EquityFinancing = () => {
             {/* 5-Stage Roadmap */}
             <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
                 <div className="container">
-                    <h2 className="section-title">Funding Roadmap 2022-2025</h2>
+                    <h2 className="section-title">{overview.heading}</h2>
                     <p style={{ textAlign: 'center', color: '#4A5568', marginBottom: '3rem', maxWidth: '700px', margin: '0 auto 3rem' }}>
-                        Our structured 5-stage equity financing roadmap guides companies from due diligence to IPO exit strategy.
+                        {overview.description}
                     </p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center' }}>
                         {roadmapStages.map((stage, i) => (
-                            <div key={i} style={{ 
-                                flex: '1 1 200px', 
+                            <div key={i} style={{
+                                flex: '1 1 200px',
                                 maxWidth: '220px',
-                                background: '#FFFFFF', 
-                                borderRadius: '12px', 
+                                background: '#FFFFFF',
+                                borderRadius: '12px',
                                 padding: '1.5rem',
                                 border: '1px solid rgba(26, 54, 93, 0.08)',
                                 position: 'relative'
                             }}>
-                                <div style={{ 
-                                    width: '40px', 
-                                    height: '40px', 
-                                    borderRadius: '50%', 
-                                    background: 'linear-gradient(135deg, #B8860B, #D4A84B)', 
-                                    color: 'white', 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
-                                    justifyContent: 'center', 
+                                <div style={{
+                                    width: '40px',
+                                    height: '40px',
+                                    borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, #B8860B, #D4A84B)',
+                                    color: 'white',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
                                     fontWeight: '700',
                                     marginBottom: '1rem'
                                 }}>
@@ -281,65 +278,71 @@ const EquityFinancing = () => {
                         </p>
                         <div style={{ background: '#FFFFFF', padding: '2.5rem', borderRadius: '12px', border: '1px solid rgba(26, 54, 93, 0.1)', boxShadow: '0 4px 20px rgba(26, 54, 93, 0.08)' }}>
                             <ProtectedFormSection serviceName="Equity Financing">
-                                <form onSubmit={handleSubmit}>
-                                <Toaster position="top-right" />
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                                    <div>
-                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Company Name *</label>
-                                        <input type="text" name="companyName" value={formData.companyName} onChange={handleChange} placeholder="Your company" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px' }} required />
-                                    </div>
-                                    <div>
-                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Industry/Sector *</label>
-                                        <select name="industrySector" value={formData.industrySector} onChange={handleChange} style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', color: '#1A365D' }} required>
-                                            <option value="">Select sector</option>
-                                            {sectors.map(s => <option key={s} value={s.toLowerCase()}>{s}</option>)}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                                    <div>
-                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Founder/CEO Name *</label>
-                                        <input type="text" name="founderName" value={formData.founderName} onChange={handleChange} placeholder="Your name" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px' }} required />
-                                    </div>
-                                    <div>
-                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Email *</label>
-                                        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="your@email.com" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px' }} required />
-                                    </div>
-                                </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                                    <div>
-                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Annual Revenue (USD) *</label>
-                                        <input type="text" name="annualRevenue" value={formData.annualRevenue} onChange={handleChange} placeholder="Current annual revenue" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px' }} required />
-                                    </div>
-                                    <div>
-                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Funding Sought (USD)</label>
-                                        <input type="text" name="fundingSought" value={formData.fundingSought} onChange={handleChange} placeholder="Up to USD 100 Million" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px' }} />
-                                    </div>
-                                </div>
-                                <div style={{ marginBottom: '1.5rem' }}>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>What are you looking for? *</label>
-                                    <select name="lookingFor" value={formData.lookingFor} onChange={handleChange} style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', color: '#1A365D' }} required>
-                                        <option value="">Select option</option>
-                                        <option value="equity">Equity Investment (Up to USD 100M)</option>
-                                        <option value="ma-sell">M&A - Sell-side Advisory</option>
-                                        <option value="ma-buy">M&A - Buy-side Advisory</option>
-                                        <option value="ipo">IPO Preparation & Listing</option>
-                                        <option value="due-diligence">Due Diligence & Valuation</option>
-                                    </select>
-                                </div>
-                                <div style={{ marginBottom: '2rem' }}>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Company Overview / Letter of Intent *</label>
-                                    <textarea name="companyOverview" value={formData.companyOverview} onChange={handleChange} rows="4" placeholder="Tell us about your company, business model, competitive advantages, growth plans, and investment objectives..." style={{ width: '100%', padding: '1rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', resize: 'vertical' }} required></textarea>
-                                </div>
-                                <div style={{ marginBottom: '2rem' }}>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Pitch Deck URL (Optional)</label>
-                                    <input type="url" name="pitchDeckUrl" value={formData.pitchDeckUrl} onChange={handleChange} placeholder="Link to your pitch deck (Google Drive, Dropbox, etc.)" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px' }} />
-                                </div>
-                                <button className="btn-solid" type="submit" style={{ width: '100%', opacity: loading ? 0.7 : 1 }} disabled={loading}>{loading ? 'Submitting...' : 'Submit Letter of Intent'}</button>
-                                <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.85rem', color: '#718096' }}>
-                                    Or email directly to: <a href="mailto:kahar@instrakventurecapital.com" style={{ color: '#B8860B', fontWeight: '600' }}>kahar@instrakventurecapital.com</a>
-                                </p>
-                            </form>
+                                <DynamicServiceForm
+                                    serviceId="equity-financing"
+                                    title="Pitch Your Company"
+                                    fallbackForm={
+                                        <form onSubmit={handleSubmit}>
+                                            <Toaster position="top-right" />
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                                                <div>
+                                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Company Name *</label>
+                                                    <input type="text" name="companyName" value={formData.companyName} onChange={handleChange} placeholder="Your company" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px' }} required />
+                                                </div>
+                                                <div>
+                                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Industry/Sector *</label>
+                                                    <select name="industrySector" value={formData.industrySector} onChange={handleChange} style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', color: '#1A365D' }} required>
+                                                        <option value="">Select sector</option>
+                                                        {sectors.map(s => <option key={s} value={s.toLowerCase()}>{s}</option>)}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                                                <div>
+                                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Founder/CEO Name *</label>
+                                                    <input type="text" name="founderName" value={formData.founderName} onChange={handleChange} placeholder="Your name" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px' }} required />
+                                                </div>
+                                                <div>
+                                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Email *</label>
+                                                    <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="your@email.com" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px' }} required />
+                                                </div>
+                                            </div>
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                                                <div>
+                                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Annual Revenue (USD) *</label>
+                                                    <input type="text" name="annualRevenue" value={formData.annualRevenue} onChange={handleChange} placeholder="Current annual revenue" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px' }} required />
+                                                </div>
+                                                <div>
+                                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Funding Sought (USD)</label>
+                                                    <input type="text" name="fundingSought" value={formData.fundingSought} onChange={handleChange} placeholder="Up to USD 100 Million" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px' }} />
+                                                </div>
+                                            </div>
+                                            <div style={{ marginBottom: '1.5rem' }}>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>What are you looking for? *</label>
+                                                <select name="lookingFor" value={formData.lookingFor} onChange={handleChange} style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', color: '#1A365D' }} required>
+                                                    <option value="">Select option</option>
+                                                    <option value="equity">Equity Investment (Up to USD 100M)</option>
+                                                    <option value="ma-sell">M&A - Sell-side Advisory</option>
+                                                    <option value="ma-buy">M&A - Buy-side Advisory</option>
+                                                    <option value="ipo">IPO Preparation & Listing</option>
+                                                    <option value="due-diligence">Due Diligence & Valuation</option>
+                                                </select>
+                                            </div>
+                                            <div style={{ marginBottom: '2rem' }}>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Company Overview / Letter of Intent *</label>
+                                                <textarea name="companyOverview" value={formData.companyOverview} onChange={handleChange} rows="4" placeholder="Tell us about your company, business model, competitive advantages, growth plans, and investment objectives..." style={{ width: '100%', padding: '1rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', resize: 'vertical' }} required></textarea>
+                                            </div>
+                                            <div style={{ marginBottom: '2rem' }}>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Pitch Deck URL (Optional)</label>
+                                                <input type="url" name="pitchDeckUrl" value={formData.pitchDeckUrl} onChange={handleChange} placeholder="Link to your pitch deck (Google Drive, Dropbox, etc.)" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px' }} />
+                                            </div>
+                                            <button className="btn-solid" type="submit" style={{ width: '100%', opacity: loading ? 0.7 : 1 }} disabled={loading}>{loading ? 'Submitting...' : 'Submit Letter of Intent'}</button>
+                                            <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.85rem', color: '#718096' }}>
+                                                Or email directly to: <a href="mailto:kahar@instrakventurecapital.com" style={{ color: '#B8860B', fontWeight: '600' }}>kahar@instrakventurecapital.com</a>
+                                            </p>
+                                        </form>
+                                    }
+                                />
                             </ProtectedFormSection>
                         </div>
                     </div>

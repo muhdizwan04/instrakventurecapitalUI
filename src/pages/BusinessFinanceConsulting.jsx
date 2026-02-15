@@ -6,6 +6,7 @@ import { usePageContent } from '../hooks/usePageContent';
 import { Link } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import ProtectedFormSection from '../components/ProtectedFormSection';
+import DynamicServiceForm from '../components/DynamicServiceForm';
 
 const BusinessFinanceConsulting = () => {
     const [formData, setFormData] = useState({
@@ -180,57 +181,63 @@ const BusinessFinanceConsulting = () => {
                         </p>
                         <div style={{ background: '#FFFFFF', padding: '2.5rem', borderRadius: '12px', border: '1px solid rgba(26, 54, 93, 0.1)', boxShadow: '0 4px 20px rgba(26, 54, 93, 0.06)' }}>
                             <ProtectedFormSection serviceName="Business Finance Consulting">
-                                <form onSubmit={handleSubmit}>
-                                <Toaster position="top-right" />
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                                    <div>
-                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Full Name *</label>
-                                        <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} placeholder="Your name" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', fontSize: '0.95rem' }} required />
-                                    </div>
-                                    <div>
-                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Email Address *</label>
-                                        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="your@email.com" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', fontSize: '0.95rem' }} required />
-                                    </div>
-                                </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                                    <div>
-                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Company Name *</label>
-                                        <input type="text" name="companyName" value={formData.companyName} onChange={handleChange} placeholder="Your company" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', fontSize: '0.95rem' }} required />
-                                    </div>
-                                    <div>
-                                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Phone Number</label>
-                                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="+60 12-345-6789" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', fontSize: '0.95rem' }} />
-                                    </div>
-                                </div>
-                                <div style={{ marginBottom: '1.5rem' }}>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Services Interested In *</label>
-                                    <select name="servicesInterested" value={formData.servicesInterested} onChange={handleChange} style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', fontSize: '0.95rem', color: '#1A365D' }} required>
-                                        <option value="">Select a service</option>
-                                        <option value="strategy">Financial Strategy & Forecasting</option>
-                                        <option value="budgeting">Budgeting & Cash Flow Management</option>
-                                        <option value="profitability">Profitability Analysis</option>
-                                        <option value="investment">Investment Readiness</option>
-                                        <option value="risk">Risk Assessment</option>
-                                        <option value="comprehensive">Comprehensive Virtual CFO</option>
-                                    </select>
-                                </div>
-                                <div style={{ marginBottom: '1.5rem' }}>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Annual Revenue Range</label>
-                                    <select name="annualRevenue" value={formData.annualRevenue} onChange={handleChange} style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', fontSize: '0.95rem', color: '#1A365D' }}>
-                                        <option value="">Select range</option>
-                                        <option value="<1m">Below RM 1 Million</option>
-                                        <option value="1-5m">RM 1 - 5 Million</option>
-                                        <option value="5-20m">RM 5 - 20 Million</option>
-                                        <option value="20-50m">RM 20 - 50 Million</option>
-                                        <option value=">50m">Above RM 50 Million</option>
-                                    </select>
-                                </div>
-                                <div style={{ marginBottom: '2rem' }}>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Tell us about your needs</label>
-                                    <textarea name="needs" value={formData.needs} onChange={handleChange} rows="4" placeholder="Describe your current challenges and what you hope to achieve..." style={{ width: '100%', padding: '1rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', fontSize: '0.95rem', resize: 'vertical' }}></textarea>
-                                </div>
-                                <button className="btn-solid" type="submit" style={{ width: '100%', opacity: loading ? 0.7 : 1 }} disabled={loading}>{loading ? 'Submitting...' : 'Request Consultation'}</button>
-                                </form>
+                                <DynamicServiceForm
+                                    serviceId="virtual-cfo"
+                                    title="Request a Consultation"
+                                    fallbackForm={
+                                        <form onSubmit={handleSubmit}>
+                                            <Toaster position="top-right" />
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                                                <div>
+                                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Full Name *</label>
+                                                    <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} placeholder="Your name" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', fontSize: '0.95rem' }} required />
+                                                </div>
+                                                <div>
+                                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Email Address *</label>
+                                                    <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="your@email.com" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', fontSize: '0.95rem' }} required />
+                                                </div>
+                                            </div>
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                                                <div>
+                                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Company Name *</label>
+                                                    <input type="text" name="companyName" value={formData.companyName} onChange={handleChange} placeholder="Your company" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', fontSize: '0.95rem' }} required />
+                                                </div>
+                                                <div>
+                                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Phone Number</label>
+                                                    <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="+60 12-345-6789" style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', fontSize: '0.95rem' }} />
+                                                </div>
+                                            </div>
+                                            <div style={{ marginBottom: '1.5rem' }}>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Services Interested In *</label>
+                                                <select name="servicesInterested" value={formData.servicesInterested} onChange={handleChange} style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', fontSize: '0.95rem', color: '#1A365D' }} required>
+                                                    <option value="">Select a service</option>
+                                                    <option value="strategy">Financial Strategy & Forecasting</option>
+                                                    <option value="budgeting">Budgeting & Cash Flow Management</option>
+                                                    <option value="profitability">Profitability Analysis</option>
+                                                    <option value="investment">Investment Readiness</option>
+                                                    <option value="risk">Risk Assessment</option>
+                                                    <option value="comprehensive">Comprehensive Virtual CFO</option>
+                                                </select>
+                                            </div>
+                                            <div style={{ marginBottom: '1.5rem' }}>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Annual Revenue Range</label>
+                                                <select name="annualRevenue" value={formData.annualRevenue} onChange={handleChange} style={{ width: '100%', padding: '0.9rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', fontSize: '0.95rem', color: '#1A365D' }}>
+                                                    <option value="">Select range</option>
+                                                    <option value="<1m">Below RM 1 Million</option>
+                                                    <option value="1-5m">RM 1 - 5 Million</option>
+                                                    <option value="5-20m">RM 5 - 20 Million</option>
+                                                    <option value="20-50m">RM 20 - 50 Million</option>
+                                                    <option value=">50m">Above RM 50 Million</option>
+                                                </select>
+                                            </div>
+                                            <div style={{ marginBottom: '2rem' }}>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#1A365D' }}>Tell us about your needs</label>
+                                                <textarea name="needs" value={formData.needs} onChange={handleChange} rows="4" placeholder="Describe your current challenges and what you hope to achieve..." style={{ width: '100%', padding: '1rem', border: '1px solid rgba(26, 54, 93, 0.2)', borderRadius: '6px', fontSize: '0.95rem', resize: 'vertical' }}></textarea>
+                                            </div>
+                                            <button className="btn-solid" type="submit" style={{ width: '100%', opacity: loading ? 0.7 : 1 }} disabled={loading}>{loading ? 'Submitting...' : 'Request Consultation'}</button>
+                                        </form>
+                                    }
+                                />
                             </ProtectedFormSection>
                         </div>
                     </div>

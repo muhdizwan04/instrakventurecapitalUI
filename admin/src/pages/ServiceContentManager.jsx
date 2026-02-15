@@ -16,7 +16,15 @@ const ServiceContentManager = () => {
             title: 'Business Finance Consulting – Virtual CFO',
             subtitle: 'Dedicated finance leadership to support funding readiness, reporting discipline, and decision-making—without the overhead of a full-time in-house CFO.',
             icon: 'Briefcase',
-            fields: [],
+            fields: [
+                { id: 'fullName', label: 'Full Name', type: 'text', required: true, width: 'half', placeholder: 'Enter your full name' },
+                { id: 'email', label: 'Email Address', type: 'email', required: true, width: 'half', placeholder: 'your@email.com' },
+                { id: 'companyName', label: 'Company Name', type: 'text', required: true, width: 'half', placeholder: 'Enter your company name' },
+                { id: 'phone', label: 'Phone Number', type: 'tel', required: true, width: 'half', placeholder: '+60 ...' },
+                { id: 'servicesInterested', label: 'Services Interested In', type: 'select', required: true, width: 'full', options: ['Financial Strategy', 'Budgeting & Cash Flow', 'Profitability Analysis', 'Investment Readiness', 'Financial Risk Assessment', 'Comprehensive CFO Support'] },
+                { id: 'annualRevenueRange', label: 'Annual Revenue Range', type: 'select', required: true, width: 'full', options: ['< RM 1 Million', 'RM 1 - 5 Million', 'RM 5 - 20 Million', 'RM 20 - 50 Million', '> RM 50 Million'] },
+                { id: 'needs', label: 'Specific Needs or Challenges', type: 'textarea', required: true, width: 'full', placeholder: 'Tell us how we can help...' }
+            ],
             ourRole: [
                 'Financial strategy & forecasting',
                 'Budgeting & cash flow management',
@@ -52,7 +60,17 @@ const ServiceContentManager = () => {
             title: 'Equity Financing (EF)',
             subtitle: 'Strategic capital injection through equity investment for high-growth companies seeking expansion and market leadership.',
             icon: 'TrendingUp',
-            fields: [],
+            fields: [
+                { id: 'companyName', label: 'Company Name', type: 'text', required: true, width: 'half', placeholder: 'Enter company name' },
+                { id: 'industrySector', label: 'Industry / Sector', type: 'select', required: true, width: 'half', options: ['Technology', 'Healthcare', 'Energy', 'Real Estate', 'Manufacturing', 'Logistics', 'Education', 'Other'] },
+                { id: 'founderName', label: 'Founder / CEO Name', type: 'text', required: true, width: 'half', placeholder: 'Full name' },
+                { id: 'email', label: 'Contact Email', type: 'email', required: true, width: 'half', placeholder: 'email@example.com' },
+                { id: 'annualRevenue', label: 'Annual Revenue (USD)', type: 'text', required: true, width: 'half', placeholder: 'e.g. 5M' },
+                { id: 'fundingSought', label: 'Funding Sought (USD)', type: 'text', required: true, width: 'half', placeholder: 'e.g. 2M' },
+                { id: 'lookingFor', label: 'What are you looking for?', type: 'select', required: true, width: 'full', options: ['Equity Investment', 'M&A (Sell-side)', 'M&A (Buy-side)', 'IPO Preparation', 'Due Diligence Service'] },
+                { id: 'companyOverview', label: 'Company Overview / Project Brief', type: 'textarea', required: true, width: 'full', placeholder: 'Describe your company and goals...' },
+                { id: 'pitchDeckUrl', label: 'Pitch Deck URL (Optional)', type: 'text', required: false, width: 'full', placeholder: 'Link to your deck' }
+            ],
             overview: {
                 heading: 'Funding Roadmap 2022-2025',
                 description: 'Our structured 5-stage equity financing roadmap guides companies from due diligence to IPO exit strategy.'
@@ -86,7 +104,18 @@ const ServiceContentManager = () => {
             title: 'Real Estate Financing (REF)',
             subtitle: 'Funding for high-yield property developments and real estate acquisitions.',
             icon: 'Building2',
-            fields: [],
+            fields: [
+                { id: 'companyName', label: 'Developer/Company Name', type: 'text', required: true, width: 'half', placeholder: 'Company name' },
+                { id: 'contactPerson', label: 'Contact Person', type: 'text', required: true, width: 'half', placeholder: 'Your name' },
+                { id: 'email', label: 'Email Address', type: 'email', required: true, width: 'half', placeholder: 'your@email.com' },
+                { id: 'phone', label: 'Phone Number', type: 'tel', required: true, width: 'half', placeholder: '+60 ...' },
+                { id: 'propertyType', label: 'Property Type', type: 'select', required: true, width: 'half', options: ['Commercial', 'Residential', 'Mixed-Use', 'Industrial'] },
+                { id: 'financingType', label: 'Financing Type', type: 'select', required: true, width: 'half', options: ['Development Loan', 'Bridge Financing', 'Acquisition Capital'] },
+                { id: 'projectLocation', label: 'Project Location', type: 'text', required: true, width: 'full', placeholder: 'City/State' },
+                { id: 'projectValue', label: 'Project Value (RM)', type: 'text', required: true, width: 'half', placeholder: 'Total project value' },
+                { id: 'financingRequired', label: 'Financing Required (RM)', type: 'text', required: true, width: 'half', placeholder: 'Amount needed' },
+                { id: 'projectDescription', label: 'Project Description', type: 'textarea', required: true, width: 'full', placeholder: 'Describe your project...' }
+            ],
             overview: {
                 heading: 'Financing Solutions',
                 description: 'Comprehensive financing solutions for property development, acquisition, and bridge financing.'
@@ -117,61 +146,114 @@ const ServiceContentManager = () => {
             title: 'Real Estate Investment Trust (REITs)',
             subtitle: 'Institutional-grade real estate investment opportunities through structured REIT vehicles.',
             icon: 'Landmark',
-            fields: [],
-            overview: { heading: 'Coming Soon', description: 'Service details available upon request.' },
-            formFields: ['companyName', 'email', 'phone', 'message']
+            fields: [
+                { id: 'fullName', label: 'Full Name', type: 'text', required: true, width: 'half' },
+                { id: 'email', label: 'Email Address', type: 'email', required: true, width: 'half' },
+                { id: 'phone', label: 'Phone Number', type: 'tel', required: true, width: 'half' },
+                { id: 'investorType', label: 'Investor Type', type: 'select', required: true, width: 'half', options: ['Individual', 'Institutional', 'Family Office', 'Corporate'] },
+                { id: 'investmentAmount', label: 'Intended Investment Amount (RM)', type: 'text', required: true, width: 'full' },
+                { id: 'message', label: 'Additional Requirements', type: 'textarea', required: false, width: 'full' }
+            ],
+            overview: { heading: 'Institutional REIT Solutions', description: 'Access high-quality real estate portfolios through our managed REIT investment structures.' },
+            formFields: ['fullName', 'email', 'phone', 'investorType', 'investmentAmount', 'message']
         },
         {
             id: 'share-financing',
             title: 'Share Financing (SF)',
             subtitle: 'Strategic share financing solutions for shareholders and institutional investors.',
             icon: 'BarChart3',
-            fields: [],
-            overview: { heading: 'Coming Soon', description: 'Service details available upon request.' },
-            formFields: ['companyName', 'email', 'phone', 'message']
+            fields: [
+                { id: 'fullName', label: 'Full Name', type: 'text', required: true, width: 'half', placeholder: 'Enter your full name' },
+                { id: 'email', label: 'Email Address', type: 'email', required: true, width: 'half', placeholder: 'your@email.com' },
+                { id: 'phone', label: 'Phone Number', type: 'tel', required: true, width: 'half', placeholder: '+60 ...' },
+                { id: 'companyName', label: 'Company Name', type: 'text', required: true, width: 'half' },
+                { id: 'stockExchange', label: 'Stock Exchange', type: 'select', required: true, width: 'half', options: ['Bursa Malaysia', 'SGX', 'HKEX', 'NYSE', 'NASDAQ', 'LSE', 'Other'] },
+                { id: 'shareValue', label: 'Estimated Share Value (Indicative)', type: 'text', required: true, width: 'half' },
+                { id: 'financingAmount', label: 'Financing Amount Required', type: 'text', required: true, width: 'half' },
+                { id: 'purpose', label: 'Purpose of Financing', type: 'select', required: true, width: 'full', options: ['Working Capital', 'Expansion', 'Debt Restructuring', 'Liquidity Release', 'Other'] },
+                { id: 'portfolioOverview', label: 'Portfolio Overview / Specific Requirements', type: 'textarea', required: true, width: 'full' }
+            ],
+            overview: { heading: 'Strategic Share Financing', description: 'Unlock liquidity from your equity holdings through our structured share financing solutions.' },
+            formFields: ['fullName', 'email', 'phone', 'companyName', 'stockExchange', 'shareValue', 'financingAmount', 'purpose', 'portfolioOverview']
         },
         {
             id: 'merger-acquisition',
             title: 'Merger & Acquisition (M&A)',
             subtitle: 'Expert guidance through complex M&A transactions, negotiations, and strategic integrations.',
             icon: 'Users',
-            fields: [],
-            overview: { heading: 'Coming Soon', description: 'Service details available upon request.' },
-            formFields: ['companyName', 'email', 'phone', 'message']
+            fields: [
+                { id: 'companyName', label: 'Company Name', type: 'text', required: true, width: 'half' },
+                { id: 'contactPerson', label: 'Contact Person', type: 'text', required: true, width: 'half' },
+                { id: 'email', label: 'Email Address', type: 'email', required: true, width: 'half' },
+                { id: 'phone', label: 'Phone Number', type: 'tel', required: true, width: 'half' },
+                { id: 'transactionType', label: 'Transaction Interest', type: 'select', required: true, width: 'full', options: ['Sell-side Advisory', 'Buy-side Advisory', 'Merger', 'Strategic Alliance', 'Joint Venture'] },
+                { id: 'industry', label: 'Industry / Sector', type: 'text', required: true, width: 'half' },
+                { id: 'valuationRange', label: 'Estimated Company Valuation', type: 'text', required: true, width: 'half' },
+                { id: 'message', label: 'Brief Overview of Transaction Goals', type: 'textarea', required: true, width: 'full' }
+            ],
+            overview: { heading: 'Expert M&A Advisory', description: 'Strategize and execute complex transactions with our experienced M&A team.' },
+            formFields: ['companyName', 'contactPerson', 'email', 'phone', 'transactionType', 'industry', 'valuationRange', 'message']
         },
         {
             id: 'tokenization',
             title: 'Tokenization',
             subtitle: 'Digital asset tokenization solutions for modern investment structures.',
             icon: 'Coins',
-            fields: [],
-            overview: { heading: 'Coming Soon', description: 'Service details available upon request.' },
-            formFields: ['companyName', 'email', 'phone', 'message']
+            fields: [
+                { id: 'fullName', label: 'Full Name', type: 'text', required: true, width: 'half' },
+                { id: 'email', label: 'Email Address', type: 'email', required: true, width: 'half' },
+                { id: 'assetType', label: 'Asset Type to Tokenize', type: 'select', required: true, width: 'half', options: ['Real Estate', 'Art/Collectibles', 'Corporate Equity', 'Revenue Streams', 'Other'] },
+                { id: 'assetValue', label: 'Estimated Asset Value', type: 'text', required: true, width: 'half' },
+                { id: 'message', label: 'Project Description', type: 'textarea', required: true, width: 'full' }
+            ],
+            overview: { heading: 'Digital Asset Tokenization', description: 'Fractionalize and digitize value through our institutional-grade tokenization platform.' },
+            formFields: ['fullName', 'email', 'assetType', 'assetValue', 'message']
         },
         {
             id: 'asset-insurance',
             title: 'Asset Insurance (AI)',
             subtitle: 'Comprehensive asset protection and insurance solutions for institutional clients.',
             icon: 'Shield',
-            fields: [],
-            overview: { heading: 'Coming Soon', description: 'Service details available upon request.' },
-            formFields: ['companyName', 'email', 'phone', 'message']
+            fields: [
+                { id: 'fullName', label: 'Full Name', type: 'text', required: true, width: 'half' },
+                { id: 'email', label: 'Email Address', type: 'email', required: true, width: 'half' },
+                { id: 'assetCategory', label: 'Asset Category', type: 'select', required: true, width: 'half', options: ['Commercial Property', 'High-Value Equipment', 'Financial Assets', 'Marine/Transit', 'Other'] },
+                { id: 'coverageNeeds', label: 'Specific Coverage Requirements', type: 'textarea', required: true, width: 'full' }
+            ],
+            overview: { heading: 'Institutional Asset Insurance', description: 'Protect your capital and physical assets with our specialized insurance advisory.' },
+            formFields: ['fullName', 'email', 'assetCategory', 'coverageNeeds']
         },
         {
             id: 'ppli',
             title: 'Private Placement Life Insurance (PPLI)',
             subtitle: 'Sophisticated life insurance solutions for wealth preservation and estate planning.',
             icon: 'ShieldCheck',
-            fields: [],
-            overview: { heading: 'Coming Soon', description: 'Service details available upon request.' },
-            formFields: ['companyName', 'email', 'phone', 'message']
+            fields: [
+                { id: 'fullName', label: 'Full Name', type: 'text', required: true, width: 'half' },
+                { id: 'email', label: 'Email Address', type: 'email', required: true, width: 'half' },
+                { id: 'wealthGoals', label: 'Primary Wealth Goals', type: 'select', required: true, width: 'full', options: ['Tax Efficiency', 'Estate Planning', 'Asset Protection', 'Investment Flexibility'] },
+                { id: 'message', label: 'Additional Information', type: 'textarea', required: false, width: 'full' }
+            ],
+            overview: { heading: 'Private Placement Life Insurance', description: 'Integrate insurance into your global wealth management and tax strategy.' },
+            formFields: ['fullName', 'email', 'wealthGoals', 'message']
         },
         {
             id: 'gig',
             title: 'Global Investment Gateway (GIG)',
             subtitle: 'A Strategic Capital Access & Global Investor Connectivity Platform by Instrak Venture Capital Berhad',
             icon: 'Globe',
-            fields: [],
+            fields: [
+                { id: 'heading_a', label: 'SECTION A — COMPANY PROFILE', type: 'heading' },
+                { id: 'companyName', label: 'Legal Company Name', type: 'text', required: true, width: 'half' },
+                { id: 'countryOfIncorporation', label: 'Country of Incorporation', type: 'text', required: true, width: 'half' },
+                { id: 'regNumber', label: 'Registration Number', type: 'text', required: true, width: 'half' },
+                { id: 'yearEstablished', label: 'Year Established', type: 'text', required: true, width: 'half' },
+                { id: 'heading_contact', label: 'CONTACT INFORMATION', type: 'heading' },
+                { id: 'contactPerson', label: 'Contact Person', type: 'text', required: true, width: 'half' },
+                { id: 'email', label: 'Email Address', type: 'email', required: true, width: 'half' },
+                { id: 'phone', label: 'Phone Number', type: 'tel', required: true, width: 'half' },
+                { id: 'message', label: 'Additional Information', type: 'textarea', required: false, width: 'full' }
+            ],
             executiveOverview: 'Global Investment Gateway (GIG) is an exclusive, subscription-based platform designed to enable qualified companies to gain structured access to global investors, institutional capital providers, family offices, and strategic partners through the international network of Instrak Venture Capital Berhad (IVC).',
             eligibility: [
                 'Legally incorporated and in good standing',
@@ -198,16 +280,39 @@ const ServiceContentManager = () => {
             title: 'Private Wealth Investment (The Luxury Dubai)',
             subtitle: 'Exclusive private wealth investment opportunities in premium real estate.',
             icon: 'Gem',
-            fields: [],
-            overview: { heading: 'Coming Soon', description: 'Service details available upon request.' },
-            formFields: ['companyName', 'email', 'phone', 'message']
+            fields: [
+                { id: 'fullName', label: 'Full Name', type: 'text', required: true, width: 'half' },
+                { id: 'email', label: 'Email Address', type: 'email', required: true, width: 'half' },
+                { id: 'interestType', label: 'Investment Interest', type: 'select', required: true, width: 'full', options: ['Off-Plan Property', 'Secondary Market', 'Luxury Portfolios', 'Commercial/Hotel Assets'] },
+                { id: 'budget', label: 'Budget Range (USD)', type: 'text', required: true, width: 'half' },
+                { id: 'message', label: 'Specific Requirements', type: 'textarea', required: false, width: 'full' }
+            ],
+            overview: { heading: 'The Luxury Dubai Investments', description: 'Exclusive access to Dubai\'s most prestigious real estate and private wealth opportunities.' },
+            formFields: ['fullName', 'email', 'interestType', 'budget', 'message']
         },
         {
             id: 'aum',
             title: 'Asset Under Management (AUM)',
             subtitle: 'Partner with Instrak Venture Capital Berhad to optimise capital, enhance portfolio performance, and achieve long-term strategic objectives with a disciplined, mandate-driven investment framework.',
             icon: 'PieChart',
-            fields: [],
+            fields: [
+                { id: 'heading_a', label: 'SECTION A — CLIENT PROFILE', type: 'heading' },
+                { id: 'legalName', label: 'Legal Name of Entity / Individual', type: 'text', required: true, width: 'half' },
+                { id: 'country', label: 'Country of Incorporation / Residence', type: 'text', required: true, width: 'half' },
+                { id: 'clientClassification', label: 'Client Classification', type: 'select', required: true, width: 'full', options: ['Institution', 'Corporation', 'Family Office', 'UHNW / Principal'] },
+                { id: 'primaryContact', label: 'Primary Contact Person & Designation', type: 'text', required: true, width: 'full' },
+                { id: 'email', label: 'Email Address', type: 'email', required: true, width: 'half' },
+                { id: 'phone', label: 'Contact Number', type: 'tel', required: true, width: 'half' },
+                { id: 'heading_b', label: 'SECTION B — OWNERSHIP & GOVERNANCE', type: 'heading' },
+                { id: 'beneficialOwners', label: 'Ultimate Beneficial Owner(s)', type: 'textarea', required: true, width: 'full' },
+                { id: 'isDecisionMaker', label: 'Are you the final investment decision-maker?', type: 'select', required: true, width: 'half', options: ['Yes', 'No'] },
+                { id: 'approvingAuthority', label: 'If No, please specify approving authority', type: 'text', required: false, width: 'half' },
+                { id: 'heading_c', label: 'SECTION C — AUM MANDATE OVERVIEW', type: 'heading' },
+                { id: 'aumSize', label: 'Indicative AUM Size (USD)', type: 'text', required: true, width: 'half' },
+                { id: 'mandateType', label: 'Intended Mandate Type', type: 'select', required: true, width: 'half', options: ['Discretionary', 'Advisory', 'Co-Investment', 'Structured'] },
+                { id: 'primaryObjective', label: 'Primary Objective', type: 'select', required: true, width: 'half', options: ['Capital Preservation', 'Growth', 'Income', 'Strategic Allocation'] },
+                { id: 'riskProfile', label: 'Risk Profile', type: 'select', required: true, width: 'half', options: ['Conservative', 'Balanced', 'Growth', 'Opportunistic'] }
+            ],
             introduction: 'Instrak Venture Capital Berhad (IVC) provides exclusive Asset Under Management (AUM) services tailored for corporations, institutional investors, family offices, and ultra-high-net-worth individuals (UHNWIs). Our approach is mandate-driven, highly disciplined, and globally informed, designed to align capital with strategic priorities, risk management, and long-term value creation.',
             philosophy: [
                 { title: 'Institutional Rigour', desc: 'Decisions guided by robust governance and analytical frameworks.' },
@@ -244,12 +349,20 @@ const ServiceContentManager = () => {
     useEffect(() => {
         if (content?.pages && !loading) {
             // Ensure every service has a fields array for the builder and migrate subtitle to introduction if needed
-            const initializedPages = content.pages.map(p => ({
-                ...p,
-                fields: p.fields || [],
-                introduction: p.introduction || p.subtitle || ''
-            }));
-            setServices(initializedPages);
+            const mergedServices = defaultServices.map(defaultSvc => {
+                const dbSvc = content.pages.find(p => p.id === defaultSvc.id);
+                if (dbSvc) {
+                    return {
+                        ...defaultSvc,
+                        ...dbSvc,
+                        // Priority to DB fields if they exist, otherwise use defaults
+                        fields: (dbSvc.fields && dbSvc.fields.length > 0) ? dbSvc.fields : (defaultSvc.fields || []),
+                        introduction: dbSvc.introduction || dbSvc.subtitle || defaultSvc.subtitle || ''
+                    };
+                }
+                return defaultSvc;
+            });
+            setServices(mergedServices);
         }
     }, [content, loading]);
 
@@ -390,11 +503,17 @@ const ServiceContentManager = () => {
             </div>
 
             <div className="flex border-b border-gray-200 px-2 overflow-x-auto">
-                <button 
+                <button
                     onClick={() => setActiveTab('content')}
                     className={`px-6 py-4 text-sm font-bold whitespace-nowrap transition-all border-b-2 ${activeTab === 'content' ? 'border-[var(--accent-primary)] text-[var(--accent-primary)]' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
                 >
                     Detailed Page Content & Overview
+                </button>
+                <button
+                    onClick={() => setActiveTab('form')}
+                    className={`px-6 py-4 text-sm font-bold whitespace-nowrap transition-all border-b-2 ${activeTab === 'form' ? 'border-[var(--accent-primary)] text-[var(--accent-primary)]' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                >
+                    Inquiry Form Builder
                 </button>
             </div>
 
@@ -613,11 +732,38 @@ const ServiceContentManager = () => {
                                         </Droppable>
                                     </div>
                                 )}
-                                
+
                             </div>
                         </div>
                     </div>
                 </DragDropContext>
+            ) : activeTab === 'form' ? (
+                <div className="glass-card p-8">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="mb-8">
+                            <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2">Service Inquiry Form</h2>
+                            <p className="text-[var(--text-secondary)]">Customize the fields your potential clients need to fill out for this specific service.</p>
+                        </div>
+
+                        <FormBuilder
+                            fields={service.fields || []}
+                            onChange={(newFields) => handleUpdateService(service.id, 'fields', newFields)}
+                        />
+
+                        <div className="mt-12 p-6 bg-blue-50 rounded-xl border border-blue-100 flex items-start gap-4">
+                            <div className="p-2 bg-blue-100 text-[var(--accent-primary)] rounded-lg">
+                                <Settings2 size={20} />
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-[var(--accent-primary)] mb-1">Developer Note</h4>
+                                <p className="text-sm text-blue-700 leading-relaxed">
+                                    The fields configured here will automatically update the inquiry form on the main website for this service.
+                                    Common fields like <strong>Full Name</strong> and <strong>Email</strong> are recommended for all forms.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             ) : null}
         </div>
     );

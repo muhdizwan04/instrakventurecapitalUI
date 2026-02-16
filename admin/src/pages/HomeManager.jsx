@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Eye, RefreshCw, Info, Plus, Trash2, Layout, Target, Zap, Building2, TrendingUp, Wallet, ShieldCheck, Scale, GripVertical, HelpCircle, Loader2, FileText } from 'lucide-react';
+import { Save, Eye, RefreshCw, Info, Plus, Trash2, Layout, Target, Zap, Building2, TrendingUp, Wallet, ShieldCheck, Scale, GripVertical, HelpCircle, Loader2, FileText, RotateCcw, ChevronDown, ChevronUp, Type, AlignLeft, MousePointer, Minus } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import toast from 'react-hot-toast';
 import IconPicker from '../components/IconPicker';
+import ImageUpload from '../components/ImageUpload';
 import * as LucideIcons from 'lucide-react';
 import { useContent } from '../hooks/useContent';
 import klSkyline from '../assets/kl-skyline.png';
@@ -23,23 +24,22 @@ const HomeManager = () => {
 
     // Default content structure
     const defaultFormData = {
-        heroTitle: 'Your Venture\nCapital Partners',
-        heroSubtitle: 'Governance • Transparency • Integrity',
-        heroDescription: 'Providing foundational governance and integrity essential for scaling visionary industrial leaders across the ASEAN region.',
-        buttons: [
+        // Hero blocks – ordered content elements
+        heroBlocks: [
+            { id: 'hb-1', type: 'title', content: 'Your Venture\nCapital Partner', color: '#1A365D', highlightColor: '#B8860B' },
+            { id: 'hb-2', type: 'subtitle', content: 'Governance • Transparency • Integrity', color: '#B8860B' },
+            { id: 'hb-3', type: 'text', content: 'Providing foundational governance and integrity essential for scaling visionary industrial leaders across the ASEAN region.', color: '#4A5568' },
             {
-                id: 1,
-                link: "/investors",
-                text: "Register as Investor ",
-                variant: "solid"
-            },
-            {
-                id: 2,
-                link: "/project-listings",
-                text: "Potential Project Listing",
-                variant: "outline"
+                id: 'hb-4', type: 'buttons', buttons: [
+                    { id: 1, text: 'Register as Investor', link: '/investors', variant: 'solid' },
+                    { id: 2, text: 'Potential Project Listing', link: '/project-listings', variant: 'outline' }
+                ], solidBg: '#1A365D', outlineColor: '#B8860B'
             }
         ],
+        // Hero background settings
+        heroBackgroundImage: '',
+        heroBgOpacity: 0.25,
+        heroOverlayOpacity: 0.92,
         servicesSubtitle: "Comprehensive financial solutions tailored for your growth",
         servicesTitle: "Our Portfolio",
         industries: [
@@ -77,25 +77,65 @@ const HomeManager = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // Button Logic
-    const handleAddButton = () => {
-        if (formData.buttons.length >= 4) return toast.error('Max 4 buttons allowed');
-        setFormData(prev => ({ ...prev, buttons: [...prev.buttons, { id: Date.now(), text: 'New Button', link: '/contact', variant: 'solid' }] }));
+    // ── Hero Block Logic ──
+    const heroBlocks = formData.heroBlocks || defaultFormData.heroBlocks;
+
+    const updateHeroBlocks = (newBlocks) => {
+        setFormData(prev => ({ ...prev, heroBlocks: newBlocks }));
     };
-    const handleRemoveButton = (id) => setFormData(prev => ({ ...prev, buttons: prev.buttons.filter(b => b.id !== id) }));
-    const handleButtonChange = (id, field, value) => {
-        setFormData(prev => ({ ...prev, buttons: prev.buttons.map(b => b.id === id ? { ...b, [field]: value } : b) }));
+
+    const addHeroBlock = (type) => {
+        const id = `hb-${Date.now()}`;
+        let newBlock;
+        switch (type) {
+            case 'title':
+                newBlock = { id, type: 'title', content: 'New Title', color: '#1A365D', highlightColor: '#B8860B' };
+                break;
+            case 'subtitle':
+                newBlock = { id, type: 'subtitle', content: 'New Subtitle', color: '#B8860B' };
+                break;
+            case 'text':
+                newBlock = { id, type: 'text', content: 'Enter your text here...', color: '#4A5568' };
+                break;
+            case 'buttons':
+                newBlock = { id, type: 'buttons', buttons: [{ id: Date.now(), text: 'New Button', link: '/contact', variant: 'solid' }], solidBg: '#1A365D', outlineColor: '#B8860B' };
+                break;
+            case 'spacer':
+                newBlock = { id, type: 'spacer', height: 24 };
+                break;
+            default: return;
+        }
+        updateHeroBlocks([...heroBlocks, newBlock]);
+    };
+
+    const updateHeroBlock = (blockId, updates) => {
+        updateHeroBlocks(heroBlocks.map(b => b.id === blockId ? { ...b, ...updates } : b));
+    };
+
+    const removeHeroBlock = (blockId) => {
+        updateHeroBlocks(heroBlocks.filter(b => b.id !== blockId));
+    };
+
+    // Button management within a buttons block
+    const addButtonToBlock = (blockId) => {
+        const block = heroBlocks.find(b => b.id === blockId);
+        if (!block || (block.buttons || []).length >= 4) return toast.error('Max 4 buttons per block');
+        updateHeroBlock(blockId, { buttons: [...(block.buttons || []), { id: Date.now(), text: 'New Button', link: '/contact', variant: 'solid' }] });
+    };
+
+    const updateButtonInBlock = (blockId, btnId, field, value) => {
+        const block = heroBlocks.find(b => b.id === blockId);
+        if (!block) return;
+        updateHeroBlock(blockId, { buttons: block.buttons.map(btn => btn.id === btnId ? { ...btn, [field]: value } : btn) });
+    };
+
+    const removeButtonFromBlock = (blockId, btnId) => {
+        const block = heroBlocks.find(b => b.id === blockId);
+        if (!block) return;
+        updateHeroBlock(blockId, { buttons: block.buttons.filter(btn => btn.id !== btnId) });
     };
 
     // Services Section Logic - title/subtitle only; individual services managed via Services Manager
-
-    const handleButtonDragEnd = (result) => {
-        if (!result.destination) return;
-        const items = Array.from(formData.buttons);
-        const [reorderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reorderedItem);
-        setFormData(prev => ({ ...prev, buttons: items }));
-    };
 
     // Industries Logic
     const handleIndustryChange = (id, field, value) => {
@@ -191,6 +231,11 @@ const HomeManager = () => {
             const [reorderedItem] = items.splice(source.index, 1);
             items.splice(destination.index, 0, reorderedItem);
             setFormData(prev => ({ ...prev, industries: items }));
+        } else if (source.droppableId === 'heroBlocks') {
+            const items = Array.from(heroBlocks);
+            const [reorderedItem] = items.splice(source.index, 1);
+            items.splice(destination.index, 0, reorderedItem);
+            updateHeroBlocks(items);
         }
     };
 
@@ -274,34 +319,203 @@ const HomeManager = () => {
                         {/* HERO TAB */}
                         {activeTab === 'hero' && (
                             <div className="glass-card p-6 space-y-6">
-                                <h3 className="text-xl font-bold mb-4">Hero Content</h3>
-                                <div>
-                                    <label className="label">Hero Title</label>
-                                    <textarea name="heroTitle" value={formData.heroTitle} onChange={handleChange} rows={2} className="input-field" />
-                                </div>
-                                <div>
-                                    <label className="label">Hero Subtitle</label>
-                                    <input name="heroSubtitle" value={formData.heroSubtitle} onChange={handleChange} className="input-field" />
-                                </div>
-                                <div>
-                                    <label className="label">Description</label>
-                                    <textarea name="heroDescription" value={formData.heroDescription} onChange={handleChange} rows={3} className="input-field" />
+                                {/* ── Live Preview ── */}
+                                <div className="rounded-lg overflow-hidden border border-gray-200 relative" style={{ height: 200 }}>
+                                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(135deg, #FAFBFC 0%, #FFFFFF 50%, #F5F7FA 100%)' }} />
+                                    <img src={formData.heroBackgroundImage || klSkyline} alt="Hero BG" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: formData.heroBgOpacity ?? 0.25 }} />
+                                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: `linear-gradient(135deg, rgba(255,255,255,${formData.heroOverlayOpacity ?? 0.92}) 0%, rgba(255,255,255,${(formData.heroOverlayOpacity ?? 0.92) * 0.92}) 40%, rgba(255,255,255,${(formData.heroOverlayOpacity ?? 0.92) * 0.65}) 70%, rgba(255,255,255,${(formData.heroOverlayOpacity ?? 0.92) * 0.33}) 100%)` }} />
+                                    <div style={{ position: 'absolute', top: 0, left: 0, width: '60%', height: '100%', background: 'linear-gradient(90deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.9) 50%, transparent 100%)' }} />
+                                    <div style={{ position: 'relative', zIndex: 10, padding: '20px 28px' }}>
+                                        {heroBlocks.map(block => {
+                                            if (block.type === 'title') {
+                                                const parts = (block.content || '').split('\n');
+                                                return <div key={block.id}><div style={{ fontSize: 20, fontWeight: 700, color: block.color || '#1A365D', lineHeight: 1.2 }}>{parts[0]}</div>{parts[1] && <div style={{ fontSize: 20, fontWeight: 700, color: block.highlightColor || '#B8860B', lineHeight: 1.2, marginBottom: 6 }}>{parts[1]}</div>}</div>;
+                                            }
+                                            if (block.type === 'subtitle') return <div key={block.id} style={{ fontSize: 10, fontWeight: 600, color: block.color || '#B8860B', letterSpacing: 1.5, marginBottom: 4 }}>{block.content}</div>;
+                                            if (block.type === 'text') return <div key={block.id} style={{ fontSize: 9, color: block.color || '#4A5568', maxWidth: 300, lineHeight: 1.5, marginBottom: 6 }}>{(block.content || '').substring(0, 80)}{(block.content || '').length > 80 ? '…' : ''}</div>;
+                                            if (block.type === 'buttons') return <div key={block.id} style={{ display: 'flex', gap: 6, marginBottom: 4 }}>{(block.buttons || []).map(btn => btn.variant === 'outline' ? <span key={btn.id} style={{ fontSize: 8, padding: '3px 10px', borderRadius: 4, border: `1.5px solid ${block.outlineColor || '#B8860B'}`, color: block.outlineColor || '#B8860B', fontWeight: 700 }}>{btn.text}</span> : <span key={btn.id} style={{ fontSize: 8, padding: '3px 10px', borderRadius: 4, background: block.solidBg || '#1A365D', color: '#fff', fontWeight: 700 }}>{btn.text}</span>)}</div>;
+                                            if (block.type === 'spacer') return <div key={block.id} style={{ height: (block.height || 24) / 3 }} />;
+                                            return null;
+                                        })}
+                                    </div>
+                                    <div className="absolute bottom-0 left-0 right-0 bg-black/30 backdrop-blur-sm px-3 py-1 text-[10px] text-white/80 text-center">Live Preview</div>
                                 </div>
 
-                                <div className="pt-4 border-t border-[var(--border-light)]">
+                                {/* ── Content Blocks (drag-and-drop) ── */}
+                                <div>
                                     <div className="flex justify-between items-center mb-4">
-                                        <label className="font-bold text-sm">Action Buttons</label>
-                                        <button onClick={handleAddButton} className="text-xs text-[var(--accent-primary)] font-bold flex items-center gap-1 hover:underline"><Plus size={14} /> Add Button</button>
-                                    </div>
-                                    {formData.buttons.map(btn => (
-                                        <div key={btn.id} className="p-3 bg-[var(--bg-tertiary)] rounded mb-3 flex gap-3 items-center">
-                                            <input value={btn.text} onChange={(e) => handleButtonChange(btn.id, 'text', e.target.value)} className="input-field text-xs flex-1" placeholder="Label" />
-                                            <select value={btn.link} onChange={(e) => handleButtonChange(btn.id, 'link', e.target.value)} className="input-field text-xs flex-1">
-                                                {AVAILABLE_ROUTES.map(r => <option key={r.path} value={r.path}>{r.label}</option>)}
-                                            </select>
-                                            <button onClick={() => handleRemoveButton(btn.id)} className="text-red-500 hover:text-red-700"><Trash2 size={16} /></button>
+                                        <h3 className="text-xl font-bold">Content Blocks</h3>
+                                        <div className="flex gap-2">
+                                            {[{ type: 'title', icon: Type, label: 'Title' }, { type: 'subtitle', icon: AlignLeft, label: 'Subtitle' }, { type: 'text', icon: FileText, label: 'Text' }, { type: 'buttons', icon: MousePointer, label: 'Buttons' }, { type: 'spacer', icon: Minus, label: 'Spacer' }].map(({ type, icon: Icon, label }) => (
+                                                <button key={type} onClick={() => addHeroBlock(type)} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded flex items-center gap-1 transition-colors">
+                                                    <Icon size={12} /> {label}
+                                                </button>
+                                            ))}
                                         </div>
-                                    ))}
+                                    </div>
+
+                                    <Droppable droppableId="heroBlocks">
+                                        {(provided) => (
+                                            <div ref={provided.innerRef} {...provided.droppableProps} className="space-y-3">
+                                                {heroBlocks.length === 0 && (
+                                                    <div className="text-center py-10 bg-gray-50 rounded border-2 border-dashed border-gray-300 text-gray-400 text-sm">No blocks yet. Add one above to start building your hero section.</div>
+                                                )}
+                                                {heroBlocks.map((block, idx) => (
+                                                    <Draggable key={block.id} draggableId={block.id} index={idx}>
+                                                        {(provided, snapshot) => (
+                                                            <div
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                className={`bg-white p-4 rounded-lg border border-gray-200 group ${snapshot.isDragging ? 'shadow-xl ring-2 ring-blue-400 z-50' : ''}`}
+                                                            >
+                                                                <div className="flex items-center gap-3 mb-3">
+                                                                    <div {...provided.dragHandleProps} className="text-gray-400 hover:text-[var(--accent-primary)] cursor-grab">
+                                                                        <GripVertical size={18} />
+                                                                    </div>
+                                                                    <span className="uppercase text-[10px] font-bold text-gray-400 tracking-wider bg-gray-100 px-2 py-0.5 rounded">{block.type}</span>
+                                                                    <button onClick={() => removeHeroBlock(block.id)} className="ml-auto text-gray-400 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
+                                                                </div>
+
+                                                                {/* ── Title Block ── */}
+                                                                {block.type === 'title' && (
+                                                                    <div className="space-y-3">
+                                                                        <textarea value={block.content} onChange={(e) => updateHeroBlock(block.id, { content: e.target.value })} rows={2} className="input-field" placeholder="Title text (use Enter for second line highlight)" />
+                                                                        <div className="flex gap-4">
+                                                                            <div className="flex items-center gap-2">
+                                                                                <span className="text-xs text-gray-500">Color</span>
+                                                                                <input type="color" value={block.color || '#1A365D'} onChange={(e) => updateHeroBlock(block.id, { color: e.target.value })} className="h-8 w-10 p-0.5 rounded border border-gray-200 cursor-pointer" />
+                                                                                <span className="text-[10px] text-gray-400 font-mono">{block.color || '#1A365D'}</span>
+                                                                            </div>
+                                                                            <div className="flex items-center gap-2">
+                                                                                <span className="text-xs text-gray-500">Highlight</span>
+                                                                                <input type="color" value={block.highlightColor || '#B8860B'} onChange={(e) => updateHeroBlock(block.id, { highlightColor: e.target.value })} className="h-8 w-10 p-0.5 rounded border border-gray-200 cursor-pointer" />
+                                                                                <span className="text-[10px] text-gray-400 font-mono">{block.highlightColor || '#B8860B'}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+
+                                                                {/* ── Subtitle Block ── */}
+                                                                {block.type === 'subtitle' && (
+                                                                    <div className="space-y-3">
+                                                                        <input value={block.content} onChange={(e) => updateHeroBlock(block.id, { content: e.target.value })} className="input-field" placeholder="Subtitle text" />
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className="text-xs text-gray-500">Color</span>
+                                                                            <input type="color" value={block.color || '#B8860B'} onChange={(e) => updateHeroBlock(block.id, { color: e.target.value })} className="h-8 w-10 p-0.5 rounded border border-gray-200 cursor-pointer" />
+                                                                            <span className="text-[10px] text-gray-400 font-mono">{block.color || '#B8860B'}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+
+                                                                {/* ── Text Block ── */}
+                                                                {block.type === 'text' && (
+                                                                    <div className="space-y-3">
+                                                                        <textarea value={block.content} onChange={(e) => updateHeroBlock(block.id, { content: e.target.value })} rows={3} className="input-field" placeholder="Description text" />
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className="text-xs text-gray-500">Color</span>
+                                                                            <input type="color" value={block.color || '#4A5568'} onChange={(e) => updateHeroBlock(block.id, { color: e.target.value })} className="h-8 w-10 p-0.5 rounded border border-gray-200 cursor-pointer" />
+                                                                            <span className="text-[10px] text-gray-400 font-mono">{block.color || '#4A5568'}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+
+                                                                {/* ── Buttons Block ── */}
+                                                                {block.type === 'buttons' && (
+                                                                    <div className="space-y-3">
+                                                                        {(block.buttons || []).map(btn => (
+                                                                            <div key={btn.id} className="p-3 bg-gray-50 rounded flex gap-2 items-center">
+                                                                                <input value={btn.text} onChange={(e) => updateButtonInBlock(block.id, btn.id, 'text', e.target.value)} className="input-field text-xs flex-1" placeholder="Label" />
+                                                                                <select value={btn.link} onChange={(e) => updateButtonInBlock(block.id, btn.id, 'link', e.target.value)} className="input-field text-xs flex-1">
+                                                                                    {AVAILABLE_ROUTES.map(r => <option key={r.path} value={r.path}>{r.label}</option>)}
+                                                                                </select>
+                                                                                <select value={btn.variant} onChange={(e) => updateButtonInBlock(block.id, btn.id, 'variant', e.target.value)} className="input-field text-xs w-24">
+                                                                                    <option value="solid">Solid</option>
+                                                                                    <option value="outline">Outline</option>
+                                                                                </select>
+                                                                                <button onClick={() => removeButtonFromBlock(block.id, btn.id)} className="text-red-500 hover:text-red-700"><Trash2 size={14} /></button>
+                                                                            </div>
+                                                                        ))}
+                                                                        <div className="flex items-center gap-4">
+                                                                            <button onClick={() => addButtonToBlock(block.id)} className="text-xs text-[var(--accent-primary)] font-bold flex items-center gap-1 hover:underline"><Plus size={14} /> Add Button</button>
+                                                                            <div className="flex items-center gap-2 ml-auto">
+                                                                                <span className="text-xs text-gray-500">Solid BG</span>
+                                                                                <input type="color" value={block.solidBg || '#1A365D'} onChange={(e) => updateHeroBlock(block.id, { solidBg: e.target.value })} className="h-7 w-9 p-0.5 rounded border border-gray-200 cursor-pointer" />
+                                                                            </div>
+                                                                            <div className="flex items-center gap-2">
+                                                                                <span className="text-xs text-gray-500">Outline</span>
+                                                                                <input type="color" value={block.outlineColor || '#B8860B'} onChange={(e) => updateHeroBlock(block.id, { outlineColor: e.target.value })} className="h-7 w-9 p-0.5 rounded border border-gray-200 cursor-pointer" />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+
+                                                                {/* ── Spacer Block ── */}
+                                                                {block.type === 'spacer' && (
+                                                                    <div className="flex items-center gap-3">
+                                                                        <span className="text-xs text-gray-500">Height (px)</span>
+                                                                        <input type="range" min="8" max="80" step="4" value={block.height || 24} onChange={(e) => updateHeroBlock(block.id, { height: parseInt(e.target.value) })} className="flex-1" />
+                                                                        <span className="text-sm font-mono w-10 text-right">{block.height || 24}</span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </Draggable>
+                                                ))}
+                                                {provided.placeholder}
+                                            </div>
+                                        )}
+                                    </Droppable>
+                                </div>
+
+                                {/* ── Background Settings ── */}
+                                <div className="pt-6 border-t border-[var(--border-light)] space-y-6">
+                                    <div className="flex justify-between items-center">
+                                        <h3 className="text-xl font-bold">Background Settings</h3>
+                                        <button
+                                            type="button"
+                                            onClick={() => setFormData(prev => ({
+                                                ...prev,
+                                                heroBackgroundImage: '',
+                                                heroBgOpacity: 0.25,
+                                                heroOverlayOpacity: 0.92,
+                                                heroBlocks: defaultFormData.heroBlocks
+                                            }))}
+                                            className="text-xs text-gray-500 hover:text-[var(--accent-primary)] flex items-center gap-1"
+                                        >
+                                            <RotateCcw size={14} /> Reset All to Defaults
+                                        </button>
+                                    </div>
+
+                                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
+                                        <label className="label font-bold">Background Image</label>
+                                        <p className="text-xs text-gray-400 -mt-2">Upload a custom hero background. Leave empty to use the default KL Skyline.</p>
+                                        <div className="max-w-xs">
+                                            <ImageUpload
+                                                value={formData.heroBackgroundImage || ''}
+                                                onChange={(val) => setFormData(prev => ({ ...prev, heroBackgroundImage: val }))}
+                                                aspectRatio="16/9"
+                                                maxSizeMB={2}
+                                                maxWidth={1600}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                            <label className="label font-bold">Background Image Opacity</label>
+                                            <div className="flex items-center gap-3">
+                                                <input type="range" min="0" max="1" step="0.05" value={formData.heroBgOpacity ?? 0.25} onChange={(e) => setFormData(prev => ({ ...prev, heroBgOpacity: parseFloat(e.target.value) }))} className="flex-1" />
+                                                <span className="text-sm font-mono w-10 text-right">{formData.heroBgOpacity ?? 0.25}</span>
+                                            </div>
+                                        </div>
+                                        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                            <label className="label font-bold">White Overlay Opacity</label>
+                                            <div className="flex items-center gap-3">
+                                                <input type="range" min="0" max="1" step="0.05" value={formData.heroOverlayOpacity ?? 0.92} onChange={(e) => setFormData(prev => ({ ...prev, heroOverlayOpacity: parseFloat(e.target.value) }))} className="flex-1" />
+                                                <span className="text-sm font-mono w-10 text-right">{formData.heroOverlayOpacity ?? 0.92}</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         )}

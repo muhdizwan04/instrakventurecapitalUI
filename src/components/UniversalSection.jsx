@@ -4,7 +4,7 @@ import { CheckCircle2, ChevronDown, ChevronUp, Image as ImageIcon, Building2, Ar
 import * as LucideIcons from 'lucide-react';
 
 const UniversalSection = ({ section, containerClass = "" }) => {
-    const { title, subtitle, content, items = [], styles = {} } = section;
+    const { title, subtitle, content, items = [], styles = {}, sectionLabel } = section;
     const layoutType = styles.layoutType || 'standard';
 
     const [openItems, setOpenItems] = useState({});
@@ -41,12 +41,12 @@ const UniversalSection = ({ section, containerClass = "" }) => {
 
     // Determine section colors
     const isDarkBg = styles.bgColor === '#0A2540' || styles.bgColor === '#0A1628' || styles.bgColor === '#1A365D';
-    const titleColor = styles.textColor || (isDarkBg ? '#FFFFFF' : '#0A3D62');
-    const subtitleColor = isDarkBg ? 'rgba(255,255,255,0.7)' : '#64748B';
+    const titleColor = styles.titleColor || (isDarkBg ? '#FFFFFF' : '#0A3D62');
+    const subtitleColor = styles.textColor || (isDarkBg ? 'rgba(255,255,255,0.7)' : '#64748B');
     const cardBg = isDarkBg ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.9)';
     const cardBorder = isDarkBg ? 'rgba(255,255,255,0.12)' : 'rgba(10, 61, 98, 0.08)';
-    const itemTextColor = isDarkBg ? '#FFFFFF' : '#1A365D';
-    const itemDescColor = isDarkBg ? 'rgba(255,255,255,0.65)' : '#64748B';
+    const itemTextColor = styles.itemTitleColor || (isDarkBg ? '#FFFFFF' : '#1A365D');
+    const itemDescColor = styles.textColor || (isDarkBg ? 'rgba(255,255,255,0.65)' : '#64748B');
     const accentColor = '#C9A227';
 
     const renderHeader = () => (
@@ -62,9 +62,11 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     style={{
-                        fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
+                        fontSize: styles.titleFontSize ? `${styles.titleFontSize}px` : 'clamp(1.75rem, 4vw, 2.5rem)',
                         fontFamily: 'var(--font-heading)',
-                        fontWeight: 800,
+                        fontWeight: styles.titleFontWeight || 800,
+                        fontStyle: styles.titleFontStyle || 'normal',
+                        textDecoration: styles.titleTextDecoration || 'none',
                         color: titleColor,
                         marginBottom: subtitle ? '1rem' : '0',
                         letterSpacing: '-0.01em',
@@ -73,24 +75,48 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                 >
                     {title}
                 </motion.h2>
-            )}
-            {subtitle && (
-                <motion.p
-                    initial={{ opacity: 0, y: 20 }}
+            )
+            }
+            {sectionLabel && (
+                <motion.h6
+                    initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: 0.1 }}
+                    transition={{ delay: 0.05 }}
                     style={{
-                        fontSize: '1.1rem',
-                        color: subtitleColor,
-                        lineHeight: 1.7,
-                        maxWidth: '650px',
-                        margin: '0 auto'
+                        color: '#D4AF37',
+                        textTransform: 'uppercase',
+                        letterSpacing: '2px',
+                        fontWeight: 'bold',
+                        fontSize: '0.75rem',
+                        marginTop: '0.5rem',
+                        marginBottom: subtitle ? '0.5rem' : '0'
                     }}
                 >
-                    {subtitle}
-                </motion.p>
+                    {sectionLabel}
+                </motion.h6>
             )}
+            {
+                subtitle && (
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.1 }}
+                        style={{
+                            fontSize: `${styles.subtitleFontSize || 17}px`,
+                            color: subtitleColor,
+                            lineHeight: 1.7,
+                            maxWidth: '650px',
+                            margin: (styles.subtitleAlign === 'left') ? '0 auto 0 0' : (styles.subtitleAlign === 'right') ? '0 0 0 auto' : '0 auto',
+                            textAlign: styles.subtitleAlign || 'center',
+                            whiteSpace: 'pre-line'
+                        }}
+                    >
+                        {subtitle}
+                    </motion.p>
+                )
+            }
             {/* Gold accent line */}
             <motion.div
                 initial={{ scaleX: 0 }}
@@ -106,7 +132,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                     transformOrigin: 'center'
                 }}
             />
-        </div>
+        </div >
     );
 
     const renderLayout = () => {
@@ -728,12 +754,16 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                     </div>
                 );
 
-            default: // standard
+            default: { // standard
+                const boxWidthMap = { short: '500px', medium: '800px', full: '100%' };
+                const boxW = boxWidthMap[styles.boxWidth] || '800px';
+                const boxPos = styles.boxPosition || 'center';
+                const boxMargin = boxPos === 'left' ? '0 auto 0 0' : boxPos === 'right' ? '0 0 0 auto' : '0 auto';
                 return (
                     <div style={{
-                        maxWidth: '800px',
-                        margin: '0 auto',
-                        textAlign: styles.textAlign || 'left'
+                        maxWidth: boxW,
+                        margin: boxMargin,
+                        textAlign: styles.contentAlign || 'left'
                     }}>
                         {content && (
                             <motion.div
@@ -750,15 +780,183 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                             >
                                 <div
                                     style={{
-                                        fontSize: '1.05rem',
+                                        fontSize: `${styles.contentFontSize || 16}px`,
                                         lineHeight: 1.9,
-                                        color: isDarkBg ? 'rgba(255,255,255,0.85)' : '#4A5568'
+                                        color: isDarkBg ? 'rgba(255,255,255,0.85)' : '#4A5568',
+                                        whiteSpace: 'pre-line'
                                     }}
                                     dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
                                 />
                             </motion.div>
                         )}
                     </div>
+                );
+            }
+            case 'profile-cards':
+                return (
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                        gap: '2.5rem'
+                    }}>
+                        {displayItems.map((item, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.1 }}
+                                className="group"
+                                style={{
+                                    overflow: 'hidden',
+                                    borderRadius: '24px',
+                                    background: cardBg,
+                                    border: `1px solid ${cardBorder}`,
+                                    transition: 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)',
+                                    textAlign: 'left'
+                                }}
+                            >
+                                <div style={{
+                                    height: '280px',
+                                    background: isDarkBg ? 'rgba(255,255,255,0.05)' : 'linear-gradient(to bottom, #F8FAFC, #E2E8F0)',
+                                    display: 'flex',
+                                    alignItems: 'flex-end',
+                                    justifyContent: 'center',
+                                    position: 'relative',
+                                    overflow: 'hidden'
+                                }}>
+                                    {item.image ? (
+                                        <img
+                                            src={item.image}
+                                            alt={item.title}
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', transition: 'transform 0.8s ease' }}
+                                        />
+                                    ) : (
+                                        <div style={{ textAlign: 'center', paddingBottom: '2rem', opacity: 0.15 }}>
+                                            {getIcon(item.icon) || <div style={{ width: 80, height: 80, borderRadius: '50%', background: isDarkBg ? 'rgba(255,255,255,0.1)' : '#E2E8F0' }} />}
+                                        </div>
+                                    )}
+                                </div>
+                                <div style={{ padding: '1.5rem 2rem', position: 'relative' }}>
+                                    <h3 style={{
+                                        fontSize: '1.25rem',
+                                        marginBottom: '0.4rem',
+                                        color: itemTextColor,
+                                        fontWeight: 800,
+                                        letterSpacing: '-0.01em'
+                                    }}>{item.title}</h3>
+                                    {item.description && (
+                                        <p style={{
+                                            color: accentColor,
+                                            fontWeight: 700,
+                                            fontSize: '0.8rem',
+                                            letterSpacing: '1px',
+                                            textTransform: 'uppercase'
+                                        }}>{item.description}</p>
+                                    )}
+                                    <div style={{
+                                        marginTop: '1rem',
+                                        width: '40px',
+                                        height: '2px',
+                                        background: 'linear-gradient(90deg, #C9A227, #E8D48B)',
+                                        transition: 'width 0.4s ease'
+                                    }} />
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                );
+
+            case 'statement-block':
+                return (
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        style={{
+                            position: 'relative',
+                            background: isDarkBg ? 'rgba(255,255,255,0.06)' : '#FFFFFF',
+                            borderRadius: '24px',
+                            padding: 'clamp(2.5rem, 5vw, 4rem)',
+                            boxShadow: isDarkBg ? 'none' : '0 4px 40px rgba(0,0,0,0.06)',
+                            border: isDarkBg ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(226,232,240,0.8)',
+                            overflow: 'hidden',
+                            maxWidth: '900px',
+                            margin: '0 auto'
+                        }}
+                    >
+                        {/* Decorative background circles */}
+                        <div style={{
+                            position: 'absolute',
+                            top: '-40px',
+                            right: '-40px',
+                            width: '300px',
+                            height: '300px',
+                            borderRadius: '50%',
+                            border: `2px solid ${isDarkBg ? 'rgba(255,255,255,0.04)' : 'rgba(10,61,98,0.04)'}`,
+                            pointerEvents: 'none'
+                        }} />
+                        <div style={{
+                            position: 'absolute',
+                            top: '-10px',
+                            right: '-10px',
+                            width: '220px',
+                            height: '220px',
+                            borderRadius: '50%',
+                            border: `2px solid ${isDarkBg ? 'rgba(255,255,255,0.03)' : 'rgba(10,61,98,0.03)'}`,
+                            pointerEvents: 'none'
+                        }} />
+                        <div style={{
+                            position: 'absolute',
+                            bottom: '-60px',
+                            left: '-60px',
+                            width: '200px',
+                            height: '200px',
+                            borderRadius: '50%',
+                            border: `2px solid ${isDarkBg ? 'rgba(255,255,255,0.03)' : 'rgba(10,61,98,0.03)'}`,
+                            pointerEvents: 'none'
+                        }} />
+
+                        <div style={{ position: 'relative', zIndex: 1 }}>
+                            {displayItems.map((item, i) => (
+                                <div key={i}>
+                                    {i > 0 && (
+                                        <div style={{
+                                            width: '50px',
+                                            height: '3px',
+                                            background: 'linear-gradient(90deg, #C9A227, #E8D48B)',
+                                            borderRadius: '2px',
+                                            margin: '2.5rem 0'
+                                        }} />
+                                    )}
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 15 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: i * 0.15 }}
+                                    >
+                                        <h3 style={{
+                                            fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+                                            fontWeight: 900,
+                                            fontFamily: 'var(--font-heading)',
+                                            color: itemTextColor,
+                                            letterSpacing: '-0.01em',
+                                            marginBottom: '1rem',
+                                            textTransform: 'uppercase'
+                                        }}>{item.title}</h3>
+                                        {item.description && (
+                                            <p style={{
+                                                fontSize: '1rem',
+                                                lineHeight: 1.8,
+                                                color: itemDescColor,
+                                                maxWidth: '650px'
+                                            }}>{item.description}</p>
+                                        )}
+                                    </motion.div>
+                                </div>
+                            ))}
+                        </div>
+                    </motion.div>
                 );
         }
     };
@@ -798,7 +996,58 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                 zIndex: 10
             }}>
                 {renderHeader()}
+
+                {/* Header content — above items */}
+                {content && layoutType !== 'standard' && (styles.contentPosition === 'header' || styles.contentPosition === 'both') && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        style={{
+                            textAlign: styles.contentAlign || 'center',
+                            maxWidth: '800px',
+                            margin: '0 auto 2rem'
+                        }}
+                    >
+                        <div
+                            style={{
+                                fontSize: `${styles.contentFontSize || 16}px`,
+                                lineHeight: 1.8,
+                                color: isDarkBg ? 'rgba(255,255,255,0.7)' : '#64748B',
+                                whiteSpace: 'pre-line'
+                            }}
+                            dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
+                        />
+                    </motion.div>
+                )}
+
                 {renderLayout()}
+
+                {/* Footer content — below items */}
+                {content && layoutType !== 'standard' && layoutType !== 'boxed-group' && layoutType !== 'mind-map' && (styles.contentPosition === 'footer' || styles.contentPosition === 'both' || !styles.contentPosition) && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.3 }}
+                        style={{
+                            textAlign: styles.contentAlign || 'center',
+                            maxWidth: '800px',
+                            margin: '2rem auto 0'
+                        }}
+                    >
+                        <div
+                            style={{
+                                fontSize: `${styles.contentFontSize || 16}px`,
+                                lineHeight: 1.8,
+                                color: isDarkBg ? 'rgba(255,255,255,0.7)' : '#64748B',
+                                fontStyle: 'italic',
+                                whiteSpace: 'pre-line'
+                            }}
+                            dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
+                        />
+                    </motion.div>
+                )}
             </div>
         </section>
     );

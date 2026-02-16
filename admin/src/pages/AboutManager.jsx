@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Plus, Trash2, Loader2, GripVertical, Target, Users, Handshake, Edit, Building2, LayoutTemplate, Star, Lightbulb, Award, Eye, Scale, ChevronDown, ChevronUp, Palette, Type, AlignLeft, AlignCenter, AlignRight, Bold, Globe, Shield, FileText, UserCheck, Briefcase, MessageSquare, X, Columns, List, Grid3X3, Image, LayoutGrid } from 'lucide-react';
+import { Save, Plus, Trash2, Loader2, GripVertical, Target, Users, Handshake, Edit, Building2, LayoutTemplate, Star, Lightbulb, Award, Eye, Scale, ChevronDown, ChevronUp, Palette, Type, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, Minus, AArrowUp, Globe, Shield, FileText, UserCheck, Briefcase, MessageSquare, X, Columns, List, Grid3X3, Image, LayoutGrid } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
@@ -193,6 +193,8 @@ const LAYOUT_OPTIONS = [
     { value: 'mind-map', label: 'Mind Map' },
     { value: 'icon-group', label: 'Icon Group' },
     { value: 'image-grid', label: 'Image Grid' },
+    { value: 'profile-cards', label: 'Profile Cards' },
+    { value: 'statement-block', label: 'Statement Block' },
 ];
 
 // ──────────────────────────────────────────────
@@ -233,18 +235,36 @@ const InlineStyleControls = ({ styles = {}, onUpdate }) => {
                     </div>
                 )}
 
+                {/* Title Color */}
+                <div>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Title Color</label>
+                    <div className="flex items-center gap-2">
+                        <input type="color" value={styles.titleColor || '#1A365D'} onChange={e => update('titleColor', e.target.value)} className="w-8 h-8 rounded border cursor-pointer" />
+                        <input type="text" value={styles.titleColor || '#1A365D'} onChange={e => update('titleColor', e.target.value)} className="input-field text-[10px] font-mono flex-1 py-1" />
+                    </div>
+                </div>
+
                 {/* Text Color */}
                 <div>
                     <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Text Color</label>
                     <div className="flex items-center gap-2">
-                        <input type="color" value={styles.textColor || '#1A365D'} onChange={e => update('textColor', e.target.value)} className="w-8 h-8 rounded border cursor-pointer" />
-                        <input type="text" value={styles.textColor || '#1A365D'} onChange={e => update('textColor', e.target.value)} className="input-field text-[10px] font-mono flex-1 py-1" />
+                        <input type="color" value={styles.textColor || '#64748B'} onChange={e => update('textColor', e.target.value)} className="w-8 h-8 rounded border cursor-pointer" />
+                        <input type="text" value={styles.textColor || '#64748B'} onChange={e => update('textColor', e.target.value)} className="input-field text-[10px] font-mono flex-1 py-1" />
                     </div>
                 </div>
 
-                {/* Text Alignment */}
+                {/* Item Title Color */}
                 <div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Alignment</label>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Item Title Color</label>
+                    <div className="flex items-center gap-2">
+                        <input type="color" value={styles.itemTitleColor || '#1A365D'} onChange={e => update('itemTitleColor', e.target.value)} className="w-8 h-8 rounded border cursor-pointer" />
+                        <input type="text" value={styles.itemTitleColor || '#1A365D'} onChange={e => update('itemTitleColor', e.target.value)} className="input-field text-[10px] font-mono flex-1 py-1" />
+                    </div>
+                </div>
+
+                {/* Title Alignment */}
+                <div>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Title Align</label>
                     <div className="flex bg-white p-1 rounded-lg border border-gray-200 h-8">
                         {[{ v: 'left', icon: AlignLeft }, { v: 'center', icon: AlignCenter }, { v: 'right', icon: AlignRight }].map(({ v, icon: Icon }) => (
                             <button key={v} onClick={() => update('textAlign', v)}
@@ -254,6 +274,160 @@ const InlineStyleControls = ({ styles = {}, onUpdate }) => {
                         ))}
                     </div>
                 </div>
+
+                {/* Subtitle Alignment */}
+                <div>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Subtitle Align</label>
+                    <div className="flex bg-white p-1 rounded-lg border border-gray-200 h-8">
+                        {[{ v: 'left', icon: AlignLeft }, { v: 'center', icon: AlignCenter }, { v: 'right', icon: AlignRight }].map(({ v, icon: Icon }) => (
+                            <button key={v} onClick={() => update('subtitleAlign', v)}
+                                className={`flex-1 flex items-center justify-center rounded text-xs transition-all ${(styles.subtitleAlign || 'center') === v ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}>
+                                <Icon size={14} />
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Content Alignment */}
+                <div>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Content Align</label>
+                    <div className="flex bg-white p-1 rounded-lg border border-gray-200 h-8">
+                        {[{ v: 'left', icon: AlignLeft }, { v: 'center', icon: AlignCenter }, { v: 'right', icon: AlignRight }].map(({ v, icon: Icon }) => (
+                            <button key={v} onClick={() => update('contentAlign', v)}
+                                className={`flex-1 flex items-center justify-center rounded text-xs transition-all ${styles.contentAlign === v ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}>
+                                <Icon size={14} />
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Title Formatting */}
+            <div>
+                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                    <Type size={12} /> Title Style
+                </div>
+                <div className="flex bg-white p-1 rounded-lg border border-gray-200 h-9 gap-0.5">
+                    <button onClick={() => update('titleFontWeight', styles.titleFontWeight === 'bold' ? 'normal' : 'bold')}
+                        className={`flex-1 flex items-center justify-center rounded text-xs font-bold transition-all ${styles.titleFontWeight === 'bold' ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}
+                        title="Bold">
+                        <Bold size={14} />
+                    </button>
+                    <button onClick={() => update('titleFontStyle', styles.titleFontStyle === 'italic' ? 'normal' : 'italic')}
+                        className={`flex-1 flex items-center justify-center rounded text-xs transition-all ${styles.titleFontStyle === 'italic' ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}
+                        title="Italic">
+                        <Italic size={14} />
+                    </button>
+                    <button onClick={() => update('titleTextDecoration', styles.titleTextDecoration === 'underline' ? 'none' : 'underline')}
+                        className={`flex-1 flex items-center justify-center rounded text-xs transition-all ${styles.titleTextDecoration === 'underline' ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}
+                        title="Underline">
+                        <Underline size={14} />
+                    </button>
+                    <button onClick={() => { update('titleFontWeight', 'normal'); update('titleFontStyle', 'normal'); update('titleTextDecoration', 'none'); }}
+                        className={`flex-1 flex items-center justify-center rounded text-xs transition-all ${(!styles.titleFontWeight || styles.titleFontWeight === 'normal') && (!styles.titleFontStyle || styles.titleFontStyle === 'normal') && (!styles.titleTextDecoration || styles.titleTextDecoration === 'none') ? 'bg-gray-200 text-gray-700' : 'text-gray-400 hover:text-gray-600'}`}
+                        title="Reset to Normal">
+                        <Minus size={14} />
+                    </button>
+                </div>
+                {/* Preview */}
+                <div className="mt-2 px-3 py-2 bg-white rounded border border-gray-100">
+                    <span className="text-xs text-gray-400">Preview: </span>
+                    <span style={{
+                        fontWeight: styles.titleFontWeight || 'normal',
+                        fontStyle: styles.titleFontStyle || 'normal',
+                        textDecoration: styles.titleTextDecoration || 'none',
+                        textAlign: styles.textAlign || 'left',
+                        fontSize: '14px',
+                        color: styles.textColor || '#1A365D'
+                    }}>Sample Title Text</span>
+                </div>
+            </div>
+
+            {/* Title Font Size */}
+            <div>
+                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                    <AArrowUp size={12} /> Title Size
+                </div>
+                <div className="flex items-center gap-3">
+                    <input type="range" min="20" max="48" step="1" value={styles.titleFontSize || 32}
+                        onChange={e => update('titleFontSize', parseInt(e.target.value))} className="flex-1 h-2 accent-blue-500" />
+                    <span className="text-xs font-bold text-gray-600 bg-white border border-gray-200 px-2 py-1 rounded min-w-[42px] text-center">
+                        {styles.titleFontSize || 32}px
+                    </span>
+                </div>
+            </div>
+
+            {/* Subtitle Font Size */}
+            <div>
+                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                    <AArrowUp size={12} /> Subtitle Size
+                </div>
+                <div className="flex items-center gap-3">
+                    <input type="range" min="12" max="28" step="1" value={styles.subtitleFontSize || 17}
+                        onChange={e => update('subtitleFontSize', parseInt(e.target.value))} className="flex-1 h-2 accent-purple-500" />
+                    <span className="text-xs font-bold text-gray-600 bg-white border border-gray-200 px-2 py-1 rounded min-w-[42px] text-center">
+                        {styles.subtitleFontSize || 17}px
+                    </span>
+                </div>
+            </div>
+
+            {/* Content Font Size */}
+            <div>
+                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                    <AArrowUp size={12} /> Content Size
+                </div>
+                <div className="flex items-center gap-3">
+                    <input type="range" min="12" max="24" step="1" value={styles.contentFontSize || 16}
+                        onChange={e => update('contentFontSize', parseInt(e.target.value))} className="flex-1 h-2 accent-green-500" />
+                    <span className="text-xs font-bold text-gray-600 bg-white border border-gray-200 px-2 py-1 rounded min-w-[42px] text-center">
+                        {styles.contentFontSize || 16}px
+                    </span>
+                </div>
+            </div>
+
+            {/* Box Width */}
+            <div>
+                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                    <Columns size={12} /> Box Width
+                </div>
+                <div className="flex bg-white p-1 rounded-lg border border-gray-200 h-9 gap-0.5">
+                    {[{ v: 'short', label: 'Short' }, { v: 'medium', label: 'Medium' }, { v: 'full', label: 'Full' }].map(({ v, label }) => (
+                        <button key={v} onClick={() => update('boxWidth', v)}
+                            className={`flex-1 flex items-center justify-center rounded text-[11px] font-bold transition-all ${(styles.boxWidth || 'medium') === v ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}>
+                            {label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Box Position */}
+            <div>
+                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                    <AlignCenter size={12} /> Box Position
+                </div>
+                <div className="flex bg-white p-1 rounded-lg border border-gray-200 h-9 gap-0.5">
+                    {[{ v: 'left', icon: AlignLeft }, { v: 'center', icon: AlignCenter }, { v: 'right', icon: AlignRight }].map(({ v, icon: Icon }) => (
+                        <button key={v} onClick={() => update('boxPosition', v)}
+                            className={`flex-1 flex items-center justify-center rounded text-xs transition-all ${(styles.boxPosition || 'center') === v ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}>
+                            <Icon size={14} />
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Content Position */}
+            <div>
+                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                    <Type size={12} /> Content Position
+                </div>
+                <div className="flex bg-white p-1 rounded-lg border border-gray-200 h-9 gap-0.5">
+                    {[{ v: 'header', label: 'Header' }, { v: 'footer', label: 'Footer' }, { v: 'both', label: 'Both' }].map(({ v, label }) => (
+                        <button key={v} onClick={() => update('contentPosition', v)}
+                            className={`flex-1 flex items-center justify-center rounded text-[11px] font-bold transition-all ${(styles.contentPosition || 'footer') === v ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}>
+                            {label}
+                        </button>
+                    ))}
+                </div>
             </div>
         </div>
     );
@@ -262,7 +436,7 @@ const InlineStyleControls = ({ styles = {}, onUpdate }) => {
 // ──────────────────────────────────────────────
 // ITEMS MANAGER — shared items editor
 // ──────────────────────────────────────────────
-const ItemsManager = ({ items = [], onChange, showDescription = true }) => {
+const ItemsManager = ({ items = [], onChange }) => {
     const addItem = () => {
         onChange([...items, { id: `item-${Date.now()}`, title: 'New Item', description: '', icon: 'CheckCircle' }]);
     };
@@ -313,9 +487,50 @@ const ItemsManager = ({ items = [], onChange, showDescription = true }) => {
                                                 <div className="flex-1 space-y-2">
                                                     <input value={item.title || ''} onChange={e => updateItem(idx, 'title', e.target.value)}
                                                         className="input-field font-bold text-sm py-1" placeholder="Item Title" />
-                                                    {showDescription && (
-                                                        <textarea value={item.description || ''} onChange={e => updateItem(idx, 'description', e.target.value)}
-                                                            className="input-field text-xs h-14 resize-none py-1" placeholder="Description..." />
+                                                    {/* Image — upload or URL */}
+                                                    {item.image !== undefined && item.image !== null ? (
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 shrink-0 bg-gray-50">
+                                                                <img src={item.image} alt="" className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none'; }} />
+                                                            </div>
+                                                            <input value={item.image || ''} onChange={e => updateItem(idx, 'image', e.target.value)}
+                                                                className="input-field text-[10px] py-1 flex-1 font-mono" placeholder="Paste image URL..." />
+                                                            <label className="text-[10px] text-blue-500 hover:text-blue-700 cursor-pointer shrink-0 bg-blue-50 px-2 py-1 rounded border border-blue-100 font-bold">
+                                                                Upload
+                                                                <input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={e => {
+                                                                    const file = e.target.files[0];
+                                                                    if (file) {
+                                                                        const reader = new FileReader();
+                                                                        reader.onload = (ev) => updateItem(idx, 'image', ev.target.result);
+                                                                        reader.readAsDataURL(file);
+                                                                    }
+                                                                }} />
+                                                            </label>
+                                                            <button onClick={() => updateItem(idx, 'image', null)}
+                                                                className="text-gray-300 hover:text-red-500 text-xs p-0.5 shrink-0" title="Remove image">
+                                                                ✕
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <button onClick={() => updateItem(idx, 'image', '')}
+                                                            className="text-[10px] text-gray-400 hover:text-blue-500 flex items-center gap-1">
+                                                            <Plus size={10} /> Add Image
+                                                        </button>
+                                                    )}
+                                                    {item.description !== undefined && item.description !== null ? (
+                                                        <div className="relative">
+                                                            <textarea value={item.description || ''} onChange={e => updateItem(idx, 'description', e.target.value)}
+                                                                className="input-field text-xs h-14 resize-none py-1 pr-8" placeholder="Description..." />
+                                                            <button onClick={() => updateItem(idx, 'description', null)}
+                                                                className="absolute top-1 right-1 text-gray-300 hover:text-red-500 text-xs p-0.5 rounded" title="Remove description">
+                                                                ✕
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <button onClick={() => updateItem(idx, 'description', '')}
+                                                            className="text-[10px] text-gray-400 hover:text-blue-500 flex items-center gap-1">
+                                                            <Plus size={10} /> Add Description
+                                                        </button>
                                                     )}
                                                 </div>
                                                 <button onClick={() => removeItem(idx)} className="text-gray-300 hover:text-red-500 pt-1">
@@ -522,7 +737,11 @@ const AboutManager = () => {
     const renderHeroEditor = (s) => (
         <div className="space-y-4">
             <div><label className="label">Page Title</label><input value={s.title || ''} onChange={e => updateSection(s.id, { title: e.target.value })} className="input-field font-bold text-lg" /></div>
-            <div><label className="label">Subtitle</label><textarea rows={3} value={s.subtitle || ''} onChange={e => updateSection(s.id, { subtitle: e.target.value })} className="input-field" /></div>
+            <div>
+                <label className="label">Subtitle</label>
+                <textarea rows={3} value={s.subtitle || ''} onChange={e => updateSection(s.id, { subtitle: e.target.value })} className="input-field" />
+                <p className="text-[10px] text-gray-400 mt-1">Press Enter for new line. Press Enter twice for paragraph gap.</p>
+            </div>
             <InlineStyleControls styles={s.styles || {}} onUpdate={(st) => updateSectionStyles(s.id, st)} />
         </div>
     );
@@ -568,6 +787,25 @@ const AboutManager = () => {
 
     const renderBoardEditor = (s) => (
         <div className="space-y-4">
+            {/* Header Fields */}
+            <div className="space-y-3 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div>
+                    <label className="label">Section Label</label>
+                    <input value={s.sectionLabel || ''} onChange={e => updateSection(s.id, { sectionLabel: e.target.value })}
+                        className="input-field text-xs text-amber-700 font-bold" placeholder="e.g. Leadership" />
+                </div>
+                <div>
+                    <label className="label">Title</label>
+                    <input value={s.title || ''} onChange={e => updateSection(s.id, { title: e.target.value })}
+                        className="input-field font-bold" placeholder="Board of Directors" />
+                </div>
+                <div>
+                    <label className="label">Subtitle</label>
+                    <input value={s.subtitle || ''} onChange={e => updateSection(s.id, { subtitle: e.target.value })}
+                        className="input-field text-sm" placeholder="Subtitle..." />
+                </div>
+            </div>
+
             <div className="flex justify-between items-center">
                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Directors — drag to reorder</span>
                 <button onClick={addDirector} className="text-xs flex items-center gap-1 text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 font-bold border border-blue-100"><Plus size={14} /> Add Director</button>
@@ -709,6 +947,7 @@ const AboutManager = () => {
         return (
             <div className="space-y-4">
                 <div><label className="label">Title</label><input value={s.title || ''} onChange={e => updateSection(s.id, { title: e.target.value })} className="input-field font-bold text-lg" /></div>
+                <div><label className="label">Section Label <span className="text-gray-400 font-normal">(optional, shown below title)</span></label><input value={s.sectionLabel || ''} onChange={e => updateSection(s.id, { sectionLabel: e.target.value })} className="input-field text-xs text-amber-700 font-bold" placeholder="e.g. Leadership, Our Team" /></div>
                 <div><label className="label">Subtitle</label><input value={s.subtitle || ''} onChange={e => updateSection(s.id, { subtitle: e.target.value })} className="input-field" placeholder="Brief description..." /></div>
 
                 {/* Layout Type */}
@@ -726,12 +965,13 @@ const AboutManager = () => {
                 {/* Content — for standard layout or as additional text */}
                 <div>
                     <label className="label">Content / Text {isStructured ? '(Footer text, optional)' : ''}</label>
-                    <textarea rows={isStructured ? 3 : 8} value={s.content || ''} onChange={e => updateSection(s.id, { content: e.target.value })} className="input-field text-sm" placeholder="Enter text content..." />
+                    <textarea rows={isStructured ? 3 : 8} value={s.content || ''} onChange={e => updateSection(s.id, { content: e.target.value })} className="input-field text-sm" placeholder="Enter text content..." style={{ fontSize: `${s.styles?.contentFontSize || 14}px` }} />
+                    <p className="text-[10px] text-gray-400 mt-1">Press Enter for new line. Press Enter twice for paragraph gap.</p>
                 </div>
 
                 {/* Items — for structured layouts */}
                 {isStructured && (
-                    <ItemsManager items={s.items || []} onChange={items => updateSection(s.id, { items })} showDescription={['grid', 'cards', 'accordion', 'image-grid', 'icon-group'].includes(layoutType)} />
+                    <ItemsManager items={s.items || []} onChange={items => updateSection(s.id, { items })} />
                 )}
 
                 <InlineStyleControls styles={s.styles || {}} onUpdate={(st) => updateSectionStyles(s.id, st)} />
@@ -869,7 +1109,7 @@ const AboutManager = () => {
                                 <label className="text-[10px] font-bold text-gray-400 uppercase block mb-2">Layout Type</label>
                                 <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
                                     {LAYOUT_OPTIONS.map(o => {
-                                        const layoutIcons = { standard: Type, list: List, grid: Grid3X3, cards: Columns, accordion: ChevronDown, 'boxed-group': LayoutGrid, 'mind-map': Globe, 'icon-group': Star, 'image-grid': Image };
+                                        const layoutIcons = { standard: Type, list: List, grid: Grid3X3, cards: Columns, accordion: ChevronDown, 'boxed-group': LayoutGrid, 'mind-map': Globe, 'icon-group': Star, 'image-grid': Image, 'profile-cards': Users, 'statement-block': FileText };
                                         const LIcon = layoutIcons[o.value] || Type;
                                         return (
                                             <button key={o.value} onClick={() => setNewSectionForm(p => ({ ...p, layoutType: o.value }))}

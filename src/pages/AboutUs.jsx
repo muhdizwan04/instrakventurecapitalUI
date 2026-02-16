@@ -247,6 +247,7 @@ const AboutUs = () => {
                     title={section.title}
                     subtitle={section.subtitle}
                     textColor={styles.textColor}
+                    sectionStyles={styles}
                     style={{ background: 'transparent', position: 'relative', zIndex: 1 }}
                 />
             </div>
@@ -344,11 +345,31 @@ const AboutUs = () => {
                 )}
                 <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: styles.textAlign || 'center' }}>
                     <div style={{ textAlign: styles.textAlign || 'center', marginBottom: '4rem' }}>
-                        <h6 style={{ color: '#D4AF37', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>Leadership</h6>
-                        <h2 className="section-title" style={{ marginTop: '0.5rem', color: styles.textColor || '#1A365D' }}>{section.title || 'Board of Directors'}</h2>
-                        <p style={{ maxWidth: '600px', margin: '1rem auto 0', color: styles.textColor ? styles.textColor : '#64748B', opacity: styles.textColor ? 0.8 : 1 }}>
-                            {section.subtitle || 'Guided by seasoned leaders with a commitment to integrity, compliance, and industrial excellence.'}
-                        </p>
+                        {(section.sectionLabel || section.sectionLabel === undefined) && (
+                            <h6 style={{ color: '#D4AF37', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+                                {section.sectionLabel !== undefined ? section.sectionLabel : 'Leadership'}
+                            </h6>
+                        )}
+                        <h2 className="section-title" style={{
+                            marginTop: '0.5rem',
+                            color: styles.textColor || '#1A365D',
+                            fontWeight: styles.titleFontWeight || 800,
+                            fontStyle: styles.titleFontStyle || 'normal',
+                            textDecoration: styles.titleTextDecoration || 'none',
+                            fontSize: styles.titleFontSize ? `${styles.titleFontSize}px` : undefined
+                        }}>{section.title || 'Board of Directors'}</h2>
+                        {section.subtitle && (
+                            <p style={{
+                                maxWidth: '600px',
+                                margin: (styles.subtitleAlign === 'left') ? '1rem auto 0 0' : (styles.subtitleAlign === 'right') ? '1rem 0 0 auto' : '1rem auto 0',
+                                textAlign: styles.subtitleAlign || 'center',
+                                color: styles.textColor ? styles.textColor : '#64748B',
+                                opacity: styles.textColor ? 0.8 : 1,
+                                fontSize: styles.subtitleFontSize ? `${styles.subtitleFontSize}px` : undefined
+                            }}>
+                                {section.subtitle}
+                            </p>
+                        )}
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2.5rem' }}>
@@ -442,7 +463,13 @@ const AboutUs = () => {
                                 {/* Chubb */}
                                 {partners.map((partner, i) => (
                                     <div key={partner.id || i} style={{ border: '1px solid #E2E8F0', borderRadius: '16px', padding: '3rem', position: 'relative', background: 'white' }}>
-                                        <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}><ShieldCheck size={24} color="#D4AF37" /></div>
+                                        {partner.logo ? (
+                                            <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+                                                <img src={partner.logo} alt={partner.name} style={{ maxHeight: '60px', maxWidth: '180px', objectFit: 'contain' }} />
+                                            </div>
+                                        ) : (
+                                            <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}><ShieldCheck size={24} color="#D4AF37" /></div>
+                                        )}
                                         <h3 style={{ fontSize: '1.5rem', color: '#1A365D', fontWeight: 'bold', marginBottom: '0.5rem' }}>{partner.name}</h3>
                                         <span style={{ display: 'inline-block', background: '#F0F9FF', color: '#0369A1', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600', marginBottom: '2rem' }}>
                                             {partner.category}
@@ -458,7 +485,13 @@ const AboutUs = () => {
                                 {/* Banks */}
                                 {banks.map((bank, i) => (
                                     <div key={bank.id || i} style={{ border: '1px solid #E2E8F0', borderRadius: '16px', padding: '3rem', position: 'relative', background: 'white' }}>
-                                        <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}><Building2 size={24} color="#D4AF37" /></div>
+                                        {bank.logo ? (
+                                            <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+                                                <img src={bank.logo} alt={bank.name} style={{ maxHeight: '60px', maxWidth: '180px', objectFit: 'contain' }} />
+                                            </div>
+                                        ) : (
+                                            <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}><Building2 size={24} color="#D4AF37" /></div>
+                                        )}
                                         <h3 style={{ fontSize: '1.5rem', color: '#1A365D', fontWeight: 'bold', marginBottom: '0.5rem' }}>{bank.name}</h3>
                                         <span style={{ display: 'inline-block', background: '#F0FDF4', color: '#166534', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600', marginBottom: '2rem' }}>
                                             {bank.role}

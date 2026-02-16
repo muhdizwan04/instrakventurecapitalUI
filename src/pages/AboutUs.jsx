@@ -14,39 +14,58 @@ const AboutUs = () => {
     // 1. About Page Content (Master of Layout)
     const defaultAbout = {
         sections: [
-            { id: 'hero', type: 'hero', title: 'Mission, Vision & Values', subtitle: 'The foundational pillars of Instrak Venture Capital Berhad.' },
-            { id: 'mission', type: 'mission' },
             {
-                id: 'philosophy',
-                type: 'custom',
-                title: 'Our Strategic Philosophy',
-                subtitle: 'The principles that guide our investment and advisory mandates.',
+                id: 'hero', type: 'hero',
+                title: 'About Instrak Venture Capital',
+                subtitle: 'A global asset and capital management institution specializing in disciplined portfolio mandates, cross-border wealth structuring, and institutional capital strategies.'
+            },
+            {
+                id: 'identity', type: 'custom',
+                title: 'Our Identity',
+                content: 'Instrak Venture Capital Berhad (IVC) is a global asset and capital management institution specializing in disciplined portfolio mandates, cross-border wealth structuring, and institutional capital strategies.\n\nOperating across Asia, the Middle East, Europe, and the United States, IVC serves a select group of institutional investors, corporations, family offices, and ultra-high-net-worth individuals.\n\nWe do not operate as a retail investment platform.\nWe operate as a mandate-driven capital institution.',
+                items: [],
+                styles: { layoutType: 'standard', bgColor: '#FFFFFF', textColor: '#1A365D', textAlign: 'center' }
+            },
+            {
+                id: 'mission', type: 'mission',
+                missionTitle: 'Our Mission',
+                missionText: 'To structure, protect, and grow global capital through disciplined asset management, transparent governance, and long-term institutional relationships.',
+                visionTitle: 'Our Vision',
+                visionText: 'To become a globally respected asset and capital management institution bridging strategic financial corridors between Asia, the Middle East, and major global markets.',
+                values: [
+                    { id: 'val-1', title: 'Governance', text: 'Every mandate is structured under defined legal, financial, and risk oversight frameworks.', icon: 'ShieldCheck' },
+                    { id: 'val-2', title: 'Transparency', text: 'Investors receive clear reporting, structured fee models, and visibility into portfolio allocation.', icon: 'Eye' },
+                    { id: 'val-3', title: 'Integrity', text: 'We accept engagements selectively, prioritizing long-term institutional relationships over short-term transactions.', icon: 'Scale' }
+                ]
+            },
+            {
+                id: 'philosophy', type: 'custom',
+                title: 'Our Philosophy',
+                subtitle: 'At IVC, capital is not treated as a speculative instrument. It is treated as a long-term responsibility.',
                 items: [
-                    { id: 'phil-1', title: 'Institutional Rigour', description: 'Decisions guided by robust governance and analytical frameworks.', icon: 'Shield' },
-                    { id: 'phil-2', title: 'Global Insight', description: 'Access to diverse markets, alternative investments, and strategic opportunities.', icon: 'Globe' },
-                    { id: 'phil-3', title: 'Tailored Solutions', description: 'Portfolios designed to reflect objectives, risk appetite, and time horizon.', icon: 'Target' },
-                    { id: 'phil-4', title: 'Alignment of Interests', description: 'Mandate structures ensure client objectives remain central.', icon: 'Users' }
+                    { id: 'phil-1', title: 'Governance', description: 'Every mandate is structured under defined legal, financial, and risk oversight frameworks.', icon: 'Shield' },
+                    { id: 'phil-2', title: 'Transparency', description: 'Investors receive clear reporting, structured fee models, and visibility into portfolio allocation.', icon: 'Eye' },
+                    { id: 'phil-3', title: 'Integrity', description: 'We accept engagements selectively, prioritizing long-term institutional relationships over short-term transactions.', icon: 'Scale' }
                 ],
-                styles: { layoutType: 'mindmap', textAlign: 'center', textColor: '#1A365D', bgColor: '#F8FAFC' }
+                styles: { layoutType: 'cards', textAlign: 'center', textColor: '#1A365D', bgColor: '#F8FAFC' }
             },
             { id: 'board', type: 'board', title: 'Board of Directors', subtitle: 'Guided by seasoned leaders with a commitment to integrity, compliance, and industrial excellence.' },
             {
-                id: 'operating-model',
-                type: 'custom',
+                id: 'operating-model', type: 'custom',
                 title: 'Our Operating Model',
-                subtitle: 'IVC functions through a mandate-based engagement structure.',
+                subtitle: 'IVC functions through a mandate-based engagement structure. Each client relationship is:',
+                content: 'This approach ensures discipline, confidentiality, and long-term capital alignment.',
                 items: [
-                    { id: 'op-1', title: 'Evaluated internally' },
-                    { id: 'op-2', title: 'Structurally designed' },
-                    { id: 'op-3', title: 'Risk-assessed' },
-                    { id: 'op-4', title: 'Legally documented' },
-                    { id: 'op-5', title: 'Monitored through institutional reporting protocols' }
+                    { id: 'op-1', title: 'Evaluated internally', icon: 'CheckCircle' },
+                    { id: 'op-2', title: 'Structurally designed', icon: 'CheckCircle' },
+                    { id: 'op-3', title: 'Risk-assessed', icon: 'CheckCircle' },
+                    { id: 'op-4', title: 'Legally documented', icon: 'CheckCircle' },
+                    { id: 'op-5', title: 'Monitored through institutional reporting protocols', icon: 'CheckCircle' }
                 ],
                 styles: { layoutType: 'boxed-group', textAlign: 'left', textColor: '#1A365D', bgColor: '#FFFFFF', groupTitle: 'OPERATIONAL PROTOCOLS' }
             },
             {
-                id: 'capital-corridor',
-                type: 'custom',
+                id: 'capital-corridor', type: 'custom',
                 title: 'Our Global Capital Corridor',
                 subtitle: 'IVC specializes in cross-border capital structuring across key financial regions:',
                 items: [
@@ -57,15 +76,70 @@ const AboutUs = () => {
                 ],
                 styles: { layoutType: 'grid', textAlign: 'center', textColor: '#1A365D', bgColor: '#F8FAFC' }
             },
+            {
+                id: 'who-we-serve', type: 'custom',
+                title: 'Who We Serve',
+                subtitle: 'IVC works with a select group of global clients. Engagement is subject to internal governance review.',
+                items: [
+                    { id: 'serve-1', title: 'Institutional investors', icon: 'Building2' },
+                    { id: 'serve-2', title: 'Family offices', icon: 'Users' },
+                    { id: 'serve-3', title: 'Publicly listed corporations', icon: 'Briefcase' },
+                    { id: 'serve-4', title: 'Strategic investment groups', icon: 'Target' },
+                    { id: 'serve-5', title: 'Ultra-high-net-worth individuals', icon: 'UserCheck' },
+                    { id: 'serve-6', title: 'Sovereign-linked entities', icon: 'Shield' }
+                ],
+                styles: { layoutType: 'icon-group', textAlign: 'center', textColor: '#1A365D', bgColor: '#FFFFFF' }
+            },
+            {
+                id: 'core-pillars', type: 'custom',
+                title: 'Core Business Pillars',
+                items: [
+                    { id: 'pillar-1', title: 'Asset Management', description: 'Institutional portfolio mandates focused on capital preservation, structured yield, and alternative asset allocation.', icon: 'Briefcase' },
+                    { id: 'pillar-2', title: 'Private Wealth & Family Office', description: 'Cross-border wealth structuring for ultra-high-net-worth individuals and multi-generational families.', icon: 'Users' },
+                    { id: 'pillar-3', title: 'Institutional Capital Solutions', description: 'Structured financing and capital market strategies supporting corporate growth and asset-backed investments.', icon: 'Building2' }
+                ],
+                styles: { layoutType: 'cards', textAlign: 'center', textColor: '#1A365D', bgColor: '#F8FAFC' }
+            },
+            {
+                id: 'governance-framework', type: 'custom',
+                title: 'Our Governance Framework',
+                subtitle: 'IVC operates under institutional-grade governance principles.',
+                items: [
+                    { id: 'gov-1', title: 'Risk Oversight', description: 'Structured portfolio allocation models, exposure limits, counterparty evaluation, periodic mandate review.', icon: 'Shield' },
+                    { id: 'gov-2', title: 'Legal Structuring', description: 'Institutional-grade documentation, cross-border compliance alignment, mandate-based engagement protocols.', icon: 'FileText' },
+                    { id: 'gov-3', title: 'Reporting Discipline', description: 'Periodic portfolio reporting, asset allocation transparency, risk exposure summaries.', icon: 'Eye' }
+                ],
+                styles: { layoutType: 'grid', textAlign: 'left', textColor: '#1A365D', bgColor: '#FFFFFF' }
+            },
+            {
+                id: 'leadership-message', type: 'custom',
+                title: 'Leadership Message',
+                subtitle: 'From the Office of the Group CEO',
+                content: 'Instrak Venture Capital Berhad was established with a singular objective: to build a disciplined capital institution that bridges strategic financial corridors across the world.\n\nIn a global environment where capital often moves faster than governance, we believe discipline, transparency, and integrity are the true foundations of sustainable wealth.\n\nOur approach is simple: We do not chase transactions.\nWe structure mandates.\nWe build long-term capital partnerships.',
+                items: [],
+                styles: { layoutType: 'standard', textAlign: 'center', textColor: '#FFFFFF', bgColor: '#0A2540' }
+            },
+            {
+                id: 'institutional-conduct', type: 'custom',
+                title: 'Institutional Conduct',
+                subtitle: 'IVC maintains a selective engagement policy. We do not operate on transaction volume. We operate on mandate integrity.',
+                content: 'Each engagement is:',
+                items: [
+                    { id: 'conduct-1', title: 'Confidential', icon: 'Shield' },
+                    { id: 'conduct-2', title: 'Governance-reviewed', icon: 'ShieldCheck' },
+                    { id: 'conduct-3', title: 'Structurally designed', icon: 'Target' },
+                    { id: 'conduct-4', title: 'Institutionally documented', icon: 'FileText' }
+                ],
+                styles: { layoutType: 'list', textAlign: 'left', textColor: '#1A365D', bgColor: '#F8FAFC' }
+            },
             { id: 'partners', type: 'partners' },
             { id: 'milestone', type: 'milestone' },
             {
-                id: 'closing',
-                type: 'custom',
-                title: 'Committed to Strategic Excellence',
-                subtitle: 'Instrak Venture Capital Berhad remains dedicated to bridging the gap between visionary potential and strategic capital.',
-                content: 'Our commitment to excellence, integrity, and sustainable growth drives every partnership we forge. We invite you to join us in shaping the future of global industry.',
-                styles: { layoutType: 'standard', textAlign: 'center', textColor: '#1A365D', bgColor: '#FFFFFF' }
+                id: 'closing', type: 'custom',
+                title: 'Closing Statement',
+                content: 'IVC exists to serve capital with responsibility.\n\nWe structure wealth with discipline.\nWe govern capital with transparency.\nWe grow institutions with integrity.',
+                items: [],
+                styles: { layoutType: 'standard', textAlign: 'center', textColor: '#FFFFFF', bgColor: '#0A2540' }
             }
         ]
     };
@@ -114,9 +188,6 @@ const AboutUs = () => {
     const banks = partnersContent.banks || defaultPartners.banks;
     const milestone = partnersContent.milestone || defaultPartners.milestone;
 
-    // --- Static Constants ---
-
-
     // --- Data Prep: Ensure we have a sections list ---
     let sections;
     if (aboutContent.sections) {
@@ -127,8 +198,8 @@ const AboutUs = () => {
             {
                 id: 'hero',
                 type: 'hero',
-                title: aboutContent.heroTitle || 'Mission, Vision & Values',
-                subtitle: aboutContent.heroSubtitle || 'The foundational pillars of Instrak Venture Capital Berhad.'
+                title: aboutContent.heroTitle || 'About Instrak Venture Capital',
+                subtitle: aboutContent.heroSubtitle || 'A global asset and capital management institution.'
             },
             {
                 id: 'mission',
@@ -137,7 +208,7 @@ const AboutUs = () => {
                 missionText: aboutContent.missionText || 'To be the catalyst...',
                 visionTitle: aboutContent.visionTitle || 'Our Vision',
                 visionText: aboutContent.visionText || 'To set the benchmark...',
-                values: aboutContent.values || defaultAbout.sections[1].values
+                values: aboutContent.values || defaultAbout.sections.find(s => s.id === 'mission')?.values
             },
             ...(aboutContent.sectionOrder || ['mission', 'board', 'partners']).filter(id => id !== 'mission').map(id => ({ id, type: id }))
         ];
@@ -175,6 +246,7 @@ const AboutUs = () => {
                 <PageHero
                     title={section.title}
                     subtitle={section.subtitle}
+                    textColor={styles.textColor}
                     style={{ background: 'transparent', position: 'relative', zIndex: 1 }}
                 />
             </div>
@@ -358,37 +430,6 @@ const AboutUs = () => {
                 )}
 
                 <div style={{ position: 'relative', zIndex: 1 }}>
-
-
-                    {/* 3b. Investment Feature (Deal Tombstone Style) */}
-                    <section style={{ padding: '80px 0', background: '#0A2540', color: 'white', position: 'relative' }}>
-                        <div className="container">
-                            <div style={{
-                                maxWidth: '900px',
-                                margin: '0 auto',
-                                border: '2px solid rgba(212, 175, 55, 0.3)',
-                                padding: '4rem',
-                                textAlign: 'center',
-                                position: 'relative'
-                            }}>
-                                <div style={{
-                                    position: 'absolute', top: '-1px', left: '50%', transform: 'translate(-50%, -50%)',
-                                    background: '#0A2540', padding: '0 1rem', textTransform: 'uppercase', letterSpacing: '2px', color: '#D4AF37', fontSize: '0.9rem', fontWeight: 'bold'
-                                }}>
-                                    Investment Milestone
-                                </div>
-
-                                <Award size={64} style={{ color: '#D4AF37', margin: '0 auto 2rem' }} />
-                                <h2 style={{ fontSize: '3.5rem', fontFamily: 'var(--font-heading)', color: '#FFFFFF', marginBottom: '1rem' }}>{milestone.headline}</h2>
-                                <p style={{ fontSize: '1.5rem', color: '#D4AF37', marginBottom: '2rem' }}>{milestone.subtitle}</p>
-                                <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', width: '100px', margin: '0 auto 2rem' }}></div>
-                                <p style={{ fontSize: '1.1rem', lineHeight: '1.8', opacity: 0.8, maxWidth: '700px', margin: '0 auto' }}>
-                                    {milestone.description}
-                                </p>
-                            </div>
-                        </div>
-                    </section>
-
                     {/* 3c. Banking & Insurance Partners - Transparent to show wrapper BG */}
                     <section style={{ padding: '100px 0', background: 'transparent' }}>
                         <div className="container">
@@ -438,6 +479,57 @@ const AboutUs = () => {
         );
     };
 
+    const renderMilestone = (section) => {
+        const styles = section.styles || {};
+        return (
+            <motion.div
+                key={section.id}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                variants={sectionVariants}
+                style={{
+                    paddingBottom: '100px',
+                    scrollMarginTop: '80px'
+                }}
+            >
+                {/* 3b. Investment Feature (Deal Tombstone Style) */}
+                <section style={{
+                    padding: '80px 0',
+                    background: '#0A2540',
+                    color: 'white',
+                    position: 'relative'
+                }}>
+                    <div className="container">
+                        <div style={{
+                            maxWidth: '900px',
+                            margin: '0 auto',
+                            border: '2px solid rgba(212, 175, 55, 0.3)',
+                            padding: '4rem',
+                            textAlign: 'center',
+                            position: 'relative'
+                        }}>
+                            <div style={{
+                                position: 'absolute', top: '-1px', left: '50%', transform: 'translate(-50%, -50%)',
+                                background: '#0A2540', padding: '0 1rem', textTransform: 'uppercase', letterSpacing: '2px', color: '#D4AF37', fontSize: '0.9rem', fontWeight: 'bold'
+                            }}>
+                                {section.title || 'Investment Milestone'}
+                            </div>
+
+                            <Award size={64} style={{ color: '#D4AF37', margin: '0 auto 2rem' }} />
+                            <h2 style={{ fontSize: '3.5rem', fontFamily: 'var(--font-heading)', color: '#FFFFFF', marginBottom: '1rem' }}>{milestone.headline}</h2>
+                            <p style={{ fontSize: '1.5rem', color: '#D4AF37', marginBottom: '2rem' }}>{milestone.subtitle}</p>
+                            <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', width: '100px', margin: '0 auto 2rem' }}></div>
+                            <p style={{ fontSize: '1.1rem', lineHeight: '1.8', opacity: 0.8, maxWidth: '700px', margin: '0 auto' }}>
+                                {milestone.description}
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </motion.div>
+        );
+    };
+
 
 
 
@@ -447,7 +539,7 @@ const AboutUs = () => {
         'mission': renderMission,
         'board': renderBoard,
         'partners': renderPartners,
-        'milestone': renderPartners, // Milestone is rendered within partners section
+        'milestone': renderMilestone,
         'custom': (section) => <UniversalSection key={section.id} section={section} />
     };
 

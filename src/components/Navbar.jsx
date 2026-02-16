@@ -63,7 +63,7 @@ const Navbar = () => {
 
     // Use loaded data or defaults
     const rawItems = navData?.items || defaultNav.items;
-    
+
     // FORCE UPDATE: Ensure About Us links point to the consolidated page
     const items = rawItems.map(item => {
         if (item.label === 'About Us' || item.id === 'nav-2') {
@@ -82,17 +82,17 @@ const Navbar = () => {
 
     return (
         <nav className={`${styles.nav} glass`}>
-            <div className={`container ${styles.container}`}>
+            <div className={styles.container}>
                 <Link to="/" className={styles.logo} onClick={closeAll}>
                     {settings?.siteIdentity?.logoUrl ? (
-                        <img 
-                            src={settings.siteIdentity.logoUrl} 
-                            alt={settings.siteIdentity.siteName || 'Logo'} 
-                            className={styles.logoImg} 
+                        <img
+                            src={settings.siteIdentity.logoUrl}
+                            alt={settings.siteIdentity.siteName || 'Logo'}
+                            className={styles.logoImg}
                         />
                     ) : (
                         <div className={styles.logoText}>
-                            <motion.span 
+                            <motion.span
                                 className={styles.brand}
                                 initial={{ opacity: 0, letterSpacing: '-0.02em', y: 5 }}
                                 animate={{ opacity: 1, letterSpacing: '0.02em', y: 0 }}
@@ -101,7 +101,7 @@ const Navbar = () => {
                                 {settings?.siteIdentity?.siteName || 'Instrak Venture Capital'}
                             </motion.span>
                             {settings?.siteIdentity?.tagline && (
-                                <motion.span 
+                                <motion.span
                                     className={styles.tagline}
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
@@ -163,7 +163,7 @@ const Navbar = () => {
                                     <span className={styles.userEmail} title={user.email}>{user.email}</span>
                                 </li>
                                 <li>
-                                    <button 
+                                    <button
                                         onClick={async () => {
                                             console.log('Logout button clicked');
                                             try {

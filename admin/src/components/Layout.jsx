@@ -179,7 +179,7 @@ const Layout = () => {
             </aside>
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col min-h-screen">
+            <div className="flex-1 flex flex-col min-h-screen min-w-0 overflow-hidden">
                 {/* Header */}
                 <header className="bg-white border-b border-gray-200 h-14 px-6 flex items-center justify-between sticky top-0 z-40 shadow-sm">
                     <button
@@ -202,8 +202,8 @@ const Layout = () => {
                 </header>
 
                 {/* Page Content */}
-                <main className="p-6 flex-1 overflow-x-hidden">
-                    <div className="max-w-7xl mx-auto">
+                <main className="p-6 flex-1 overflow-hidden min-w-0">
+                    <div className="overflow-hidden">
                         <Outlet />
                     </div>
                 </main>

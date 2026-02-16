@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import ChatWidget from "./ChatWidget/ChatWidget";
 import { usePageContent } from '../hooks/usePageContent';
 import SEO from './SEO';
 import { Helmet } from 'react-helmet-async';
@@ -25,6 +26,7 @@ const Layout = ({ children }) => {
       <Navbar />
       <main>{children}</main>
       <Footer />
+      <ChatWidget />
     </div>
   );
 };

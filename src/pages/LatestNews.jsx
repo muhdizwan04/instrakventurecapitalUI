@@ -8,7 +8,10 @@ const LatestNews = () => {
     const defaultContent = {
         hero: {
             title: 'News & Events',
-            subtitle: 'Stay updated with the latest insights, announcements, and events from Instrak Venture Capital.'
+            subtitle: 'Stay updated with the latest insights, announcements, and events from Instrak Venture Capital.',
+            buttonLabel: '',
+            buttonLink: '',
+            styles: {}
         },
         blocks: [
             {
@@ -35,6 +38,9 @@ const LatestNews = () => {
             <PageHero
                 title={hero?.title || defaultContent.hero.title}
                 subtitle={hero?.subtitle || defaultContent.hero.subtitle}
+                sectionStyles={hero?.styles || {}}
+                buttonLabel={hero?.buttonLabel || ''}
+                buttonLink={hero?.buttonLink || ''}
             />
 
             {/* New magazine blocks */}

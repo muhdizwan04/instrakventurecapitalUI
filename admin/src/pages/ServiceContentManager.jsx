@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
 import FormBuilder from '../components/FormBuilder';
 
-const ServiceContentManager = () => {
+const ServiceContentManager = ({ embedded = false } = {}) => {
     const [activeService, setActiveService] = useState(null);
     const [activeTab, setActiveTab] = useState('content');
     const [editingLabel, setEditingLabel] = useState(null);

@@ -27,16 +27,35 @@ const Services = () => {
     const { content: servicesContent } = usePageContent('services', { items: defaultServices });
     const services = servicesContent.items || defaultServices;
 
-    // Fetch section title/subtitle from home settings
+    // Fetch section title/subtitle and styles from home settings
     const { content: homeContent } = usePageContent('home', {
         servicesTitle: 'Our Portfolio',
-        servicesSubtitle: 'Comprehensive financial solutions tailored for your growth'
+        servicesSubtitle: 'Comprehensive financial solutions tailored for your growth',
+        servicesSectionStyles: {}
     });
     const title = homeContent.servicesTitle || 'Our Portfolio';
     const subtitle = homeContent.servicesSubtitle || 'Comprehensive financial solutions tailored for your growth';
+    const sectionStyles = homeContent.servicesSectionStyles || {};
+    const sectionStyle = {};
+    if (sectionStyles.backgroundColor) {
+        const v = sectionStyles.backgroundColor.trim();
+        if (v.startsWith('linear-gradient') || v.startsWith('radial-gradient')) {
+            sectionStyle.background = v;
+        } else {
+            sectionStyle.backgroundColor = v;
+            sectionStyle['--services-bg'] = v;
+        }
+    } else {
+        sectionStyle['--services-bg'] = '#0b1120';
+    }
+    if (sectionStyles.textColor) {
+        sectionStyle.color = sectionStyles.textColor;
+        sectionStyle['--services-text'] = sectionStyles.textColor;
+    }
+    if (sectionStyles.boxColor) sectionStyle['--services-box-bg'] = sectionStyles.boxColor;
 
     return (
-        <section id="services" className={styles.services}>
+        <section id="services" className={styles.services} style={sectionStyle}>
             <div className="container">
                 <h2 className="section-title">{title}</h2>
                 {subtitle && <p className={styles.subtitle}>{subtitle}</p>}

@@ -12,6 +12,13 @@ const SECTION_COMPONENTS = {
     industries: Industries,
 };
 
+// Normalize alignment values coming from the CMS (left / middle / right)
+const resolveAlign = (align, fallback = 'left') => {
+    if (!align) return fallback;
+    if (align === 'middle') return 'center';
+    return align;
+};
+
 const Home = () => {
     // Fetch home content including section order
     const { content } = usePageContent('home', {
@@ -38,7 +45,7 @@ const Home = () => {
                             paddingTop: isFirst ? '120px' : '64px', // 120px = 80px nav + 40px spacing
                             paddingBottom: '64px',
                             color: section.textColor || '#1A365D',
-                            textAlign: section.textAlign || 'center',
+                            textAlign: resolveAlign(section.textAlign, 'center'),
                             position: 'relative',
                             overflow: 'hidden'
                         };
@@ -88,7 +95,10 @@ const Home = () => {
                                                 {section.blocks.map(block => {
                                                     if (block.type === 'image') {
                                                         return (
-                                                            <div key={block.id} style={{ textAlign: block.align || 'center' }}>
+                                                            <div
+                                                                key={block.id}
+                                                                style={{ textAlign: resolveAlign(block.align, 'center') }}
+                                                            >
                                                                 {block.url && (
                                                                     <img
                                                                         src={block.url}
@@ -106,12 +116,15 @@ const Home = () => {
                                                     }
                                                     if (block.type === 'button') {
                                                         return (
-                                                            <div key={block.id} style={{ textAlign: block.align || 'center' }}>
+                                                            <div
+                                                                key={block.id}
+                                                                style={{ textAlign: resolveAlign(block.align, 'center') }}
+                                                            >
                                                                 <a
                                                                     href={block.link || '#'}
-                                                                    className={`px-8 py-3 rounded text-sm uppercase tracking-wider font-bold transition-all inline-block hover:opacity-90 ${block.variant === 'solid'
-                                                                        ? 'bg-[#1A365D] text-white'
-                                                                        : 'border-2 border-[#1A365D] text-[#1A365D] bg-transparent'
+                                                                    className={`${block.variant === 'solid'
+                                                                        ? 'btn-solid'
+                                                                        : 'btn-outline-gold'
                                                                         }`}
                                                                     style={{
                                                                         // Dynamic overrides for custom text colors
@@ -129,10 +142,14 @@ const Home = () => {
                                                     }
                                                     // Text block
                                                     return (
-                                                        <div key={block.id} className="prose prose-lg max-w-none" style={{
-                                                            textAlign: block.align || 'left',
-                                                            color: block.color || 'inherit'
-                                                        }}>
+                                                        <div
+                                                            key={block.id}
+                                                            className="prose prose-lg max-w-none"
+                                                            style={{
+                                                                textAlign: resolveAlign(block.align, 'left'),
+                                                                color: block.color || 'inherit'
+                                                            }}
+                                                        >
                                                             <div className="whitespace-pre-wrap" style={{ color: 'inherit' }}>{block.content}</div>
                                                         </div>
                                                     );

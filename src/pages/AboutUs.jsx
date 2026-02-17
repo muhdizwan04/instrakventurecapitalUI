@@ -155,8 +155,9 @@ const AboutUs = () => {
         { id: 'dir-6', name: 'NORLI HIDAYATUL AINI', role: 'GENERAL MANAGER', image: '' },
         { id: 'dir-7', name: 'DR. SUHAILY SHAHIMI', role: 'INTERNAL AUDITOR', image: '' },
     ];
-    const { content: boardContent } = usePageContent('board', { directors: defaultDirectors });
+    const { content: boardContent } = usePageContent('board', { directors: defaultDirectors, styleColors: {} });
     const directors = boardContent.directors || defaultDirectors;
+    const boardStyleColors = boardContent.styleColors || {};
 
     // 3. Partners Content (Source of Truth for Partners & Milestone)
     const defaultPartners = {
@@ -409,8 +410,11 @@ const AboutUs = () => {
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
                                 <div style={{ padding: '2rem', position: 'relative' }}>
-                                    <h3 style={{ fontSize: '1.35rem', marginBottom: '0.5rem', color: 'var(--accent-primary)', fontWeight: '800', letterSpacing: '-0.01em' }}>{d.name}</h3>
-                                    <p style={{ color: 'var(--accent-secondary)', fontWeight: '700', fontSize: '0.85rem', letterSpacing: '1px', textTransform: 'uppercase' }}>{d.role}</p>
+                                    <h3 style={{ fontSize: '1.35rem', marginBottom: '0.5rem', color: boardStyleColors.nameColor || 'var(--accent-primary)', fontWeight: '800', letterSpacing: '-0.01em' }}>{d.name}</h3>
+                                    <p style={{ color: boardStyleColors.roleColor || 'var(--accent-secondary)', fontWeight: '700', fontSize: '0.85rem', letterSpacing: '1px', textTransform: 'uppercase' }}>{d.role}</p>
+                                    {d.bio && (
+                                        <p style={{ marginTop: '1rem', fontSize: '0.9rem', lineHeight: 1.6, color: boardStyleColors.bioColor || '#64748b' }}>{d.bio}</p>
+                                    )}
                                     <div style={{ marginTop: '1.5rem', width: '40px', height: '2px', background: 'var(--gradient-gold)', transition: 'width 0.4s ease' }} className="group-hover:width-[100px]"></div>
                                 </div>
                             </div>
@@ -423,6 +427,8 @@ const AboutUs = () => {
 
     const renderPartners = (section) => {
         const styles = section.styles || {};
+        const bgColor = styles.bgColor || 'transparent';
+        const isBlack = typeof bgColor === 'string' && (bgColor.toLowerCase() === 'black' || bgColor === '#000' || bgColor === '#000000');
         return (
             <motion.div
                 key={section.id}
@@ -434,7 +440,7 @@ const AboutUs = () => {
                 style={{
                     paddingBottom: '100px',
                     scrollMarginTop: '80px',
-                    backgroundColor: styles.bgColor || 'transparent',
+                    backgroundColor: isBlack ? 'transparent' : bgColor,
                     backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
                     backgroundSize: styles.backgroundSize || 'cover',
                     backgroundPosition: 'center',

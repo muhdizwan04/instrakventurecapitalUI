@@ -10,7 +10,25 @@ const makeId = (prefix) => `${prefix}-${Date.now()}-${Math.random().toString(16)
 const DEFAULT_DATA = {
     hero: {
         title: 'News & Events',
-        subtitle: 'Articles, announcements, and upcoming events—managed from the admin panel and synced to the client site.'
+        subtitle: 'Articles, announcements, and upcoming events—managed from the admin panel and synced to the client site.',
+        buttonLabel: '',
+        buttonLink: '',
+        styles: {
+            titleFontFamily: 'var(--font-heading)',
+            titleFontSize: '2.8rem',
+            titleFontWeight: '700',
+            titleColor: '#1A365D',
+            titleAlign: 'center',
+            subtitleFontFamily: 'var(--font-main)',
+            subtitleFontSize: '1.15rem',
+            subtitleColor: '#4A5568',
+            subtitleAlign: 'center',
+            buttonFontFamily: 'var(--font-heading)',
+            buttonFontSize: '1rem',
+            buttonFontWeight: '600',
+            buttonColor: '#FFFFFF',
+            buttonBgColor: '#1A365D'
+        }
     },
     blocks: [
         {
@@ -48,10 +66,11 @@ const NewsManager = () => {
     const [hero, setHero] = useState(DEFAULT_DATA.hero);
     const [blocks, setBlocks] = useState(DEFAULT_DATA.blocks);
     const [activeBlockId, setActiveBlockId] = useState(DEFAULT_DATA.blocks[0]?.id || null);
+    const [activeItemId, setActiveItemId] = useState(null);
 
     useEffect(() => {
         if (!content || loading) return;
-        if (content.hero) setHero(content.hero);
+        if (content.hero) setHero({ ...DEFAULT_DATA.hero, ...content.hero, styles: { ...DEFAULT_DATA.hero.styles, ...(content.hero.styles || {}) } });
         if (Array.isArray(content.blocks) && content.blocks.length > 0) {
             const sanitized = content.blocks.map((b, idx) => ({
                 id: b.id || makeId(`block-${idx}`),
@@ -69,7 +88,8 @@ const NewsManager = () => {
                     image: it.image || '',
                     link: it.link || '',
                     buttonLabel: it.buttonLabel || 'Read more',
-                    published: it.published !== false
+                    published: it.published !== false,
+                    styles: it.styles || {}
                 })) : []
             }));
             setBlocks(sanitized);
@@ -78,10 +98,15 @@ const NewsManager = () => {
     }, [content, loading]);
 
     const activeBlock = useMemo(() => blocks.find(b => b.id === activeBlockId), [blocks, activeBlockId]);
+    const activeItem = useMemo(() => activeBlock?.items?.find(it => it.id === activeItemId) ?? null, [activeBlock, activeItemId]);
 
     useEffect(() => {
         if (!activeBlockId && blocks.length > 0) setActiveBlockId(blocks[0].id);
     }, [blocks, activeBlockId]);
+
+    useEffect(() => {
+        if (activeItemId && activeBlock && !(activeBlock.items || []).some(it => it.id === activeItemId)) setActiveItemId(null);
+    }, [activeBlockId, activeBlock?.items, activeItemId]);
 
     const updateBlock = (blockId, updates) => setBlocks(prev => prev.map(b => (b.id === blockId ? { ...b, ...updates } : b)));
     const updateBlockStyles = (blockId, styles) => setBlocks(prev => prev.map(b => (b.id === blockId ? { ...b, styles } : b)));
@@ -121,9 +146,11 @@ const NewsManager = () => {
             image: '',
             link: '',
             buttonLabel: 'Read more',
-            published: true
+            published: true,
+            styles: {}
         };
         setBlocks(prev => prev.map(b => (b.id === blockId ? { ...b, items: [...(b.items || []), item] } : b)));
+        setActiveItemId(item.id);
         toast.success('Item added');
     };
 
@@ -198,11 +225,55 @@ const NewsManager = () => {
                 <div className="grid gap-4">
                     <div>
                         <label className="label">Title</label>
-                        <input value={hero.title || ''} onChange={(e) => setHero({ ...hero, title: e.target.value })} className="input-field" />
+                        <input value={hero.title || ''} onChange={(e) => setHero({ ...hero, title: e.target.value })} className="input-field" placeholder="News & Events" />
                     </div>
                     <div>
-                        <label className="label">Subtitle</label>
-                        <input value={hero.subtitle || ''} onChange={(e) => setHero({ ...hero, subtitle: e.target.value })} className="input-field" />
+                        <label className="label">Summary / Subtitle</label>
+                        <textarea value={hero.subtitle || ''} onChange={(e) => setHero({ ...hero, subtitle: e.target.value })} className="input-field" rows={2} placeholder="Stay updated with the latest..." />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="label">Button label (optional)</label>
+                            <input value={hero.buttonLabel || ''} onChange={(e) => setHero({ ...hero, buttonLabel: e.target.value })} className="input-field" placeholder="e.g. View all" />
+                        </div>
+                        <div>
+                            <label className="label">Button link (optional)</label>
+                            <input value={hero.buttonLink || ''} onChange={(e) => setHero({ ...hero, buttonLink: e.target.value })} className="input-field" placeholder="/latest-news-2" />
+                        </div>
+                    </div>
+                </div>
+                <div className="border-t border-gray-200 pt-4 mt-4">
+                    <h4 className="text-sm font-bold text-gray-600 mb-3">Hero font & alignment</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                            <span className="text-xs font-bold text-gray-500 uppercase block mb-2">Title</span>
+                            <div className="space-y-2">
+                                <div><label className="text-[10px] text-gray-400">Align</label><select value={(hero.styles || {}).titleAlign || 'center'} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), titleAlign: e.target.value } })} className="input-field text-xs w-full"> <option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></div>
+                                <div><label className="text-[10px] text-gray-400">Font family</label><input value={(hero.styles || {}).titleFontFamily || ''} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), titleFontFamily: e.target.value } })} className="input-field text-xs" placeholder="var(--font-heading)" /></div>
+                                <div><label className="text-[10px] text-gray-400">Font size</label><input value={(hero.styles || {}).titleFontSize || ''} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), titleFontSize: e.target.value } })} className="input-field text-xs" placeholder="2.8rem" /></div>
+                                <div><label className="text-[10px] text-gray-400">Font weight</label><select value={(hero.styles || {}).titleFontWeight || '700'} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), titleFontWeight: e.target.value } })} className="input-field text-xs w-full"><option value="400">400</option><option value="600">600</option><option value="700">700</option><option value="800">800</option></select></div>
+                                <div className="flex items-center gap-2"><input type="color" value={(hero.styles || {}).titleColor || '#1A365D'} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), titleColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" /><input type="text" value={(hero.styles || {}).titleColor || ''} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), titleColor: e.target.value } })} className="input-field text-xs flex-1" placeholder="#1A365D" /></div>
+                            </div>
+                        </div>
+                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                            <span className="text-xs font-bold text-gray-500 uppercase block mb-2">Summary / Subtitle</span>
+                            <div className="space-y-2">
+                                <div><label className="text-[10px] text-gray-400">Align</label><select value={(hero.styles || {}).subtitleAlign || 'center'} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), subtitleAlign: e.target.value } })} className="input-field text-xs w-full"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></div>
+                                <div><label className="text-[10px] text-gray-400">Font family</label><input value={(hero.styles || {}).subtitleFontFamily || ''} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), subtitleFontFamily: e.target.value } })} className="input-field text-xs" placeholder="var(--font-main)" /></div>
+                                <div><label className="text-[10px] text-gray-400">Font size</label><input value={(hero.styles || {}).subtitleFontSize || ''} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), subtitleFontSize: e.target.value } })} className="input-field text-xs" placeholder="1.15rem" /></div>
+                                <div className="flex items-center gap-2"><label className="text-[10px] text-gray-400">Color</label><input type="color" value={(hero.styles || {}).subtitleColor || '#4A5568'} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), subtitleColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" /><input type="text" value={(hero.styles || {}).subtitleColor || ''} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), subtitleColor: e.target.value } })} className="input-field text-xs flex-1" /></div>
+                            </div>
+                        </div>
+                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                            <span className="text-xs font-bold text-gray-500 uppercase block mb-2">Button</span>
+                            <div className="space-y-2">
+                                <div><label className="text-[10px] text-gray-400">Font family</label><input value={(hero.styles || {}).buttonFontFamily || ''} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), buttonFontFamily: e.target.value } })} className="input-field text-xs" placeholder="var(--font-heading)" /></div>
+                                <div><label className="text-[10px] text-gray-400">Font size</label><input value={(hero.styles || {}).buttonFontSize || ''} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), buttonFontSize: e.target.value } })} className="input-field text-xs" placeholder="1rem" /></div>
+                                <div><label className="text-[10px] text-gray-400">Font weight</label><select value={(hero.styles || {}).buttonFontWeight || '600'} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), buttonFontWeight: e.target.value } })} className="input-field text-xs w-full"><option value="400">400</option><option value="600">600</option><option value="700">700</option></select></div>
+                                <div className="flex items-center gap-2"><label className="text-[10px] text-gray-400">Text color</label><input type="color" value={(hero.styles || {}).buttonColor || '#FFFFFF'} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), buttonColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" /><input type="text" value={(hero.styles || {}).buttonColor || ''} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), buttonColor: e.target.value } })} className="input-field text-xs flex-1" /></div>
+                                <div className="flex items-center gap-2"><label className="text-[10px] text-gray-400">BG color</label><input type="color" value={(hero.styles || {}).buttonBgColor || '#1A365D'} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), buttonBgColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" /><input type="text" value={(hero.styles || {}).buttonBgColor || ''} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), buttonBgColor: e.target.value } })} className="input-field text-xs flex-1" /></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -262,7 +333,10 @@ const NewsManager = () => {
                             <div className="text-sm text-gray-400 py-10 text-center">Add a block to start managing News & Events.</div>
                         ) : (
                             <div className="space-y-6">
-                                {/* Block meta */}
+                                {/* Block – title, subtitle, CTA, appearance, fonts */}
+                                <div className="flex items-center gap-2 border-b border-gray-200 pb-2">
+                                    <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Block</h4>
+                                </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="label">Block Title</label>
@@ -324,7 +398,44 @@ const NewsManager = () => {
                                     </div>
                                 </div>
 
-                                {/* Items */}
+                                {/* Block font & alignment (title, subtitle, button) */}
+                                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                                    <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Block font & alignment</div>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="p-3 bg-white rounded-lg border border-gray-100">
+                                            <span className="text-xs font-bold text-gray-500 uppercase block mb-2">Title</span>
+                                            <div className="space-y-2">
+                                                <div><label className="text-[10px] text-gray-400">Align</label><select value={activeBlock.styles?.titleAlign || 'left'} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), titleAlign: e.target.value })} className="input-field text-xs w-full"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></div>
+                                                <div><label className="text-[10px] text-gray-400">Font family</label><input value={activeBlock.styles?.titleFontFamily || ''} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), titleFontFamily: e.target.value })} className="input-field text-xs" placeholder="var(--font-heading)" /></div>
+                                                <div><label className="text-[10px] text-gray-400">Font size</label><input value={activeBlock.styles?.titleFontSize || ''} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), titleFontSize: e.target.value })} className="input-field text-xs" placeholder="2rem" /></div>
+                                                <div><label className="text-[10px] text-gray-400">Font weight</label><select value={activeBlock.styles?.titleFontWeight || '800'} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), titleFontWeight: e.target.value })} className="input-field text-xs w-full"><option value="400">400</option><option value="600">600</option><option value="700">700</option><option value="800">800</option></select></div>
+                                                <div className="flex items-center gap-2"><input type="color" value={activeBlock.styles?.titleColor || activeBlock.styles?.textColor || '#1A365D'} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), titleColor: e.target.value })} className="w-8 h-8 rounded border cursor-pointer" /><input type="text" value={activeBlock.styles?.titleColor || ''} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), titleColor: e.target.value })} className="input-field text-xs flex-1" placeholder="#1A365D" /></div>
+                                            </div>
+                                        </div>
+                                        <div className="p-3 bg-white rounded-lg border border-gray-100">
+                                            <span className="text-xs font-bold text-gray-500 uppercase block mb-2">Subtitle</span>
+                                            <div className="space-y-2">
+                                                <div><label className="text-[10px] text-gray-400">Align</label><select value={activeBlock.styles?.subtitleAlign || 'left'} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), subtitleAlign: e.target.value })} className="input-field text-xs w-full"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></div>
+                                                <div><label className="text-[10px] text-gray-400">Font family</label><input value={activeBlock.styles?.subtitleFontFamily || ''} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), subtitleFontFamily: e.target.value })} className="input-field text-xs" placeholder="var(--font-main)" /></div>
+                                                <div><label className="text-[10px] text-gray-400">Font size</label><input value={activeBlock.styles?.subtitleFontSize || ''} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), subtitleFontSize: e.target.value })} className="input-field text-xs" placeholder="1rem" /></div>
+                                                <div className="flex items-center gap-2"><label className="text-[10px] text-gray-400">Color</label><input type="color" value={activeBlock.styles?.subtitleColor || activeBlock.styles?.textColor || '#4A5568'} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), subtitleColor: e.target.value })} className="w-8 h-8 rounded border cursor-pointer" /><input type="text" value={activeBlock.styles?.subtitleColor || ''} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), subtitleColor: e.target.value })} className="input-field text-xs flex-1" /></div>
+                                            </div>
+                                        </div>
+                                        <div className="p-3 bg-white rounded-lg border border-gray-100">
+                                            <span className="text-xs font-bold text-gray-500 uppercase block mb-1">Button (block header CTA)</span>
+                                            <p className="text-[10px] text-gray-400 mb-2">Styles the &quot;View all&quot; (or your label) button next to the block title above the cards.</p>
+                                            <div className="space-y-2">
+                                                <div><label className="text-[10px] text-gray-400">Font family</label><input value={activeBlock.styles?.buttonFontFamily || ''} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), buttonFontFamily: e.target.value })} className="input-field text-xs" placeholder="var(--font-heading)" /></div>
+                                                <div><label className="text-[10px] text-gray-400">Font size</label><input value={activeBlock.styles?.buttonFontSize || ''} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), buttonFontSize: e.target.value })} className="input-field text-xs" placeholder="0.9rem" /></div>
+                                                <div><label className="text-[10px] text-gray-400">Font weight</label><select value={activeBlock.styles?.buttonFontWeight || '800'} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), buttonFontWeight: e.target.value })} className="input-field text-xs w-full"><option value="400">400</option><option value="600">600</option><option value="700">700</option><option value="800">800</option></select></div>
+                                                <div className="flex items-center gap-2"><label className="text-[10px] text-gray-400">Text color</label><input type="color" value={activeBlock.styles?.buttonColor || '#1A365D'} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), buttonColor: e.target.value })} className="w-8 h-8 rounded border cursor-pointer" /><input type="text" value={activeBlock.styles?.buttonColor || ''} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), buttonColor: e.target.value })} className="input-field text-xs flex-1" /></div>
+                                                <div className="flex items-center gap-2"><label className="text-[10px] text-gray-400">BG / border</label><input type="color" value={activeBlock.styles?.buttonBgColor || '#B8860B'} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), buttonBgColor: e.target.value })} className="w-8 h-8 rounded border cursor-pointer" /><input type="text" value={activeBlock.styles?.buttonBgColor || ''} onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), buttonBgColor: e.target.value })} className="input-field text-xs flex-1" /></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Items (News / Events) – list only */}
                                 <div className="flex items-center justify-between">
                                     <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Items (News / Events)</h4>
                                     <button onClick={() => addItem(activeBlock.id)} className="text-xs flex items-center gap-1 text-blue-600 bg-blue-50 px-3 py-2 rounded-lg hover:bg-blue-100 font-bold border border-blue-100">
@@ -334,87 +445,29 @@ const NewsManager = () => {
 
                                 <Droppable droppableId="items">
                                     {(provided) => (
-                                        <div ref={provided.innerRef} {...provided.droppableProps} className="space-y-3">
+                                        <div ref={provided.innerRef} {...provided.droppableProps} className="space-y-2">
                                             {(activeBlock.items || []).map((it, idx) => (
                                                 <Draggable key={it.id} draggableId={it.id} index={idx}>
                                                     {(prov, snap) => (
                                                         <div
                                                             ref={prov.innerRef}
                                                             {...prov.draggableProps}
-                                                            className={`bg-white rounded-xl border border-gray-200 p-4 ${snap.isDragging ? 'shadow-lg ring-2 ring-blue-300' : 'shadow-sm'}`}
+                                                            className={`flex items-center gap-3 rounded-lg border p-2 transition-all ${activeItemId === it.id ? 'border-blue-300 bg-blue-50 ring-1 ring-blue-200' : 'border-gray-200 bg-white hover:bg-gray-50'} ${snap.isDragging ? 'shadow-lg ring-2 ring-blue-300' : ''}`}
                                                             style={prov.draggableProps.style}
                                                         >
-                                                            <div className="flex items-start gap-4">
-                                                                <div {...prov.dragHandleProps} className="text-gray-300 hover:text-gray-500 cursor-grab pt-2">
-                                                                    <GripVertical size={16} />
-                                                                </div>
-
-                                                                <div className="w-28 shrink-0">
-                                                                    <div className="rounded-lg overflow-hidden border bg-gray-50">
-                                                                        <ImageUpload
-                                                                            value={it.image}
-                                                                            onChange={val => updateItem(activeBlock.id, it.id, { image: val })}
-                                                                            aspectRatio="16/10"
-                                                                            maxSizeMB={2}
-                                                                            maxWidth={900}
-                                                                        />
-                                                                    </div>
-                                                                </div>
-
-                                                                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                                    <div className="md:col-span-2">
-                                                                        <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Title</label>
-                                                                        <input value={it.title || ''} onChange={e => updateItem(activeBlock.id, it.id, { title: e.target.value })} className="input-field font-bold" />
-                                                                    </div>
-
-                                                                    <div>
-                                                                        <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Type</label>
-                                                                        <select value={it.type || 'news'} onChange={e => updateItem(activeBlock.id, it.id, { type: e.target.value })} className="input-field">
-                                                                            <option value="news">News</option>
-                                                                            <option value="event">Event</option>
-                                                                        </select>
-                                                                    </div>
-
-                                                                    <div>
-                                                                        <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1 flex items-center gap-2"><Calendar size={12} /> Date</label>
-                                                                        <input type="date" value={it.date || ''} onChange={e => updateItem(activeBlock.id, it.id, { date: e.target.value })} className="input-field" />
-                                                                    </div>
-
-                                                                    <div className="md:col-span-2">
-                                                                        <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Excerpt / Summary</label>
-                                                                        <textarea value={it.excerpt || ''} onChange={e => updateItem(activeBlock.id, it.id, { excerpt: e.target.value })} className="input-field text-sm h-20 resize-none" placeholder="Short summary shown in the magazine card..." />
-                                                                    </div>
-
-                                                                    <div className="md:col-span-2">
-                                                                        <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1 flex items-center gap-2"><LinkIcon size={12} /> Link (button destination)</label>
-                                                                        <input value={it.link || ''} onChange={e => updateItem(activeBlock.id, it.id, { link: e.target.value })} className="input-field font-mono text-xs" placeholder="/some-page or https://..." />
-                                                                    </div>
-
-                                                                    <div>
-                                                                        <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Button Label</label>
-                                                                        <input value={it.buttonLabel || ''} onChange={e => updateItem(activeBlock.id, it.id, { buttonLabel: e.target.value })} className="input-field" placeholder="Read more" />
-                                                                    </div>
-
-                                                                    <div className="flex items-end justify-between gap-3">
-                                                                        <div className="flex items-center gap-2">
-                                                                            <button
-                                                                                type="button"
-                                                                                onClick={() => updateItem(activeBlock.id, it.id, { published: !it.published })}
-                                                                                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-bold transition-all ${it.published ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-50 border-gray-200 text-gray-500'}`}
-                                                                                title="Toggle published"
-                                                                            >
-                                                                                {it.published ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
-                                                                                {it.published ? 'Published' : 'Hidden'}
-                                                                            </button>
-                                                                            <span className="text-[10px] text-gray-400 flex items-center gap-1"><ImageIcon size={12} /> Image optional</span>
-                                                                        </div>
-
-                                                                        <button onClick={() => removeItem(activeBlock.id, it.id)} className="text-red-600 bg-red-50 px-3 py-2 rounded-lg hover:bg-red-100 text-xs font-bold border border-red-100 flex items-center gap-2">
-                                                                            <Trash2 size={14} /> Delete
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
+                                                            <div {...prov.dragHandleProps} className="text-gray-300 hover:text-gray-500 cursor-grab shrink-0">
+                                                                <GripVertical size={16} />
                                                             </div>
+                                                            <div className="w-12 h-8 rounded overflow-hidden border bg-gray-100 shrink-0">
+                                                                {it.image ? <img src={it.image} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gray-300"><ImageIcon size={14} /></div>}
+                                                            </div>
+                                                            <div className="min-w-0 flex-1">
+                                                                <span className="text-sm font-medium text-gray-800 truncate block">{it.title || 'Untitled'}</span>
+                                                                <span className={`text-[10px] font-bold uppercase ${(it.type || '').toLowerCase() === 'event' ? 'text-amber-600' : 'text-blue-600'}`}>{(it.type || 'news')}</span>
+                                                            </div>
+                                                            <button type="button" onClick={() => setActiveItemId(activeItemId === it.id ? null : it.id)} className="text-xs font-bold text-blue-600 hover:text-blue-700 shrink-0">
+                                                                {activeItemId === it.id ? 'Done' : 'Edit'}
+                                                            </button>
                                                         </div>
                                                     )}
                                                 </Draggable>
@@ -427,6 +480,105 @@ const NewsManager = () => {
                                 {(activeBlock.items || []).length === 0 && (
                                     <div className="text-center p-8 bg-gray-50 border border-dashed border-gray-200 rounded-xl text-gray-400 text-sm">
                                         No items yet. Click “Add Item” to create your first news/event card.
+                                    </div>
+                                )}
+
+                                {/* Item detail – below the list */}
+                                {activeItem && (
+                                    <div className="mt-6 p-5 bg-gray-50 rounded-xl border border-gray-200">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Item detail – {activeItem.title || 'Untitled'}</h4>
+                                            <button type="button" onClick={() => setActiveItemId(null)} className="text-xs text-gray-500 hover:text-gray-700">Close</button>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="md:col-span-2">
+                                                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Title</label>
+                                                <input value={activeItem.title || ''} onChange={e => updateItem(activeBlock.id, activeItem.id, { title: e.target.value })} className="input-field font-bold bg-white" />
+                                            </div>
+                                            <div>
+                                                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Type</label>
+                                                <select value={activeItem.type || 'news'} onChange={e => updateItem(activeBlock.id, activeItem.id, { type: e.target.value })} className="input-field bg-white">
+                                                    <option value="news">News</option>
+                                                    <option value="event">Event</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1 flex items-center gap-2"><Calendar size={12} /> Date</label>
+                                                <input type="date" value={activeItem.date || ''} onChange={e => updateItem(activeBlock.id, activeItem.id, { date: e.target.value })} className="input-field bg-white" />
+                                            </div>
+                                            <div className="md:col-span-2">
+                                                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Excerpt / Summary</label>
+                                                <textarea value={activeItem.excerpt || ''} onChange={e => updateItem(activeBlock.id, activeItem.id, { excerpt: e.target.value })} className="input-field text-sm h-20 resize-none bg-white" placeholder="Short summary shown on the card..." />
+                                            </div>
+                                            <div className="md:col-span-2">
+                                                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1 flex items-center gap-2"><LinkIcon size={12} /> Link (button destination)</label>
+                                                <input value={activeItem.link || ''} onChange={e => updateItem(activeBlock.id, activeItem.id, { link: e.target.value })} className="input-field font-mono text-xs bg-white" placeholder="/page or https://..." />
+                                            </div>
+                                            <div>
+                                                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Button text (for this card)</label>
+                                                <input value={activeItem.buttonLabel ?? ''} onChange={e => updateItem(activeBlock.id, activeItem.id, { buttonLabel: e.target.value })} className="input-field text-sm bg-white text-gray-900" placeholder="e.g. Read more" />
+                                            </div>
+                                            <div className="md:col-span-2">
+                                                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Image</label>
+                                                <div className="rounded-lg overflow-hidden border bg-white p-2 max-w-[280px]">
+                                                    <ImageUpload
+                                                        value={activeItem.image}
+                                                        onChange={val => updateItem(activeBlock.id, activeItem.id, { image: val })}
+                                                        aspectRatio="16/10"
+                                                        maxSizeMB={2}
+                                                        maxWidth={900}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="md:col-span-2 flex items-center justify-between gap-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateItem(activeBlock.id, activeItem.id, { published: !activeItem.published })}
+                                                    className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-bold ${activeItem.published ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-100 border-gray-200 text-gray-500'}`}
+                                                >
+                                                    {activeItem.published ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
+                                                    {activeItem.published ? 'Published' : 'Hidden'}
+                                                </button>
+                                                <button onClick={() => { removeItem(activeBlock.id, activeItem.id); setActiveItemId(null); }} className="text-red-600 bg-red-50 px-3 py-2 rounded-lg hover:bg-red-100 text-xs font-bold border border-red-100 flex items-center gap-2">
+                                                    <Trash2 size={14} /> Delete item
+                                                </button>
+                                            </div>
+
+                                            {/* Font (this card) – card title, summary, button */}
+                                            <div className="md:col-span-2 border-t border-gray-200 pt-4 mt-2">
+                                                <h5 className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-3">Font (this card)</h5>
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    <div className="p-3 bg-white rounded-lg border border-gray-100">
+                                                        <span className="text-xs font-bold text-gray-500 uppercase block mb-2">Card title</span>
+                                                        <div className="space-y-2">
+                                                            <div><label className="text-[10px] text-gray-400">Font family</label><input value={activeItem.styles?.itemTitleFontFamily ?? ''} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemTitleFontFamily: e.target.value } })} className="input-field text-xs bg-white" placeholder="var(--font-heading)" /></div>
+                                                            <div><label className="text-[10px] text-gray-400">Font size</label><input value={activeItem.styles?.itemTitleFontSize ?? ''} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemTitleFontSize: e.target.value } })} className="input-field text-xs bg-white" placeholder="1.2rem" /></div>
+                                                            <div><label className="text-[10px] text-gray-400">Font weight</label><select value={activeItem.styles?.itemTitleFontWeight ?? '900'} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemTitleFontWeight: e.target.value } })} className="input-field text-xs w-full bg-white"><option value="400">400</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option></select></div>
+                                                            <div className="flex items-center gap-2"><label className="text-[10px] text-gray-400">Color</label><input type="color" value={activeItem.styles?.itemTitleColor ?? '#1A365D'} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemTitleColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" /><input type="text" value={activeItem.styles?.itemTitleColor ?? ''} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemTitleColor: e.target.value } })} className="input-field text-xs flex-1 bg-white" /></div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="p-3 bg-white rounded-lg border border-gray-100">
+                                                        <span className="text-xs font-bold text-gray-500 uppercase block mb-2">Card summary / excerpt</span>
+                                                        <div className="space-y-2">
+                                                            <div><label className="text-[10px] text-gray-400">Font family</label><input value={activeItem.styles?.itemExcerptFontFamily ?? ''} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemExcerptFontFamily: e.target.value } })} className="input-field text-xs bg-white" placeholder="var(--font-main)" /></div>
+                                                            <div><label className="text-[10px] text-gray-400">Font size</label><input value={activeItem.styles?.itemExcerptFontSize ?? ''} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemExcerptFontSize: e.target.value } })} className="input-field text-xs bg-white" placeholder="0.95rem" /></div>
+                                                            <div className="flex items-center gap-2"><label className="text-[10px] text-gray-400">Color</label><input type="color" value={activeItem.styles?.itemExcerptColor ?? '#4A5568'} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemExcerptColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" /><input type="text" value={activeItem.styles?.itemExcerptColor ?? ''} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemExcerptColor: e.target.value } })} className="input-field text-xs flex-1 bg-white" /></div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="p-3 bg-white rounded-lg border border-gray-100">
+                                                        <span className="text-xs font-bold text-gray-500 uppercase block mb-1">Card button (rectangle)</span>
+                                                        <div className="space-y-2">
+                                                            <div><label className="text-[10px] text-gray-400">Button text</label><input value={activeItem.styles?.itemButtonLabel ?? ''} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemButtonLabel: e.target.value } })} className="input-field text-xs bg-white text-gray-900" placeholder="e.g. Read more" /></div>
+                                                            <div><label className="text-[10px] text-gray-400">Font family</label><input value={activeItem.styles?.itemBtnFontFamily ?? ''} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemBtnFontFamily: e.target.value } })} className="input-field text-xs bg-white" placeholder="var(--font-heading)" /></div>
+                                                            <div><label className="text-[10px] text-gray-400">Font size</label><input value={activeItem.styles?.itemBtnFontSize ?? ''} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemBtnFontSize: e.target.value } })} className="input-field text-xs bg-white" placeholder="0.9rem" /></div>
+                                                            <div><label className="text-[10px] text-gray-400">Font weight</label><select value={activeItem.styles?.itemBtnFontWeight ?? '800'} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemBtnFontWeight: e.target.value } })} className="input-field text-xs w-full bg-white"><option value="400">400</option><option value="600">600</option><option value="700">700</option><option value="800">800</option></select></div>
+                                                            <div className="flex items-center gap-2"><label className="text-[10px] text-gray-400">Text color</label><input type="color" value={activeItem.styles?.itemBtnColor ?? '#FFFFFF'} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemBtnColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" /><input type="text" value={activeItem.styles?.itemBtnColor ?? ''} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemBtnColor: e.target.value } })} className="input-field text-xs flex-1 bg-white" /></div>
+                                                            <div className="flex items-center gap-2"><label className="text-[10px] text-gray-400">BG color</label><input type="color" value={activeItem.styles?.itemBtnBgColor ?? '#1A365D'} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemBtnBgColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" /><input type="text" value={activeItem.styles?.itemBtnBgColor ?? ''} onChange={e => updateItem(activeBlock.id, activeItem.id, { styles: { ...(activeItem.styles || {}), itemBtnBgColor: e.target.value } })} className="input-field text-xs flex-1 bg-white" /></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                             </div>

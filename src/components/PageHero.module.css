@@ -27,6 +27,26 @@
     line-height: 1.7;
 }
 
+.heroButton {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 0.75rem 1.75rem;
+    border-radius: 6px;
+    text-decoration: none;
+    border: none;
+    cursor: default;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.heroButton:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+a.heroButton {
+    cursor: pointer;
+}
+
 /* Professional grid pattern */
 .overlay {
     position: absolute;

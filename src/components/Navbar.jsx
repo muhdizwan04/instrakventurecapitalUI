@@ -64,6 +64,16 @@ const Navbar = () => {
     // Use loaded data or defaults
     const rawItems = navData?.items || defaultNav.items;
 
+    // Navigation color styles (configurable from admin Navigation Manager)
+    const navStylesConfig = navData?.navStyles || {};
+    const navStyleVars = {};
+    if (navStylesConfig.backgroundColor) {
+        navStyleVars['--nav-bg-color'] = navStylesConfig.backgroundColor;
+    }
+    if (navStylesConfig.textColor) {
+        navStyleVars['--nav-link-color'] = navStylesConfig.textColor;
+    }
+
     // FORCE UPDATE: Ensure About Us links point to the consolidated page
     const items = rawItems.map(item => {
         if (item.label === 'About Us' || item.id === 'nav-2') {
@@ -81,7 +91,7 @@ const Navbar = () => {
     });
 
     return (
-        <nav className={`${styles.nav} glass`}>
+        <nav className={`${styles.nav} glass`} style={navStyleVars}>
             <div className={styles.container}>
                 <Link to="/" className={styles.logo} onClick={closeAll}>
                     {settings?.siteIdentity?.logoUrl ? (

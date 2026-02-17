@@ -23,7 +23,7 @@ const ICON_MAP = {
     'PieChart': PieChart
 };
 
-const ServicesManager = () => {
+const ServicesManager = ({ embedded = false } = {}) => {
     const [selectedService, setSelectedService] = useState(null);
 
     const defaultServices = [
@@ -99,7 +99,7 @@ const ServicesManager = () => {
     };
 
     return (
-        <div className="h-[calc(100vh-80px)] flex flex-col">
+        <div className={`${embedded ? 'h-full' : 'h-[calc(100vh-80px)]'} flex flex-col`}>
             {/* Compact Header */}
             <div className="shrink-0 bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">

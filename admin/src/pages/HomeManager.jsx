@@ -6,7 +6,6 @@ import IconPicker from '../components/IconPicker';
 import ImageUpload from '../components/ImageUpload';
 import * as LucideIcons from 'lucide-react';
 import { useContent } from '../hooks/useContent';
-import klSkyline from '../assets/kl-skyline.png';
 
 const AVAILABLE_ROUTES = [
     { label: 'Strategic Services', path: '/services' },
@@ -18,6 +17,33 @@ const AVAILABLE_ROUTES = [
     { label: 'Board of Directors', path: '/board-of-directors' },
     { label: 'Project Listing', path: '/project-listings' }
 ];
+
+const GRADIENT_DIRECTIONS = [
+    { label: 'To bottom', value: 'to bottom' },
+    { label: 'To right', value: 'to right' },
+    { label: 'To top', value: 'to top' },
+    { label: 'To top right', value: '135deg' },
+    { label: 'To bottom right', value: '45deg' }
+];
+
+function parseGradient(str) {
+    if (!str || typeof str !== 'string' || !str.includes('linear-gradient')) return null;
+    const m = str.match(/linear-gradient\s*\(\s*([^)]+)\s*\)/);
+    if (!m) return null;
+    const parts = m[1].split(',').map(s => s.trim()).filter(Boolean);
+    if (parts.length >= 3) return { direction: parts[0], start: parts[1], end: parts[2] };
+    if (parts.length === 2) return { direction: 'to bottom', start: parts[0], end: parts[1] };
+    return null;
+}
+
+function safeHex(val, fallback) {
+    if (!val || typeof val !== 'string') return fallback;
+    return val.match(/^#[0-9A-Fa-f]{6}$/) ? val : fallback;
+}
+
+function buildGradient(direction, start, end) {
+    return `linear-gradient(${direction}, ${start}, ${end})`;
+}
 
 const HomeManager = () => {
     const [activeTab, setActiveTab] = useState('hero');
@@ -42,6 +68,16 @@ const HomeManager = () => {
         heroOverlayOpacity: 0.92,
         servicesSubtitle: "Comprehensive financial solutions tailored for your growth",
         servicesTitle: "Our Portfolio",
+        servicesSectionStyles: {
+            backgroundColor: '',
+            textColor: '',
+            boxColor: ''
+        },
+        industriesSectionStyles: {
+            backgroundColor: '',
+            textColor: '',
+            boxColor: ''
+        },
         industries: [
             { id: "ind-1", icon: "Fuel", name: "Oil and Gas" },
             { id: "ind-2", icon: "GraduationCap", name: "Education" },
@@ -89,16 +125,16 @@ const HomeManager = () => {
         let newBlock;
         switch (type) {
             case 'title':
-                newBlock = { id, type: 'title', content: 'New Title', color: '#1A365D', highlightColor: '#B8860B' };
+                newBlock = { id, type: 'title', content: 'New Title', color: '#1A365D', highlightColor: '#B8860B', align: 'left' };
                 break;
             case 'subtitle':
-                newBlock = { id, type: 'subtitle', content: 'New Subtitle', color: '#B8860B' };
+                newBlock = { id, type: 'subtitle', content: 'New Subtitle', color: '#B8860B', align: 'left' };
                 break;
             case 'text':
-                newBlock = { id, type: 'text', content: 'Enter your text here...', color: '#4A5568' };
+                newBlock = { id, type: 'text', content: 'Enter your text here...', color: '#4A5568', align: 'left' };
                 break;
             case 'buttons':
-                newBlock = { id, type: 'buttons', buttons: [{ id: Date.now(), text: 'New Button', link: '/contact', variant: 'solid' }], solidBg: '#1A365D', outlineColor: '#B8860B' };
+                newBlock = { id, type: 'buttons', buttons: [{ id: Date.now(), text: 'New Button', link: '/contact', variant: 'solid' }], solidBg: '#1A365D', outlineColor: '#B8860B', align: 'left' };
                 break;
             case 'spacer':
                 newBlock = { id, type: 'spacer', height: 24 };
@@ -319,28 +355,6 @@ const HomeManager = () => {
                         {/* HERO TAB */}
                         {activeTab === 'hero' && (
                             <div className="glass-card p-6 space-y-6">
-                                {/* ── Live Preview ── */}
-                                <div className="rounded-lg overflow-hidden border border-gray-200 relative" style={{ height: 200 }}>
-                                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(135deg, #FAFBFC 0%, #FFFFFF 50%, #F5F7FA 100%)' }} />
-                                    <img src={formData.heroBackgroundImage || klSkyline} alt="Hero BG" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: formData.heroBgOpacity ?? 0.25 }} />
-                                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: `linear-gradient(135deg, rgba(255,255,255,${formData.heroOverlayOpacity ?? 0.92}) 0%, rgba(255,255,255,${(formData.heroOverlayOpacity ?? 0.92) * 0.92}) 40%, rgba(255,255,255,${(formData.heroOverlayOpacity ?? 0.92) * 0.65}) 70%, rgba(255,255,255,${(formData.heroOverlayOpacity ?? 0.92) * 0.33}) 100%)` }} />
-                                    <div style={{ position: 'absolute', top: 0, left: 0, width: '60%', height: '100%', background: 'linear-gradient(90deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.9) 50%, transparent 100%)' }} />
-                                    <div style={{ position: 'relative', zIndex: 10, padding: '20px 28px' }}>
-                                        {heroBlocks.map(block => {
-                                            if (block.type === 'title') {
-                                                const parts = (block.content || '').split('\n');
-                                                return <div key={block.id}><div style={{ fontSize: 20, fontWeight: 700, color: block.color || '#1A365D', lineHeight: 1.2 }}>{parts[0]}</div>{parts[1] && <div style={{ fontSize: 20, fontWeight: 700, color: block.highlightColor || '#B8860B', lineHeight: 1.2, marginBottom: 6 }}>{parts[1]}</div>}</div>;
-                                            }
-                                            if (block.type === 'subtitle') return <div key={block.id} style={{ fontSize: 10, fontWeight: 600, color: block.color || '#B8860B', letterSpacing: 1.5, marginBottom: 4 }}>{block.content}</div>;
-                                            if (block.type === 'text') return <div key={block.id} style={{ fontSize: 9, color: block.color || '#4A5568', maxWidth: 300, lineHeight: 1.5, marginBottom: 6 }}>{(block.content || '').substring(0, 80)}{(block.content || '').length > 80 ? '…' : ''}</div>;
-                                            if (block.type === 'buttons') return <div key={block.id} style={{ display: 'flex', gap: 6, marginBottom: 4 }}>{(block.buttons || []).map(btn => btn.variant === 'outline' ? <span key={btn.id} style={{ fontSize: 8, padding: '3px 10px', borderRadius: 4, border: `1.5px solid ${block.outlineColor || '#B8860B'}`, color: block.outlineColor || '#B8860B', fontWeight: 700 }}>{btn.text}</span> : <span key={btn.id} style={{ fontSize: 8, padding: '3px 10px', borderRadius: 4, background: block.solidBg || '#1A365D', color: '#fff', fontWeight: 700 }}>{btn.text}</span>)}</div>;
-                                            if (block.type === 'spacer') return <div key={block.id} style={{ height: (block.height || 24) / 3 }} />;
-                                            return null;
-                                        })}
-                                    </div>
-                                    <div className="absolute bottom-0 left-0 right-0 bg-black/30 backdrop-blur-sm px-3 py-1 text-[10px] text-white/80 text-center">Live Preview</div>
-                                </div>
-
                                 {/* ── Content Blocks (drag-and-drop) ── */}
                                 <div>
                                     <div className="flex justify-between items-center mb-4">
@@ -380,7 +394,15 @@ const HomeManager = () => {
                                                                 {block.type === 'title' && (
                                                                     <div className="space-y-3">
                                                                         <textarea value={block.content} onChange={(e) => updateHeroBlock(block.id, { content: e.target.value })} rows={2} className="input-field" placeholder="Title text (use Enter for second line highlight)" />
-                                                                        <div className="flex gap-4">
+                                                                        <div className="flex flex-wrap gap-4 items-center">
+                                                                            <div className="flex items-center gap-2">
+                                                                                <span className="text-xs text-gray-500">Align</span>
+                                                                                <select value={block.align || 'left'} onChange={(e) => updateHeroBlock(block.id, { align: e.target.value })} className="input-field text-sm w-28">
+                                                                                    <option value="left">Left</option>
+                                                                                    <option value="middle">Middle</option>
+                                                                                    <option value="right">Right</option>
+                                                                                </select>
+                                                                            </div>
                                                                             <div className="flex items-center gap-2">
                                                                                 <span className="text-xs text-gray-500">Color</span>
                                                                                 <input type="color" value={block.color || '#1A365D'} onChange={(e) => updateHeroBlock(block.id, { color: e.target.value })} className="h-8 w-10 p-0.5 rounded border border-gray-200 cursor-pointer" />
@@ -399,10 +421,20 @@ const HomeManager = () => {
                                                                 {block.type === 'subtitle' && (
                                                                     <div className="space-y-3">
                                                                         <input value={block.content} onChange={(e) => updateHeroBlock(block.id, { content: e.target.value })} className="input-field" placeholder="Subtitle text" />
-                                                                        <div className="flex items-center gap-2">
-                                                                            <span className="text-xs text-gray-500">Color</span>
-                                                                            <input type="color" value={block.color || '#B8860B'} onChange={(e) => updateHeroBlock(block.id, { color: e.target.value })} className="h-8 w-10 p-0.5 rounded border border-gray-200 cursor-pointer" />
-                                                                            <span className="text-[10px] text-gray-400 font-mono">{block.color || '#B8860B'}</span>
+                                                                        <div className="flex flex-wrap gap-4 items-center">
+                                                                            <div className="flex items-center gap-2">
+                                                                                <span className="text-xs text-gray-500">Align</span>
+                                                                                <select value={block.align || 'left'} onChange={(e) => updateHeroBlock(block.id, { align: e.target.value })} className="input-field text-sm w-28">
+                                                                                    <option value="left">Left</option>
+                                                                                    <option value="middle">Middle</option>
+                                                                                    <option value="right">Right</option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div className="flex items-center gap-2">
+                                                                                <span className="text-xs text-gray-500">Color</span>
+                                                                                <input type="color" value={block.color || '#B8860B'} onChange={(e) => updateHeroBlock(block.id, { color: e.target.value })} className="h-8 w-10 p-0.5 rounded border border-gray-200 cursor-pointer" />
+                                                                                <span className="text-[10px] text-gray-400 font-mono">{block.color || '#B8860B'}</span>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 )}
@@ -411,10 +443,20 @@ const HomeManager = () => {
                                                                 {block.type === 'text' && (
                                                                     <div className="space-y-3">
                                                                         <textarea value={block.content} onChange={(e) => updateHeroBlock(block.id, { content: e.target.value })} rows={3} className="input-field" placeholder="Description text" />
-                                                                        <div className="flex items-center gap-2">
-                                                                            <span className="text-xs text-gray-500">Color</span>
-                                                                            <input type="color" value={block.color || '#4A5568'} onChange={(e) => updateHeroBlock(block.id, { color: e.target.value })} className="h-8 w-10 p-0.5 rounded border border-gray-200 cursor-pointer" />
-                                                                            <span className="text-[10px] text-gray-400 font-mono">{block.color || '#4A5568'}</span>
+                                                                        <div className="flex flex-wrap gap-4 items-center">
+                                                                            <div className="flex items-center gap-2">
+                                                                                <span className="text-xs text-gray-500">Align</span>
+                                                                                <select value={block.align || 'left'} onChange={(e) => updateHeroBlock(block.id, { align: e.target.value })} className="input-field text-sm w-28">
+                                                                                    <option value="left">Left</option>
+                                                                                    <option value="middle">Middle</option>
+                                                                                    <option value="right">Right</option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div className="flex items-center gap-2">
+                                                                                <span className="text-xs text-gray-500">Color</span>
+                                                                                <input type="color" value={block.color || '#4A5568'} onChange={(e) => updateHeroBlock(block.id, { color: e.target.value })} className="h-8 w-10 p-0.5 rounded border border-gray-200 cursor-pointer" />
+                                                                                <span className="text-[10px] text-gray-400 font-mono">{block.color || '#4A5568'}</span>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 )}
@@ -422,17 +464,39 @@ const HomeManager = () => {
                                                                 {/* ── Buttons Block ── */}
                                                                 {block.type === 'buttons' && (
                                                                     <div className="space-y-3">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className="text-xs text-gray-500">Align</span>
+                                                                            <select value={block.align || 'left'} onChange={(e) => updateHeroBlock(block.id, { align: e.target.value })} className="input-field text-sm w-28">
+                                                                                <option value="left">Left</option>
+                                                                                <option value="middle">Middle</option>
+                                                                                <option value="right">Right</option>
+                                                                            </select>
+                                                                        </div>
                                                                         {(block.buttons || []).map(btn => (
-                                                                            <div key={btn.id} className="p-3 bg-gray-50 rounded flex gap-2 items-center">
-                                                                                <input value={btn.text} onChange={(e) => updateButtonInBlock(block.id, btn.id, 'text', e.target.value)} className="input-field text-xs flex-1" placeholder="Label" />
-                                                                                <select value={btn.link} onChange={(e) => updateButtonInBlock(block.id, btn.id, 'link', e.target.value)} className="input-field text-xs flex-1">
-                                                                                    {AVAILABLE_ROUTES.map(r => <option key={r.path} value={r.path}>{r.label}</option>)}
-                                                                                </select>
-                                                                                <select value={btn.variant} onChange={(e) => updateButtonInBlock(block.id, btn.id, 'variant', e.target.value)} className="input-field text-xs w-24">
-                                                                                    <option value="solid">Solid</option>
-                                                                                    <option value="outline">Outline</option>
-                                                                                </select>
-                                                                                <button onClick={() => removeButtonFromBlock(block.id, btn.id)} className="text-red-500 hover:text-red-700"><Trash2 size={14} /></button>
+                                                                            <div key={btn.id} className="p-3 bg-gray-50 rounded-lg flex flex-wrap gap-2 items-center border border-gray-200">
+                                                                                <div className="flex-1 min-w-[120px] flex flex-col gap-1">
+                                                                                    <span className="text-[10px] font-bold text-gray-500 uppercase">Button label</span>
+                                                                                    <input
+                                                                                        value={btn.text ?? ''}
+                                                                                        onChange={(e) => updateButtonInBlock(block.id, btn.id, 'text', e.target.value)}
+                                                                                        className="input-field text-xs flex-1 bg-white text-gray-900 border-gray-300 placeholder:text-gray-400"
+                                                                                        placeholder="e.g. Contact Us"
+                                                                                    />
+                                                                                </div>
+                                                                                <div className="flex-1 min-w-[120px] flex flex-col gap-1">
+                                                                                    <span className="text-[10px] font-bold text-gray-500 uppercase">Link</span>
+                                                                                    <select value={btn.link ?? ''} onChange={(e) => updateButtonInBlock(block.id, btn.id, 'link', e.target.value)} className="input-field text-xs flex-1 bg-white text-gray-900 border-gray-300">
+                                                                                        {AVAILABLE_ROUTES.map(r => <option key={r.path} value={r.path}>{r.label}</option>)}
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div className="flex flex-col gap-1">
+                                                                                    <span className="text-[10px] font-bold text-gray-500 uppercase">Style</span>
+                                                                                    <select value={btn.variant ?? 'solid'} onChange={(e) => updateButtonInBlock(block.id, btn.id, 'variant', e.target.value)} className="input-field text-xs w-24 bg-white text-gray-900 border-gray-300">
+                                                                                        <option value="solid">Solid</option>
+                                                                                        <option value="outline">Outline</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <button type="button" onClick={() => removeButtonFromBlock(block.id, btn.id)} className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded" title="Remove button"><Trash2 size={14} /></button>
                                                                             </div>
                                                                         ))}
                                                                         <div className="flex items-center gap-4">
@@ -552,6 +616,100 @@ const HomeManager = () => {
                                         placeholder="Comprehensive financial solutions..."
                                     />
                                 </div>
+
+                                <div className="border-t border-[var(--border-light)] pt-6 mt-6">
+                                    <h4 className="font-bold text-[var(--accent-primary)] mb-3">Section Colours</h4>
+                                    <p className="text-sm text-[var(--text-secondary)] mb-4">Solid colour or gradient. Use picker or enter hex/gradient in the field.</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        {/* Background */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-medium text-[var(--text-secondary)]">Background</label>
+                                            {(() => {
+                                                const bgVal = formData.servicesSectionStyles?.backgroundColor || '';
+                                                const isBgGrad = bgVal.includes('linear-gradient');
+                                                const parsedBg = parseGradient(bgVal) || { direction: 'to bottom', start: '#0b1120', end: '#1e293b' };
+                                                return (
+                                                    <>
+                                                        <div className="flex gap-2 mb-2">
+                                                            <button type="button" onClick={() => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), backgroundColor: '#0b1120' } }))} className={`px-2 py-1 text-xs rounded ${!isBgGrad ? 'bg-[var(--accent-primary)] text-white' : 'bg-gray-200 text-gray-600'}`}>Solid</button>
+                                                            <button type="button" onClick={() => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), backgroundColor: buildGradient(parsedBg.direction, parsedBg.start, parsedBg.end) } }))} className={`px-2 py-1 text-xs rounded ${isBgGrad ? 'bg-[var(--accent-primary)] text-white' : 'bg-gray-200 text-gray-600'}`}>Gradient</button>
+                                                        </div>
+                                                        {!isBgGrad ? (
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-12 h-12 rounded-lg border-2 border-[var(--border-light)] shrink-0" style={{ background: bgVal || '#0b1120' }} />
+                                                                <input type="color" value={(bgVal || '#0b1120').match(/^#[0-9A-Fa-f]{6}$/) ? (bgVal || '#0b1120') : '#0b1120'} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), backgroundColor: e.target.value } }))} className="h-10 w-12 rounded border border-[var(--border-light)] cursor-pointer" />
+                                                                <input type="text" value={bgVal} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), backgroundColor: e.target.value } }))} className="input-field text-sm flex-1" placeholder="#0b1120" />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="space-y-2">
+                                                                <div className="w-full h-10 rounded-lg border-2 border-[var(--border-light)]" style={{ background: bgVal }} />
+                                                                <select value={parsedBg.direction} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), backgroundColor: buildGradient(e.target.value, parsedBg.start, parsedBg.end) } }))} className="input-field text-sm w-full">
+                                                                    {GRADIENT_DIRECTIONS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+                                                                </select>
+                                                                <div className="flex items-center gap-2">
+                                                                    <input type="color" value={safeHex(parsedBg.start, '#0b1120')} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), backgroundColor: buildGradient(parsedBg.direction, e.target.value, parsedBg.end) } }))} className="h-9 w-10 rounded border cursor-pointer" />
+                                                                    <input type="text" value={parsedBg.start} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), backgroundColor: buildGradient(parsedBg.direction, e.target.value, parsedBg.end) } }))} className="input-field text-xs flex-1" placeholder="Start" />
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <input type="color" value={safeHex(parsedBg.end, '#1e293b')} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), backgroundColor: buildGradient(parsedBg.direction, parsedBg.start, e.target.value) } }))} className="h-9 w-10 rounded border cursor-pointer" />
+                                                                    <input type="text" value={parsedBg.end} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), backgroundColor: buildGradient(parsedBg.direction, parsedBg.start, e.target.value) } }))} className="input-field text-xs flex-1" placeholder="End" />
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </>
+                                                );
+                                            })()}
+                                        </div>
+                                        {/* Text colour */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Text colour</label>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 rounded-lg border-2 border-[var(--border-light)] shrink-0 flex items-center justify-center text-xs font-medium" style={{ background: formData.servicesSectionStyles?.textColor || '#e5e7eb', color: ['#fff', '#ffffff', '#e5e7eb', '#f9fafb', '#f3f4f6', '#e0e0e0'].includes((formData.servicesSectionStyles?.textColor || '').toLowerCase()) ? '#333' : '#fff' }}>Aa</div>
+                                                <input type="color" value={formData.servicesSectionStyles?.textColor || '#e5e7eb'} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), textColor: e.target.value } }))} className="h-10 w-12 rounded border border-[var(--border-light)] cursor-pointer" />
+                                                <input type="text" value={formData.servicesSectionStyles?.textColor || ''} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), textColor: e.target.value } }))} className="input-field text-sm flex-1" placeholder="#e5e7eb" />
+                                            </div>
+                                        </div>
+                                        {/* Box colour */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-medium text-[var(--text-secondary)]">Card / box colour</label>
+                                            {(() => {
+                                                const boxVal = formData.servicesSectionStyles?.boxColor || '';
+                                                const isBoxGrad = boxVal.includes('linear-gradient');
+                                                const parsedBox = parseGradient(boxVal) || { direction: 'to bottom', start: '#111827', end: '#1e293b' };
+                                                return (
+                                                    <>
+                                                        <div className="flex gap-2 mb-2">
+                                                            <button type="button" onClick={() => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), boxColor: '#111827' } }))} className={`px-2 py-1 text-xs rounded ${!isBoxGrad ? 'bg-[var(--accent-primary)] text-white' : 'bg-gray-200 text-gray-600'}`}>Solid</button>
+                                                            <button type="button" onClick={() => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), boxColor: buildGradient(parsedBox.direction, parsedBox.start, parsedBox.end) } }))} className={`px-2 py-1 text-xs rounded ${isBoxGrad ? 'bg-[var(--accent-primary)] text-white' : 'bg-gray-200 text-gray-600'}`}>Gradient</button>
+                                                        </div>
+                                                        {!isBoxGrad ? (
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-12 h-12 rounded-lg border-2 border-[var(--border-light)] shrink-0" style={{ background: boxVal || '#111827' }} />
+                                                                <input type="color" value={(boxVal || '#111827').match(/^#[0-9A-Fa-f]{6}$/) ? (boxVal || '#111827') : '#111827'} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), boxColor: e.target.value } }))} className="h-10 w-12 rounded border border-[var(--border-light)] cursor-pointer" />
+                                                                <input type="text" value={boxVal} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), boxColor: e.target.value } }))} className="input-field text-sm flex-1" placeholder="#111827" />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="space-y-2">
+                                                                <div className="w-full h-10 rounded-lg border-2 border-[var(--border-light)]" style={{ background: boxVal }} />
+                                                                <select value={parsedBox.direction} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), boxColor: buildGradient(e.target.value, parsedBox.start, parsedBox.end) } }))} className="input-field text-sm w-full">
+                                                                    {GRADIENT_DIRECTIONS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+                                                                </select>
+                                                                <div className="flex items-center gap-2">
+                                                                    <input type="color" value={safeHex(parsedBox.start, '#111827')} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), boxColor: buildGradient(parsedBox.direction, e.target.value, parsedBox.end) } }))} className="h-9 w-10 rounded border cursor-pointer" />
+                                                                    <input type="text" value={parsedBox.start} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), boxColor: buildGradient(parsedBox.direction, e.target.value, parsedBox.end) } }))} className="input-field text-xs flex-1" placeholder="Start" />
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <input type="color" value={safeHex(parsedBox.end, '#1e293b')} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), boxColor: buildGradient(parsedBox.direction, parsedBox.start, e.target.value) } }))} className="h-9 w-10 rounded border cursor-pointer" />
+                                                                    <input type="text" value={parsedBox.end} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), boxColor: buildGradient(parsedBox.direction, parsedBox.start, e.target.value) } }))} className="input-field text-xs flex-1" placeholder="End" />
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </>
+                                                );
+                                            })()}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         )}
 
@@ -605,6 +763,100 @@ const HomeManager = () => {
                                         </div>
                                     )}
                                 </Droppable>
+
+                                <div className="border-t border-[var(--border-light)] pt-6 mt-6">
+                                    <h4 className="font-bold text-[var(--accent-primary)] mb-3">Section Colours</h4>
+                                    <p className="text-sm text-[var(--text-secondary)] mb-4">Solid or gradient. Pick colours or enter hex/gradient.</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        {/* Background */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-medium text-[var(--text-secondary)]">Background</label>
+                                            {(() => {
+                                                const bgVal = formData.industriesSectionStyles?.backgroundColor || '';
+                                                const isBgGrad = bgVal.includes('linear-gradient');
+                                                const parsedBg = parseGradient(bgVal) || { direction: 'to bottom', start: '#0b1120', end: '#1e293b' };
+                                                return (
+                                                    <>
+                                                        <div className="flex gap-2 mb-2">
+                                                            <button type="button" onClick={() => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), backgroundColor: '#0b1120' } }))} className={`px-2 py-1 text-xs rounded ${!isBgGrad ? 'bg-[var(--accent-primary)] text-white' : 'bg-gray-200 text-gray-600'}`}>Solid</button>
+                                                            <button type="button" onClick={() => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), backgroundColor: buildGradient(parsedBg.direction, parsedBg.start, parsedBg.end) } }))} className={`px-2 py-1 text-xs rounded ${isBgGrad ? 'bg-[var(--accent-primary)] text-white' : 'bg-gray-200 text-gray-600'}`}>Gradient</button>
+                                                        </div>
+                                                        {!isBgGrad ? (
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-12 h-12 rounded-lg border-2 border-[var(--border-light)] shrink-0" style={{ background: bgVal || '#0b1120' }} />
+                                                                <input type="color" value={(bgVal || '#0b1120').match(/^#[0-9A-Fa-f]{6}$/) ? (bgVal || '#0b1120') : '#0b1120'} onChange={(e) => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), backgroundColor: e.target.value } }))} className="h-10 w-12 rounded border border-[var(--border-light)] cursor-pointer" />
+                                                                <input type="text" value={bgVal} onChange={(e) => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), backgroundColor: e.target.value } }))} className="input-field text-sm flex-1" placeholder="#0b1120" />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="space-y-2">
+                                                                <div className="w-full h-10 rounded-lg border-2 border-[var(--border-light)]" style={{ background: bgVal }} />
+                                                                <select value={parsedBg.direction} onChange={(e) => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), backgroundColor: buildGradient(e.target.value, parsedBg.start, parsedBg.end) } }))} className="input-field text-sm w-full">
+                                                                    {GRADIENT_DIRECTIONS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+                                                                </select>
+                                                                <div className="flex items-center gap-2">
+                                                                    <input type="color" value={safeHex(parsedBg.start, '#0b1120')} onChange={(e) => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), backgroundColor: buildGradient(parsedBg.direction, e.target.value, parsedBg.end) } }))} className="h-9 w-10 rounded border cursor-pointer" />
+                                                                    <input type="text" value={parsedBg.start} onChange={(e) => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), backgroundColor: buildGradient(parsedBg.direction, e.target.value, parsedBg.end) } }))} className="input-field text-xs flex-1" placeholder="Start" />
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <input type="color" value={safeHex(parsedBg.end, '#1e293b')} onChange={(e) => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), backgroundColor: buildGradient(parsedBg.direction, parsedBg.start, e.target.value) } }))} className="h-9 w-10 rounded border cursor-pointer" />
+                                                                    <input type="text" value={parsedBg.end} onChange={(e) => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), backgroundColor: buildGradient(parsedBg.direction, parsedBg.start, e.target.value) } }))} className="input-field text-xs flex-1" placeholder="End" />
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </>
+                                                );
+                                            })()}
+                                        </div>
+                                        {/* Text colour */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Text colour</label>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 rounded-lg border-2 border-[var(--border-light)] shrink-0 flex items-center justify-center text-xs font-medium" style={{ background: formData.industriesSectionStyles?.textColor || '#e5e7eb', color: ['#fff', '#ffffff', '#e5e7eb', '#f9fafb', '#f3f4f6', '#e0e0e0'].includes((formData.industriesSectionStyles?.textColor || '').toLowerCase()) ? '#333' : '#fff' }}>Aa</div>
+                                                <input type="color" value={formData.industriesSectionStyles?.textColor || '#e5e7eb'} onChange={(e) => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), textColor: e.target.value } }))} className="h-10 w-12 rounded border border-[var(--border-light)] cursor-pointer" />
+                                                <input type="text" value={formData.industriesSectionStyles?.textColor || ''} onChange={(e) => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), textColor: e.target.value } }))} className="input-field text-sm flex-1" placeholder="#e5e7eb" />
+                                            </div>
+                                        </div>
+                                        {/* Box colour */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-medium text-[var(--text-secondary)]">Box / card colour</label>
+                                            {(() => {
+                                                const boxVal = formData.industriesSectionStyles?.boxColor || '';
+                                                const isBoxGrad = boxVal.includes('linear-gradient');
+                                                const parsedBox = parseGradient(boxVal) || { direction: 'to bottom', start: '#111827', end: '#1e293b' };
+                                                return (
+                                                    <>
+                                                        <div className="flex gap-2 mb-2">
+                                                            <button type="button" onClick={() => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), boxColor: '#111827' } }))} className={`px-2 py-1 text-xs rounded ${!isBoxGrad ? 'bg-[var(--accent-primary)] text-white' : 'bg-gray-200 text-gray-600'}`}>Solid</button>
+                                                            <button type="button" onClick={() => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), boxColor: buildGradient(parsedBox.direction, parsedBox.start, parsedBox.end) } }))} className={`px-2 py-1 text-xs rounded ${isBoxGrad ? 'bg-[var(--accent-primary)] text-white' : 'bg-gray-200 text-gray-600'}`}>Gradient</button>
+                                                        </div>
+                                                        {!isBoxGrad ? (
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-12 h-12 rounded-lg border-2 border-[var(--border-light)] shrink-0" style={{ background: boxVal || '#111827' }} />
+                                                                <input type="color" value={(boxVal || '#111827').match(/^#[0-9A-Fa-f]{6}$/) ? (boxVal || '#111827') : '#111827'} onChange={(e) => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), boxColor: e.target.value } }))} className="h-10 w-12 rounded border border-[var(--border-light)] cursor-pointer" />
+                                                                <input type="text" value={boxVal} onChange={(e) => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), boxColor: e.target.value } }))} className="input-field text-sm flex-1" placeholder="#111827" />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="space-y-2">
+                                                                <div className="w-full h-10 rounded-lg border-2 border-[var(--border-light)]" style={{ background: boxVal }} />
+                                                                <select value={parsedBox.direction} onChange={(e) => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), boxColor: buildGradient(e.target.value, parsedBox.start, parsedBox.end) } }))} className="input-field text-sm w-full">
+                                                                    {GRADIENT_DIRECTIONS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+                                                                </select>
+                                                                <div className="flex items-center gap-2">
+                                                                    <input type="color" value={safeHex(parsedBox.start, '#111827')} onChange={(e) => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), boxColor: buildGradient(parsedBox.direction, e.target.value, parsedBox.end) } }))} className="h-9 w-10 rounded border cursor-pointer" />
+                                                                    <input type="text" value={parsedBox.start} onChange={(e) => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), boxColor: buildGradient(parsedBox.direction, e.target.value, parsedBox.end) } }))} className="input-field text-xs flex-1" placeholder="Start" />
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <input type="color" value={safeHex(parsedBox.end, '#1e293b')} onChange={(e) => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), boxColor: buildGradient(parsedBox.direction, parsedBox.start, e.target.value) } }))} className="h-9 w-10 rounded border cursor-pointer" />
+                                                                    <input type="text" value={parsedBox.end} onChange={(e) => setFormData(prev => ({ ...prev, industriesSectionStyles: { ...(prev.industriesSectionStyles || {}), boxColor: buildGradient(parsedBox.direction, parsedBox.start, e.target.value) } }))} className="input-field text-xs flex-1" placeholder="End" />
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </>
+                                                );
+                                            })()}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         )}
 

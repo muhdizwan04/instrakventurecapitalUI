@@ -11,30 +11,51 @@ export const AuthProvider = ({ children }) => {
 
     // Check if the logged-in user is in the admin_users whitelist
     const checkAdminStatus = async (userEmail) => {
+        console.log('[Auth] Checking admin status for:', userEmail);
         if (!userEmail) {
             setIsAdmin(false);
             return false;
         }
 
         try {
-            const { data, error } = await supabase
-                .from('admin_users')
-                .select('email')
-                .eq('email', userEmail)
-                .maybeSingle();
+            // Use RPC to avoid RLS recursion on admin_users table
+            const { data, error } = await supabase.rpc('is_admin');
 
-            if (error && error.code !== 'PGRST116') {
-                console.warn('[Admin Auth] Error checking admin status:', error.message);
-                setIsAdmin(false);
+            if (error) {
+                // Don't log network errors as errors - they're expected when connection is lost
+                const isNetworkError = error.message?.toLowerCase().includes('network') || 
+                                     error.message?.toLowerCase().includes('connection') ||
+                                     error.message?.toLowerCase().includes('failed to fetch');
+                
+                if (!isNetworkError) {
+                    console.error('[Auth] Error checking admin status via RPC:', error);
+                }
+                // Keep current admin status on network errors (don't reset to false)
+                // This prevents kicking out admins when connection is temporarily lost
+                if (!isNetworkError) {
+                    setIsAdmin(false);
+                }
                 return false;
             }
+
+            console.log('[Auth] Admin check result (RPC):', data);
 
             const adminStatus = !!data;
             setIsAdmin(adminStatus);
             return adminStatus;
         } catch (err) {
-            console.warn('[Admin Auth] Admin check failed:', err);
-            setIsAdmin(false);
+            // Don't log network errors as errors
+            const isNetworkError = err.message?.toLowerCase().includes('network') || 
+                                 err.message?.toLowerCase().includes('connection') ||
+                                 err.message?.toLowerCase().includes('failed to fetch');
+            
+            if (!isNetworkError) {
+                console.error('[Auth] Admin check panic:', err);
+            }
+            // Keep current admin status on network errors
+            if (!isNetworkError) {
+                setIsAdmin(false);
+            }
             return false;
         }
     };
@@ -80,13 +101,13 @@ export const AuthProvider = ({ children }) => {
         // Get initial session
         supabase.auth.getSession().then(async ({ data: { session } }) => {
             setUser(session?.user ?? null);
+            // If early check was for the same email, await it.
+            // However, if early check FAILED (returned false), but we have a valid session,
+            // we should TRY AGAIN with the verified session token to be sure.
             if (session?.user?.email) {
-                // If early check was for the same email, just await it; otherwise do a fresh check
-                if (earlyAdminCheck) {
-                    await earlyAdminCheck;
-                } else {
-                    await checkAdminStatus(session.user.email);
-                }
+                // await checkAdminStatus(session.user.email);
+                // Temporarily disabling automatic check to debug network issues
+                 await checkAdminStatus(session.user.email);
             }
             setLoading(false);
         }).catch(err => {
@@ -96,10 +117,14 @@ export const AuthProvider = ({ children }) => {
         });
 
         // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        // CRITICAL: Do NOT await inside onAuthStateChange callback.
+        // Awaiting a Supabase call (like rpc) here blocks the auth state machine,
+        // which prevents ALL subsequent Supabase requests from resolving (deadlock).
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null);
             if (session?.user?.email) {
-                await checkAdminStatus(session.user.email);
+                // Fire and forget — don't block the auth state machine
+                checkAdminStatus(session.user.email);
             } else {
                 setIsAdmin(false);
             }
@@ -124,18 +149,11 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (email, password) => {
-        // Create a timeout promise
-        const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Login request timed out. Please check your network connection.')), 10000);
-        });
-
         // Race the login against the timeout
-        const loginPromise = supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password
         });
-
-        const { data, error } = await Promise.race([loginPromise, timeoutPromise]);
         
         if (error) throw error;
 

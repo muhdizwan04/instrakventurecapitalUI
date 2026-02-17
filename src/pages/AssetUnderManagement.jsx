@@ -173,15 +173,18 @@ const AssetUnderManagement = () => {
                 <div className="container">
                     <h2 className="section-title">{labels.philosophy || 'Our Philosophy'}</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem' }}>
-                        {content.philosophy.map((item, i) => (
+                        {content.philosophy.map((item, i) => {
+                            const icons = [<Shield size={28} color="#FFF" />, <Globe size={28} color="#FFF" />, <Target size={28} color="#FFF" />, <Users size={28} color="#FFF" />];
+                            return (
                             <div key={i} className="glass-card" style={{ textAlign: 'center', padding: '2rem' }}>
                                 <div style={{ width: '60px', height: '60px', background: 'linear-gradient(135deg, #1A365D 0%, #B8860B 100%)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-                                    {[<Shield key={0} size={28} color="#FFF" />, <Globe key={1} size={28} color="#FFF" />, <Target key={2} size={28} color="#FFF" />, <Users key={3} size={28} color="#FFF" />][i]}
+                                    {icons[i]}
                                 </div>
                                 <h4 style={{ marginBottom: '0.75rem', color: '#1A365D', fontSize: '1.1rem' }}>{item.title}</h4>
                                 <p style={{ color: '#4A5568', fontSize: '0.9rem', lineHeight: '1.6' }}>{item.desc}</p>
                             </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </section>}
@@ -191,17 +194,20 @@ const AssetUnderManagement = () => {
                 <div className="container">
                     <h2 className="section-title">{labels.services || 'Our Services'}</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2rem' }}>
-                        {content.services.map((item, i) => (
+                        {content.services.map((item, i) => {
+                            const serviceIcons = [<BarChart3 size={24} color="#B8860B" />, <TrendingUp size={24} color="#B8860B" />, <Briefcase size={24} color="#B8860B" />, <Eye size={24} color="#B8860B" />];
+                            return (
                             <div key={i} style={{ display: 'flex', gap: '1.5rem', padding: '2rem', background: '#F5F7FA', borderRadius: '12px', border: '1px solid rgba(26, 54, 93, 0.08)' }}>
                                 <div style={{ width: '50px', height: '50px', background: '#1A365D', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                    {[<BarChart3 key={0} size={24} color="#B8860B" />, <TrendingUp key={1} size={24} color="#B8860B" />, <Briefcase key={2} size={24} color="#B8860B" />, <Eye key={3} size={24} color="#B8860B" />][i]}
+                                    {serviceIcons[i]}
                                 </div>
                                 <div>
                                     <h4 style={{ marginBottom: '0.5rem', color: '#1A365D', fontSize: '1.1rem' }}>{item.title}</h4>
                                     <p style={{ color: '#4A5568', fontSize: '0.95rem', lineHeight: '1.6' }}>{item.desc}</p>
                                 </div>
                             </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </section>}
@@ -246,15 +252,18 @@ const AssetUnderManagement = () => {
                 <div className="container">
                     <h2 className="section-title">{labels.whyChoose || 'Why Choose IVC'}</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
-                        {content.whyChoose.map((item, i) => (
+                        {content.whyChoose.map((item, i) => {
+                            const whyChooseIcons = [<Globe size={32} />, <Shield size={32} />, <Users size={32} />, <Lock size={32} />];
+                            return (
                             <div key={i} className="glass-card" style={{ textAlign: 'center', padding: '1.5rem' }}>
                                 <div style={{ color: '#B8860B', marginBottom: '1rem' }}>
-                                    {[<Globe key={0} size={32} />, <Shield key={1} size={32} />, <Users key={2} size={32} />, <Lock key={3} size={32} />][i]}
+                                    {whyChooseIcons[i]}
                                 </div>
                                 <h4 style={{ marginBottom: '0.5rem', color: '#1A365D', fontSize: '1rem' }}>{item.title}</h4>
                                 <p style={{ color: '#4A5568', fontSize: '0.85rem' }}>{item.desc}</p>
                             </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </section>}

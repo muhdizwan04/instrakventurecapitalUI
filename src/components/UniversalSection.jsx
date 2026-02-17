@@ -148,7 +148,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                     }}>
                         {displayItems.map((item, i) => (
                             <motion.div
-                                key={i}
+                                key={`${section.id || 'section'}-${layoutType}-${i}-${item.id || item.title || i}`}
                                 initial={{ opacity: 0, x: -20 }}
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
@@ -210,7 +210,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                     }}>
                         {displayItems.map((item, i) => (
                             <motion.div
-                                key={i}
+                                key={`${section.id || 'section'}-${layoutType}-${i}-${item.id || item.title || i}`}
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
@@ -277,7 +277,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                     }}>
                         {displayItems.map((item, i) => (
                             <motion.div
-                                key={i}
+                                key={`${section.id || 'section'}-${layoutType}-${i}-${item.id || item.title || i}`}
                                 initial={{ opacity: 0, y: 25 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
@@ -353,7 +353,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                     }}>
                         {displayItems.map((item, i) => (
                             <motion.div
-                                key={i}
+                                key={`${section.id || 'section'}-${layoutType}-${i}-${item.id || item.title || i}`}
                                 initial={{ opacity: 0, y: 10 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
@@ -442,7 +442,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                     }}>
                         {displayItems.map((item, i) => (
                             <motion.div
-                                key={i}
+                                key={`${section.id || 'section'}-${layoutType}-${i}-${item.id || item.title || i}`}
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
@@ -689,7 +689,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                     }}>
                         {displayItems.map((item, i) => (
                             <motion.div
-                                key={i}
+                                key={`${section.id || 'section'}-${layoutType}-${i}-${item.id || item.title || i}`}
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 viewport={{ once: true }}
@@ -801,7 +801,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                     }}>
                         {displayItems.map((item, i) => (
                             <motion.div
-                                key={i}
+                                key={`${section.id || 'section'}-${layoutType}-${i}-${item.id || item.title || i}`}
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
@@ -919,7 +919,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
 
                         <div style={{ position: 'relative', zIndex: 1 }}>
                             {displayItems.map((item, i) => (
-                                <div key={i}>
+                                <div key={`${section.id || 'section'}-timeline-${i}-${item.id || item.title || i}`}>
                                     {i > 0 && (
                                         <div style={{
                                             width: '50px',

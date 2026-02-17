@@ -90,7 +90,7 @@ const DynamicForm = ({ fields = [], title, onSubmit, loading }) => {
                                     >
                                         <option value="">Select option...</option>
                                         {field.options?.map((opt, i) => (
-                                            <option key={i} value={opt}>{opt}</option>
+                                            <option key={`${field.id}-opt-${i}`} value={opt}>{opt}</option>
                                         ))}
                                     </select>
                                 ) : field.type === 'textarea' ? (

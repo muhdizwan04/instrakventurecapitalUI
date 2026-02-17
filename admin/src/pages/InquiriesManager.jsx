@@ -555,8 +555,22 @@ const InquiriesManager = () => {
                                                 </div>
                                             </div>
                                         )}
+                                        {/* Show Account Email if user was logged in */}
+                                        {selectedInquiry.metadata?.accountEmail && (
+                                            <div className="p-3 bg-white border border-gray-200 rounded-lg flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center">
+                                                    <User size={14} />
+                                                </div>
+                                                <div>
+                                                    <p className="text-[10px] text-gray-400 uppercase">Account Email</p>
+                                                    <a href={`mailto:${selectedInquiry.metadata.accountEmail}`} className="text-xs font-medium text-purple-600 hover:underline">
+                                                        {selectedInquiry.metadata.accountEmail}
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        )}
                                         {Object.entries(selectedInquiry.metadata)
-                                            .filter(([k, v]) => v && !['notes', 'companyName', 'phone'].includes(k))
+                                            .filter(([k, v]) => v && !['notes', 'companyName', 'phone', 'accountEmail', 'userId'].includes(k))
                                             .map(([key, value]) => (
                                                 <div key={key} className="p-3 bg-white border border-gray-200 rounded-lg">
                                                     <p className="text-[10px] text-gray-400 uppercase mb-1">{key.replace(/([A-Z])/g, ' $1')}</p>

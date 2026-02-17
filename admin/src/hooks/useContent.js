@@ -7,6 +7,46 @@ import toast from 'react-hot-toast';
 const contentCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+// Save operation timeout (15 seconds)
+const SAVE_TIMEOUT = 15000;
+
+// Helper to check if error is a network error
+const isNetworkError = (error) => {
+    if (!error) return false;
+    const message = error.message?.toLowerCase() || '';
+    const code = error.code?.toLowerCase() || '';
+    return (
+        message.includes('network') ||
+        message.includes('connection') ||
+        message.includes('failed to fetch') ||
+        message.includes('load failed') ||
+        code === 'network_error' ||
+        code === 'fetch_error'
+    );
+};
+
+// Retry helper with exponential backoff
+const retryWithBackoff = async (fn, maxRetries = 3, baseDelay = 500) => {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+            return await fn();
+        } catch (error) {
+            const isLastAttempt = attempt === maxRetries;
+            const isNetwork = isNetworkError(error);
+            
+            // Only retry network errors
+            if (!isNetwork || isLastAttempt) {
+                throw error;
+            }
+            
+            // Exponential backoff: 500ms, 1000ms, 2000ms
+            const delay = baseDelay * Math.pow(2, attempt);
+            console.log(`[Content] Network error, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries + 1})...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+    }
+};
+
 /**
  * Hook for managing page content in admin panel
  * @param {string} contentId - Unique identifier for the content (e.g., 'home_hero', 'footer')
@@ -25,6 +65,23 @@ export const useContent = (contentId, defaultContent = {}, options = {}) => {
     const [loading, setLoading] = useState(!forceDefaults && !hasFreshCache);
     const [saving, setSaving] = useState(false);
     const fetchedRef = useRef(false);
+    const isMountedRef = useRef(true);
+    const timeoutIdRef = useRef(null);
+
+    // Track mount status and reset state on unmount or contentId change
+    useEffect(() => {
+        isMountedRef.current = true;
+        setSaving(false);
+        
+        return () => {
+            isMountedRef.current = false;
+            if (timeoutIdRef.current) {
+                clearTimeout(timeoutIdRef.current);
+                timeoutIdRef.current = null;
+            }
+            setSaving(false);
+        };
+    }, [contentId]);
 
     useEffect(() => {
         fetchedRef.current = false;
@@ -34,7 +91,6 @@ export const useContent = (contentId, defaultContent = {}, options = {}) => {
         if (forceDefaults || fetchedRef.current) return;
         fetchedRef.current = true;
 
-        // If we have fresh cache, skip the network call entirely
         if (hasFreshCache) {
             setContent(cached.data);
             setLoading(false);
@@ -56,43 +112,101 @@ export const useContent = (contentId, defaultContent = {}, options = {}) => {
                 console.error('Error fetching content:', error);
             }
 
-            if (data?.content) {
+            if (data?.content && isMountedRef.current) {
                 setContent(data.content);
-                // Update cache
                 contentCache.set(contentId, { data: data.content, timestamp: Date.now() });
             }
         } catch (err) {
             console.error('Error:', err);
         } finally {
-            setLoading(false);
+            if (isMountedRef.current) {
+                setLoading(false);
+            }
         }
     };
 
     const saveContent = async (newContent = content, options = {}) => {
         const { silent = false } = options;
+        
+        if (saving) {
+            return false;
+        }
+
         setSaving(true);
+        
+        // Clear any previous timeout
+        if (timeoutIdRef.current) {
+            clearTimeout(timeoutIdRef.current);
+            timeoutIdRef.current = null;
+        }
+        
         try {
-            const { error } = await supabase
-                .from('site_content')
-                .upsert({
-                    id: contentId,
-                    content: newContent,
-                    updated_at: new Date().toISOString()
+            // DO NOT call supabase.auth.getSession() here!
+            // It causes a deadlock when onAuthStateChange is processing checkAdminStatus.
+            // The Supabase client automatically includes auth headers in every request.
+
+            // Wrap save operation with retry logic for network errors
+            const result = await retryWithBackoff(async () => {
+                const savePromise = supabase
+                    .from('site_content')
+                    .upsert({
+                        id: contentId,
+                        content: newContent,
+                        updated_at: new Date().toISOString()
+                    }, {
+                        onConflict: 'id'
+                    })
+                    .select();
+
+                const timeoutPromise = new Promise((_, reject) => {
+                    timeoutIdRef.current = setTimeout(() => {
+                        reject(new Error('Save operation timed out'));
+                    }, SAVE_TIMEOUT);
                 });
+
+                return await Promise.race([savePromise, timeoutPromise]);
+            });
+            
+            // Clear timeout on success
+            if (timeoutIdRef.current) {
+                clearTimeout(timeoutIdRef.current);
+                timeoutIdRef.current = null;
+            }
+
+            if (!isMountedRef.current) return false;
+
+            const { data, error } = result;
 
             if (error) throw error;
 
-            setContent(newContent);
-            // Update cache immediately after save
-            contentCache.set(contentId, { data: newContent, timestamp: Date.now() });
-            if (!silent) toast.success('Changes saved successfully!');
+            if (isMountedRef.current) {
+                setContent(newContent);
+                contentCache.set(contentId, { data: newContent, timestamp: Date.now() });
+                if (!silent) toast.success('Changes saved successfully!');
+            }
             return true;
         } catch (err) {
+            if (!isMountedRef.current) return false;
+
             console.error('Error saving content:', err);
-            if (!silent) toast.error('Failed to save changes');
+            if (!silent) {
+                if (isNetworkError(err)) {
+                    toast.error('Network connection lost. Please check your internet and try again.');
+                } else if (err.message?.includes('timed out')) {
+                    toast.error('Save timed out. Please check your connection and try again.');
+                } else {
+                    toast.error('Failed to save changes. Please try again.');
+                }
+            }
             return false;
         } finally {
-            setSaving(false);
+            if (timeoutIdRef.current) {
+                clearTimeout(timeoutIdRef.current);
+                timeoutIdRef.current = null;
+            }
+            if (isMountedRef.current) {
+                setSaving(false);
+            }
         }
     };
 

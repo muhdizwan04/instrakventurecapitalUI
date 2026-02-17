@@ -85,7 +85,6 @@ const Layout = () => {
 
     // Other items that might not be in the nav but we want to show
     const fixedAdminItems = {
-        '/service-pages': { icon: FileText, label: "Service Pages", path: "/service-pages", section: 'Services' },
         '/careers': { icon: Calendar, label: "Careers", path: "/career", section: 'Pages' },
         '/inquiries': { icon: MessageSquare, label: "Inquiries", path: "/inquiries", section: 'Content' },
         '/users': { icon: Users, label: "Registered Users", path: "/users", section: 'Content' },
@@ -160,10 +159,14 @@ const Layout = () => {
                         <SidebarItem key={item.path} icon={item.icon} label={item.label} path={item.path} />
                     ))}
 
-                    <SectionDivider label="Services" />
-                    {getItemsBySection('Services').map(item => (
-                        <SidebarItem key={item.path} icon={item.icon} label={item.label} path={item.path} />
-                    ))}
+                    {getItemsBySection('Services').length > 0 && (
+                        <>
+                            <SectionDivider label="Services" />
+                            {getItemsBySection('Services').map(item => (
+                                <SidebarItem key={item.path} icon={item.icon} label={item.label} path={item.path} />
+                            ))}
+                        </>
+                    )}
 
                     {/* Logout */}
                     <div className="pt-6 mt-4 border-t border-gray-100">

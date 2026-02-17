@@ -21,11 +21,29 @@ const Industries = () => {
         { id: 'ind-8', name: 'Digital Tech', icon: 'Cpu' }
     ];
 
-    const { content } = usePageContent('home', { industries: defaultIndustries });
+    const { content } = usePageContent('home', { industries: defaultIndustries, industriesSectionStyles: {} });
     const industries = content.industries || defaultIndustries;
+    const sectionStyles = content.industriesSectionStyles || {};
+    const sectionStyle = {};
+    if (sectionStyles.backgroundColor) {
+        const v = sectionStyles.backgroundColor.trim();
+        if (v.startsWith('linear-gradient') || v.startsWith('radial-gradient')) {
+            sectionStyle.background = v;
+        } else {
+            sectionStyle.backgroundColor = v;
+            sectionStyle['--industries-bg'] = v;
+        }
+    } else {
+        sectionStyle['--industries-bg'] = '#0b1120';
+    }
+    if (sectionStyles.textColor) {
+        sectionStyle.color = sectionStyles.textColor;
+        sectionStyle['--industries-text'] = sectionStyles.textColor;
+    }
+    if (sectionStyles.boxColor) sectionStyle['--industries-box-bg'] = sectionStyles.boxColor;
 
     return (
-        <section id="industries" className={styles.industries}>
+        <section id="industries" className={styles.industries} style={sectionStyle}>
             <div className="container">
                 <ScrollReveal>
                     <h2 className="section-title">Focus Industries</h2>

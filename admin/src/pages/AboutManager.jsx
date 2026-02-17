@@ -159,7 +159,8 @@ const DEFAULT_BOARD = {
         { id: 'dir-5', name: 'NORZALIZA ABD GHAFAR', role: 'GENERAL MANAGER', image: '', bio: '' },
         { id: 'dir-6', name: 'NORLI HIDAYATUL AINI', role: 'GENERAL MANAGER', image: '', bio: '' },
         { id: 'dir-7', name: 'DR. SUHAILY SHAHIMI', role: 'INTERNAL AUDITOR', image: '', bio: '' },
-    ]
+    ],
+    styleColors: { nameColor: '', roleColor: '', bioColor: '' }
 };
 
 const DEFAULT_PARTNERS = {
@@ -569,6 +570,7 @@ const AboutManager = () => {
     const [sections, setSections] = useState(ALL_SECTIONS);
     const [activeSection, setActiveSection] = useState(null);
     const [directors, setDirectors] = useState(DEFAULT_BOARD.directors);
+    const [boardStyleColors, setBoardStyleColors] = useState(DEFAULT_BOARD.styleColors || { nameColor: '', roleColor: '', bioColor: '' });
     const [partners, setPartners] = useState(DEFAULT_PARTNERS.partners);
     const [banks, setBanks] = useState(DEFAULT_PARTNERS.banks);
     const [milestone, setMilestone] = useState(DEFAULT_PARTNERS.milestone);
@@ -594,7 +596,12 @@ const AboutManager = () => {
         }
     }, [content, loading]);
 
-    useEffect(() => { if (boardContent?.directors && !boardLoading) setDirectors(boardContent.directors); }, [boardContent, boardLoading]);
+    useEffect(() => {
+        if (boardContent && !boardLoading) {
+            if (boardContent.directors) setDirectors(boardContent.directors);
+            if (boardContent.styleColors) setBoardStyleColors(boardContent.styleColors);
+        }
+    }, [boardContent, boardLoading]);
     useEffect(() => {
         if (partnersContent && !partnersLoading) {
             if (partnersContent.partners) setPartners(partnersContent.partners);
@@ -674,7 +681,7 @@ const AboutManager = () => {
         try {
             await Promise.all([
                 saveContent({ sections }, { silent: true }),
-                saveBoard({ directors }, { silent: true }),
+                saveBoard({ directors, styleColors: boardStyleColors }, { silent: true }),
                 savePartners({ partners, banks, milestone }, { silent: true })
             ]);
             toast.success('All changes saved!');
@@ -803,6 +810,38 @@ const AboutManager = () => {
                     <label className="label">Subtitle</label>
                     <input value={s.subtitle || ''} onChange={e => updateSection(s.id, { subtitle: e.target.value })}
                         className="input-field text-sm" placeholder="Subtitle..." />
+                </div>
+            </div>
+
+            {/* Custom font colours for name, role, bio */}
+            <div className="p-4 bg-amber-50/50 rounded-xl border border-amber-200/80">
+                <h4 className="text-sm font-bold text-amber-800 mb-3">Font colours (name, role, bio)</h4>
+                <p className="text-xs text-amber-700/90 mb-3">Set colours for director name, role, and bio on the public page. Leave empty for site default.</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Name</label>
+                        <div className="flex items-center gap-2">
+                            <div className="w-10 h-10 rounded-lg border border-amber-300 shrink-0 flex items-center justify-center text-[10px] font-bold" style={{ background: boardStyleColors.nameColor || '#1A365D', color: '#fff' }}>Aa</div>
+                            <input type="color" value={boardStyleColors.nameColor || '#1A365D'} onChange={(e) => setBoardStyleColors(prev => ({ ...prev, nameColor: e.target.value }))} className="h-9 w-10 rounded border border-gray-300 cursor-pointer" />
+                            <input type="text" value={boardStyleColors.nameColor || ''} onChange={(e) => setBoardStyleColors(prev => ({ ...prev, nameColor: e.target.value }))} className="input-field text-xs flex-1 py-1.5" placeholder="#1A365D" />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Role</label>
+                        <div className="flex items-center gap-2">
+                            <div className="w-10 h-10 rounded-lg border border-amber-300 shrink-0 flex items-center justify-center text-[10px] font-bold" style={{ background: boardStyleColors.roleColor || '#b8860b', color: '#fff' }}>Aa</div>
+                            <input type="color" value={boardStyleColors.roleColor || '#b8860b'} onChange={(e) => setBoardStyleColors(prev => ({ ...prev, roleColor: e.target.value }))} className="h-9 w-10 rounded border border-gray-300 cursor-pointer" />
+                            <input type="text" value={boardStyleColors.roleColor || ''} onChange={(e) => setBoardStyleColors(prev => ({ ...prev, roleColor: e.target.value }))} className="input-field text-xs flex-1 py-1.5" placeholder="#b8860b" />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Bio</label>
+                        <div className="flex items-center gap-2">
+                            <div className="w-10 h-10 rounded-lg border border-amber-300 shrink-0 flex items-center justify-center text-[10px] font-bold" style={{ background: boardStyleColors.bioColor || '#64748b', color: '#fff' }}>Aa</div>
+                            <input type="color" value={boardStyleColors.bioColor || '#64748b'} onChange={(e) => setBoardStyleColors(prev => ({ ...prev, bioColor: e.target.value }))} className="h-9 w-10 rounded border border-gray-300 cursor-pointer" />
+                            <input type="text" value={boardStyleColors.bioColor || ''} onChange={(e) => setBoardStyleColors(prev => ({ ...prev, bioColor: e.target.value }))} className="input-field text-xs flex-1 py-1.5" placeholder="#64748b" />
+                        </div>
+                    </div>
                 </div>
             </div>
 

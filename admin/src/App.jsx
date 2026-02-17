@@ -6,8 +6,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import HomeManager from './pages/HomeManager';
 import AboutManager from './pages/AboutManager';
-import ServicesManager from './pages/ServicesManager';
-import ServiceContentManager from './pages/ServiceContentManager';
+import CombinedServicesManager from './pages/CombinedServicesManager';
 import CareerManager from './pages/CareerManager';
 import NewsManager from './pages/NewsManager';
 import InquiriesManager from './pages/InquiriesManager';
@@ -57,8 +56,9 @@ function AppRoutes() {
         <Route path="about" element={<AboutManager />} />
         <Route path="board" element={<BoardManager />} />
         <Route path="partners" element={<PartnersManager />} />
-        <Route path="services" element={<ServicesManager />} />
-        <Route path="service-pages" element={<ServiceContentManager />} />
+        <Route path="services" element={<CombinedServicesManager />} />
+        <Route path="services-page" element={<Navigate to="/services?tab=page-settings" replace />} />
+        <Route path="service-pages" element={<Navigate to="/services?tab=detail-pages" replace />} />
         <Route path="career" element={<CareerManager />} />
         <Route path="news" element={<NewsManager />} />
         <Route path="footer" element={<FooterManager />} />

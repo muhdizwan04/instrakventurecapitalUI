@@ -10,6 +10,10 @@ const NavigationManager = () => {
             url: '/logo.png',
             alt: 'Instrak Venture Capital'
         },
+        navStyles: {
+            backgroundColor: '#020617',
+            textColor: '#e5e7eb'
+        },
         items: [
             { id: 'nav-1', label: 'Home', link: '/', isDropdown: false, children: [] },
             {
@@ -177,20 +181,78 @@ const NavigationManager = () => {
 
             {/* Live Preview */}
             <div className="glass-card p-0 overflow-hidden mb-8">
-                <div className="bg-gray-100 p-2 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Navigation Preview</div>
-                <div className="bg-[#1A365D] p-4">
+                <div className="bg-gray-100 p-2 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    Navigation Preview
+                </div>
+                <div
+                    className="p-4"
+                    style={{ backgroundColor: formData.navStyles?.backgroundColor || '#020617' }}
+                >
                     <div className="flex items-center justify-between max-w-6xl mx-auto">
-                        <div className="text-white font-bold">{formData.logo?.alt || 'Logo'}</div>
+                        <div
+                            className="font-bold"
+                            style={{ color: formData.navStyles?.textColor || '#e5e7eb' }}
+                        >
+                            {formData.logo?.alt || 'Logo'}
+                        </div>
                         <div className="flex items-center gap-6">
                             {formData.items.map(item => (
                                 <div key={item.id} className="relative group">
-                                    <span className={`text-white text-sm ${item.isButton ? 'bg-[#B8860B] px-4 py-2 rounded' : ''} cursor-pointer hover:text-[#B8860B]`}>
+                                    <span
+                                        className={`text-sm cursor-pointer ${item.isButton ? 'px-4 py-2 rounded border border-white/15' : ''}`}
+                                        style={{ color: formData.navStyles?.textColor || '#e5e7eb' }}
+                                    >
                                         {item.label}
                                         {item.isDropdown && <ChevronDown size={14} className="inline ml-1" />}
                                     </span>
                                 </div>
                             ))}
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Navigation Styles */}
+            <div className="glass-card p-6">
+                <h3 className="font-bold text-[var(--accent-primary)] mb-4">Navigation Styles</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+                            Navigation background color
+                        </label>
+                        <input
+                            type="color"
+                            value={formData.navStyles?.backgroundColor || '#020617'}
+                            onChange={(e) =>
+                                setFormData(prev => ({
+                                    ...prev,
+                                    navStyles: {
+                                        ...(prev.navStyles || {}),
+                                        backgroundColor: e.target.value
+                                    }
+                                }))
+                            }
+                            className="w-16 h-10 p-1 rounded border border-[var(--border-light)] cursor-pointer bg-transparent"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+                            Navigation text color
+                        </label>
+                        <input
+                            type="color"
+                            value={formData.navStyles?.textColor || '#e5e7eb'}
+                            onChange={(e) =>
+                                setFormData(prev => ({
+                                    ...prev,
+                                    navStyles: {
+                                        ...(prev.navStyles || {}),
+                                        textColor: e.target.value
+                                    }
+                                }))
+                            }
+                            className="w-16 h-10 p-1 rounded border border-[var(--border-light)] cursor-pointer bg-transparent"
+                        />
                     </div>
                 </div>
             </div>

@@ -27,12 +27,15 @@ const BoardManager = () => {
         { id: 'dir-7', name: 'DR. SUHAILY SHAHIMI', role: 'INTERNAL AUDITOR', image: '', bio: '' },
     ];
 
-    const { content, loading, saving, saveContent } = useContent('board', { directors: defaultDirectors });
+    const defaultBoardContent = { directors: defaultDirectors, styleColors: { nameColor: '', roleColor: '', bioColor: '' } };
+    const { content, loading, saving, saveContent } = useContent('board', defaultBoardContent);
     const [directors, setDirectors] = useState(defaultDirectors);
+    const [styleColors, setStyleColors] = useState(defaultBoardContent.styleColors);
 
     useEffect(() => {
-        if (content?.directors && !loading) {
-            setDirectors(content.directors);
+        if (content && !loading) {
+            if (content.directors) setDirectors(content.directors);
+            if (content.styleColors) setStyleColors(content.styleColors);
         }
     }, [content, loading]);
 
@@ -49,7 +52,7 @@ const BoardManager = () => {
 
     const handleSave = async (e) => {
         e.preventDefault();
-        await saveContent({ directors });
+        await saveContent({ directors, styleColors });
     };
 
     const handleDelete = (id) => {
@@ -90,6 +93,38 @@ const BoardManager = () => {
                         {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                         <span>{saving ? 'Saving...' : 'Save Changes'}</span>
                     </button>
+                </div>
+            </div>
+
+            {/* Custom font colours */}
+            <div className="glass-card p-6 mb-8">
+                <h3 className="font-bold text-[var(--accent-primary)] mb-3">Custom font colours</h3>
+                <p className="text-sm text-[var(--text-secondary)] mb-4">Set colours for name, role, and bio on the public Board of Directors section. Leave empty to use the site default.</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Name</label>
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-lg border-2 border-[var(--border-light)] shrink-0 flex items-center justify-center text-xs font-bold" style={{ background: styleColors.nameColor || '#0b1120', color: styleColors.nameColor && (styleColors.nameColor.toLowerCase() === '#ffffff' || styleColors.nameColor.toLowerCase() === '#fff') ? '#333' : '#fff' }}>Aa</div>
+                            <input type="color" value={styleColors.nameColor || '#0b1120'} onChange={(e) => setStyleColors(prev => ({ ...prev, nameColor: e.target.value }))} className="h-10 w-12 rounded border border-[var(--border-light)] cursor-pointer" />
+                            <input type="text" value={styleColors.nameColor || ''} onChange={(e) => setStyleColors(prev => ({ ...prev, nameColor: e.target.value }))} className="input-field text-sm flex-1" placeholder="#0b1120" />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Role</label>
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-lg border-2 border-[var(--border-light)] shrink-0 flex items-center justify-center text-xs font-bold" style={{ background: styleColors.roleColor || '#b8860b', color: '#fff' }}>Aa</div>
+                            <input type="color" value={styleColors.roleColor || '#b8860b'} onChange={(e) => setStyleColors(prev => ({ ...prev, roleColor: e.target.value }))} className="h-10 w-12 rounded border border-[var(--border-light)] cursor-pointer" />
+                            <input type="text" value={styleColors.roleColor || ''} onChange={(e) => setStyleColors(prev => ({ ...prev, roleColor: e.target.value }))} className="input-field text-sm flex-1" placeholder="#b8860b" />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Bio</label>
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-lg border-2 border-[var(--border-light)] shrink-0 flex items-center justify-center text-xs font-bold" style={{ background: styleColors.bioColor || '#64748b', color: '#fff' }}>Aa</div>
+                            <input type="color" value={styleColors.bioColor || '#64748b'} onChange={(e) => setStyleColors(prev => ({ ...prev, bioColor: e.target.value }))} className="h-10 w-12 rounded border border-[var(--border-light)] cursor-pointer" />
+                            <input type="text" value={styleColors.bioColor || ''} onChange={(e) => setStyleColors(prev => ({ ...prev, bioColor: e.target.value }))} className="input-field text-sm flex-1" placeholder="#64748b" />
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -145,6 +180,15 @@ const BoardManager = () => {
                                                                 value={director.role}
                                                                 onChange={(e) => handleUpdate(director.id, 'role', e.target.value)}
                                                                 className="w-full p-2 border border-[var(--border-light)] rounded focus:border-[var(--accent-primary)] text-xs outline-none"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-[10px] font-bold uppercase text-[var(--text-muted)] mb-1 block">Bio (optional)</label>
+                                                            <textarea
+                                                                value={director.bio || ''}
+                                                                onChange={(e) => handleUpdate(director.id, 'bio', e.target.value)}
+                                                                className="w-full p-2 border border-[var(--border-light)] rounded focus:border-[var(--accent-primary)] text-xs outline-none resize-none h-14"
+                                                                placeholder="Short bio..."
                                                             />
                                                         </div>
                                                         <div className="pt-2 mt-auto">

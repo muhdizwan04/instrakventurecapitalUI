@@ -39,39 +39,81 @@ const ServicesPage = () => {
     const { content: industriesContent } = usePageContent('industries', { items: defaultIndustries });
     const industries = industriesContent.items || defaultIndustries;
 
+    const defaultPageContent = {
+        heroTitle: 'Strategic Financial Services',
+        heroSubtitle: 'Comprehensive financial pathways tailored for institutional growth, industrial expansion, and global capital access.',
+        heroBackground: 'linear-gradient(135deg, #1A365D 0%, #0F2942 100%)',
+        heroTextColor: '#FFFFFF',
+        heroTextAlign: 'center',
+        heroFontFamily: 'var(--font-heading)',
+        heroTitleFontSize: '3.5rem',
+        heroSubtitleFontSize: '1.25rem',
+        heroFontWeight: '700',
+        ctaPrimaryText: 'Speak to an Advisor',
+        ctaPrimaryLink: '/contact',
+        ctaSecondaryText: 'Explore Solutions',
+        sectionSolutionsTitle: 'Our Specialized Solutions',
+        sectionIndustriesTitle: 'Sector Expertise',
+        sectionTitleFontFamily: 'var(--font-heading)',
+        sectionTitleFontSize: '2.5rem',
+        sectionTitleColor: '#1A365D',
+        sectionTitleAlign: 'center',
+        sectionTitleFontWeight: '700',
+        leadMagnetTitle: 'Unsure which solution fits your needs?',
+        leadMagnetDescription: 'Our analysts can assess your current financial position and recommend the optimal funding or restructuring strategy.',
+        leadMagnetButtonText: 'Get a Free Assessment',
+        leadMagnetButtonLink: '/contact',
+        leadMagnetTextAlign: 'center',
+        leadMagnetFontFamily: 'var(--font-heading)',
+        leadMagnetTitleFontSize: '2rem',
+        leadMagnetDescFontSize: '1.1rem',
+        leadMagnetTitleColor: '#1A365D',
+        leadMagnetDescColor: '#4A5568'
+    };
+    const { content: pageContent } = usePageContent('services_page', defaultPageContent);
+    const p = { ...defaultPageContent, ...pageContent };
+
     return (
         <div className="page-wrapper">
-            {/* Enhanced Hero with CTA */}
+            {/* Enhanced Hero with CTA (from services_page content) */}
             <div style={{
-                background: 'linear-gradient(135deg, #1A365D 0%, #0F2942 100%)',
-                color: '#FFFFFF',
+                background: p.heroBackground || 'linear-gradient(135deg, #1A365D 0%, #0F2942 100%)',
+                color: p.heroTextColor || '#FFFFFF',
                 padding: '120px 20px 80px',
-                textAlign: 'center',
+                textAlign: p.heroTextAlign || 'center',
                 position: 'relative',
                 overflow: 'hidden'
             }}>
                 <div className="container" style={{ position: 'relative', zIndex: 2 }}>
                     <h1 style={{ 
-                        fontSize: '3.5rem', 
-                        fontWeight: '700', 
+                        fontSize: p.heroTitleFontSize || '3.5rem', 
+                        fontWeight: p.heroFontWeight || '700', 
                         marginBottom: '1.5rem', 
-                        fontFamily: 'var(--font-heading)',
+                        fontFamily: p.heroFontFamily || 'var(--font-heading)',
                         letterSpacing: '-1px',
-                        color: '#FFFFFF'
+                        color: p.heroTextColor || '#FFFFFF',
+                        textAlign: p.heroTextAlign || 'center'
                     }}>
-                        Strategic Financial Services
+                        {p.heroTitle}
                     </h1>
                     <p style={{ 
-                        fontSize: '1.25rem', 
+                        fontSize: p.heroSubtitleFontSize || '1.25rem', 
                         maxWidth: '700px', 
-                        margin: '0 auto 2.5rem', 
-                        color: 'rgba(255,255,255,0.85)', 
-                        lineHeight: '1.6' 
+                        margin: p.heroTextAlign === 'center' ? '0 auto 2.5rem' : (p.heroTextAlign === 'right' ? '0 0 2.5rem auto' : '0 auto 2.5rem 0'), 
+                        color: p.heroTextColor ? `${p.heroTextColor}dd` : 'rgba(255,255,255,0.85)', 
+                        lineHeight: '1.6',
+                        fontFamily: p.heroFontFamily || 'var(--font-heading)',
+                        textAlign: p.heroTextAlign || 'center'
                     }}>
-                        Comprehensive financial pathways tailored for institutional growth, industrial expansion, and global capital access.
+                        {p.heroSubtitle}
                     </p>
-                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                        <Link to="/contact" className="btn-solid" style={{ 
+                    <div style={{ 
+                        display: 'flex', 
+                        gap: '1rem', 
+                        justifyContent: p.heroTextAlign === 'center' ? 'center' : (p.heroTextAlign === 'right' ? 'flex-end' : 'flex-start'), 
+                        flexWrap: 'wrap' 
+                    }}>
+                        <Link to={p.ctaPrimaryLink || '/contact'} className="btn-solid" style={{ 
                             background: '#B8860B', 
                             color: '#FFFFFF', 
                             padding: '1rem 2rem', 
@@ -80,22 +122,22 @@ const ServicesPage = () => {
                             alignItems: 'center',
                             gap: '0.5rem'
                         }}>
-                            Speak to an Advisor <ArrowRight size={18} />
+                            {p.ctaPrimaryText} <ArrowRight size={18} />
                         </Link>
                         <a href="#services-list" className="btn-outline" style={{ 
                             borderColor: 'rgba(255,255,255,0.3)', 
-                            color: '#FFFFFF', 
+                            color: p.heroTextColor || '#FFFFFF', 
                             padding: '1rem 2rem', 
                             fontSize: '1.1rem' 
                         }}>
-                            Explore Solutions
+                            {p.ctaSecondaryText}
                         </a>
                     </div>
                 </div>
             </div>
 
             <div id="services-list" className="container" style={{ padding: '80px 20px' }}>
-                <h2 style={{ fontSize: '2.5rem', marginBottom: '3rem', textAlign: 'center', fontFamily: 'var(--font-heading)', color: '#1A365D' }}>Our Specialized Solutions</h2>
+                <h2 style={{ fontSize: p.sectionTitleFontSize || '2.5rem', marginBottom: '3rem', textAlign: p.sectionTitleAlign || 'center', fontFamily: p.sectionTitleFontFamily || 'var(--font-heading)', color: p.sectionTitleColor || '#1A365D', fontWeight: p.sectionTitleFontWeight || '700' }}>{p.sectionSolutionsTitle}</h2>
                 <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', marginBottom: '100px' }}>
                     {services.map((s, i) => {
                         const IconComponent = ICON_MAP[s.icon] || Briefcase;
@@ -159,20 +201,33 @@ const ServicesPage = () => {
                     background: 'linear-gradient(135deg, #F8FAFC, #EDF2F7)', 
                     borderRadius: '20px', 
                     padding: '4rem 2rem', 
-                    textAlign: 'center',
+                    textAlign: p.leadMagnetTextAlign || 'center',
                     marginBottom: '100px',
                     border: '1px solid rgba(26, 54, 93, 0.05)'
                 }}>
-                    <h3 style={{ fontSize: '2rem', color: '#1A365D', marginBottom: '1rem' }}>Unsure which solution fits your needs?</h3>
-                    <p style={{ maxWidth: '600px', margin: '0 auto 2rem', color: '#4A5568', fontSize: '1.1rem' }}>
-                        Our analysts can assess your current financial position and recommend the optimal funding or restructuring strategy.
+                    <h3 style={{ 
+                        fontSize: p.leadMagnetTitleFontSize || '2rem', 
+                        color: p.leadMagnetTitleColor || '#1A365D', 
+                        marginBottom: '1rem',
+                        fontFamily: p.leadMagnetFontFamily || 'var(--font-heading)',
+                        textAlign: p.leadMagnetTextAlign || 'center'
+                    }}>{p.leadMagnetTitle}</h3>
+                    <p style={{ 
+                        maxWidth: '600px', 
+                        margin: p.leadMagnetTextAlign === 'center' ? '0 auto 2rem' : (p.leadMagnetTextAlign === 'right' ? '0 0 2rem auto' : '0 auto 2rem 0'), 
+                        color: p.leadMagnetDescColor || '#4A5568', 
+                        fontSize: p.leadMagnetDescFontSize || '1.1rem',
+                        fontFamily: p.leadMagnetFontFamily || 'var(--font-heading)',
+                        textAlign: p.leadMagnetTextAlign || 'center'
+                    }}>
+                        {p.leadMagnetDescription}
                     </p>
-                    <Link to="/contact" className="btn-solid" style={{ background: '#1A365D', color: '#FFFFFF', padding: '1rem 2.5rem' }}>
-                        Get a Free Assessment
+                    <Link to={p.leadMagnetButtonLink || '/contact'} className="btn-solid" style={{ background: '#1A365D', color: '#FFFFFF', padding: '1rem 2.5rem' }}>
+                        {p.leadMagnetButtonText}
                     </Link>
                 </div>
 
-                <h2 style={{ fontSize: '2.5rem', marginBottom: '3rem', textAlign: 'center', fontFamily: 'var(--font-heading)', color: '#1A365D' }}>Sector Expertise</h2>
+                <h2 style={{ fontSize: p.sectionTitleFontSize || '2.5rem', marginBottom: '3rem', textAlign: p.sectionTitleAlign || 'center', fontFamily: p.sectionTitleFontFamily || 'var(--font-heading)', color: p.sectionTitleColor || '#1A365D', fontWeight: p.sectionTitleFontWeight || '700' }}>{p.sectionIndustriesTitle}</h2>
                 <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1.5rem' }}>
                     {industries.map((ind, i) => {
                         const IndustryIcon = INDUSTRY_ICONS[ind.icon] || Factory;

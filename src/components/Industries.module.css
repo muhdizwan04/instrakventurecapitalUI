@@ -1,7 +1,12 @@
 .industries {
     padding: var(--section-padding);
-    background: #F5F7FA;
+    background: var(--industries-bg, #0b1120);
+    color: var(--industries-text, #e5e7eb);
     position: relative;
+}
+
+.industries .section-title {
+    color: inherit;
 }
 
 /* Professional grid pattern */
@@ -33,12 +38,12 @@
     align-items: center;
     justify-content: center;
     padding: 2.5rem;
-    background: #FFFFFF;
-    border: 1px solid rgba(26, 54, 93, 0.08);
+    background: var(--industries-box-bg, rgba(30, 41, 59, 0.6));
+    border: 1px solid rgba(148, 163, 184, 0.2);
     border-radius: 8px;
     transition: all 0.3s ease;
     cursor: default;
-    box-shadow: 0 2px 6px rgba(26, 54, 93, 0.04);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .item:hover {
@@ -59,6 +64,6 @@
 
 .item span {
     font-weight: 500;
-    color: #1A365D;
+    color: inherit;
     text-align: center;
 }

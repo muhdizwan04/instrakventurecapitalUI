@@ -162,8 +162,8 @@
   justify-content: center;
   padding: 10px 14px;
   border-radius: 12px;
-  background: var(--accent-primary);
-  color: white;
+  background: var(--card-cta-bg, var(--accent-primary));
+  color: var(--card-cta-color, white);
   font-weight: 800;
   text-decoration: none;
   font-size: 0.9rem;

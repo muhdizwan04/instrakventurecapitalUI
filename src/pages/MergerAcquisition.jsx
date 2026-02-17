@@ -2,6 +2,7 @@ import React from 'react';
 import PageHero from '../components/PageHero';
 import { Users, TrendingUp, Search, Briefcase, Target, CheckCircle } from 'lucide-react';
 import { usePageContent } from '../hooks/usePageContent';
+import { isSectionVisible } from '../utils/sectionVisibility';
 import ProtectedFormSection from '../components/ProtectedFormSection';
 import DynamicServiceForm from '../components/DynamicServiceForm';
 
@@ -28,6 +29,7 @@ const MergerAcquisition = () => {
     };
 
     const pageContent = serviceData || defaultData;
+    const show = (key) => isSectionVisible(pageContent, key);
     const title = pageContent.title || defaultData.title;
     const introduction = pageContent.introduction || pageContent.subtitle || defaultData.introduction;
     const overview = pageContent.overview || defaultData.overview;
@@ -44,7 +46,7 @@ const MergerAcquisition = () => {
             />
 
             {/* Introduction */}
-            <section style={{ padding: '80px 20px 40px', background: '#FFFFFF' }}>
+            {show('subtitle') && <section style={{ padding: '80px 20px 40px', background: '#FFFFFF' }}>
                 <div className="container">
                     <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
                         <p style={{ fontSize: '1.15rem', color: '#4A5568', lineHeight: '1.9' }}>
@@ -52,10 +54,10 @@ const MergerAcquisition = () => {
                         </p>
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Overview / Services */}
-            <section style={{ padding: '40px 20px 80px', background: '#FFFFFF' }}>
+            {show('services') && <section style={{ padding: '40px 20px 80px', background: '#FFFFFF' }}>
                 <div className="container">
                     <h2 className="section-title">{overview.heading}</h2>
                     <p style={{ textAlign: 'center', color: '#4A5568', marginBottom: '3rem', maxWidth: '700px', margin: '0 auto 3rem' }}>
@@ -71,7 +73,7 @@ const MergerAcquisition = () => {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Form Section */}
             <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>

@@ -28,7 +28,9 @@ export const usePageContent = (contentId, defaultContent = {}, options = {}) => 
         },
         enabled: !forceDefaults,
         placeholderData: defaultContent, // Show default content immediately while background fetching
-        staleTime: 0, // Disable cache for immediate updates
+        // Use the global 5-minute staleTime from QueryClient for fast repeat loads.
+        // refetchOnMount ensures we still get fresh data in the background.
+        refetchOnMount: 'always',
         refetchOnWindowFocus: true
     });
 
@@ -59,7 +61,7 @@ export const useMultipleContent = (contentIds, defaults = {}) => {
                 if (error && error.code !== 'PGRST116') throw error;
                 return { id, content: data?.content || defaults[id] };
             },
-            staleTime: 0,
+            refetchOnMount: 'always',
         }))
     });
 

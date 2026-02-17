@@ -3,6 +3,7 @@ import PageHero from '../components/PageHero';
 import { CheckCircle, Building2, Users, Briefcase, Shield, Globe, BarChart3, Target, TrendingUp, Lock, Eye, ArrowRight, Loader2 } from 'lucide-react';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { usePageContent } from '../hooks/usePageContent';
+import { isSectionVisible } from '../utils/sectionVisibility';
 import { Link } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import ProtectedFormSection from '../components/ProtectedFormSection';
@@ -86,6 +87,7 @@ const AssetUnderManagement = () => {
 
     const { content: servicePages } = usePageContent('service_pages', { pages: [] });
     const pageContent = servicePages.pages?.find(p => p.id === 'aum') || defaultContent;
+    const show = (key) => isSectionVisible(pageContent, key);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -141,6 +143,7 @@ const AssetUnderManagement = () => {
     const introductoryText = content.introduction || defaultContent.introduction;
     const dynamicIntro = introductoryText.replace('Instrak Venture Capital Berhad', siteName);
     const dynamicDisclaimer = (content.disclaimer || defaultContent.disclaimer).replace('IVC', settings?.siteIdentity?.siteName ? settings.siteIdentity.siteName.split(' ').map(w => w[0]).join('') : 'IVC');
+    const labels = content.sectionLabels || {};
 
     const labelStyle = { display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#1A365D', fontSize: '0.9rem' };
     const inputStyle = { width: '100%', padding: '0.9rem', border: '1px solid #E2E8F0', borderRadius: '8px', fontSize: '1rem', color: '#1A365D', background: '#FFFFFF', transition: 'border-color 0.2s' };
@@ -155,7 +158,7 @@ const AssetUnderManagement = () => {
             />
 
             {/* Introduction */}
-            <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>
+            {show('subtitle') && <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>
                 <div className="container">
                     <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
                         <p style={{ fontSize: '1.15rem', color: '#4A5568', lineHeight: '1.9' }}>
@@ -163,12 +166,12 @@ const AssetUnderManagement = () => {
                         </p>
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Philosophy */}
-            <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
+            {show('philosophy') && <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
                 <div className="container">
-                    <h2 className="section-title">Our Philosophy</h2>
+                    <h2 className="section-title">{labels.philosophy || 'Our Philosophy'}</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem' }}>
                         {content.philosophy.map((item, i) => (
                             <div key={i} className="glass-card" style={{ textAlign: 'center', padding: '2rem' }}>
@@ -181,12 +184,12 @@ const AssetUnderManagement = () => {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Our Services */}
-            <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>
+            {show('services') && <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>
                 <div className="container">
-                    <h2 className="section-title">Our Services</h2>
+                    <h2 className="section-title">{labels.services || 'Our Services'}</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2rem' }}>
                         {content.services.map((item, i) => (
                             <div key={i} style={{ display: 'flex', gap: '1.5rem', padding: '2rem', background: '#F5F7FA', borderRadius: '12px', border: '1px solid rgba(26, 54, 93, 0.08)' }}>
@@ -201,12 +204,12 @@ const AssetUnderManagement = () => {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Who We Serve */}
-            <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
+            {show('whoWeServe') && <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
                 <div className="container">
-                    <h2 className="section-title">Who We Serve</h2>
+                    <h2 className="section-title">{labels.whoWeServe || 'Who We Serve'}</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
                         {content.whoWeServe.map((item, i) => (
                             <div key={i} style={{ background: '#FFFFFF', padding: '1.5rem', borderRadius: '10px', borderLeft: '4px solid #B8860B' }}>
@@ -216,12 +219,12 @@ const AssetUnderManagement = () => {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Our Approach */}
-            <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>
+            {show('approach') && <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>
                 <div className="container">
-                    <h2 className="section-title">Our Approach</h2>
+                    <h2 className="section-title">{labels.approach || 'Our Approach'}</h2>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                         {content.approach.map((item, i) => (
                             <div key={i} style={{ display: 'flex', gap: '1.5rem', marginBottom: '2rem', alignItems: 'flex-start' }}>
@@ -236,12 +239,12 @@ const AssetUnderManagement = () => {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Why Choose IVC */}
-            <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
+            {show('whyChoose') && <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
                 <div className="container">
-                    <h2 className="section-title">Why Choose IVC</h2>
+                    <h2 className="section-title">{labels.whyChoose || 'Why Choose IVC'}</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
                         {content.whyChoose.map((item, i) => (
                             <div key={i} className="glass-card" style={{ textAlign: 'center', padding: '1.5rem' }}>
@@ -254,7 +257,7 @@ const AssetUnderManagement = () => {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Dynamic Sections from Admin */}
             {(pageContent.sections || []).map((section, idx) => (

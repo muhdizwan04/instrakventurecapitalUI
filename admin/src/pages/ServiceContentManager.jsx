@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, ArrowLeft, Edit2, Plus, Trash2, Briefcase, FileText, TrendingUp, Building2, GripVertical, ChevronDown, ChevronUp, Loader2, Globe, Shield, Landmark, Coins, Gem, Users, ShieldCheck, PieChart, BarChart3, Settings2 } from 'lucide-react';
+import { List, Save, ArrowLeft, Edit2, Plus, Trash2, Briefcase, FileText, TrendingUp, Building2, GripVertical, ChevronDown, ChevronUp, Loader2, Globe, Shield, Landmark, Coins, Gem, Users, ShieldCheck, PieChart, BarChart3, Settings2, Eye, EyeOff } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
@@ -8,6 +8,37 @@ import FormBuilder from '../components/FormBuilder';
 const ServiceContentManager = () => {
     const [activeService, setActiveService] = useState(null);
     const [activeTab, setActiveTab] = useState('content');
+    const [editingLabel, setEditingLabel] = useState(null);
+
+    // Click-to-edit section label component
+    const EditableSectionLabel = ({ serviceId, labelKey, defaultText }) => {
+        const isEditing = editingLabel === labelKey;
+        const currentValue = services.find(s => s.id === serviceId)?.sectionLabels?.[labelKey] || defaultText;
+        if (isEditing) {
+            return (
+                <div className="flex items-center gap-1.5">
+                    <input
+                        type="text"
+                        autoFocus
+                        value={currentValue}
+                        onChange={(e) => {
+                            const svc = services.find(s => s.id === serviceId);
+                            handleUpdateService(serviceId, 'sectionLabels', { ...svc?.sectionLabels, [labelKey]: e.target.value });
+                        }}
+                        onBlur={() => setEditingLabel(null)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') setEditingLabel(null); }}
+                        className="font-bold text-[var(--text-primary)] bg-white px-2 py-1 rounded border-2 border-[var(--accent-primary)] outline-none text-base"
+                    />
+                </div>
+            );
+        }
+        return (
+            <div className="flex items-center gap-1.5 group/label cursor-pointer" onClick={() => setEditingLabel(labelKey)}>
+                <h3 className="font-bold text-[var(--text-primary)] text-base">{currentValue}</h3>
+                <Edit2 size={14} className="text-gray-400 group-hover/label:text-[var(--accent-primary)] transition-colors" />
+            </div>
+        );
+    };
 
     // Default data for all 12 service detail pages
     const defaultServices = [
@@ -412,11 +443,54 @@ const ServiceContentManager = () => {
         }));
     };
 
+    // All possible section keys
+    const ALL_SECTION_KEYS = [
+        'subtitle', 'services', 'overview', 'philosophy', 'whoWeServe', 'approach', 'whyChoose', 'disclaimer',
+        'ourRole', 'whoNeeds', 'keyBenefits',
+        'roadmapStages', 'sectors',
+        'financingTerms', 'financingTypes', 'propertyTypes', 'loanTerms',
+        'executiveOverview', 'eligibility', 'valueProposition', 'subscriptionTiers',
+        'offerings', 'process'
+    ];
+
+    // Check if section key exists on a service
+    const sectionExists = (svc, key) => {
+        if (key === 'subtitle') return true;
+        if (key === 'disclaimer') return svc.disclaimer !== undefined || svc.id === 'aum';
+        if (key === 'executiveOverview') return svc.executiveOverview !== undefined;
+        return !!svc[key];
+    };
+
+    // Get the ordered section keys for a service
+    const getActiveSectionKeys = (svc) => {
+        const available = ALL_SECTION_KEYS.filter(k => sectionExists(svc, k));
+        if (svc.sectionOrder) {
+            const ordered = svc.sectionOrder.filter(k => available.includes(k));
+            const missing = available.filter(k => !ordered.includes(k));
+            return [...ordered, ...missing];
+        }
+        return available;
+    };
+
     const handleDragEnd = (result) => {
         if (!result.destination) return;
         const { source, destination } = result;
         const arrayName = source.droppableId;
 
+        // Section-level reordering
+        if (arrayName === 'contentSections') {
+            setServices(prev => prev.map(s => {
+                if (s.id !== activeService) return s;
+                const currentOrder = getActiveSectionKeys(s);
+                const newOrder = Array.from(currentOrder);
+                const [moved] = newOrder.splice(source.index, 1);
+                newOrder.splice(destination.index, 0, moved);
+                return { ...s, sectionOrder: newOrder };
+            }));
+            return;
+        }
+
+        // Item-level reordering within a section
         setServices(prev => prev.map(s => {
             if (s.id !== activeService) return s;
             const newArray = Array.from(s[arrayName]);
@@ -424,6 +498,775 @@ const ServiceContentManager = () => {
             newArray.splice(destination.index, 0, reorderedItem);
             return { ...s, [arrayName]: newArray };
         }));
+    };
+
+    // Toggle section visibility (hide/show)
+    const toggleSectionVisibility = (serviceId, sectionKey) => {
+        setServices(prev => prev.map(s => {
+            if (s.id !== serviceId) return s;
+            const hidden = s.hiddenSections || [];
+            const isHidden = hidden.includes(sectionKey);
+            return {
+                ...s,
+                hiddenSections: isHidden
+                    ? hidden.filter(k => k !== sectionKey)
+                    : [...hidden, sectionKey]
+            };
+        }));
+    };
+
+    const renderSection = (key, service, dragHandleProps) => {
+        const isHidden = (service.hiddenSections || []).includes(key);
+
+        // Helper: wraps section content with drag handle + hide/show toggle
+        const wrapSection = (content) => (
+            <div className={`space-y-4 border-b border-[var(--border-light)] pb-6 mb-6 p-4 rounded-lg transition-all relative ${isHidden ? 'bg-gray-100/80 opacity-60 border-dashed' : 'bg-white/50 hover:bg-white/80'}`}>
+                {/* Drag Handle */}
+                <div className="absolute left-2 top-4" {...dragHandleProps}>
+                    <div className="text-gray-400 hover:text-[var(--accent-primary)] cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded transition-colors">
+                        <GripVertical size={20} />
+                    </div>
+                </div>
+                {/* Hide/Show Toggle */}
+                <div className="absolute right-3 top-3 flex items-center gap-2">
+                    {isHidden && (
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-orange-500 bg-orange-50 px-2 py-0.5 rounded-full">Hidden</span>
+                    )}
+                    <button
+                        onClick={() => toggleSectionVisibility(service.id, key)}
+                        className={`p-1.5 rounded-lg transition-all ${isHidden ? 'text-orange-500 hover:bg-orange-100 bg-orange-50' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
+                        title={isHidden ? 'Show this section on the website' : 'Hide this section from the website'}
+                    >
+                        {isHidden ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                </div>
+                <div className="pl-10 pr-20">
+                    {content}
+                </div>
+            </div>
+        );
+
+        switch (key) {
+            case 'subtitle':
+                return wrapSection(
+                    <>
+                        <div className="mb-4"><EditableSectionLabel serviceId={service.id} labelKey="subtitle" defaultText="Introduction & Subtitle" /></div>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Tagline / Subtitle</label>
+                                <input
+                                    type="text"
+                                    value={service.subtitle || ''}
+                                    onChange={(e) => handleUpdateService(service.id, 'subtitle', e.target.value)}
+                                    className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                                    placeholder="Short tagline for the service..."
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Main Introduction Text</label>
+                                <textarea
+                                    rows={4}
+                                    value={service.introduction || ''}
+                                    onChange={(e) => handleUpdateService(service.id, 'introduction', e.target.value)}
+                                    className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                                    placeholder="Detailed introduction paragraph..."
+                                />
+                            </div>
+                        </div>
+                    </>
+                );
+            case 'overview':
+                if (!service.overview) return null;
+                return wrapSection(
+                    <>
+                        <div className="mb-4"><EditableSectionLabel serviceId={service.id} labelKey="overview" defaultText="Overview Section" /></div>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Section Heading</label>
+                                <input
+                                    type="text"
+                                    value={service.overview.heading || ''}
+                                    onChange={(e) => handleUpdateService(service.id, 'overview', { ...service.overview, heading: e.target.value })}
+                                    className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                                    placeholder="Overview Heading"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
+                                <textarea
+                                    rows={3}
+                                    value={service.overview.description || ''}
+                                    onChange={(e) => handleUpdateService(service.id, 'overview', { ...service.overview, description: e.target.value })}
+                                    className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                                    placeholder="Overview Description..."
+                                />
+                            </div>
+                        </div>
+                    </>
+                );
+            case 'services':
+                if (!service.services) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="services" defaultText="Services / Key Features" />
+                            <button
+                                onClick={() => handleAddArrayItem(service.id, 'services', { title: 'New Service', desc: 'Description...' })}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add Service
+                            </button>
+                        </div>
+                        <Droppable droppableId="services">
+                            {(provided) => (
+                                <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
+                                    {service.services.map((item, index) => (
+                                        <Draggable key={index} draggableId={`service-${index}`} index={index}>
+                                            {(provided, snapshot) => (
+                                                <div ref={provided.innerRef} {...provided.draggableProps}
+                                                    className={`p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 ${snapshot.isDragging ? 'shadow-lg border-[var(--accent-primary)]' : 'border border-transparent'}`}>
+                                                    <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab pt-2"><GripVertical size={16} /></div>
+                                                    <div className="flex-1 space-y-2">
+                                                        <input type="text" value={item.title} onChange={(e) => handleUpdateArrayItem(service.id, 'services', index, 'title', e.target.value)}
+                                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium" placeholder="Title" />
+                                                        <textarea rows={2} value={item.desc} onChange={(e) => handleUpdateArrayItem(service.id, 'services', index, 'desc', e.target.value)}
+                                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm" placeholder="Description" />
+                                                    </div>
+                                                    <button onClick={() => handleDeleteArrayItem(service.id, 'services', index)} className="text-gray-400 hover:text-red-500 self-start pt-2"><Trash2 size={16} /></button>
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                    </>
+                );
+            case 'philosophy':
+                if (!service.philosophy) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="philosophy" defaultText="Our Philosophy" />
+                            <button
+                                onClick={() => handleAddArrayItem(service.id, 'philosophy', { title: 'New Item', desc: 'Description...' })}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add Item
+                            </button>
+                        </div>
+                        <Droppable droppableId="philosophy">
+                            {(provided) => (
+                                <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
+                                    {service.philosophy.map((item, index) => (
+                                        <Draggable key={index} draggableId={`philosophy-${index}`} index={index}>
+                                            {(provided, snapshot) => (
+                                                <div ref={provided.innerRef} {...provided.draggableProps}
+                                                    className={`p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 ${snapshot.isDragging ? 'shadow-lg border-[var(--accent-primary)]' : 'border border-transparent'}`}>
+                                                    <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab pt-2"><GripVertical size={16} /></div>
+                                                    <div className="flex-1 space-y-2">
+                                                        <input type="text" value={item.title} onChange={(e) => handleUpdateArrayItem(service.id, 'philosophy', index, 'title', e.target.value)}
+                                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium" placeholder="Title" />
+                                                        <textarea rows={2} value={item.desc} onChange={(e) => handleUpdateArrayItem(service.id, 'philosophy', index, 'desc', e.target.value)}
+                                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm" placeholder="Description" />
+                                                    </div>
+                                                    <button onClick={() => handleDeleteArrayItem(service.id, 'philosophy', index)} className="text-gray-400 hover:text-red-500 self-start pt-2"><Trash2 size={16} /></button>
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                    </>
+                );
+            case 'whoWeServe':
+                if (!service.whoWeServe) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="whoWeServe" defaultText="Who We Serve" />
+                            <button
+                                onClick={() => handleAddArrayItem(service.id, 'whoWeServe', { title: 'New Client Type', desc: 'Description...' })}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add Target
+                            </button>
+                        </div>
+                        <Droppable droppableId="whoWeServe">
+                            {(provided) => (
+                                <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
+                                    {service.whoWeServe.map((item, index) => (
+                                        <Draggable key={index} draggableId={`whoWeServe-${index}`} index={index}>
+                                            {(provided, snapshot) => (
+                                                <div ref={provided.innerRef} {...provided.draggableProps}
+                                                    className={`p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 ${snapshot.isDragging ? 'shadow-lg border-[var(--accent-primary)]' : 'border border-transparent'}`}>
+                                                    <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab pt-2"><GripVertical size={16} /></div>
+                                                    <div className="flex-1 space-y-2">
+                                                        <input type="text" value={item.title} onChange={(e) => handleUpdateArrayItem(service.id, 'whoWeServe', index, 'title', e.target.value)}
+                                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium" placeholder="Client Type" />
+                                                        <input type="text" value={item.desc} onChange={(e) => handleUpdateArrayItem(service.id, 'whoWeServe', index, 'desc', e.target.value)}
+                                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm" placeholder="Description" />
+                                                    </div>
+                                                    <button onClick={() => handleDeleteArrayItem(service.id, 'whoWeServe', index)} className="text-gray-400 hover:text-red-500 self-start pt-2"><Trash2 size={16} /></button>
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                    </>
+                );
+            case 'approach':
+                if (!service.approach) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="approach" defaultText="Our Approach" />
+                            <button
+                                onClick={() => handleAddArrayItem(service.id, 'approach', { title: 'New Step', desc: 'Description...' })}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add Step
+                            </button>
+                        </div>
+                        <Droppable droppableId="approach">
+                            {(provided) => (
+                                <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
+                                    {service.approach.map((item, index) => (
+                                        <Draggable key={index} draggableId={`approach-${index}`} index={index}>
+                                            {(provided, snapshot) => (
+                                                <div ref={provided.innerRef} {...provided.draggableProps}
+                                                    className={`p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 items-center ${snapshot.isDragging ? 'shadow-lg border-[var(--accent-primary)]' : 'border border-transparent'}`}>
+                                                    <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab"><GripVertical size={16} /></div>
+                                                    <span className="w-10 h-10 bg-[var(--accent-primary)] text-white rounded-full flex items-center justify-center font-bold text-sm shrink-0">{index + 1}</span>
+                                                    <div className="flex-1 space-y-2">
+                                                        <input type="text" value={item.title} onChange={(e) => handleUpdateArrayItem(service.id, 'approach', index, 'title', e.target.value)}
+                                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium" placeholder="Step Title" />
+                                                        <input type="text" value={item.desc} onChange={(e) => handleUpdateArrayItem(service.id, 'approach', index, 'desc', e.target.value)}
+                                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm" placeholder="Step Description" />
+                                                    </div>
+                                                    <button onClick={() => handleDeleteArrayItem(service.id, 'approach', index)} className="text-gray-400 hover:text-red-500 self-start pt-2"><Trash2 size={16} /></button>
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                    </>
+                );
+            case 'whyChoose':
+                if (!service.whyChoose) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="whyChoose" defaultText="Why Choose IVC" />
+                            <button
+                                onClick={() => handleAddArrayItem(service.id, 'whyChoose', { title: 'New Reason', desc: 'Description...' })}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add Reason
+                            </button>
+                        </div>
+                        <Droppable droppableId="whyChoose">
+                            {(provided) => (
+                                <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
+                                    {service.whyChoose.map((item, index) => (
+                                        <Draggable key={index} draggableId={`whyChoose-${index}`} index={index}>
+                                            {(provided, snapshot) => (
+                                                <div ref={provided.innerRef} {...provided.draggableProps}
+                                                    className={`p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 ${snapshot.isDragging ? 'shadow-lg border-[var(--accent-primary)]' : 'border border-transparent'}`}>
+                                                    <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab pt-2"><GripVertical size={16} /></div>
+                                                    <div className="flex-1 space-y-2">
+                                                        <input type="text" value={item.title} onChange={(e) => handleUpdateArrayItem(service.id, 'whyChoose', index, 'title', e.target.value)}
+                                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium" placeholder="Title" />
+                                                        <input type="text" value={item.desc} onChange={(e) => handleUpdateArrayItem(service.id, 'whyChoose', index, 'desc', e.target.value)}
+                                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm" placeholder="Description" />
+                                                    </div>
+                                                    <button onClick={() => handleDeleteArrayItem(service.id, 'whyChoose', index)} className="text-gray-400 hover:text-red-500 self-start pt-2"><Trash2 size={16} /></button>
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                    </>
+                );
+            case 'disclaimer':
+                return wrapSection(
+                    <>
+                        <div className="mb-4"><EditableSectionLabel serviceId={service.id} labelKey="disclaimer" defaultText="Legal Disclaimer" /></div>
+                        <textarea
+                            rows={3}
+                            value={service.disclaimer || ''}
+                            onChange={(e) => handleUpdateService(service.id, 'disclaimer', e.target.value)}
+                            className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)] text-sm"
+                            placeholder="Legal disclaimer text..."
+                        />
+                    </>
+                );
+            case 'ourRole':
+                if (!service.ourRole) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="ourRole" defaultText="Our Role" />
+                            <button
+                                onClick={() => handleUpdateService(service.id, 'ourRole', [...service.ourRole, 'New role item'])}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add Role
+                            </button>
+                        </div>
+                        <div className="space-y-2">
+                            {service.ourRole.map((item, index) => (
+                                <div key={index} className="flex gap-2 items-center">
+                                    <span className="w-6 h-6 bg-[var(--accent-primary)] text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0">{index + 1}</span>
+                                    <input
+                                        type="text"
+                                        value={item}
+                                        onChange={(e) => {
+                                            const newArr = [...service.ourRole];
+                                            newArr[index] = e.target.value;
+                                            handleUpdateService(service.id, 'ourRole', newArr);
+                                        }}
+                                        className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm"
+                                    />
+                                    <button onClick={() => {
+                                        const newArr = service.ourRole.filter((_, i) => i !== index);
+                                        handleUpdateService(service.id, 'ourRole', newArr);
+                                    }} className="text-gray-400 hover:text-red-500"><Trash2 size={14} /></button>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                );
+            case 'whoNeeds':
+                if (!service.whoNeeds) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="whoNeeds" defaultText="Who Needs This" />
+                            <button
+                                onClick={() => handleUpdateService(service.id, 'whoNeeds', [...service.whoNeeds, 'New audience'])}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add
+                            </button>
+                        </div>
+                        <div className="space-y-2">
+                            {service.whoNeeds.map((item, index) => (
+                                <div key={index} className="flex gap-2 items-center">
+                                    <input type="text" value={item}
+                                        onChange={(e) => {
+                                            const newArr = [...service.whoNeeds];
+                                            newArr[index] = e.target.value;
+                                            handleUpdateService(service.id, 'whoNeeds', newArr);
+                                        }}
+                                        className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm" />
+                                    <button onClick={() => handleUpdateService(service.id, 'whoNeeds', service.whoNeeds.filter((_, i) => i !== index))}
+                                        className="text-gray-400 hover:text-red-500"><Trash2 size={14} /></button>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                );
+            case 'keyBenefits':
+                if (!service.keyBenefits) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="keyBenefits" defaultText="Key Benefits" />
+                            <button
+                                onClick={() => handleUpdateService(service.id, 'keyBenefits', [...service.keyBenefits, 'New benefit'])}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add
+                            </button>
+                        </div>
+                        <div className="space-y-2">
+                            {service.keyBenefits.map((item, index) => (
+                                <div key={index} className="flex gap-2 items-center">
+                                    <input type="text" value={item}
+                                        onChange={(e) => {
+                                            const newArr = [...service.keyBenefits];
+                                            newArr[index] = e.target.value;
+                                            handleUpdateService(service.id, 'keyBenefits', newArr);
+                                        }}
+                                        className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm" />
+                                    <button onClick={() => handleUpdateService(service.id, 'keyBenefits', service.keyBenefits.filter((_, i) => i !== index))}
+                                        className="text-gray-400 hover:text-red-500"><Trash2 size={14} /></button>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                );
+            case 'roadmapStages':
+                if (!service.roadmapStages) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="roadmapStages" defaultText="Funding Roadmap Stages" />
+                            <button
+                                onClick={() => handleAddArrayItem(service.id, 'roadmapStages', { stage: String(service.roadmapStages.length + 1), title: 'New Stage', duration: '', investment: '', items: [] })}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add Stage
+                            </button>
+                        </div>
+                        <div className="space-y-3">
+                            {service.roadmapStages.map((item, index) => (
+                                <div key={index} className="p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 items-start border border-transparent">
+                                    <span className="w-10 h-10 bg-[var(--accent-primary)] text-white rounded-full flex items-center justify-center font-bold text-sm shrink-0">{item.stage}</span>
+                                    <div className="flex-1 space-y-3">
+                                        <div className="grid grid-cols-3 gap-2">
+                                            <input type="text" value={item.title} placeholder="Stage Title"
+                                                onChange={(e) => handleUpdateArrayItem(service.id, 'roadmapStages', index, 'title', e.target.value)}
+                                                className="px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium" />
+                                            <input type="text" value={item.duration} placeholder="Duration"
+                                                onChange={(e) => handleUpdateArrayItem(service.id, 'roadmapStages', index, 'duration', e.target.value)}
+                                                className="px-3 py-2 rounded border border-[var(--border-light)] text-sm" />
+                                            <input type="text" value={item.investment} placeholder="Investment"
+                                                onChange={(e) => handleUpdateArrayItem(service.id, 'roadmapStages', index, 'investment', e.target.value)}
+                                                className="px-3 py-2 rounded border border-[var(--border-light)] text-sm" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-gray-500 uppercase font-bold mb-1 block">Key Items (one per line)</label>
+                                            <textarea
+                                                rows={3}
+                                                value={(item.items || []).join('\n')}
+                                                onChange={(e) => handleUpdateArrayItem(service.id, 'roadmapStages', index, 'items', e.target.value.split('\n'))}
+                                                className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-xs"
+                                                placeholder="List key items for this stage..."
+                                            />
+                                        </div>
+                                    </div>
+                                    <button onClick={() => handleDeleteArrayItem(service.id, 'roadmapStages', index)}
+                                        className="text-gray-400 hover:text-red-500"><Trash2 size={16} /></button>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                );
+            case 'financingTerms':
+                if (!service.financingTerms) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="financingTerms" defaultText="Financing / Investment Terms" />
+                            <button
+                                onClick={() => handleAddArrayItem(service.id, 'financingTerms', { label: 'New Term', value: 'Value' })}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add Term
+                            </button>
+                        </div>
+                        <div className="space-y-2">
+                            {service.financingTerms.map((item, index) => (
+                                <div key={index} className="flex gap-2 items-center">
+                                    <input
+                                        type="text"
+                                        value={item.label}
+                                        onChange={(e) => handleUpdateArrayItem(service.id, 'financingTerms', index, 'label', e.target.value)}
+                                        className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm"
+                                        placeholder="Label (e.g. Interest Rate)"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={item.value}
+                                        onChange={(e) => handleUpdateArrayItem(service.id, 'financingTerms', index, 'value', e.target.value)}
+                                        className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium text-[var(--accent-secondary)]"
+                                        placeholder="Value (e.g. 5%)"
+                                    />
+                                    <button onClick={() => handleDeleteArrayItem(service.id, 'financingTerms', index)}
+                                        className="text-gray-400 hover:text-red-500"><Trash2 size={14} /></button>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                );
+            case 'sectors':
+                if (!service.sectors) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="sectors" defaultText="Target Sectors" />
+                            <button
+                                onClick={() => handleUpdateService(service.id, 'sectors', [...service.sectors, 'New Sector'])}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add Sector
+                            </button>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            {service.sectors.map((sector, index) => (
+                                <div key={index} className="flex items-center gap-1 bg-[var(--bg-tertiary)] px-3 py-1.5 rounded-full border">
+                                    <input type="text" value={sector}
+                                        onChange={(e) => {
+                                            const newArr = [...service.sectors];
+                                            newArr[index] = e.target.value;
+                                            handleUpdateService(service.id, 'sectors', newArr);
+                                        }}
+                                        className="bg-transparent text-sm w-auto min-w-[80px] outline-none" />
+                                    <button onClick={() => handleUpdateService(service.id, 'sectors', service.sectors.filter((_, i) => i !== index))}
+                                        className="text-gray-400 hover:text-red-500"><Trash2 size={12} /></button>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                );
+            case 'financingTypes':
+                if (!service.financingTypes) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="financingTypes" defaultText="Financing Types" />
+                            <button
+                                onClick={() => handleAddArrayItem(service.id, 'financingTypes', { title: 'New Type', desc: 'Description...' })}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add Type
+                            </button>
+                        </div>
+                        <div className="space-y-3">
+                            {service.financingTypes.map((item, index) => (
+                                <div key={index} className="p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 border border-transparent">
+                                    <div className="flex-1 space-y-2">
+                                        <input type="text" value={item.title} onChange={(e) => handleUpdateArrayItem(service.id, 'financingTypes', index, 'title', e.target.value)}
+                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium" placeholder="Type" />
+                                        <textarea rows={2} value={item.desc} onChange={(e) => handleUpdateArrayItem(service.id, 'financingTypes', index, 'desc', e.target.value)}
+                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm" placeholder="Description" />
+                                    </div>
+                                    <button onClick={() => handleDeleteArrayItem(service.id, 'financingTypes', index)} className="text-gray-400 hover:text-red-500 self-start pt-2"><Trash2 size={16} /></button>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                );
+            case 'propertyTypes':
+                if (!service.propertyTypes) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="propertyTypes" defaultText="Property Types" />
+                            <button
+                                onClick={() => handleAddArrayItem(service.id, 'propertyTypes', { type: 'New Type', examples: 'Examples...' })}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add Type
+                            </button>
+                        </div>
+                        <div className="space-y-2">
+                            {service.propertyTypes.map((item, index) => (
+                                <div key={index} className="flex gap-2 items-center">
+                                    <input type="text" value={item.type}
+                                        onChange={(e) => handleUpdateArrayItem(service.id, 'propertyTypes', index, 'type', e.target.value)}
+                                        className="w-1/3 px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium" placeholder="Type" />
+                                    <input type="text" value={item.examples}
+                                        onChange={(e) => handleUpdateArrayItem(service.id, 'propertyTypes', index, 'examples', e.target.value)}
+                                        className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm" placeholder="Examples" />
+                                    <button onClick={() => handleDeleteArrayItem(service.id, 'propertyTypes', index)}
+                                        className="text-gray-400 hover:text-red-500"><Trash2 size={14} /></button>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                );
+            case 'loanTerms':
+                if (!service.loanTerms) return null;
+                return wrapSection(
+                    <>
+                        <div className="mb-4"><EditableSectionLabel serviceId={service.id} labelKey="loanTerms" defaultText="Loan Terms" /></div>
+                        <div className="space-y-2">
+                            {service.loanTerms.map((item, index) => (
+                                <div key={index} className="flex gap-2 items-center">
+                                    <input type="text" value={item.label}
+                                        onChange={(e) => handleUpdateArrayItem(service.id, 'loanTerms', index, 'label', e.target.value)}
+                                        className="w-1/2 px-3 py-2 rounded border border-[var(--border-light)] text-sm" />
+                                    <input type="text" value={item.value}
+                                        onChange={(e) => handleUpdateArrayItem(service.id, 'loanTerms', index, 'value', e.target.value)}
+                                        className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium text-[var(--accent-secondary)]" />
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                );
+            case 'executiveOverview':
+                return wrapSection(
+                    <>
+                        <div className="mb-4"><EditableSectionLabel serviceId={service.id} labelKey="executiveOverview" defaultText="Executive Overview" /></div>
+                        <textarea
+                            rows={3}
+                            value={service.executiveOverview || ''}
+                            onChange={(e) => handleUpdateService(service.id, 'executiveOverview', e.target.value)}
+                            className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)] text-sm"
+                            placeholder="Executive overview text..."
+                        />
+                    </>
+                );
+            case 'eligibility':
+                if (!service.eligibility) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="eligibility" defaultText="Eligibility Criteria" />
+                            <button
+                                onClick={() => handleAddArrayItem(service.id, 'eligibility', { criteria: 'New Criteria', description: 'Description...' })}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add Criteria
+                            </button>
+                        </div>
+                        <div className="space-y-3">
+                            {service.eligibility.map((item, index) => (
+                                <div key={index} className="p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 border border-transparent">
+                                    <div className="flex-1 space-y-2">
+                                        <input type="text" value={item.criteria} onChange={(e) => handleUpdateArrayItem(service.id, 'eligibility', index, 'criteria', e.target.value)}
+                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium" placeholder="Criteria" />
+                                        <textarea rows={2} value={item.description} onChange={(e) => handleUpdateArrayItem(service.id, 'eligibility', index, 'description', e.target.value)}
+                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm" placeholder="Description" />
+                                    </div>
+                                    <button onClick={() => handleDeleteArrayItem(service.id, 'eligibility', index)} className="text-gray-400 hover:text-red-500 self-start pt-2"><Trash2 size={16} /></button>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                );
+            case 'valueProposition':
+                if (!service.valueProposition) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="valueProposition" defaultText="Value Proposition" />
+                            <button
+                                onClick={() => handleAddArrayItem(service.id, 'valueProposition', { title: 'New Prop', desc: 'Description...' })}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add Prop
+                            </button>
+                        </div>
+                        <div className="space-y-3">
+                            {service.valueProposition.map((item, index) => (
+                                <div key={index} className="p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 border border-transparent">
+                                    <div className="flex-1 space-y-2">
+                                        <input type="text" value={item.title} onChange={(e) => handleUpdateArrayItem(service.id, 'valueProposition', index, 'title', e.target.value)}
+                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium" placeholder="Title" />
+                                        <textarea rows={2} value={item.desc} onChange={(e) => handleUpdateArrayItem(service.id, 'valueProposition', index, 'desc', e.target.value)}
+                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm" placeholder="Description" />
+                                    </div>
+                                    <button onClick={() => handleDeleteArrayItem(service.id, 'valueProposition', index)} className="text-gray-400 hover:text-red-500 self-start pt-2"><Trash2 size={16} /></button>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                );
+            case 'subscriptionTiers':
+                if (!service.subscriptionTiers) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="subscriptionTiers" defaultText="Subscription Tiers" />
+                            <button
+                                onClick={() => handleAddArrayItem(service.id, 'subscriptionTiers', { name: 'New Tier', price: '$0', features: [] })}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add Tier
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {service.subscriptionTiers.map((tier, index) => (
+                                <div key={index} className="p-4 bg-[var(--bg-tertiary)] rounded-lg border border-transparent relative group">
+                                    <button onClick={() => handleDeleteArrayItem(service.id, 'subscriptionTiers', index)} 
+                                        className="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 size={16} /></button>
+                                    <div className="space-y-3">
+                                        <input type="text" value={tier.name} onChange={(e) => handleUpdateArrayItem(service.id, 'subscriptionTiers', index, 'name', e.target.value)}
+                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-bold" placeholder="Tier Name" />
+                                        <input type="text" value={tier.price} onChange={(e) => handleUpdateArrayItem(service.id, 'subscriptionTiers', index, 'price', e.target.value)}
+                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm text-[var(--accent-primary)] font-medium" placeholder="Price" />
+                                        <div className="space-y-2">
+                                            <label className="text-xs text-gray-500 uppercase font-bold">Features (one per line)</label>
+                                            <textarea rows={4} value={tier.features.join('\n')} 
+                                                onChange={(e) => handleUpdateArrayItem(service.id, 'subscriptionTiers', index, 'features', e.target.value.split('\n'))}
+                                                className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-xs" placeholder="Features..." />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                );
+            case 'offerings':
+                if (!service.offerings) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="offerings" defaultText="Service Offerings" />
+                            <button
+                                onClick={() => handleAddArrayItem(service.id, 'offerings', { title: 'New Offering', items: [] })}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add Offering
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {service.offerings.map((offering, index) => (
+                                <div key={index} className="p-4 bg-[var(--bg-tertiary)] rounded-lg border border-transparent relative group">
+                                    <button onClick={() => handleDeleteArrayItem(service.id, 'offerings', index)}
+                                        className="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 size={16} /></button>
+                                    <div className="space-y-3">
+                                        <input type="text" value={offering.title} onChange={(e) => handleUpdateArrayItem(service.id, 'offerings', index, 'title', e.target.value)}
+                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-bold" placeholder="Offering Title" />
+                                        <div className="space-y-2">
+                                            <label className="text-xs text-gray-500 uppercase font-bold">Items (one per line)</label>
+                                            <textarea rows={4} value={offering.items.join('\n')}
+                                                onChange={(e) => handleUpdateArrayItem(service.id, 'offerings', index, 'items', e.target.value.split('\n'))}
+                                                className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-xs" placeholder="Items..." />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                );
+            case 'process':
+                if (!service.process) return null;
+                return wrapSection(
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <EditableSectionLabel serviceId={service.id} labelKey="process" defaultText="Process Steps" />
+                            <button
+                                onClick={() => handleAddArrayItem(service.id, 'process', { title: 'New Step', desc: 'Description...' })}
+                                className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
+                            >
+                                <Plus size={14} /> Add Step
+                            </button>
+                        </div>
+                        <div className="space-y-3">
+                            {service.process.map((item, index) => (
+                                <div key={index} className="p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 items-center border border-transparent">
+                                    <span className="w-8 h-8 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center font-bold text-xs shrink-0">{index + 1}</span>
+                                    <div className="flex-1 space-y-2">
+                                        <input type="text" value={item.title} onChange={(e) => handleUpdateArrayItem(service.id, 'process', index, 'title', e.target.value)}
+                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium" placeholder="Step Title" />
+                                        <input type="text" value={item.desc} onChange={(e) => handleUpdateArrayItem(service.id, 'process', index, 'desc', e.target.value)}
+                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm" placeholder="Step Description" />
+                                    </div>
+                                    <button onClick={() => handleDeleteArrayItem(service.id, 'process', index)} className="text-gray-400 hover:text-red-500 self-start pt-2"><Trash2 size={16} /></button>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                );
+            default: return null;
+        }
     };
 
     // List View
@@ -557,320 +1400,31 @@ const ServiceContentManager = () => {
                                 </div>
                             </div>
 
-                            {/* Overview Section */}
-                            <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
-                                <h3 className="font-bold text-[var(--text-primary)]">Overview Section</h3>
-                                <div className="grid grid-cols-1 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Heading</label>
-                                        <input
-                                            type="text"
-                                            value={service.overview?.heading || ''}
-                                            onChange={(e) => handleUpdateOverview(service.id, 'heading', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Description</label>
-                                        <textarea
-                                            rows={4}
-                                            value={service.overview?.description || ''}
-                                            onChange={(e) => handleUpdateOverview(service.id, 'description', e.target.value)}
-                                            className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
-                                        />
-                                    </div>
+
+
+
+                            {/* Draggable Content Sections */}
+                            <div className="mt-8 border-t border-[var(--border-light)] pt-8">
+                                <div className="flex items-center gap-2 mb-6">
+                                    <List size={20} className="text-[var(--accent-primary)]" />
+                                    <h4 className="font-bold text-[var(--text-primary)]">Reorderable Content Sections</h4>
                                 </div>
-                            </div>
-
-                            {/* Dynamic Sections based on service type */}
-                            {service.offerings && (
-                                <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
-                                    <div className="flex justify-between items-center">
-                                        <h3 className="font-bold text-[var(--text-primary)]">Service Offerings</h3>
-                                        <button
-                                            onClick={() => handleAddArrayItem(service.id, 'offerings', { title: 'New Offering', desc: 'Description...' })}
-                                            className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
-                                        >
-                                            <Plus size={14} /> Add Offering
-                                        </button>
-                                    </div>
-                                    <div className="space-y-3">
-                                        <Droppable droppableId="offerings">
-                                            {(provided) => (
-                                                <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
-                                                    {service.offerings.map((item, index) => (
-                                                        <Draggable key={index} draggableId={`offering-${index}`} index={index}>
-                                                            {(provided, snapshot) => (
-                                                                <div
-                                                                    ref={provided.innerRef}
-                                                                    {...provided.draggableProps}
-                                                                    className={`p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 ${snapshot.isDragging ? 'shadow-lg border-[var(--accent-primary)]' : 'border border-transparent'}`}
-                                                                >
-                                                                    <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab pt-2">
-                                                                        <GripVertical size={16} />
-                                                                    </div>
-                                                                    <div className="flex-1 space-y-2">
-                                                                        <input
-                                                                            type="text"
-                                                                            value={item.title}
-                                                                            onChange={(e) => handleUpdateArrayItem(service.id, 'offerings', index, 'title', e.target.value)}
-                                                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium"
-                                                                            placeholder="Title"
-                                                                        />
-                                                                        <textarea
-                                                                            rows={2}
-                                                                            value={item.desc}
-                                                                            onChange={(e) => handleUpdateArrayItem(service.id, 'offerings', index, 'desc', e.target.value)}
-                                                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm"
-                                                                            placeholder="Description"
-                                                                        />
-                                                                    </div>
-                                                                    <button
-                                                                        onClick={() => handleDeleteArrayItem(service.id, 'offerings', index)}
-                                                                        className="text-gray-400 hover:text-red-500 self-start pt-2"
-                                                                    >
-                                                                        <Trash2 size={16} />
-                                                                    </button>
-                                                                </div>
-                                                            )}
-                                                        </Draggable>
-                                                    ))}
-                                                    {provided.placeholder}
-                                                </div>
-                                            )}
-                                        </Droppable>
-                                    </div>
-                                </div>
-                            )}
-
-                            {service.process && (
-                                <div className="space-y-4 border-b border-[var(--border-light)] pb-6 mb-6">
-                                    <h3 className="font-bold text-[var(--text-primary)]">Process Steps</h3>
-                                    <div className="space-y-3">
-                                        <Droppable droppableId="process">
-                                            {(provided) => (
-                                                <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
-                                                    {service.process.map((item, index) => (
-                                                        <Draggable key={index} draggableId={`process-${index}`} index={index}>
-                                                            {(provided, snapshot) => (
-                                                                <div
-                                                                    ref={provided.innerRef}
-                                                                    {...provided.draggableProps}
-                                                                    className={`p-4 bg-[var(--bg-tertiary)] rounded-lg flex gap-3 items-center ${snapshot.isDragging ? 'shadow-lg border-[var(--accent-primary)]' : 'border border-transparent'}`}
-                                                                >
-                                                                    <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab">
-                                                                        <GripVertical size={16} />
-                                                                    </div>
-                                                                    <span className="w-10 h-10 bg-[var(--accent-primary)] text-white rounded-full flex items-center justify-center font-bold text-sm shrink-0">{item.step || item.num || index + 1}</span>
-                                                                    <div className="flex-1 space-y-2">
-                                                                        <input
-                                                                            type="text"
-                                                                            value={item.title}
-                                                                            onChange={(e) => handleUpdateArrayItem(service.id, 'process', index, 'title', e.target.value)}
-                                                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm font-medium"
-                                                                        />
-                                                                        <input
-                                                                            type="text"
-                                                                            value={item.desc}
-                                                                            onChange={(e) => handleUpdateArrayItem(service.id, 'process', index, 'desc', e.target.value)}
-                                                                            className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm"
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                            )}
-                                                        </Draggable>
-                                                    ))}
-                                                    {provided.placeholder}
-                                                </div>
-                                            )}
-                                        </Droppable>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Modular Sections Area */}
-                            <div className="space-y-6 pt-6">
-                                <div className="flex justify-between items-center">
-                                    <div>
-                                        <h3 className="text-xl font-bold text-[var(--text-primary)]">Advanced Layout Sections</h3>
-                                        <p className="text-xs text-gray-500">Add accordions, grids, or custom text blocks to further detail this service.</p>
-                                    </div>
-                                    <button
-                                        onClick={() => {
-                                            const newSection = {
-                                                id: `sec-${Date.now()}`,
-                                                title: 'New Section',
-                                                subtitle: '',
-                                                type: 'custom',
-                                                items: [],
-                                                styles: { layoutType: 'standard', textAlign: 'left' }
-                                            };
-                                            handleUpdateService(service.id, 'sections', [...(service.sections || []), newSection]);
-                                        }}
-                                        className="text-xs flex items-center gap-1 text-[var(--accent-primary)] bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-all font-semibold"
-                                    >
-                                        <Plus size={14} /> Add Advanced Section
-                                    </button>
-                                </div>
-
-                                <div className="space-y-8">
-                                    {(service.sections || []).map((section, sIdx) => (
-                                        <div key={section.id} className="p-6 bg-white rounded-xl border-2 border-dashed border-gray-200 relative group">
-                                            {/* Section Controls */}
-                                            <div className="absolute -top-3 right-4 flex gap-2">
-                                                <button
-                                                    onClick={() => {
-                                                        const newSections = service.sections.filter(s => s.id !== section.id);
-                                                        handleUpdateService(service.id, 'sections', newSections);
-                                                    }}
-                                                    className="p-1.5 bg-red-50 text-red-500 rounded-md hover:bg-red-100 border border-red-100"
-                                                    title="Delete Section"
-                                                >
-                                                    <Trash2 size={14} />
-                                                </button>
-                                            </div>
-
-                                            <div className="space-y-4">
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div>
-                                                        <label className="text-[10px] font-bold uppercase text-gray-400">Section Title</label>
-                                                        <input
-                                                            value={section.title}
-                                                            onChange={(e) => {
-                                                                const newSections = [...service.sections];
-                                                                newSections[sIdx] = { ...section, title: e.target.value };
-                                                                handleUpdateService(service.id, 'sections', newSections);
-                                                            }}
-                                                            className="w-full px-3 py-2 text-sm font-bold border rounded-lg"
-                                                            placeholder="e.g. Key Features"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label className="text-[10px] font-bold uppercase text-gray-400">Layout Type</label>
-                                                        <select
-                                                            value={section.styles?.layoutType || 'standard'}
-                                                            onChange={(e) => {
-                                                                const newSections = [...service.sections];
-                                                                newSections[sIdx] = { ...section, styles: { ...section.styles, layoutType: e.target.value } };
-                                                                handleUpdateService(service.id, 'sections', newSections);
-                                                            }}
-                                                            className="w-full px-3 py-2 text-sm border rounded-lg bg-gray-50"
-                                                        >
-                                                            <option value="standard">Standard (Text/HTML)</option>
-                                                            <option value="list">Professional List</option>
-                                                            <option value="grid">Feature Grid</option>
-                                                            <option value="cards">Interactive Cards</option>
-                                                            <option value="accordion">Accordion (Collapse)</option>
-                                                            <option value="image-grid">Premium Image Grid</option>
-                                                            <option value="icon-group">Icon Connectivity Group</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-                                                <div>
-                                                    <label className="text-[10px] font-bold uppercase text-gray-400">Subtitle (Optional)</label>
-                                                    <input
-                                                        value={section.subtitle}
-                                                        onChange={(e) => {
-                                                            const newSections = [...service.sections];
-                                                            newSections[sIdx] = { ...section, subtitle: e.target.value };
-                                                            handleUpdateService(service.id, 'sections', newSections);
-                                                        }}
-                                                        className="w-full px-3 py-1.5 text-xs border rounded-lg"
-                                                        placeholder="Small descriptive text below title"
-                                                    />
-                                                </div>
-
-                                                {/* Content Editor based on Layout */}
-                                                {(section.styles?.layoutType === 'standard' || !section.styles?.layoutType) ? (
-                                                    <div>
-                                                        <label className="text-[10px] font-bold uppercase text-gray-400">Content (HTML/Markdown)</label>
-                                                        <textarea
-                                                            rows={6}
-                                                            value={section.content || ''}
-                                                            onChange={(e) => {
-                                                                const newSections = [...service.sections];
-                                                                newSections[sIdx] = { ...section, content: e.target.value };
-                                                                handleUpdateService(service.id, 'sections', newSections);
-                                                            }}
-                                                            className="w-full px-3 py-2 text-xs font-mono border rounded-lg"
-                                                        />
-                                                    </div>
-                                                ) : (
-                                                    <div className="space-y-3">
-                                                        <div className="flex justify-between items-center">
-                                                            <label className="text-[10px] font-bold uppercase text-gray-400">Structured Items</label>
-                                                            <button
-                                                                onClick={() => {
-                                                                    const newItem = { id: Date.now(), title: 'New Item', description: '', icon: 'CheckCircle' };
-                                                                    const newSections = [...service.sections];
-                                                                    newSections[sIdx] = { ...section, items: [...(section.items || []), newItem] };
-                                                                    handleUpdateService(service.id, 'sections', newSections);
-                                                                }}
-                                                                className="text-[10px] bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors"
-                                                            >
-                                                                + Add Item
-                                                            </button>
+                                <Droppable droppableId="contentSections">
+                                    {(provided) => (
+                                        <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-6 min-h-[200px]">
+                                            {getActiveSectionKeys(service).map((key, index) => (
+                                                <Draggable key={key} draggableId={key} index={index}>
+                                                    {(provided, snapshot) => (
+                                                        <div ref={provided.innerRef} {...provided.draggableProps} className={`transition-all duration-200 ${snapshot.isDragging ? 'opacity-90 scale-[1.01] rotate-1 z-50' : ''}`}>
+                                                            {renderSection(key, service, provided.dragHandleProps)}
                                                         </div>
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                            {(section.items || []).map((item, iIdx) => (
-                                                                <div key={item.id || iIdx} className="p-3 bg-gray-50 rounded-lg border border-gray-100 flex gap-3 relative group/item">
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            const newItems = section.items.filter((_, i) => i !== iIdx);
-                                                                            const newSections = [...service.sections];
-                                                                            newSections[sIdx] = { ...section, items: newItems };
-                                                                            handleUpdateService(service.id, 'sections', newSections);
-                                                                        }}
-                                                                        className="absolute top-1 right-1 text-gray-300 hover:text-red-500 opacity-0 group-hover/item:opacity-100 transition-opacity"
-                                                                    >
-                                                                        <Trash2 size={12} />
-                                                                    </button>
-                                                                    <div className="flex flex-col gap-1">
-                                                                        <div className="w-8 h-8 bg-white border rounded flex items-center justify-center text-gray-400">
-                                                                            <Settings2 size={14} />
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="flex-1 space-y-1">
-                                                                        <input
-                                                                            value={item.title}
-                                                                            onChange={(e) => {
-                                                                                const newItems = [...section.items];
-                                                                                newItems[iIdx] = { ...item, title: e.target.value };
-                                                                                const newSections = [...service.sections];
-                                                                                newSections[sIdx] = { ...section, items: newItems };
-                                                                                handleUpdateService(service.id, 'sections', newSections);
-                                                                            }}
-                                                                            className="w-full px-2 py-1 text-xs font-bold border-b bg-transparent"
-                                                                            placeholder="Item Title"
-                                                                        />
-                                                                        <textarea
-                                                                            value={item.description}
-                                                                            onChange={(e) => {
-                                                                                const newItems = [...section.items];
-                                                                                newItems[iIdx] = { ...item, description: e.target.value };
-                                                                                const newSections = [...service.sections];
-                                                                                newSections[sIdx] = { ...section, items: newItems };
-                                                                                handleUpdateService(service.id, 'sections', newSections);
-                                                                            }}
-                                                                            className="w-full px-2 py-1 text-[10px] bg-transparent resize-none h-10"
-                                                                            placeholder="Brief description..."
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                    {(service.sections || []).length === 0 && (
-                                        <div className="text-center py-10 bg-gray-50 rounded-xl border border-dashed text-gray-400 text-sm">
-                                            No advanced layout sections added yet.
+                                                    )}
+                                                </Draggable>
+                                            ))}
+                                            {provided.placeholder}
                                         </div>
                                     )}
-                                </div>
+                                </Droppable>
                             </div>
                         </div>
 
@@ -880,7 +1434,7 @@ const ServiceContentManager = () => {
                             <div className="glass-card p-6">
                                 {service.financingTerms && (
                                     <div className="space-y-4">
-                                        <h3 className="font-bold text-[var(--text-primary)]">Financing Terms</h3>
+                                        <EditableSectionLabel serviceId={service.id} labelKey="financingTerms" defaultText="Financing Terms" />
                                         <Droppable droppableId="financingTerms">
                                             {(provided) => (
                                                 <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">

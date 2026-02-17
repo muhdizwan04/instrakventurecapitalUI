@@ -7,6 +7,7 @@ import ProtectedFormSection from '../components/ProtectedFormSection';
 import DynamicServiceForm from '../components/DynamicServiceForm';
 import UniversalSection from '../components/UniversalSection';
 import { usePageContent } from '../hooks/usePageContent';
+import { isSectionVisible } from '../utils/sectionVisibility';
 
 const EquityFinancing = () => {
     // Fetch content from admin
@@ -60,10 +61,15 @@ const EquityFinancing = () => {
             { label: 'Service Fee', value: '10% on Approval' },
             { label: 'Target Revenue', value: '6x Capital (USD 600M)' },
         ],
-        sectors: ['Oil & Gas', 'Property Development', 'Education', 'Logistics', 'Automotive', 'Manufacturing', 'Construction', 'Digital Technology']
+        sectors: ['Oil & Gas', 'Property Development', 'Education', 'Logistics', 'Automotive', 'Manufacturing', 'Construction', 'Digital Technology'],
+        subscriptionTiers: [
+            { name: 'Option 1', price: 'Retainer Fee & Insurance Bond', features: ['USD 1,000,000 non-refundable retainer fee', '5% insurance bond of facility line approved', 'Excludes stamp duty and government taxes'] },
+            { name: 'Option 2', price: 'Initial Fees Upon Settlement', features: ['Registration Fee: USD 5,000', 'Processing Fee: USD 15,000', 'Legal Fee: USD 1,500,000', 'Stamp Duty: USD 500,000', 'Insurance Bond: USD 5,000,000', 'Due Diligence & M&A (3.6%): USD 3,600,000'] }
+        ]
     };
 
     const pageContent = serviceData || defaultData;
+    const show = (key) => isSectionVisible(pageContent, key);
     const title = pageContent.title || defaultData.title;
     const introduction = pageContent.introduction || pageContent.subtitle || defaultData.introduction;
     const services = (pageContent.services || defaultData.services).map((s, i) => ({
@@ -74,6 +80,8 @@ const EquityFinancing = () => {
     const financingTerms = pageContent.financingTerms || defaultData.financingTerms;
     const sectors = pageContent.sectors || defaultData.sectors;
     const overview = pageContent.overview || defaultData.overview;
+    const subscriptionTiers = pageContent.subscriptionTiers || defaultData.subscriptionTiers;
+    const labels = pageContent.sectionLabels || {};
 
     return (
         <div className="page-wrapper">
@@ -83,7 +91,7 @@ const EquityFinancing = () => {
             />
 
             {/* Introduction */}
-            <section style={{ padding: '80px 20px 40px', background: '#FFFFFF' }}>
+            {show('subtitle') && <section style={{ padding: '80px 20px 40px', background: '#FFFFFF' }}>
                 <div className="container">
                     <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
                         <p style={{ fontSize: '1.15rem', color: '#4A5568', lineHeight: '1.9' }}>
@@ -91,12 +99,12 @@ const EquityFinancing = () => {
                         </p>
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Services */}
-            <section style={{ padding: '40px 20px 80px', background: '#FFFFFF' }}>
+            {show('services') && <section style={{ padding: '40px 20px 80px', background: '#FFFFFF' }}>
                 <div className="container">
-                    <h2 className="section-title">Our Services</h2>
+                    <h2 className="section-title">{labels.services || 'Our Services'}</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
                         {services.map((service, i) => (
                             <div key={i} className="glass-card">
@@ -107,10 +115,10 @@ const EquityFinancing = () => {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* 5-Stage Roadmap */}
-            <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
+            {show('roadmapStages') && <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
                 <div className="container">
                     <h2 className="section-title">{overview.heading}</h2>
                     <p style={{ textAlign: 'center', color: '#4A5568', marginBottom: '3rem', maxWidth: '700px', margin: '0 auto 3rem' }}>
@@ -144,7 +152,7 @@ const EquityFinancing = () => {
                                 <h4 style={{ marginBottom: '0.5rem', color: '#1A365D', fontSize: '1rem' }}>{stage.title}</h4>
                                 <p style={{ fontSize: '0.75rem', color: '#B8860B', fontWeight: '600', marginBottom: '1rem' }}>{stage.duration}</p>
                                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                                    {stage.items.map((item, j) => (
+                                    {(stage.items || []).map((item, j) => (
                                         <li key={j} style={{ fontSize: '0.8rem', color: '#4A5568', marginBottom: '0.5rem', display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
                                             <CheckCircle size={12} color="#B8860B" style={{ marginTop: '3px', flexShrink: 0 }} />
                                             {item}
@@ -163,14 +171,14 @@ const EquityFinancing = () => {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Financing Terms */}
-            <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>
+            {show('financingTerms') && <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>
                 <div className="container">
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }}>
                         <div>
-                            <h2 style={{ fontSize: '2.2rem', marginBottom: '1.5rem', color: '#1A365D' }}>Investment Terms</h2>
+                            <h2 style={{ fontSize: '2.2rem', marginBottom: '1.5rem', color: '#1A365D' }}>{labels.financingTerms || 'Investment Terms'}</h2>
                             <p style={{ color: '#4A5568', marginBottom: '2rem', lineHeight: '1.7' }}>
                                 INSTRAKVC offers equity financing against secured contracts with guaranteed payment by reputable paymasters. The facility accommodates working capital with secured loan and receivable financing for reimbursement basis.
                             </p>
@@ -201,73 +209,36 @@ const EquityFinancing = () => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Fee Options */}
-            <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
+            {show('subscriptionTiers') && <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
                 <div className="container">
-                    <h2 className="section-title">Investment Fee Structure</h2>
+                    <h2 className="section-title">{labels.subscriptionTiers || 'Investment Fee Structure'}</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', maxWidth: '900px', margin: '0 auto' }}>
-                        <div style={{ background: '#FFFFFF', borderRadius: '12px', padding: '2rem', border: '2px solid #B8860B' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                                <DollarSign size={24} color="#B8860B" />
-                                <h3 style={{ color: '#1A365D', margin: 0 }}>Option 1</h3>
+                        {subscriptionTiers.map((tier, i) => (
+                            <div key={i} style={{ background: '#FFFFFF', borderRadius: '12px', padding: '2rem', border: i === 0 ? '2px solid #B8860B' : '1px solid rgba(26, 54, 93, 0.1)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                                    {i === 0 ? <DollarSign size={24} color="#B8860B" /> : <PieChart size={24} color="#1A365D" />}
+                                    <h3 style={{ color: '#1A365D', margin: 0 }}>{tier.name}</h3>
+                                </div>
+                                <p style={{ fontWeight: '600', color: '#1A365D', marginBottom: '1rem' }}>{tier.price}</p>
+                                <ul style={{ listStyle: 'none', padding: 0 }}>
+                                    {(tier.features || []).map((feature, j) => (
+                                        <li key={j} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.75rem', color: '#4A5568' }}>
+                                            <CheckCircle size={16} color="#B8860B" style={{ marginTop: '3px', flexShrink: 0 }} />
+                                            {feature}
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
-                            <p style={{ fontWeight: '600', color: '#1A365D', marginBottom: '1rem' }}>Retainer Fee & Insurance Bond</p>
-                            <ul style={{ listStyle: 'none', padding: 0 }}>
-                                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.75rem', color: '#4A5568' }}>
-                                    <CheckCircle size={16} color="#B8860B" style={{ marginTop: '3px' }} />
-                                    USD 1,000,000 non-refundable retainer fee
-                                </li>
-                                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.75rem', color: '#4A5568' }}>
-                                    <CheckCircle size={16} color="#B8860B" style={{ marginTop: '3px' }} />
-                                    5% insurance bond of facility line approved
-                                </li>
-                                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', color: '#4A5568' }}>
-                                    <CheckCircle size={16} color="#B8860B" style={{ marginTop: '3px' }} />
-                                    Excludes stamp duty and government taxes
-                                </li>
-                            </ul>
-                        </div>
-                        <div style={{ background: '#FFFFFF', borderRadius: '12px', padding: '2rem', border: '1px solid rgba(26, 54, 93, 0.1)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                                <PieChart size={24} color="#1A365D" />
-                                <h3 style={{ color: '#1A365D', margin: 0 }}>Option 2</h3>
-                            </div>
-                            <p style={{ fontWeight: '600', color: '#1A365D', marginBottom: '1rem' }}>Initial Fees Upon Settlement</p>
-                            <ul style={{ listStyle: 'none', padding: 0, fontSize: '0.9rem' }}>
-                                <li style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: '#4A5568' }}>
-                                    <span>Registration Fee</span>
-                                    <span style={{ fontWeight: '600' }}>USD 5,000</span>
-                                </li>
-                                <li style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: '#4A5568' }}>
-                                    <span>Processing Fee</span>
-                                    <span style={{ fontWeight: '600' }}>USD 15,000</span>
-                                </li>
-                                <li style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: '#4A5568' }}>
-                                    <span>Legal Fee</span>
-                                    <span style={{ fontWeight: '600' }}>USD 1,500,000</span>
-                                </li>
-                                <li style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: '#4A5568' }}>
-                                    <span>Stamp Duty</span>
-                                    <span style={{ fontWeight: '600' }}>USD 500,000</span>
-                                </li>
-                                <li style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: '#4A5568' }}>
-                                    <span>Insurance Bond</span>
-                                    <span style={{ fontWeight: '600' }}>USD 5,000,000</span>
-                                </li>
-                                <li style={{ display: 'flex', justifyContent: 'space-between', color: '#4A5568' }}>
-                                    <span>Due Diligence & M&A (3.6%)</span>
-                                    <span style={{ fontWeight: '600' }}>USD 3,600,000</span>
-                                </li>
-                            </ul>
-                        </div>
+                        ))}
                     </div>
                     <p style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.85rem', color: '#718096', fontStyle: 'italic' }}>
                         * Terms & Conditions Apply. All payments must be made through controlled banking accounts.
                     </p>
                 </div>
-            </section>
+            </section>}
 
             {/* Dynamic Sections from Admin */}
             {(pageContent.sections || []).map((section, idx) => (

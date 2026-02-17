@@ -21,9 +21,9 @@ import ProjectListingManager from './pages/ProjectListingManager';
 import UsersManager from './pages/UsersManager';
 import { Loader2 } from 'lucide-react';
 
-// Protected Route wrapper component
+// Protected Route wrapper component — requires both auth + admin status
 const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, isAdmin, loading } = useAuth();
 
   if (loading) {
     return (
@@ -33,7 +33,7 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  if (!user) {
+  if (!user || !isAdmin) {
     return <Navigate to="/login" replace />;
   }
 

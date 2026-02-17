@@ -3,6 +3,7 @@ import PageHero from '../components/PageHero';
 import { TrendingUp, Target, Shield, BarChart3, CheckCircle, Users, DollarSign, Briefcase, LineChart } from 'lucide-react';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { usePageContent } from '../hooks/usePageContent';
+import { isSectionVisible } from '../utils/sectionVisibility';
 import { Link } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import ProtectedFormSection from '../components/ProtectedFormSection';
@@ -53,6 +54,7 @@ const BusinessFinanceConsulting = () => {
     // Fetch content from admin
     const { content: servicePages } = usePageContent('service_pages', { pages: [] });
     const pageContent = servicePages.pages?.find(p => p.id === 'virtual-cfo') || defaultContent;
+    const show = (key) => isSectionVisible(pageContent, key);
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -73,6 +75,7 @@ const BusinessFinanceConsulting = () => {
     const whoNeeds = pageContent.whoNeeds || defaultContent.whoNeeds;
     const keyBenefits = pageContent.keyBenefits || defaultContent.keyBenefits;
     const approach = pageContent.approach || defaultContent.approach;
+    const labels = pageContent.sectionLabels || {};
 
     return (
         <div className="page-wrapper">
@@ -82,7 +85,7 @@ const BusinessFinanceConsulting = () => {
             />
 
             {/* Introduction */}
-            <section style={{ padding: '80px 20px 40px', background: '#FFFFFF' }}>
+            {show('subtitle') && <section style={{ padding: '80px 20px 40px', background: '#FFFFFF' }}>
                 <div className="container">
                     <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
                         <p style={{ fontSize: '1.15rem', color: '#4A5568', lineHeight: '1.9' }}>
@@ -90,14 +93,14 @@ const BusinessFinanceConsulting = () => {
                         </p>
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Our Role as Your Virtual CFO */}
-            <section style={{ padding: '40px 20px 80px', background: '#FFFFFF' }}>
+            {show('ourRole') && <section style={{ padding: '40px 20px 80px', background: '#FFFFFF' }}>
                 <div className="container">
                     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
                         <h2 style={{ fontSize: '2.2rem', marginBottom: '2rem', color: '#1A365D', textAlign: 'center' }}>
-                            Our Role as Your Virtual CFO
+                            {labels.ourRole || 'Our Role as Your Virtual CFO'}
                         </h2>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
                             {ourRole.map((item, i) => (
@@ -109,15 +112,15 @@ const BusinessFinanceConsulting = () => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Who Needs a Virtual CFO */}
-            <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
+            {show('whoNeeds') && <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
                 <div className="container">
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }}>
                         <div>
                             <h2 style={{ fontSize: '2.2rem', marginBottom: '1.5rem', color: '#1A365D' }}>
-                                Who Needs a Virtual CFO?
+                                {labels.whoNeeds || 'Who Needs a Virtual CFO?'}
                             </h2>
                             <ul style={{ listStyle: 'none', padding: 0 }}>
                                 {whoNeeds.map((item, i) => (
@@ -129,7 +132,7 @@ const BusinessFinanceConsulting = () => {
                             </ul>
                         </div>
                         <div style={{ background: '#FFFFFF', borderRadius: '12px', padding: '2rem', border: '1px solid rgba(26, 54, 93, 0.1)' }}>
-                            <h3 style={{ color: '#1A365D', marginBottom: '1.5rem', fontSize: '1.3rem' }}>Key Benefits</h3>
+                            <h3 style={{ color: '#1A365D', marginBottom: '1.5rem', fontSize: '1.3rem' }}>{labels.keyBenefits || 'Key Benefits'}</h3>
                             <ul style={{ listStyle: 'none', padding: 0 }}>
                                 {keyBenefits.map((item, i) => (
                                     <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '1rem', color: '#4A5568' }}>
@@ -141,12 +144,12 @@ const BusinessFinanceConsulting = () => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Our Approach */}
-            <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>
+            {show('approach') && <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>
                 <div className="container">
-                    <h2 className="section-title">Our Approach</h2>
+                    <h2 className="section-title">{labels.approach || 'Our Approach'}</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem' }}>
                         {approach.map((step, i) => (
                             <div key={i} style={{ textAlign: 'center', position: 'relative' }}>
@@ -157,7 +160,7 @@ const BusinessFinanceConsulting = () => {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Dynamic Sections from Admin */}
             {(pageContent.sections || []).map((section, idx) => (

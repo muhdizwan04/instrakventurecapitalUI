@@ -7,6 +7,7 @@ import ProtectedFormSection from '../components/ProtectedFormSection';
 import DynamicServiceForm from '../components/DynamicServiceForm';
 import UniversalSection from '../components/UniversalSection';
 import { usePageContent } from '../hooks/usePageContent';
+import { isSectionVisible } from '../utils/sectionVisibility';
 
 const RealEstateFinancing = () => {
     // Fetch content from admin
@@ -57,6 +58,7 @@ const RealEstateFinancing = () => {
     };
 
     const pageContent = serviceData || defaultData;
+    const show = (key) => isSectionVisible(pageContent, key);
     const title = pageContent.title || defaultData.title;
     const introduction = pageContent.introduction || pageContent.subtitle || defaultData.introduction;
     const financingTypes = (pageContent.financingTypes || defaultData.financingTypes).map((t, i) => ({
@@ -65,6 +67,7 @@ const RealEstateFinancing = () => {
     }));
     const propertyTypes = pageContent.propertyTypes || defaultData.propertyTypes;
     const loanTerms = pageContent.loanTerms || defaultData.loanTerms;
+    const labels = pageContent.sectionLabels || {};
 
     return (
         <div className="page-wrapper">
@@ -74,7 +77,7 @@ const RealEstateFinancing = () => {
             />
 
             {/* Introduction */}
-            <section style={{ padding: '80px 20px 40px', background: '#FFFFFF' }}>
+            {show('subtitle') && <section style={{ padding: '80px 20px 40px', background: '#FFFFFF' }}>
                 <div className="container">
                     <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
                         <p style={{ fontSize: '1.15rem', color: '#4A5568', lineHeight: '1.9' }}>
@@ -82,12 +85,12 @@ const RealEstateFinancing = () => {
                         </p>
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Financing Types */}
-            <section style={{ padding: '40px 20px 80px', background: '#FFFFFF' }}>
+            {show('financingTypes') && <section style={{ padding: '40px 20px 80px', background: '#FFFFFF' }}>
                 <div className="container">
-                    <h2 className="section-title">Financing Solutions</h2>
+                    <h2 className="section-title">{labels.financingTypes || 'Financing Solutions'}</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
                         {financingTypes.map((item, i) => (
                             <div key={i} className="glass-card">
@@ -98,14 +101,14 @@ const RealEstateFinancing = () => {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Property Types & Terms */}
-            <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
+            {show('propertyTypes') && <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
                 <div className="container">
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem' }}>
                         <div>
-                            <h2 style={{ fontSize: '2rem', marginBottom: '2rem', color: '#1A365D' }}>Property Types We Finance</h2>
+                            <h2 style={{ fontSize: '2rem', marginBottom: '2rem', color: '#1A365D' }}>{labels.propertyTypes || 'Property Types We Finance'}</h2>
                             <div style={{ display: 'grid', gap: '1.5rem' }}>
                                 {propertyTypes.map((item, i) => (
                                     <div key={i} style={{ background: '#FFFFFF', padding: '1.5rem', borderRadius: '10px', border: '1px solid rgba(26, 54, 93, 0.08)' }}>
@@ -119,7 +122,7 @@ const RealEstateFinancing = () => {
                             </div>
                         </div>
                         <div>
-                            <h2 style={{ fontSize: '2rem', marginBottom: '2rem', color: '#1A365D' }}>Loan Terms</h2>
+                            <h2 style={{ fontSize: '2rem', marginBottom: '2rem', color: '#1A365D' }}>{labels.loanTerms || 'Loan Terms'}</h2>
                             <div style={{ background: '#FFFFFF', borderRadius: '12px', padding: '2rem', border: '1px solid rgba(26, 54, 93, 0.08)' }}>
                                 {loanTerms.map((item, i) => (
                                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem 0', borderBottom: i < loanTerms.length - 1 ? '1px solid rgba(26, 54, 93, 0.08)' : 'none' }}>
@@ -134,7 +137,7 @@ const RealEstateFinancing = () => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section>}
 
             {/* Dynamic Sections from Admin */}
             {(pageContent.sections || []).map((section, idx) => (

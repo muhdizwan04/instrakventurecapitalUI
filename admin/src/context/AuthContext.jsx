@@ -6,7 +6,38 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
     const [loading, setLoading] = useState(true);
+
+    // Check if the logged-in user is in the admin_users whitelist
+    const checkAdminStatus = async (userEmail) => {
+        if (!userEmail) {
+            setIsAdmin(false);
+            return false;
+        }
+
+        try {
+            const { data, error } = await supabase
+                .from('admin_users')
+                .select('email')
+                .eq('email', userEmail)
+                .maybeSingle();
+
+            if (error && error.code !== 'PGRST116') {
+                console.warn('[Admin Auth] Error checking admin status:', error.message);
+                setIsAdmin(false);
+                return false;
+            }
+
+            const adminStatus = !!data;
+            setIsAdmin(adminStatus);
+            return adminStatus;
+        } catch (err) {
+            console.warn('[Admin Auth] Admin check failed:', err);
+            setIsAdmin(false);
+            return false;
+        }
+    };
 
     useEffect(() => {
         // OPTIMIZATION: Check for local session immediately to unblock guests
@@ -15,7 +46,6 @@ export const AuthProvider = ({ children }) => {
         
         try {
             if (supabaseUrl) {
-                // Extract project ref from URL (e.g. https://xyz.supabase.co -> xyz)
                 const projectRef = supabaseUrl.split('.')[0].split('//')[1];
                 const storageKey = `sb-${projectRef}-auth-token`;
                 const localData = localStorage.getItem(storageKey);
@@ -24,28 +54,55 @@ export const AuthProvider = ({ children }) => {
                 }
             }
         } catch (e) {
-            console.warn('[AuthContext] Local storage check failed', e);
+            console.warn('[Admin Auth] Local storage check failed', e);
         }
 
-        // If no local session, we can release loading state immediately for guests
         if (!hasLocalSession) {
-            console.log('[AuthContext] No local session found, skipping wait.');
             setLoading(false);
+        }
+
+        // If we have a local session, start admin check early (in parallel with getSession)
+        let earlyAdminCheck = null;
+        if (hasLocalSession) {
+            try {
+                const localData = JSON.parse(localStorage.getItem(
+                    `sb-${supabaseUrl.split('.')[0].split('//')[1]}-auth-token`
+                ));
+                const email = localData?.user?.email;
+                if (email) {
+                    earlyAdminCheck = checkAdminStatus(email);
+                }
+            } catch (e) {
+                // Fall through to normal flow
+            }
         }
 
         // Get initial session
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        supabase.auth.getSession().then(async ({ data: { session } }) => {
             setUser(session?.user ?? null);
+            if (session?.user?.email) {
+                // If early check was for the same email, just await it; otherwise do a fresh check
+                if (earlyAdminCheck) {
+                    await earlyAdminCheck;
+                } else {
+                    await checkAdminStatus(session.user.email);
+                }
+            }
             setLoading(false);
         }).catch(err => {
-            console.error('[AuthContext] getSession failed:', err);
+            console.error('[Admin Auth] getSession failed:', err);
             toast.error('Unable to verify login session. You may be working offline.');
             setLoading(false);
         });
 
         // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
             setUser(session?.user ?? null);
+            if (session?.user?.email) {
+                await checkAdminStatus(session.user.email);
+            } else {
+                setIsAdmin(false);
+            }
         });
 
         return () => subscription.unsubscribe();
@@ -56,7 +113,7 @@ export const AuthProvider = ({ children }) => {
         const timer = setTimeout(() => {
             setLoading((currentLoading) => {
                 if (currentLoading) {
-                    console.warn('[AuthContext] Auth check timed out, forcing loading=false');
+                    console.warn('[Admin Auth] Auth check timed out, forcing loading=false');
                     toast.error('Authentication check timed out. Proceeding in offline mode.');
                     return false;
                 }
@@ -81,16 +138,26 @@ export const AuthProvider = ({ children }) => {
         const { data, error } = await Promise.race([loginPromise, timeoutPromise]);
         
         if (error) throw error;
+
+        // After successful auth, verify this user is an admin
+        const adminStatus = await checkAdminStatus(email);
+        if (!adminStatus) {
+            // Not an admin — sign them out immediately
+            await supabase.auth.signOut();
+            throw new Error('Access denied. This account is not authorized to access the admin panel.');
+        }
+
         return data;
     };
 
     const logout = async () => {
         const { error } = await supabase.auth.signOut();
         if (error) throw error;
+        setIsAdmin(false);
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout }}>
+        <AuthContext.Provider value={{ user, isAdmin, loading, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
         try {
             const { data, error } = await supabase
                 .from('client_profiles')
-                .select('*')
+                .select('id')
                 .eq('id', userId)
                 .maybeSingle();
             
@@ -37,20 +37,37 @@ export const AuthProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        // Get initial session
+        // OPTIMIZATION: Start client profile check early from localStorage
+        let earlyProfileCheck = null;
+        try {
+            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+            if (supabaseUrl) {
+                const projectRef = supabaseUrl.split('.')[0].split('//')[1];
+                const storageKey = `sb-${projectRef}-auth-token`;
+                const localData = localStorage.getItem(storageKey);
+                if (localData) {
+                    const parsed = JSON.parse(localData);
+                    const userId = parsed?.user?.id;
+                    if (userId) {
+                        earlyProfileCheck = checkClientProfile(userId);
+                    }
+                }
+            }
+        } catch (e) {
+            // Fall through to normal flow
+        }
+
+        // Get initial session (runs in parallel with earlyProfileCheck)
         supabase.auth.getSession().then(async ({ data: { session }, error }) => {
-            console.log('[AuthContext] getSession result:', { 
-                hasSession: !!session, 
-                email: session?.user?.email,
-                verified: session?.user?.email_confirmed_at,
-                error: error?.message 
-            });
-            
             setUser(session?.user ?? null);
             
             // Check if this is a client user (not admin)
             if (session?.user) {
-                await checkClientProfile(session.user.id);
+                if (earlyProfileCheck) {
+                    await earlyProfileCheck;
+                } else {
+                    await checkClientProfile(session.user.id);
+                }
             }
             
             setLoading(false);

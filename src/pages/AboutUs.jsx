@@ -1,6 +1,6 @@
 import React from 'react';
 import PageHero from '../components/PageHero';
-import { ShieldCheck, Eye, Scale, User, Shield, Handshake, Building2, Globe, Award, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Eye, Scale, User, Shield, Handshake, Building2, Award, CheckCircle2 } from 'lucide-react';
 import { usePageContent } from '../hooks/usePageContent';
 import { motion } from 'framer-motion';
 import UniversalSection from '../components/UniversalSection';
@@ -194,7 +194,8 @@ const AboutUs = () => {
     if (aboutContent.sections) {
         sections = aboutContent.sections;
     } else {
-        // Fallback: Construct sections list from legacy data
+        // Fallback: Construct sections list from legacy data (when API has no sections array)
+        const sectionTitles = { board: 'Board of Directors', milestone: 'Investment Milestone', partners: 'Strategic Partners' };
         sections = [
             {
                 id: 'hero',
@@ -205,13 +206,14 @@ const AboutUs = () => {
             {
                 id: 'mission',
                 type: 'mission',
+                title: aboutContent.missionSectionTitle || 'Our Mission & Vision',
                 missionTitle: aboutContent.missionTitle || 'Our Mission',
                 missionText: aboutContent.missionText || 'To be the catalyst...',
                 visionTitle: aboutContent.visionTitle || 'Our Vision',
                 visionText: aboutContent.visionText || 'To set the benchmark...',
                 values: aboutContent.values || defaultAbout.sections.find(s => s.id === 'mission')?.values
             },
-            ...(aboutContent.sectionOrder || ['mission', 'board', 'partners']).filter(id => id !== 'mission').map(id => ({ id, type: id }))
+            ...(aboutContent.sectionOrder || ['board', 'milestone', 'partners']).map(id => ({ id, type: id, title: sectionTitles[id] || undefined }))
         ];
     }
 
@@ -257,6 +259,11 @@ const AboutUs = () => {
 
     const renderMission = (section) => {
         const styles = section.styles || {};
+        const titleColor = styles.titleColor || styles.textColor || 'var(--accent-primary)';
+        const textColor = styles.textColor || '#475569';
+        const titleSizePx = styles.titleFontSize != null ? styles.titleFontSize : 32;
+        const bodySizePx = styles.contentFontSize != null ? styles.contentFontSize : 18;
+        const titleWeight = styles.titleFontWeight === 'bold' ? 700 : 900;
         return (
             <motion.section
                 key={section.id}
@@ -283,35 +290,54 @@ const AboutUs = () => {
                     }} />
                 )}
                 <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: styles.textAlign || 'left' }}>
-                    {/* Mission Statement */}
-                    <div className="luxury-glass luxury-border-gold overflow-hidden" style={{
+                    {section.title && (
+                        <div style={{ marginBottom: '2rem', textAlign: styles.textAlign || 'center' }}>
+                            <h2 className="section-title" style={{ color: titleColor, fontSize: styles.titleFontSize ? `${styles.titleFontSize}px` : undefined }}>{section.title}</h2>
+                        </div>
+                    )}
+                    {/* Mission Statement card — glass/solid + colour from admin */}
+                    {(() => {
+                        const cardStyle = styles.cardStyle || 'glass';
+                        const isGlass = cardStyle !== 'solid';
+                        const hex = (styles.cardColor || '#FFFFFF').replace(/^#/, '');
+                        const cardBg = isGlass && hex.length === 6
+                            ? `rgba(${parseInt(hex.slice(0,2),16)},${parseInt(hex.slice(2,4),16)},${parseInt(hex.slice(4,6),16)},0.42)`
+                            : (styles.cardColor || '#FFFFFF');
+                        const glassStyle = isGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {};
+                        return (
+                    <div className="luxury-border-gold overflow-hidden" style={{
                         borderRadius: '24px',
                         padding: '4rem',
-                        color: styles.textColor || '#1A365D',
+                        color: textColor,
                         position: 'relative',
                         boxShadow: 'var(--shadow-lg)',
-                        marginBottom: '4rem'
+                        marginBottom: '4rem',
+                        background: cardBg,
+                        ...glassStyle
                     }}>
-                        {/* Decorative Background Element */}
-                        <div style={{ position: 'absolute', top: '-10%', right: '-5%', opacity: 0.03, transform: 'scale(1.5)', pointerEvents: 'none' }}>
-                            <Globe size={400} color="var(--accent-primary)" />
-                        </div>
-
                         <div style={{ position: 'relative', zIndex: 10, maxWidth: '800px' }}>
-                            <h6 style={{ color: 'var(--accent-secondary)', textTransform: 'uppercase', letterSpacing: '3px', fontWeight: '800', fontSize: '0.8rem', marginBottom: '1.5rem' }}>Our institutional Mandate</h6>
-                            <h2 style={{ fontSize: '3rem', marginBottom: '2rem', lineHeight: '1.1', color: 'var(--accent-primary)', fontWeight: '900' }}>{section.missionTitle || 'Our Mission'}</h2>
-                            <p style={{ fontSize: '1.25rem', lineHeight: '1.8', color: 'var(--text-secondary)', marginBottom: '3rem', fontWeight: '500' }}>
+                            {section.mandateLabel != null && section.mandateLabel.trim() !== '' && (
+                                <h6 style={{ color: styles.itemTitleColor || 'var(--accent-secondary)', textTransform: 'uppercase', letterSpacing: '3px', fontWeight: '800', fontSize: `${styles.subtitleFontSize != null ? styles.subtitleFontSize : 13}px`, marginBottom: '1.5rem' }}>{section.mandateLabel.trim()}</h6>
+                            )}
+                            <h2 style={{ fontSize: `${titleSizePx}px`, marginBottom: '2rem', lineHeight: 1.1, color: titleColor, fontWeight: titleWeight }}>
+                                {section.missionTitle || 'Our Mission'}
+                            </h2>
+                            <p style={{ fontSize: `${bodySizePx}px`, lineHeight: 1.8, color: textColor, marginBottom: '3rem', fontWeight: 500 }}>
                                 {section.missionText}
                             </p>
 
                             <div style={{ height: '2px', background: 'var(--gradient-gold)', width: '80px', margin: '3rem 0' }}></div>
 
-                            <h3 style={{ fontSize: '1.75rem', color: 'var(--accent-primary)', marginBottom: '1.5rem', fontWeight: '700' }}>{section.visionTitle || 'Our Vision'}</h3>
-                            <p style={{ fontSize: '1.1rem', lineHeight: '1.9', color: 'var(--text-secondary)', opacity: 0.9 }}>
+                            <h3 style={{ fontSize: `${titleSizePx}px`, color: titleColor, marginBottom: '1.5rem', fontWeight: titleWeight }}>
+                                {section.visionTitle || 'Our Vision'}
+                            </h3>
+                            <p style={{ fontSize: `${bodySizePx}px`, lineHeight: 1.9, color: textColor, opacity: 0.9, fontWeight: 500 }}>
                                 {section.visionText}
                             </p>
                         </div>
                     </div>
+                        );
+                    })()}
                 </div>
             </motion.section>
         );
@@ -374,15 +400,25 @@ const AboutUs = () => {
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2.5rem' }}>
-                        {directors.map((d, i) => (
+                        {directors.map((d, i) => {
+                            const cardStyle = boardStyleColors.cardStyle || 'glass';
+                            const isGlass = cardStyle !== 'solid';
+                            const hex = (boardStyleColors.cardColor || '#FFFFFF').replace(/^#/, '');
+                            const cardBg = isGlass && hex.length === 6
+                                ? `rgba(${parseInt(hex.slice(0,2),16)},${parseInt(hex.slice(2,4),16)},${parseInt(hex.slice(4,6),16)},0.42)`
+                                : (boardStyleColors.cardColor || '#FFFFFF');
+                            const glassStyle = isGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {};
+                            return (
                             <div
                                 key={i}
-                                className="luxury-glass luxury-border-gold group"
+                                className="luxury-border-gold group"
                                 style={{
                                     overflow: 'hidden',
                                     borderRadius: '24px',
                                     transition: 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)',
-                                    textAlign: 'left'
+                                    textAlign: 'left',
+                                    background: cardBg,
+                                    ...glassStyle
                                 }}
                             >
                                 <div style={{
@@ -418,7 +454,8 @@ const AboutUs = () => {
                                     <div style={{ marginTop: '1.5rem', width: '40px', height: '2px', background: 'var(--gradient-gold)', transition: 'width 0.4s ease' }} className="group-hover:width-[100px]"></div>
                                 </div>
                             </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </motion.section>
@@ -429,6 +466,13 @@ const AboutUs = () => {
         const styles = section.styles || {};
         const bgColor = styles.bgColor || 'transparent';
         const isBlack = typeof bgColor === 'string' && (bgColor.toLowerCase() === 'black' || bgColor === '#000' || bgColor === '#000000');
+        const titleColor = styles.titleColor || '#1A365D';
+        const textColor = styles.textColor || '#475569';
+        const itemTitleColor = styles.itemTitleColor || '#1A365D';
+        const contentSizePx = styles.contentFontSize || 16;
+        const titleSizePx = styles.titleFontSize || 32;
+        const subtitleSizePx = styles.subtitleFontSize || 17;
+        const iconColor = styles.iconColor || '#D4AF37';
         return (
             <motion.div
                 key={section.id}
@@ -461,55 +505,71 @@ const AboutUs = () => {
                     <section style={{ padding: '100px 0', background: 'transparent' }}>
                         <div className="container">
                             <div style={{ textAlign: styles.textAlign || 'center', marginBottom: '4rem' }}>
-                                <h2 className="section-title" style={{ color: styles.textColor || '#1A365D' }}>{section.title || 'Strategic Banking & Insurance'}</h2>
-                                {section.subtitle && <p className="mt-2" style={{ color: styles.textColor ? styles.textColor : '#6b7280', opacity: styles.textColor ? 0.8 : 1 }}>{section.subtitle}</p>}
+                                <h2 className="section-title" style={{ color: titleColor, fontSize: titleSizePx ? `${titleSizePx}px` : undefined }}>{section.title || 'Strategic Banking & Insurance'}</h2>
+                                {section.subtitle && <p className="mt-2" style={{ color: textColor, opacity: 0.9, fontSize: subtitleSizePx ? `${subtitleSizePx}px` : undefined }}>{section.subtitle}</p>}
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
-                                {/* Chubb */}
-                                {partners.map((partner, i) => (
-                                    <div key={partner.id || i} style={{ border: '1px solid #E2E8F0', borderRadius: '16px', padding: '3rem', position: 'relative', background: 'white' }}>
+                                {partners.map((partner, i) => {
+                                    const cardStyle = styles.cardStyle || 'glass';
+                                    const isGlass = cardStyle !== 'solid';
+                                    const hex = (styles.cardColor || '#FFFFFF').replace(/^#/, '');
+                                    const cardBg = isGlass && hex.length === 6
+                                        ? `rgba(${parseInt(hex.slice(0,2),16)},${parseInt(hex.slice(2,4),16)},${parseInt(hex.slice(4,6),16)},0.42)`
+                                        : (styles.cardColor || '#FFFFFF');
+                                    const glassStyle = isGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {};
+                                    return (
+                                    <div key={partner.id || i} style={{ border: '1px solid rgba(226,232,240,0.8)', borderRadius: '16px', padding: '3rem', position: 'relative', background: cardBg, ...glassStyle }}>
                                         {partner.logo ? (
                                             <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
                                                 <img src={partner.logo} alt={partner.name} style={{ maxHeight: '60px', maxWidth: '180px', objectFit: 'contain' }} />
                                             </div>
                                         ) : (
-                                            <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}><ShieldCheck size={24} color="#D4AF37" /></div>
+                                            <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}><ShieldCheck size={24} color={iconColor} /></div>
                                         )}
-                                        <h3 style={{ fontSize: '1.5rem', color: '#1A365D', fontWeight: 'bold', marginBottom: '0.5rem' }}>{partner.name}</h3>
-                                        <span style={{ display: 'inline-block', background: '#F0F9FF', color: '#0369A1', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600', marginBottom: '2rem' }}>
+                                        <h3 style={{ fontSize: `${Math.max(14, contentSizePx + 6)}px`, color: itemTitleColor, fontWeight: 'bold', marginBottom: '0.5rem' }}>{partner.name}</h3>
+                                        <span style={{ display: 'inline-block', color: textColor, padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600', marginBottom: '2rem', border: `1px solid ${textColor}40` }}>
                                             {partner.category}
                                         </span>
-                                        <p style={{ color: '#475569', marginBottom: '1.5rem', lineHeight: '1.6' }}>{partner.description}</p>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#0F172A', fontWeight: '500' }}>
-                                            <CheckCircle2 size={18} color="#16A34A" />
+                                        <p style={{ color: textColor, marginBottom: '1.5rem', lineHeight: '1.6', fontSize: `${contentSizePx}px` }}>{partner.description}</p>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: textColor, fontWeight: '500', fontSize: `${contentSizePx}px` }}>
+                                            <CheckCircle2 size={18} color={iconColor} />
                                             <span>{partner.partnership}</span>
                                         </div>
                                     </div>
-                                ))}
+                                    );
+                                })}
 
-                                {/* Banks */}
-                                {banks.map((bank, i) => (
-                                    <div key={bank.id || i} style={{ border: '1px solid #E2E8F0', borderRadius: '16px', padding: '3rem', position: 'relative', background: 'white' }}>
+                                {banks.map((bank, i) => {
+                                    const cardStyle = styles.cardStyle || 'glass';
+                                    const isGlass = cardStyle !== 'solid';
+                                    const hex = (styles.cardColor || '#FFFFFF').replace(/^#/, '');
+                                    const cardBg = isGlass && hex.length === 6
+                                        ? `rgba(${parseInt(hex.slice(0,2),16)},${parseInt(hex.slice(2,4),16)},${parseInt(hex.slice(4,6),16)},0.42)`
+                                        : (styles.cardColor || '#FFFFFF');
+                                    const glassStyle = isGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {};
+                                    return (
+                                    <div key={bank.id || i} style={{ border: '1px solid rgba(226,232,240,0.8)', borderRadius: '16px', padding: '3rem', position: 'relative', background: cardBg, ...glassStyle }}>
                                         {bank.logo ? (
                                             <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
                                                 <img src={bank.logo} alt={bank.name} style={{ maxHeight: '60px', maxWidth: '180px', objectFit: 'contain' }} />
                                             </div>
                                         ) : (
-                                            <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}><Building2 size={24} color="#D4AF37" /></div>
+                                            <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}><Building2 size={24} color={iconColor} /></div>
                                         )}
-                                        <h3 style={{ fontSize: '1.5rem', color: '#1A365D', fontWeight: 'bold', marginBottom: '0.5rem' }}>{bank.name}</h3>
-                                        <span style={{ display: 'inline-block', background: '#F0FDF4', color: '#166534', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600', marginBottom: '2rem' }}>
+                                        <h3 style={{ fontSize: `${Math.max(14, contentSizePx + 6)}px`, color: itemTitleColor, fontWeight: 'bold', marginBottom: '0.5rem' }}>{bank.name}</h3>
+                                        <span style={{ display: 'inline-block', color: textColor, padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600', marginBottom: '2rem', border: `1px solid ${textColor}40` }}>
                                             {bank.role}
                                         </span>
-                                        <p style={{ color: '#475569', marginBottom: '1.5rem', lineHeight: '1.6' }}>{bank.description}</p>
+                                        <p style={{ color: textColor, marginBottom: '1.5rem', lineHeight: '1.6', fontSize: `${contentSizePx}px` }}>{bank.description}</p>
                                         <div style={{ display: 'flex', flexDirection: 'col', gap: '0.5rem' }}>
-                                            {bank.branch && <div style={{ fontSize: '0.9rem', color: '#64748B' }}>📍 {bank.branch}</div>}
-                                            {bank.location && <div style={{ fontSize: '0.9rem', color: '#64748B' }}>📍 {bank.location}</div>}
-                                            {bank.swift && <div style={{ fontSize: '0.9rem', color: '#64748B' }}>🌐 SWIFT: {bank.swift}</div>}
+                                            {bank.branch && <div style={{ fontSize: '0.9rem', color: textColor }}>📍 {bank.branch}</div>}
+                                            {bank.location && <div style={{ fontSize: '0.9rem', color: textColor }}>📍 {bank.location}</div>}
+                                            {bank.swift && <div style={{ fontSize: '0.9rem', color: textColor }}>🌐 SWIFT: {bank.swift}</div>}
                                         </div>
                                     </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     </section>
@@ -520,6 +580,10 @@ const AboutUs = () => {
 
     const renderMilestone = (section) => {
         const styles = section.styles || {};
+        const bgBase = styles.bgColor || '#0A2540';
+        const textBase = styles.textColor || '#FFFFFF';
+        const titleBase = styles.titleColor || textBase;
+        const iconColor = styles.iconColor || '#D4AF37';
         return (
             <motion.div
                 key={section.id}
@@ -528,17 +592,26 @@ const AboutUs = () => {
                 viewport={{ once: true, margin: "-100px" }}
                 variants={sectionVariants}
                 style={{
-                    paddingBottom: '100px',
                     scrollMarginTop: '80px'
                 }}
             >
                 {/* 3b. Investment Feature (Deal Tombstone Style) */}
                 <section style={{
                     padding: '80px 0',
-                    background: '#0A2540',
-                    color: 'white',
-                    position: 'relative'
+                    backgroundColor: bgBase,
+                    color: textBase,
+                    position: 'relative',
+                    backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
+                    backgroundSize: styles.backgroundSize || 'cover',
+                    backgroundPosition: 'center'
                 }}>
+                    {styles.backgroundImage && (
+                        <div style={{
+                            position: 'absolute', inset: 0, background: 'black',
+                            opacity: styles.overlayOpacity !== undefined ? styles.overlayOpacity : 0.4,
+                            zIndex: 0, pointerEvents: 'none'
+                        }} />
+                    )}
                     <div className="container">
                         <div style={{
                             maxWidth: '900px',
@@ -546,18 +619,19 @@ const AboutUs = () => {
                             border: '2px solid rgba(212, 175, 55, 0.3)',
                             padding: '4rem',
                             textAlign: 'center',
-                            position: 'relative'
+                            position: 'relative',
+                            zIndex: 1
                         }}>
                             <div style={{
                                 position: 'absolute', top: '-1px', left: '50%', transform: 'translate(-50%, -50%)',
-                                background: '#0A2540', padding: '0 1rem', textTransform: 'uppercase', letterSpacing: '2px', color: '#D4AF37', fontSize: '0.9rem', fontWeight: 'bold'
+                                background: bgBase, padding: '0 1rem', textTransform: 'uppercase', letterSpacing: '2px', color: iconColor, fontSize: '0.9rem', fontWeight: 'bold'
                             }}>
                                 {section.title || 'Investment Milestone'}
                             </div>
 
-                            <Award size={64} style={{ color: '#D4AF37', margin: '0 auto 2rem' }} />
-                            <h2 style={{ fontSize: '3.5rem', fontFamily: 'var(--font-heading)', color: '#FFFFFF', marginBottom: '1rem' }}>{milestone.headline}</h2>
-                            <p style={{ fontSize: '1.5rem', color: '#D4AF37', marginBottom: '2rem' }}>{milestone.subtitle}</p>
+                            <Award size={64} style={{ color: iconColor, margin: '0 auto 2rem' }} />
+                            <h2 style={{ fontSize: '3.5rem', fontFamily: 'var(--font-heading)', color: titleBase, marginBottom: '1rem' }}>{milestone.headline}</h2>
+                            <p style={{ fontSize: '1.5rem', color: iconColor, marginBottom: '2rem' }}>{milestone.subtitle}</p>
                             <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', width: '100px', margin: '0 auto 2rem' }}></div>
                             <p style={{ fontSize: '1.1rem', lineHeight: '1.8', opacity: 0.8, maxWidth: '700px', margin: '0 auto' }}>
                                 {milestone.description}
@@ -585,7 +659,7 @@ const AboutUs = () => {
     const renderCustom = (section) => <UniversalSection key={section.id} section={section} />;
 
     return (
-        <div className="page-wrapper bg-gray-50">
+        <div className="page-wrapper">
             {sections.map(section => {
                 const RenderFn = renderers[section.type] || renderCustom;
                 return RenderFn(section);

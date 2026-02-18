@@ -20,7 +20,15 @@ const FooterManager = () => {
             { id: 'ql-3', label: 'Services', url: '/services' },
             { id: 'ql-4', label: 'News', url: '/latest-news-2' },
             { id: 'ql-5', label: 'Contact Us', url: '/contact' }
-        ]
+        ],
+        styles: {
+            footerBgColor: '#FAFBFC',
+            descriptionTextColor: '#4A5568',
+            addressTextColor: '#4A5568',
+            phoneTextColor: '#4A5568',
+            emailTextColor: '#1A365D',
+            quickLinkTextColor: '#4A5568'
+        }
     };
 
     const { content, loading, saving, saveContent } = useContent('footer', defaultData);
@@ -84,6 +92,13 @@ const FooterManager = () => {
     const handleSave = async (e) => {
         e.preventDefault();
         await saveContent(footerData);
+    };
+
+    const updateStyle = (key, value) => {
+        setFooterData(prev => ({
+            ...prev,
+            styles: { ...(prev.styles || {}), [key]: value }
+        }));
     };
 
     return (
@@ -151,7 +166,7 @@ const FooterManager = () => {
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2"><Phone size={14} className="inline mr-1" /> Phone Number</label>
                             <input
@@ -171,6 +186,65 @@ const FooterManager = () => {
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
                             />
+                        </div>
+                    </div>
+
+                    {/* Footer appearance – text and background colours */}
+                    <div className="border-t border-[var(--border-light)] pt-6 mt-6">
+                        <h4 className="text-sm font-bold text-[var(--text-secondary)] mb-3">Footer appearance</h4>
+                        <div className="space-y-3">
+                            <div>
+                                <label className="block text-xs text-[var(--text-muted)] mb-1">Footer background colour</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="color"
+                                        value={footerData.styles?.footerBgColor || '#FAFBFC'}
+                                        onChange={(e) => updateStyle('footerBgColor', e.target.value)}
+                                        className="w-10 h-10 rounded border border-[var(--border-light)] cursor-pointer"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={footerData.styles?.footerBgColor || ''}
+                                        onChange={(e) => updateStyle('footerBgColor', e.target.value)}
+                                        className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm font-mono"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs text-[var(--text-muted)] mb-1">Company description text colour</label>
+                                <div className="flex gap-2">
+                                    <input type="color" value={footerData.styles?.descriptionTextColor || '#4A5568'} onChange={(e) => updateStyle('descriptionTextColor', e.target.value)} className="w-10 h-10 rounded border cursor-pointer" />
+                                    <input type="text" value={footerData.styles?.descriptionTextColor || ''} onChange={(e) => updateStyle('descriptionTextColor', e.target.value)} className="flex-1 px-3 py-2 rounded border text-sm font-mono" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs text-[var(--text-muted)] mb-1">Official office address text colour</label>
+                                <div className="flex gap-2">
+                                    <input type="color" value={footerData.styles?.addressTextColor || '#4A5568'} onChange={(e) => updateStyle('addressTextColor', e.target.value)} className="w-10 h-10 rounded border cursor-pointer" />
+                                    <input type="text" value={footerData.styles?.addressTextColor || ''} onChange={(e) => updateStyle('addressTextColor', e.target.value)} className="flex-1 px-3 py-2 rounded border text-sm font-mono" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs text-[var(--text-muted)] mb-1">Phone number text colour</label>
+                                <div className="flex gap-2">
+                                    <input type="color" value={footerData.styles?.phoneTextColor || '#4A5568'} onChange={(e) => updateStyle('phoneTextColor', e.target.value)} className="w-10 h-10 rounded border cursor-pointer" />
+                                    <input type="text" value={footerData.styles?.phoneTextColor || ''} onChange={(e) => updateStyle('phoneTextColor', e.target.value)} className="flex-1 px-3 py-2 rounded border text-sm font-mono" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs text-[var(--text-muted)] mb-1">Email address text colour</label>
+                                <div className="flex gap-2">
+                                    <input type="color" value={footerData.styles?.emailTextColor || '#1A365D'} onChange={(e) => updateStyle('emailTextColor', e.target.value)} className="w-10 h-10 rounded border cursor-pointer" />
+                                    <input type="text" value={footerData.styles?.emailTextColor || ''} onChange={(e) => updateStyle('emailTextColor', e.target.value)} className="flex-1 px-3 py-2 rounded border text-sm font-mono" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs text-[var(--text-muted)] mb-1">Quick links text colour</label>
+                                <div className="flex gap-2">
+                                    <input type="color" value={footerData.styles?.quickLinkTextColor || '#4A5568'} onChange={(e) => updateStyle('quickLinkTextColor', e.target.value)} className="w-10 h-10 rounded border cursor-pointer" />
+                                    <input type="text" value={footerData.styles?.quickLinkTextColor || ''} onChange={(e) => updateStyle('quickLinkTextColor', e.target.value)} className="flex-1 px-3 py-2 rounded border text-sm font-mono" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -258,47 +332,6 @@ const FooterManager = () => {
                         </div>
                     </div>
 
-                    {/* Footer Preview */}
-                    <div className="glass-card p-6">
-                        <h3 className="text-lg font-bold border-b border-[var(--border-light)] pb-2 mb-4">Footer Preview</h3>
-                        <div className="rounded-lg overflow-hidden border border-[var(--border-light)]" style={{ background: '#FAFBFC' }}>
-                            <div className="h-1 w-full bg-gradient-to-r from-[#1A365D] via-[#B8860B] to-[#1A365D]" />
-                            <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-                                <div className="space-y-4">
-                                    <div className="font-bold text-[#1A365D] text-lg">Instrak VC</div>
-                                    <p className="text-xs text-[#1A365D] font-bold uppercase tracking-wider">{footerData.companyName}</p>
-                                    <p className="text-sm text-[#4A5568] leading-relaxed">{footerData.description}</p>
-                                </div>
-                                <div>
-                                    <h4 className="text-[#1A365D] font-bold mb-4">Quick Links</h4>
-                                    <ul className="space-y-2 text-sm text-[#4A5568]">
-                                        {footerData.quickLinks.map((link) => (
-                                            <li key={link.id} className="hover:text-[#B8860B] cursor-pointer transition-colors">{link.label}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                                <div>
-                                    <h4 className="text-[#1A365D] font-bold mb-4">Contact Us</h4>
-                                    <div className="text-sm text-[#4A5568] space-y-1">
-                                        <p className="whitespace-pre-line">{footerData.address}</p>
-                                        <p className="text-[#1A365D] font-medium mt-4 pt-2">{footerData.email}</p>
-                                        {footerData.phone && <p>{footerData.phone}</p>}
-                                    </div>
-                                    <div className="flex gap-4 mt-6">
-                                        {footerData.socials.linkedin && <Linkedin size={18} className="text-[#0077b5]" />}
-                                        {footerData.socials.facebook && <Facebook size={18} className="text-[#1877f2]" />}
-                                        {footerData.socials.twitter && <Twitter size={18} className="text-[#1da1f2]" />}
-                                        {footerData.socials.instagram && <Instagram size={18} className="text-[#e4405f]" />}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="bg-[#1A365D]/5 py-4 text-center border-t border-[#1A365D]/10">
-                                <p className="text-xs text-[#4A5568]">
-                                    &copy; {new Date().getFullYear()} Instrak Venture Capital Berhad. All rights reserved.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

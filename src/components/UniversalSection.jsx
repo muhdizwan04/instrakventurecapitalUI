@@ -19,7 +19,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
     const getIcon = (iconName) => {
         if (!iconName) return null;
         const Icon = LucideIcons[iconName];
-        return Icon ? <Icon size={20} /> : null;
+        return Icon ? <Icon size={20} color={iconColor} /> : null;
     };
 
     const parseMarkdown = (text) => {
@@ -43,11 +43,26 @@ const UniversalSection = ({ section, containerClass = "" }) => {
     const isDarkBg = styles.bgColor === '#0A2540' || styles.bgColor === '#0A1628' || styles.bgColor === '#1A365D';
     const titleColor = styles.titleColor || (isDarkBg ? '#FFFFFF' : '#0A3D62');
     const subtitleColor = styles.textColor || (isDarkBg ? 'rgba(255,255,255,0.7)' : '#64748B');
-    const cardBg = isDarkBg ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.9)';
-    const cardBorder = isDarkBg ? 'rgba(255,255,255,0.12)' : 'rgba(10, 61, 98, 0.08)';
     const itemTextColor = styles.itemTitleColor || (isDarkBg ? '#FFFFFF' : '#1A365D');
     const itemDescColor = styles.textColor || (isDarkBg ? 'rgba(255,255,255,0.65)' : '#64748B');
     const accentColor = '#C9A227';
+    const iconColor = styles.iconColor || accentColor;
+
+    // Card/box style: glass (tinted, blurred) or solid (opaque)
+    const cardStyle = styles.cardStyle || 'glass';
+    const isCardGlass = cardStyle !== 'solid';
+    const cardColorHex = styles.cardColor || '#FFFFFF';
+    const hexToRgba = (hex, a) => {
+        const h = hex.replace(/^#/, '');
+        if (h.length === 6) {
+            const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
+            return `rgba(${r},${g},${b},${a})`;
+        }
+        return isDarkBg ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.85)';
+    };
+    const cardBg = isCardGlass ? hexToRgba(cardColorHex, 0.42) : cardColorHex;
+    const cardBorder = isDarkBg ? 'rgba(255,255,255,0.12)' : 'rgba(10, 61, 98, 0.08)';
+    const cardGlassStyle = isCardGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {};
 
     const renderHeader = () => (
         <div style={{
@@ -137,6 +152,58 @@ const UniversalSection = ({ section, containerClass = "" }) => {
 
     const renderLayout = () => {
         switch (layoutType) {
+            case 'mission-card':
+                return (
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="luxury-border-gold"
+                        style={{
+                            borderRadius: '24px',
+                            padding: 'clamp(2.5rem, 5vw, 4rem)',
+                            position: 'relative',
+                            boxShadow: 'var(--shadow-lg)',
+                            maxWidth: '900px',
+                            margin: '0 auto',
+                            color: subtitleColor,
+                            overflow: 'hidden',
+                            background: cardBg,
+                            ...cardGlassStyle,
+                            border: `1px solid ${cardBorder}`
+                        }}
+                    >
+                        <div style={{ position: 'relative', zIndex: 1 }}>
+                            {title && (
+                                <h2 style={{
+                                    fontSize: styles.titleFontSize ? `${styles.titleFontSize}px` : 'clamp(1.75rem, 3vw, 2.5rem)',
+                                    fontWeight: styles.titleFontWeight === 'bold' ? 700 : 800,
+                                    fontFamily: 'var(--font-heading)',
+                                    color: titleColor,
+                                    marginBottom: subtitle ? '1rem' : '0',
+                                    lineHeight: 1.2
+                                }}>{title}</h2>
+                            )}
+                            {subtitle && (
+                                <p style={{
+                                    fontSize: `${styles.subtitleFontSize || 17}px`,
+                                    color: subtitleColor,
+                                    lineHeight: 1.7,
+                                    marginBottom: content ? '1.5rem' : 0
+                                }}>{subtitle}</p>
+                            )}
+                            {content && (
+                                <div style={{
+                                    fontSize: `${styles.contentFontSize || 16}px`,
+                                    lineHeight: 1.8,
+                                    color: subtitleColor,
+                                    whiteSpace: 'pre-line'
+                                }}>{content.split('\n').map((para, i) => para ? <p key={i} style={{ marginBottom: '1rem' }}>{para}</p> : <br key={i} />)}</div>
+                            )}
+                        </div>
+                    </motion.div>
+                );
+
             case 'list':
                 return (
                     <div style={{
@@ -159,6 +226,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                     gap: '1rem',
                                     padding: '1.25rem 1.5rem',
                                     background: cardBg,
+                                    ...cardGlassStyle,
                                     border: `1px solid ${cardBorder}`,
                                     borderRadius: '12px',
                                     transition: 'all 0.3s ease',
@@ -175,9 +243,9 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     flexShrink: 0,
-                                    color: accentColor
+                                    color: iconColor
                                 }}>
-                                    {getIcon(item.icon) || <CheckCircle2 size={18} />}
+                                    {getIcon(item.icon) || <CheckCircle2 size={18} color={iconColor} />}
                                 </div>
                                 <div>
                                     <span style={{
@@ -219,6 +287,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                 style={{
                                     padding: '2rem',
                                     background: cardBg,
+                                    ...cardGlassStyle,
                                     border: `1px solid ${cardBorder}`,
                                     borderRadius: '16px',
                                     transition: 'all 0.4s cubic-bezier(0.23, 1, 0.32, 1)',
@@ -243,9 +312,9 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     marginBottom: '1.25rem',
-                                    color: isDarkBg ? accentColor : '#0A3D62'
+                                    color: iconColor
                                 }}>
-                                    {getIcon(item.icon) || <CheckCircle2 size={22} />}
+                                    {getIcon(item.icon) || <CheckCircle2 size={22} color={iconColor} />}
                                 </div>
                                 <h3 style={{
                                     fontSize: '1.1rem',
@@ -286,6 +355,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                 style={{
                                     padding: '2.5rem',
                                     background: cardBg,
+                                    ...cardGlassStyle,
                                     border: `1px solid ${cardBorder}`,
                                     borderRadius: '20px',
                                     position: 'relative',
@@ -318,10 +388,10 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     marginBottom: '1.5rem',
-                                    color: isDarkBg ? accentColor : '#0A3D62',
+                                    color: iconColor,
                                     border: `1px solid ${isDarkBg ? 'rgba(201, 162, 39, 0.2)' : 'rgba(10, 61, 98, 0.08)'}`
                                 }}>
-                                    {getIcon(item.icon) || <CheckCircle2 size={24} />}
+                                    {getIcon(item.icon) || <CheckCircle2 size={24} color={iconColor} />}
                                 </div>
                                 <h3 style={{
                                     fontSize: '1.25rem',
@@ -360,6 +430,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                 transition={{ delay: i * 0.08 }}
                                 style={{
                                     background: cardBg,
+                                    ...cardGlassStyle,
                                     border: `1px solid ${openItems[i] ? accentColor + '40' : cardBorder}`,
                                     borderRadius: '14px',
                                     overflow: 'hidden',
@@ -383,10 +454,10 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                 >
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                         <div style={{
-                                            color: openItems[i] ? accentColor : (isDarkBg ? '#94A3B8' : '#64748B'),
+                                            color: openItems[i] ? iconColor : (isDarkBg ? '#94A3B8' : '#64748B'),
                                             flexShrink: 0
                                         }}>
-                                            {getIcon(item.icon) || <CheckCircle2 size={20} />}
+                                            {getIcon(item.icon) || <CheckCircle2 size={20} color={openItems[i] ? iconColor : undefined} />}
                                         </div>
                                         <span style={{
                                             fontWeight: 600,
@@ -456,6 +527,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                     width: '140px',
                                     padding: '1.5rem 1rem',
                                     background: cardBg,
+                                    ...cardGlassStyle,
                                     border: `1px solid ${cardBorder}`,
                                     borderRadius: '16px',
                                     transition: 'all 0.3s ease'
@@ -470,10 +542,10 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     marginBottom: '0.75rem',
-                                    color: isDarkBg ? accentColor : '#0A3D62',
+                                    color: iconColor,
                                     border: `1px solid ${isDarkBg ? 'rgba(201, 162, 39, 0.2)' : 'rgba(10, 61, 98, 0.08)'}`
                                 }}>
-                                    {getIcon(item.icon) || <CheckCircle2 size={20} />}
+                                    {getIcon(item.icon) || <CheckCircle2 size={20} color={iconColor} />}
                                 </div>
                                 <h4 style={{
                                     fontWeight: 700,
@@ -550,6 +622,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                         gap: '0.75rem',
                                         padding: '1rem 1.25rem',
                                         background: cardBg,
+                                        ...cardGlassStyle,
                                         border: `1px solid ${cardBorder}`,
                                         borderRadius: '50px',
                                         fontWeight: 600,
@@ -559,8 +632,8 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                         boxShadow: '0 2px 10px rgba(0,0,0,0.04)'
                                     }}
                                 >
-                                    <div style={{ color: accentColor, flexShrink: 0 }}>
-                                        {getIcon(item.icon) || <ArrowRight size={18} />}
+                                    <div style={{ color: iconColor, flexShrink: 0 }}>
+                                        {getIcon(item.icon) || <ArrowRight size={18} color={iconColor} />}
                                     </div>
                                     {item.title}
                                 </motion.div>
@@ -635,11 +708,11 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                         }}
                                     >
                                         <div style={{
-                                            color: accentColor,
+                                            color: iconColor,
                                             flexShrink: 0,
                                             marginTop: '2px'
                                         }}>
-                                            {getIcon(item.icon) || <CheckCircle2 size={18} />}
+                                            {getIcon(item.icon) || <CheckCircle2 size={18} color={iconColor} />}
                                         </div>
                                         <div>
                                             <h4 style={{
@@ -773,6 +846,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                 style={{
                                     padding: '2.5rem',
                                     background: cardBg,
+                                    ...cardGlassStyle,
                                     border: `1px solid ${cardBorder}`,
                                     borderRadius: '20px',
                                     boxShadow: isDarkBg ? 'none' : '0 2px 15px rgba(0,0,0,0.04)'
@@ -782,7 +856,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                     style={{
                                         fontSize: `${styles.contentFontSize || 16}px`,
                                         lineHeight: 1.9,
-                                        color: isDarkBg ? 'rgba(255,255,255,0.85)' : '#4A5568',
+                                        color: styles.textColor || (isDarkBg ? 'rgba(255,255,255,0.85)' : '#4A5568'),
                                         whiteSpace: 'pre-line'
                                     }}
                                     dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
@@ -811,6 +885,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                     overflow: 'hidden',
                                     borderRadius: '24px',
                                     background: cardBg,
+                                    ...cardGlassStyle,
                                     border: `1px solid ${cardBorder}`,
                                     transition: 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)',
                                     textAlign: 'left'
@@ -1013,7 +1088,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                             style={{
                                 fontSize: `${styles.contentFontSize || 16}px`,
                                 lineHeight: 1.8,
-                                color: isDarkBg ? 'rgba(255,255,255,0.7)' : '#64748B',
+                                color: styles.textColor || (isDarkBg ? 'rgba(255,255,255,0.7)' : '#64748B'),
                                 whiteSpace: 'pre-line'
                             }}
                             dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
@@ -1040,7 +1115,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                             style={{
                                 fontSize: `${styles.contentFontSize || 16}px`,
                                 lineHeight: 1.8,
-                                color: isDarkBg ? 'rgba(255,255,255,0.7)' : '#64748B',
+                                color: styles.textColor || (isDarkBg ? 'rgba(255,255,255,0.7)' : '#64748B'),
                                 fontStyle: 'italic',
                                 whiteSpace: 'pre-line'
                             }}

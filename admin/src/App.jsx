@@ -8,6 +8,7 @@ import HomeManager from './pages/HomeManager';
 import AboutManager from './pages/AboutManager';
 import CombinedServicesManager from './pages/CombinedServicesManager';
 import CareerManager from './pages/CareerManager';
+import ContactManager from './pages/ContactManager';
 import NewsManager from './pages/NewsManager';
 import InquiriesManager from './pages/InquiriesManager';
 import BoardManager from './pages/BoardManager';
@@ -60,6 +61,7 @@ function AppRoutes() {
         <Route path="services-page" element={<Navigate to="/services?tab=page-settings" replace />} />
         <Route path="service-pages" element={<Navigate to="/services?tab=detail-pages" replace />} />
         <Route path="career" element={<CareerManager />} />
+        <Route path="contact" element={<ContactManager />} />
         <Route path="news" element={<NewsManager />} />
         <Route path="footer" element={<FooterManager />} />
         <Route path="inquiries" element={<InquiriesManager />} />

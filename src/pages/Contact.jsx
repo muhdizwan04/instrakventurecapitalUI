@@ -61,13 +61,43 @@ const Contact = () => {
         }
     };
 
-    // Use loaded content or defaults
     const pageHero = content?.pageHero || defaultContent.pageHero;
     const contactInfo = content?.contactInfo || defaultContent.contactInfo;
     const formLabels = content?.formLabels || defaultContent.formLabels;
+    const styles = content?.styles || {};
 
-    const inputStyle = { width: '100%', padding: '0.9rem', background: '#FFFFFF', border: '1px solid rgba(26, 54, 93, 0.2)', color: '#1A365D', borderRadius: '6px', fontSize: '0.95rem' };
-    const labelStyle = { display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500', color: '#1A365D' };
+    const sectionTitle = styles.sectionTitle ?? 'Get in Touch';
+    const sectionBgColor = styles.sectionBgColor || 'transparent';
+    const sectionTitleColor = styles.sectionTitleColor || '#1A365D';
+    const sectionTextColor = styles.sectionTextColor || '#64748B';
+    const sectionAlign = styles.sectionAlign || 'left';
+
+    const contactBlockStyle = styles.contactBlockStyle || 'solid';
+    const contactBlockBgColor = styles.contactBlockBgColor || 'transparent';
+    const isContactGlass = contactBlockStyle === 'glass';
+    const contactHex = (contactBlockBgColor !== 'transparent' ? contactBlockBgColor : '#FFFFFF').replace(/^#/, '');
+    const hexToRgba = (hex, a) => { if (hex.length === 6) { const r = parseInt(hex.slice(0, 2), 16), g = parseInt(hex.slice(2, 4), 16), b = parseInt(hex.slice(4, 6), 16); return `rgba(${r},${g},${b},${a})`; } return `rgba(255,255,255,${a})`; };
+    const contactBlockBg = isContactGlass ? hexToRgba(contactHex.length === 6 ? contactHex : 'ffffff', 0.42) : (contactBlockBgColor !== 'transparent' ? contactBlockBgColor : 'transparent');
+    const contactGlassStyle = isContactGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {};
+    const contactIconColor = styles.contactIconColor || 'var(--accent-secondary)';
+
+    const formCardStyle = styles.formCardStyle || 'solid';
+    const formCardBgColor = styles.formCardBgColor || '#FFFFFF';
+    const isFormGlass = formCardStyle === 'glass';
+    const formHex = (formCardBgColor || '#FFFFFF').replace(/^#/, '');
+    const formCardBg = isFormGlass ? hexToRgba(formHex.length === 6 ? formHex : 'ffffff', 0.42) : (formCardBgColor || '#FFFFFF');
+    const formGlassStyle = isFormGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {};
+
+    const inputStyle = {
+        width: '100%',
+        padding: '0.9rem',
+        background: styles.formInputBgColor || '#FFFFFF',
+        border: `1px solid ${styles.formInputBorderColor || 'rgba(26, 54, 93, 0.2)'}`,
+        color: styles.formInputTextColor || '#1A365D',
+        borderRadius: styles.formInputBorderRadius ?? '6px',
+        fontSize: styles.formInputFontSize ?? '0.95rem'
+    };
+    const labelStyle = { display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500', color: styles.formLabelColor || '#1A365D' };
 
     if (contentLoading) {
         return (
@@ -80,20 +110,44 @@ const Contact = () => {
     return (
         <div className="page-wrapper">
             <Toaster position="top-right" />
-            <PageHero 
-                title={pageHero.title} 
+            <PageHero
+                title={pageHero.title}
                 subtitle={pageHero.subtitle}
+                style={{ backgroundColor: pageHero.styles?.bgColor }}
+                sectionStyles={{
+                    titleColor: pageHero.styles?.titleColor,
+                    subtitleColor: pageHero.styles?.subtitleColor,
+                    titleAlign: pageHero.styles?.textAlign,
+                    textAlign: pageHero.styles?.textAlign
+                }}
+                textColor={pageHero.styles?.titleColor}
             />
-            <div className="container" style={{ padding: '80px 20px' }}>
+            <div
+                className="container"
+                style={{
+                    padding: `${styles.sectionPaddingTop ?? '80px'} ${styles.sectionPaddingHorizontal ?? '20px'} ${styles.sectionPaddingBottom ?? '80px'}`,
+                    backgroundColor: sectionBgColor !== 'transparent' ? sectionBgColor : undefined
+                }}
+            >
                 <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '5rem' }}>
-                    <div>
-                        <h2 style={{ fontSize: '2rem', marginBottom: '2rem' }}>Get in Touch</h2>
-                        <div style={{ display: 'grid', gap: '2rem' }}>
+                    <div style={{ textAlign: sectionAlign }}>
+                        <h2 style={{ fontSize: styles.sectionTitleFontSize ?? '2rem', marginBottom: styles.sectionTitleMarginBottom ?? '2rem', color: sectionTitleColor }}>{sectionTitle}</h2>
+                        <div style={{
+                            display: 'grid',
+                            gap: '2rem',
+                            background: contactBlockBg !== 'transparent' ? contactBlockBg : undefined,
+                            ...(contactBlockBg !== 'transparent' ? {
+                                padding: styles.contactBlockPadding ?? '2rem',
+                                borderRadius: styles.contactBlockBorderRadius ?? '16px',
+                                border: styles.contactBlockBorderColor ? `1px solid ${styles.contactBlockBorderColor}` : '1px solid rgba(0,0,0,0.06)',
+                                ...contactGlassStyle
+                            } : {})
+                        }}>
                             <div style={{ display: 'flex', gap: '1.5rem' }}>
-                                <MapPin style={{ color: 'var(--accent-secondary)' }} />
+                                <MapPin style={{ color: contactIconColor, flexShrink: 0 }} />
                                 <div>
-                                    <h4 style={{ marginBottom: '0.5rem' }}>{contactInfo.address.title}</h4>
-                                    <p style={{ color: 'var(--text-secondary)' }}>
+                                    <h4 style={{ marginBottom: '0.5rem', color: sectionTitleColor }}>{contactInfo.address.title}</h4>
+                                    <p style={{ color: sectionTextColor }}>
                                         {contactInfo.address.lines.map((line, i) => (
                                             <React.Fragment key={i}>
                                                 {line}<br />
@@ -103,27 +157,33 @@ const Contact = () => {
                                 </div>
                             </div>
                             <div style={{ display: 'flex', gap: '1.5rem' }}>
-                                <Phone style={{ color: 'var(--accent-secondary)' }} />
+                                <Phone style={{ color: contactIconColor, flexShrink: 0 }} />
                                 <div>
-                                    <h4 style={{ marginBottom: '0.5rem' }}>{contactInfo.phones.title}</h4>
+                                    <h4 style={{ marginBottom: '0.5rem', color: sectionTitleColor }}>{contactInfo.phones.title}</h4>
                                     {contactInfo.phones.numbers.map((num, i) => (
-                                        <p key={i} style={{ color: 'var(--text-secondary)' }}>{num}</p>
+                                        <p key={i} style={{ color: sectionTextColor }}>{num}</p>
                                     ))}
                                 </div>
                             </div>
                             <div style={{ display: 'flex', gap: '1.5rem' }}>
-                                <Mail style={{ color: 'var(--accent-secondary)' }} />
+                                <Mail style={{ color: contactIconColor, flexShrink: 0 }} />
                                 <div>
-                                    <h4 style={{ marginBottom: '0.5rem' }}>{contactInfo.email.title}</h4>
-                                    <p style={{ color: 'var(--accent-primary)' }}>{contactInfo.email.address}</p>
+                                    <h4 style={{ marginBottom: '0.5rem', color: sectionTitleColor }}>{contactInfo.email.title}</h4>
+                                    <p style={{ color: contactIconColor }}>{contactInfo.email.address}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div 
-                        className="glass-card" 
-                        style={{ padding: '2.5rem', background: '#FFFFFF', border: '1px solid rgba(26, 54, 93, 0.12)', boxShadow: '0 4px 20px rgba(26, 54, 93, 0.08)' }}
+                    <div
+                        className="glass-card"
+                        style={{
+                            padding: styles.formCardPadding ?? '2.5rem',
+                            background: formCardBg,
+                            border: styles.formCardBorderColor ? `1px solid ${styles.formCardBorderColor}` : '1px solid rgba(26, 54, 93, 0.12)',
+                            boxShadow: styles.formCardBoxShadow || '0 4px 20px rgba(26, 54, 93, 0.08)',
+                            ...formGlassStyle
+                        }}
                     >
                         <form onSubmit={handleSubmit}>
                             <div style={{ marginBottom: '1.5rem' }}>
@@ -174,10 +234,19 @@ const Contact = () => {
                                     required
                                 ></textarea>
                             </div>
-                            <button 
-                                className="btn-solid" 
-                                type="submit" 
-                                style={{ width: '100%', opacity: formLoading ? 0.7 : 1 }}
+                            <button
+                                className="btn-solid"
+                                type="submit"
+                                style={{
+                                    width: '100%',
+                                    opacity: formLoading ? 0.7 : 1,
+                                    backgroundColor: styles.formButtonBgColor || '#1A365D',
+                                    color: styles.formButtonTextColor || '#FFFFFF',
+                                    border: 'none',
+                                    padding: styles.formButtonPadding ?? '0.75rem 1.5rem',
+                                    borderRadius: styles.formButtonBorderRadius ?? '6px',
+                                    fontWeight: styles.formButtonFontWeight ?? 600
+                                }}
                                 disabled={formLoading}
                             >
                                 {formLoading ? 'Sending...' : formLabels.submitButton}

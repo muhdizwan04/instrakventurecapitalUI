@@ -160,7 +160,7 @@ const DEFAULT_BOARD = {
         { id: 'dir-6', name: 'NORLI HIDAYATUL AINI', role: 'GENERAL MANAGER', image: '', bio: '' },
         { id: 'dir-7', name: 'DR. SUHAILY SHAHIMI', role: 'INTERNAL AUDITOR', image: '', bio: '' },
     ],
-    styleColors: { nameColor: '', roleColor: '', bioColor: '' }
+    styleColors: { nameColor: '', roleColor: '', bioColor: '', cardStyle: 'glass', cardColor: '#FFFFFF' }
 };
 
 const DEFAULT_PARTNERS = {
@@ -186,6 +186,7 @@ const DEFAULT_PARTNERS = {
 // ──────────────────────────────────────────────
 const LAYOUT_OPTIONS = [
     { value: 'standard', label: 'Standard Text' },
+    { value: 'mission-card', label: 'Mission-style Card (glass card like Our Mission & Vision)' },
     { value: 'list', label: 'Professional List' },
     { value: 'grid', label: 'Feature Grid' },
     { value: 'cards', label: 'Interactive Cards' },
@@ -261,6 +262,37 @@ const InlineStyleControls = ({ styles = {}, onUpdate }) => {
                         <input type="color" value={styles.itemTitleColor || '#1A365D'} onChange={e => update('itemTitleColor', e.target.value)} className="w-8 h-8 rounded border cursor-pointer" />
                         <input type="text" value={styles.itemTitleColor || '#1A365D'} onChange={e => update('itemTitleColor', e.target.value)} className="input-field text-[10px] font-mono flex-1 py-1" />
                     </div>
+                </div>
+
+                {/* Icon Color */}
+                <div>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Icon Color</label>
+                    <div className="flex items-center gap-2">
+                        <input type="color" value={styles.iconColor || '#C9A227'} onChange={e => update('iconColor', e.target.value)} className="w-8 h-8 rounded border cursor-pointer" />
+                        <input type="text" value={styles.iconColor || '#C9A227'} onChange={e => update('iconColor', e.target.value)} className="input-field text-[10px] font-mono flex-1 py-1" placeholder="#C9A227" />
+                    </div>
+                    <p className="text-[10px] text-gray-400 mt-0.5">Applied to icons in this section.</p>
+                </div>
+
+                {/* Card/box style — glass or solid */}
+                <div className="col-span-2">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Card / box style</label>
+                    <div className="flex gap-2 mb-1.5">
+                        <button type="button" onClick={() => update('cardStyle', 'glass')}
+                            className={`flex-1 py-2 rounded-lg border text-xs font-medium transition-all ${(styles.cardStyle || 'glass') === 'glass' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}>
+                            Glass
+                        </button>
+                        <button type="button" onClick={() => update('cardStyle', 'solid')}
+                            className={`flex-1 py-2 rounded-lg border text-xs font-medium transition-all ${styles.cardStyle === 'solid' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}>
+                            Solid
+                        </button>
+                    </div>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Card colour</label>
+                    <div className="flex items-center gap-2">
+                        <input type="color" value={styles.cardColor || '#FFFFFF'} onChange={e => update('cardColor', e.target.value)} className="w-8 h-8 rounded border cursor-pointer" />
+                        <input type="text" value={styles.cardColor || '#FFFFFF'} onChange={e => update('cardColor', e.target.value)} className="input-field text-[10px] font-mono flex-1 py-1" placeholder="#FFFFFF" />
+                    </div>
+                    <p className="text-[10px] text-gray-400 mt-0.5">Glass = tint; Solid = opaque background.</p>
                 </div>
 
                 {/* Title Alignment */}
@@ -570,7 +602,7 @@ const AboutManager = () => {
     const [sections, setSections] = useState(ALL_SECTIONS);
     const [activeSection, setActiveSection] = useState(null);
     const [directors, setDirectors] = useState(DEFAULT_BOARD.directors);
-    const [boardStyleColors, setBoardStyleColors] = useState(DEFAULT_BOARD.styleColors || { nameColor: '', roleColor: '', bioColor: '' });
+    const [boardStyleColors, setBoardStyleColors] = useState(DEFAULT_BOARD.styleColors || { nameColor: '', roleColor: '', bioColor: '', cardStyle: 'glass', cardColor: '#FFFFFF' });
     const [partners, setPartners] = useState(DEFAULT_PARTNERS.partners);
     const [banks, setBanks] = useState(DEFAULT_PARTNERS.banks);
     const [milestone, setMilestone] = useState(DEFAULT_PARTNERS.milestone);
@@ -579,6 +611,7 @@ const AboutManager = () => {
         title: '', subtitle: '', layoutType: 'standard',
         bgColor: '#FFFFFF', textColor: '#1A365D', textAlign: 'left',
         fontWeight: 'normal', icon: 'Lightbulb',
+        cardStyle: 'glass', cardColor: '#FFFFFF',
         initialItems: []
     });
 
@@ -589,7 +622,7 @@ const AboutManager = () => {
                 ...s,
                 id: s.id || `s-${i}-${Date.now()}`,
                 type: s.type || 'custom',
-                title: s.title || s.missionTitle || 'Untitled',
+                title: s.title || s.missionTitle || (s.type === 'milestone' ? 'Investment Milestone' : s.type === 'partners' ? 'Strategic Partners' : 'Untitled'),
                 styles: s.styles || { bgColor: '#FFFFFF', textColor: '#1A365D', textAlign: 'left' }
             }));
             setSections(sanitized.length > 0 ? sanitized : ALL_SECTIONS);
@@ -621,6 +654,7 @@ const AboutManager = () => {
             title: '', subtitle: '', layoutType: 'standard',
             bgColor: '#FFFFFF', textColor: '#1A365D', textAlign: 'left',
             fontWeight: 'normal', icon: 'Lightbulb',
+            cardStyle: 'glass', cardColor: '#FFFFFF',
             initialItems: []
         });
         setShowAddModal(true);
@@ -661,7 +695,9 @@ const AboutManager = () => {
                 textColor: newSectionForm.textColor,
                 textAlign: newSectionForm.textAlign,
                 fontWeight: newSectionForm.fontWeight,
-                icon: newSectionForm.icon
+                icon: newSectionForm.icon,
+                cardStyle: newSectionForm.cardStyle || 'glass',
+                cardColor: newSectionForm.cardColor || '#FFFFFF'
             }
         };
         setSections(prev => [...prev, s]);
@@ -755,6 +791,16 @@ const AboutManager = () => {
 
     const renderMissionEditor = (s) => (
         <div className="space-y-6">
+            <div>
+                <label className="label">Section title</label>
+                <input value={s.title || ''} onChange={e => updateSection(s.id, { title: e.target.value })} className="input-field font-bold bg-white" placeholder="e.g. Our Mission & Vision" />
+                <p className="text-[10px] text-gray-400 mt-1">Main heading for this section on the About page.</p>
+            </div>
+            <div>
+                <label className="label">Label above Mission (e.g. Our institutional Mandate)</label>
+                <input value={s.mandateLabel || ''} onChange={e => updateSection(s.id, { mandateLabel: e.target.value })} className="input-field bg-white" placeholder="e.g. Our institutional Mandate" />
+                <p className="text-[10px] text-gray-400 mt-1">Small label shown inside the card, above &quot;Our Mission&quot;.</p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100 space-y-3">
                     <div className="flex items-center gap-2 text-blue-700 font-bold text-xs uppercase"><Target size={14} /> Mission</div>
@@ -845,6 +891,21 @@ const AboutManager = () => {
                 </div>
             </div>
 
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 mt-3">
+                <h4 className="text-sm font-bold text-gray-700 mb-2">Director card / box style</h4>
+                <div className="flex gap-2 mb-2">
+                    <button type="button" onClick={() => setBoardStyleColors(prev => ({ ...prev, cardStyle: 'glass' }))}
+                        className={`flex-1 py-2 rounded-lg border text-xs font-medium ${(boardStyleColors.cardStyle || 'glass') === 'glass' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white border-gray-200'}`}>Glass</button>
+                    <button type="button" onClick={() => setBoardStyleColors(prev => ({ ...prev, cardStyle: 'solid' }))}
+                        className={`flex-1 py-2 rounded-lg border text-xs font-medium ${boardStyleColors.cardStyle === 'solid' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white border-gray-200'}`}>Solid</button>
+                </div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Card colour</label>
+                <div className="flex items-center gap-2">
+                    <input type="color" value={boardStyleColors.cardColor || '#FFFFFF'} onChange={(e) => setBoardStyleColors(prev => ({ ...prev, cardColor: e.target.value }))} className="h-9 w-10 rounded border cursor-pointer" />
+                    <input type="text" value={boardStyleColors.cardColor || '#FFFFFF'} onChange={(e) => setBoardStyleColors(prev => ({ ...prev, cardColor: e.target.value }))} className="input-field text-xs flex-1 py-1.5" placeholder="#FFFFFF" />
+                </div>
+            </div>
+
             <div className="flex justify-between items-center">
                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Directors — drag to reorder</span>
                 <button onClick={addDirector} className="text-xs flex items-center gap-1 text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 font-bold border border-blue-100"><Plus size={14} /> Add Director</button>
@@ -886,20 +947,15 @@ const AboutManager = () => {
 
     const renderMilestoneEditor = (s) => (
         <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                    <div><label className="label">Headline</label><input value={milestone.headline || ''} onChange={e => updateMilestone('headline', e.target.value)} className="input-field font-bold text-xl" placeholder="e.g. USD 1 Billion" /></div>
-                    <div><label className="label">Subtitle</label><input value={milestone.subtitle || ''} onChange={e => updateMilestone('subtitle', e.target.value)} className="input-field text-amber-700 font-bold" /></div>
-                    <div><label className="label">Description</label><textarea rows={4} value={milestone.description || ''} onChange={e => updateMilestone('description', e.target.value)} className="input-field" /></div>
-                </div>
-                <div className="hidden md:block">
-                    <label className="label">Preview</label>
-                    <div className="p-6 bg-gradient-to-br from-[#0A2540] to-[#1A365D] rounded-xl text-white text-center">
-                        <p className="text-3xl font-bold mb-2">{milestone.headline || '—'}</p>
-                        <p className="text-[#D4AF37] font-bold text-sm uppercase tracking-wider">{milestone.subtitle || '—'}</p>
-                        <p className="text-gray-300 text-xs mt-4 line-clamp-3">{milestone.description || '—'}</p>
-                    </div>
-                </div>
+            <div>
+                <label className="label">Section title</label>
+                <input value={s.title || ''} onChange={e => updateSection(s.id, { title: e.target.value })} className="input-field font-bold bg-white" placeholder="e.g. Investment Milestone" />
+                <p className="text-[10px] text-gray-400 mt-1">Heading shown above the milestone block on the About page.</p>
+            </div>
+            <div className="space-y-3">
+                <div><label className="label">Headline</label><input value={milestone.headline || ''} onChange={e => updateMilestone('headline', e.target.value)} className="input-field font-bold text-xl" placeholder="e.g. USD 1 Billion" /></div>
+                <div><label className="label">Subtitle</label><input value={milestone.subtitle || ''} onChange={e => updateMilestone('subtitle', e.target.value)} className="input-field text-amber-700 font-bold" /></div>
+                <div><label className="label">Description</label><textarea rows={4} value={milestone.description || ''} onChange={e => updateMilestone('description', e.target.value)} className="input-field" /></div>
             </div>
             <InlineStyleControls styles={s.styles || {}} onUpdate={(st) => updateSectionStyles(s.id, st)} />
         </div>
@@ -907,6 +963,13 @@ const AboutManager = () => {
 
     const renderPartnersEditor = (s) => (
         <div className="space-y-6">
+            <div>
+                <label className="label">Section title</label>
+                <input value={s.title || ''} onChange={e => updateSection(s.id, { title: e.target.value })} className="input-field font-bold bg-white" placeholder="e.g. Strategic Partners" />
+                <label className="label mt-2 block">Section subtitle (optional)</label>
+                <input value={s.subtitle || ''} onChange={e => updateSection(s.id, { subtitle: e.target.value })} className="input-field bg-white" placeholder="e.g. Collaborating with world-class institutions." />
+                <p className="text-[10px] text-gray-400 mt-1">Shown on the About page above the partners and banks.</p>
+            </div>
             {/* Partners */}
             <div>
                 <div className="flex justify-between items-center mb-3">
@@ -1148,7 +1211,7 @@ const AboutManager = () => {
                                 <label className="text-[10px] font-bold text-gray-400 uppercase block mb-2">Layout Type</label>
                                 <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
                                     {LAYOUT_OPTIONS.map(o => {
-                                        const layoutIcons = { standard: Type, list: List, grid: Grid3X3, cards: Columns, accordion: ChevronDown, 'boxed-group': LayoutGrid, 'mind-map': Globe, 'icon-group': Star, 'image-grid': Image, 'profile-cards': Users, 'statement-block': FileText };
+                                        const layoutIcons = { standard: Type, 'mission-card': Target, list: List, grid: Grid3X3, cards: Columns, accordion: ChevronDown, 'boxed-group': LayoutGrid, 'mind-map': Globe, 'icon-group': Star, 'image-grid': Image, 'profile-cards': Users, 'statement-block': FileText };
                                         const LIcon = layoutIcons[o.value] || Type;
                                         return (
                                             <button key={o.value} onClick={() => setNewSectionForm(p => ({ ...p, layoutType: o.value }))}
@@ -1236,6 +1299,20 @@ const AboutManager = () => {
                                                     {label}
                                                 </button>
                                             ))}
+                                        </div>
+                                    </div>
+                                    <div className="col-span-2">
+                                        <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Card / box style</label>
+                                        <div className="flex gap-2 mb-1.5">
+                                            <button type="button" onClick={() => setNewSectionForm(p => ({ ...p, cardStyle: 'glass' }))}
+                                                className={`flex-1 py-2 rounded-lg border text-xs font-medium ${(newSectionForm.cardStyle || 'glass') === 'glass' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white border-gray-200'}`}>Glass</button>
+                                            <button type="button" onClick={() => setNewSectionForm(p => ({ ...p, cardStyle: 'solid' }))}
+                                                className={`flex-1 py-2 rounded-lg border text-xs font-medium ${newSectionForm.cardStyle === 'solid' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white border-gray-200'}`}>Solid</button>
+                                        </div>
+                                        <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Card colour</label>
+                                        <div className="flex items-center gap-2">
+                                            <input type="color" value={newSectionForm.cardColor || '#FFFFFF'} onChange={e => setNewSectionForm(p => ({ ...p, cardColor: e.target.value }))} className="w-8 h-8 rounded border cursor-pointer" />
+                                            <input type="text" value={newSectionForm.cardColor || '#FFFFFF'} onChange={e => setNewSectionForm(p => ({ ...p, cardColor: e.target.value }))} className="input-field text-[10px] font-mono flex-1 py-1" />
                                         </div>
                                     </div>
                                 </div>

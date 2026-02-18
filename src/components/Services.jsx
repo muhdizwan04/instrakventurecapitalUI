@@ -51,10 +51,11 @@ const Services = () => {
         sectionStyle.color = sectionStyles.textColor;
         sectionStyle['--services-text'] = sectionStyles.textColor;
     }
-    if (sectionStyles.boxColor) sectionStyle['--services-box-bg'] = sectionStyles.boxColor;
+    if (sectionStyles.boxColor && sectionStyles.cardStyle === 'solid') sectionStyle['--services-box-bg'] = sectionStyles.boxColor;
+    const cardStyleGlass = sectionStyles.cardStyle !== 'solid';
 
     return (
-        <section id="services" className={styles.services} style={sectionStyle}>
+        <section id="services" className={`${styles.services} ${cardStyleGlass ? styles.cardStyleGlass : ''}`} style={sectionStyle}>
             <div className="container">
                 <h2 className="section-title">{title}</h2>
                 {subtitle && <p className={styles.subtitle}>{subtitle}</p>}

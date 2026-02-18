@@ -115,12 +115,6 @@ const MagazineBlock = ({ block }) => {
                 fontSize: itemStyles.itemBtnFontSize || undefined,
                 fontWeight: itemStyles.itemBtnFontWeight || undefined,
               };
-              const itemBtnLabelStyle = {
-                fontFamily: itemStyles.itemBtnFontFamily || undefined,
-                fontSize: itemStyles.itemBtnFontSize || undefined,
-                fontWeight: itemStyles.itemBtnFontWeight || undefined,
-                color: itemStyles.itemBtnBgColor || itemStyles.itemTitleColor || undefined,
-              };
               const cardStyle = {
                 ...(itemStyles.itemBtnBgColor && { '--card-cta-bg': itemStyles.itemBtnBgColor }),
                 ...(itemStyles.itemBtnColor && { '--card-cta-color': itemStyles.itemBtnColor }),
@@ -135,7 +129,6 @@ const MagazineBlock = ({ block }) => {
                   <div className={styles.body}>
                     <div className={styles.meta}>
                       <span>{formatDate(it.date)}</span>
-                      <span style={itemBtnLabelStyle}>{cardButtonText}</span>
                     </div>
 
                     <h3 className={styles.cardTitle} style={itemTitleStyle}>{it.title}</h3>

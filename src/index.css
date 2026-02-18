@@ -50,6 +50,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* Match body so overscroll (top/bottom) never shows white */
+  background: #020617;
 }
 
 body {
@@ -159,6 +161,26 @@ ul {
   transition: opacity 0.3s ease;
 }
 
+/* Career / Join Us – Apply button box + hover (outline & background set inline) */
+.career-apply-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
+}
+.career-apply-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0.95;
+  filter: brightness(1.05);
+}
+
 .glass-card:hover {
   transform: translateY(-8px);
   box-shadow: var(--shadow-lg);
@@ -167,6 +189,16 @@ ul {
 
 .glass-card:hover::before {
   opacity: 1;
+}
+
+/* Investors page – glass form placeholders */
+.investors-form-glass input::placeholder,
+.investors-form-glass textarea::placeholder {
+  color: rgba(241, 245, 249, 0.5);
+}
+.investors-form-glass select option {
+  background: #0f172a;
+  color: #f1f5f9;
 }
 
 /* Button Styles - Premium */

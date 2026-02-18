@@ -7,7 +7,47 @@ const ContactManager = () => {
     const defaultData = {
         pageHero: {
             title: 'Contact Us',
-            subtitle: 'Inquiries regarding strategic capital, institutional partnerships, and industrial growth.'
+            subtitle: 'Inquiries regarding strategic capital, institutional partnerships, and industrial growth.',
+            styles: {
+                titleColor: '#FFFFFF',
+                subtitleColor: '#e2e8f0',
+                textAlign: 'center',
+                bgColor: '#0b1120'
+            }
+        },
+        styles: {
+            sectionTitle: 'Get in Touch',
+            sectionBgColor: 'transparent',
+            sectionTitleColor: '#1A365D',
+            sectionTextColor: '#64748B',
+            sectionAlign: 'left',
+            sectionPaddingTop: '80px',
+            sectionPaddingBottom: '80px',
+            sectionPaddingHorizontal: '20px',
+            sectionTitleFontSize: '2rem',
+            sectionTitleMarginBottom: '2rem',
+            contactBlockStyle: 'solid',
+            contactBlockBgColor: 'transparent',
+            contactBlockPadding: '2rem',
+            contactBlockBorderRadius: '16px',
+            contactBlockBorderColor: 'rgba(0,0,0,0.06)',
+            contactIconColor: '#fde68a',
+            formCardStyle: 'solid',
+            formCardBgColor: '#FFFFFF',
+            formCardPadding: '2.5rem',
+            formCardBorderColor: 'rgba(26, 54, 93, 0.12)',
+            formCardBoxShadow: '0 4px 20px rgba(26, 54, 93, 0.08)',
+            formLabelColor: '#1A365D',
+            formInputBgColor: '#FFFFFF',
+            formInputBorderColor: 'rgba(26, 54, 93, 0.2)',
+            formInputTextColor: '#1A365D',
+            formInputBorderRadius: '6px',
+            formInputFontSize: '0.95rem',
+            formButtonBgColor: '#1A365D',
+            formButtonTextColor: '#FFFFFF',
+            formButtonBorderRadius: '6px',
+            formButtonPadding: '0.75rem 1.5rem',
+            formButtonFontWeight: '600'
         },
         contactInfo: {
             address: {
@@ -127,6 +167,23 @@ const ContactManager = () => {
         }));
     };
 
+    const updateHeroStyle = (key, value) => {
+        setFormData(prev => ({
+            ...prev,
+            pageHero: {
+                ...prev.pageHero,
+                styles: { ...(prev.pageHero.styles || {}), [key]: value }
+            }
+        }));
+    };
+
+    const updateStyle = (key, value) => {
+        setFormData(prev => ({
+            ...prev,
+            styles: { ...(prev.styles || {}), [key]: value }
+        }));
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center h-64">
@@ -177,6 +234,58 @@ const ContactManager = () => {
                                 onChange={(e) => setFormData(prev => ({ ...prev, pageHero: { ...prev.pageHero, subtitle: e.target.value } }))}
                                 className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
                             />
+                        </div>
+                        <div className="border-t border-[var(--border-light)] pt-4 mt-4">
+                            <h4 className="text-xs font-bold text-[var(--text-secondary)] uppercase mb-3">Hero style</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                                <div>
+                                    <label className="block text-xs text-[var(--text-secondary)] mb-1">Title colour</label>
+                                    <div className="flex gap-2 items-center">
+                                        <input
+                                            type="color"
+                                            value={(formData.pageHero.styles || {}).titleColor || '#FFFFFF'}
+                                            onChange={(e) => updateHeroStyle('titleColor', e.target.value)}
+                                            className="shrink-0 rounded border border-[var(--border-light)] cursor-pointer bg-transparent"
+                                            style={{ width: 40, height: 40, padding: 2 }}
+                                        />
+                                        <input type="text" value={(formData.pageHero.styles || {}).titleColor || ''} onChange={(e) => updateHeroStyle('titleColor', e.target.value)} className="flex-1 min-w-0 px-2 py-1 rounded border text-xs font-mono" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-[var(--text-secondary)] mb-1">Subtitle colour</label>
+                                    <div className="flex gap-2 items-center">
+                                        <input
+                                            type="color"
+                                            value={(formData.pageHero.styles || {}).subtitleColor || '#e2e8f0'}
+                                            onChange={(e) => updateHeroStyle('subtitleColor', e.target.value)}
+                                            className="shrink-0 rounded border border-[var(--border-light)] cursor-pointer bg-transparent"
+                                            style={{ width: 40, height: 40, padding: 2 }}
+                                        />
+                                        <input type="text" value={(formData.pageHero.styles || {}).subtitleColor || ''} onChange={(e) => updateHeroStyle('subtitleColor', e.target.value)} className="flex-1 min-w-0 px-2 py-1 rounded border text-xs font-mono" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-[var(--text-secondary)] mb-1">Align</label>
+                                    <select value={(formData.pageHero.styles || {}).textAlign || 'center'} onChange={(e) => updateHeroStyle('textAlign', e.target.value)} className="w-full px-2 py-1.5 rounded border text-sm bg-white">
+                                        <option value="left">Left</option>
+                                        <option value="center">Center</option>
+                                        <option value="right">Right</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-[var(--text-secondary)] mb-1">Background colour</label>
+                                    <div className="flex gap-2 items-center">
+                                        <input
+                                            type="color"
+                                            value={(formData.pageHero.styles || {}).bgColor || '#0b1120'}
+                                            onChange={(e) => updateHeroStyle('bgColor', e.target.value)}
+                                            className="shrink-0 rounded border border-[var(--border-light)] cursor-pointer bg-transparent"
+                                            style={{ width: 40, height: 40, padding: 2 }}
+                                        />
+                                        <input type="text" value={(formData.pageHero.styles || {}).bgColor || ''} onChange={(e) => updateHeroStyle('bgColor', e.target.value)} className="flex-1 min-w-0 px-2 py-1 rounded border text-xs font-mono" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -336,6 +445,144 @@ const ContactManager = () => {
                                 onChange={(e) => setFormData(prev => ({ ...prev, contactInfo: { ...prev.contactInfo, email: { ...prev.contactInfo.email, address: e.target.value } } }))}
                                 className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm"
                             />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Section & Form Appearance */}
+                <div className="glass-card p-6 lg:col-span-2 border-l-4 border-l-purple-500">
+                    <h3 className="font-bold text-[var(--accent-primary)] mb-4">Section & Form Appearance</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                            <h4 className="text-sm font-bold text-gray-600">Content section</h4>
+                            <div>
+                                <label className="block text-xs text-gray-500 mb-1">Section title</label>
+                                <input type="text" value={formData.styles?.sectionTitle ?? 'Get in Touch'} onChange={(e) => updateStyle('sectionTitle', e.target.value)} className="input-field text-sm w-full py-1.5" />
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label className="text-[10px] text-gray-500 block mb-0.5">Section bg</label>
+                                    <div className="flex gap-1">
+                                        <input type="color" value={(formData.styles?.sectionBgColor && formData.styles.sectionBgColor !== 'transparent') ? formData.styles.sectionBgColor : '#f8fafc'} onChange={(e) => updateStyle('sectionBgColor', e.target.value)} className="w-7 h-7 rounded border cursor-pointer" />
+                                        <input type="text" value={formData.styles?.sectionBgColor || ''} onChange={(e) => updateStyle('sectionBgColor', e.target.value)} className="flex-1 min-w-0 px-1 py-1 text-[10px] font-mono rounded border" placeholder="transparent" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] text-gray-500 block mb-0.5">Title colour</label>
+                                    <div className="flex gap-1">
+                                        <input type="color" value={formData.styles?.sectionTitleColor || '#1A365D'} onChange={(e) => updateStyle('sectionTitleColor', e.target.value)} className="w-7 h-7 rounded border cursor-pointer" />
+                                        <input type="text" value={formData.styles?.sectionTitleColor || ''} onChange={(e) => updateStyle('sectionTitleColor', e.target.value)} className="flex-1 min-w-0 px-1 py-1 text-[10px] font-mono rounded border" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] text-gray-500 block mb-0.5">Text colour</label>
+                                    <div className="flex gap-1">
+                                        <input type="color" value={formData.styles?.sectionTextColor || '#64748B'} onChange={(e) => updateStyle('sectionTextColor', e.target.value)} className="w-7 h-7 rounded border cursor-pointer" />
+                                        <input type="text" value={formData.styles?.sectionTextColor || ''} onChange={(e) => updateStyle('sectionTextColor', e.target.value)} className="flex-1 min-w-0 px-1 py-1 text-[10px] font-mono rounded border" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] text-gray-500 block mb-0.5">Align</label>
+                                    <select value={formData.styles?.sectionAlign || 'left'} onChange={(e) => updateStyle('sectionAlign', e.target.value)} className="w-full px-1 py-1 rounded border text-xs">
+                                        <option value="left">Left</option>
+                                        <option value="center">Center</option>
+                                        <option value="right">Right</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-1">
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Padding top</label><input type="text" value={formData.styles?.sectionPaddingTop ?? '80px'} onChange={(e) => updateStyle('sectionPaddingTop', e.target.value)} className="w-full px-1 py-1 text-[10px] rounded border" placeholder="80px" /></div>
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Padding bottom</label><input type="text" value={formData.styles?.sectionPaddingBottom ?? '80px'} onChange={(e) => updateStyle('sectionPaddingBottom', e.target.value)} className="w-full px-1 py-1 text-[10px] rounded border" placeholder="80px" /></div>
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Padding horizontal</label><input type="text" value={formData.styles?.sectionPaddingHorizontal ?? '20px'} onChange={(e) => updateStyle('sectionPaddingHorizontal', e.target.value)} className="w-full px-1 py-1 text-[10px] rounded border" placeholder="20px" /></div>
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Title font size</label><input type="text" value={formData.styles?.sectionTitleFontSize ?? '2rem'} onChange={(e) => updateStyle('sectionTitleFontSize', e.target.value)} className="w-full px-1 py-1 text-[10px] rounded border" placeholder="2rem" /></div>
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Title margin bottom</label><input type="text" value={formData.styles?.sectionTitleMarginBottom ?? '2rem'} onChange={(e) => updateStyle('sectionTitleMarginBottom', e.target.value)} className="w-full px-1 py-1 text-[10px] rounded border" placeholder="2rem" /></div>
+                            </div>
+                        </div>
+                        <div className="space-y-3">
+                            <h4 className="text-sm font-bold text-gray-600">Contact info block (left)</h4>
+                            <div className="flex gap-2">
+                                <button type="button" onClick={() => updateStyle('contactBlockStyle', 'solid')} className={`flex-1 py-2 rounded border text-xs font-medium ${(formData.styles || {}).contactBlockStyle !== 'glass' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white border-gray-200'}`}>Solid</button>
+                                <button type="button" onClick={() => updateStyle('contactBlockStyle', 'glass')} className={`flex-1 py-2 rounded border text-xs font-medium ${(formData.styles || {}).contactBlockStyle === 'glass' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white border-gray-200'}`}>Glass (transparent)</button>
+                            </div>
+                            <div>
+                                <label className="text-[10px] text-gray-500 block mb-0.5">Block background colour</label>
+                                <div className="flex gap-1">
+                                    <input type="color" value={(formData.styles?.contactBlockBgColor && formData.styles.contactBlockBgColor !== 'transparent') ? formData.styles.contactBlockBgColor : '#ffffff'} onChange={(e) => updateStyle('contactBlockBgColor', e.target.value)} className="w-7 h-7 rounded border cursor-pointer" />
+                                    <input type="text" value={formData.styles?.contactBlockBgColor || ''} onChange={(e) => updateStyle('contactBlockBgColor', e.target.value)} className="flex-1 min-w-0 px-1 py-1 text-[10px] font-mono rounded border" placeholder="transparent" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="text-[10px] text-gray-500 block mb-0.5">Icon colour</label>
+                                <div className="flex gap-1">
+                                    <input type="color" value={formData.styles?.contactIconColor || '#fde68a'} onChange={(e) => updateStyle('contactIconColor', e.target.value)} className="w-7 h-7 rounded border cursor-pointer" />
+                                    <input type="text" value={formData.styles?.contactIconColor || ''} onChange={(e) => updateStyle('contactIconColor', e.target.value)} className="flex-1 min-w-0 px-1 py-1 text-[10px] font-mono rounded border" />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2">
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Padding</label><input type="text" value={formData.styles?.contactBlockPadding ?? '2rem'} onChange={(e) => updateStyle('contactBlockPadding', e.target.value)} className="w-full px-1 py-1 text-[10px] rounded border" placeholder="2rem" /></div>
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Border radius</label><input type="text" value={formData.styles?.contactBlockBorderRadius ?? '16px'} onChange={(e) => updateStyle('contactBlockBorderRadius', e.target.value)} className="w-full px-1 py-1 text-[10px] rounded border" placeholder="16px" /></div>
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Border colour</label><input type="text" value={formData.styles?.contactBlockBorderColor ?? ''} onChange={(e) => updateStyle('contactBlockBorderColor', e.target.value)} className="w-full px-1 py-1 text-[10px] font-mono rounded border" placeholder="rgba(0,0,0,0.06)" /></div>
+                            </div>
+                        </div>
+                        <div className="space-y-3 md:col-span-2">
+                            <h4 className="text-sm font-bold text-gray-600">Form card (right)</h4>
+                            <div className="flex gap-2 mb-2">
+                                <button type="button" onClick={() => updateStyle('formCardStyle', 'solid')} className={`py-2 px-4 rounded border text-xs font-medium ${(formData.styles || {}).formCardStyle !== 'glass' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white border-gray-200'}`}>Solid</button>
+                                <button type="button" onClick={() => updateStyle('formCardStyle', 'glass')} className={`py-2 px-4 rounded border text-xs font-medium ${(formData.styles || {}).formCardStyle === 'glass' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white border-gray-200'}`}>Glass (transparent)</button>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div>
+                                    <label className="text-[10px] text-gray-500 block mb-0.5">Card background</label>
+                                    <div className="flex gap-1">
+                                        <input type="color" value={formData.styles?.formCardBgColor || '#FFFFFF'} onChange={(e) => updateStyle('formCardBgColor', e.target.value)} className="w-7 h-7 rounded border cursor-pointer" />
+                                        <input type="text" value={formData.styles?.formCardBgColor || ''} onChange={(e) => updateStyle('formCardBgColor', e.target.value)} className="flex-1 min-w-0 px-1 py-1 text-[10px] font-mono rounded border" />
+                                    </div>
+                                </div>
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Card padding</label><input type="text" value={formData.styles?.formCardPadding ?? '2.5rem'} onChange={(e) => updateStyle('formCardPadding', e.target.value)} className="w-full px-1 py-1 text-[10px] rounded border" placeholder="2.5rem" /></div>
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Card border colour</label><input type="text" value={formData.styles?.formCardBorderColor ?? ''} onChange={(e) => updateStyle('formCardBorderColor', e.target.value)} className="w-full px-1 py-1 text-[10px] font-mono rounded border" placeholder="rgba(26,54,93,0.12)" /></div>
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Card box shadow</label><input type="text" value={formData.styles?.formCardBoxShadow ?? ''} onChange={(e) => updateStyle('formCardBoxShadow', e.target.value)} className="w-full px-1 py-1 text-[10px] font-mono rounded border" placeholder="0 4px 20px rgba(26,54,93,0.08)" /></div>
+                                <div>
+                                    <label className="text-[10px] text-gray-500 block mb-0.5">Label colour</label>
+                                    <div className="flex gap-1">
+                                        <input type="color" value={formData.styles?.formLabelColor || '#1A365D'} onChange={(e) => updateStyle('formLabelColor', e.target.value)} className="w-7 h-7 rounded border cursor-pointer" />
+                                        <input type="text" value={formData.styles?.formLabelColor || ''} onChange={(e) => updateStyle('formLabelColor', e.target.value)} className="flex-1 min-w-0 px-1 py-1 text-[10px] font-mono rounded border" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] text-gray-500 block mb-0.5">Input background</label>
+                                    <div className="flex gap-1">
+                                        <input type="color" value={formData.styles?.formInputBgColor || '#FFFFFF'} onChange={(e) => updateStyle('formInputBgColor', e.target.value)} className="w-7 h-7 rounded border cursor-pointer" />
+                                        <input type="text" value={formData.styles?.formInputBgColor || ''} onChange={(e) => updateStyle('formInputBgColor', e.target.value)} className="flex-1 min-w-0 px-1 py-1 text-[10px] font-mono rounded border" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] text-gray-500 block mb-0.5">Input text colour</label>
+                                    <div className="flex gap-1">
+                                        <input type="color" value={formData.styles?.formInputTextColor || '#1A365D'} onChange={(e) => updateStyle('formInputTextColor', e.target.value)} className="w-7 h-7 rounded border cursor-pointer" />
+                                        <input type="text" value={formData.styles?.formInputTextColor || ''} onChange={(e) => updateStyle('formInputTextColor', e.target.value)} className="flex-1 min-w-0 px-1 py-1 text-[10px] font-mono rounded border" />
+                                    </div>
+                                </div>
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Input border colour</label><input type="text" value={formData.styles?.formInputBorderColor || ''} onChange={(e) => updateStyle('formInputBorderColor', e.target.value)} className="w-full px-1 py-1 text-[10px] font-mono rounded border" placeholder="rgba(26,54,93,0.2)" /></div>
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Input border radius</label><input type="text" value={formData.styles?.formInputBorderRadius ?? '6px'} onChange={(e) => updateStyle('formInputBorderRadius', e.target.value)} className="w-full px-1 py-1 text-[10px] rounded border" placeholder="6px" /></div>
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Input font size</label><input type="text" value={formData.styles?.formInputFontSize ?? '0.95rem'} onChange={(e) => updateStyle('formInputFontSize', e.target.value)} className="w-full px-1 py-1 text-[10px] rounded border" placeholder="0.95rem" /></div>
+                                <div>
+                                    <label className="text-[10px] text-gray-500 block mb-0.5">Button background</label>
+                                    <div className="flex gap-1">
+                                        <input type="color" value={formData.styles?.formButtonBgColor || '#1A365D'} onChange={(e) => updateStyle('formButtonBgColor', e.target.value)} className="w-7 h-7 rounded border cursor-pointer" />
+                                        <input type="text" value={formData.styles?.formButtonBgColor || ''} onChange={(e) => updateStyle('formButtonBgColor', e.target.value)} className="flex-1 min-w-0 px-1 py-1 text-[10px] font-mono rounded border" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] text-gray-500 block mb-0.5">Button text colour</label>
+                                    <div className="flex gap-1">
+                                        <input type="color" value={formData.styles?.formButtonTextColor || '#FFFFFF'} onChange={(e) => updateStyle('formButtonTextColor', e.target.value)} className="w-7 h-7 rounded border cursor-pointer" />
+                                        <input type="text" value={formData.styles?.formButtonTextColor || ''} onChange={(e) => updateStyle('formButtonTextColor', e.target.value)} className="flex-1 min-w-0 px-1 py-1 text-[10px] font-mono rounded border" />
+                                    </div>
+                                </div>
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Button border radius</label><input type="text" value={formData.styles?.formButtonBorderRadius ?? '6px'} onChange={(e) => updateStyle('formButtonBorderRadius', e.target.value)} className="w-full px-1 py-1 text-[10px] rounded border" placeholder="6px" /></div>
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Button padding</label><input type="text" value={formData.styles?.formButtonPadding ?? '0.75rem 1.5rem'} onChange={(e) => updateStyle('formButtonPadding', e.target.value)} className="w-full px-1 py-1 text-[10px] rounded border" placeholder="0.75rem 1.5rem" /></div>
+                                <div><label className="text-[10px] text-gray-500 block mb-0.5">Button font weight</label><input type="text" value={formData.styles?.formButtonFontWeight ?? '600'} onChange={(e) => updateStyle('formButtonFontWeight', e.target.value)} className="w-full px-1 py-1 text-[10px] rounded border" placeholder="600" /></div>
+                            </div>
                         </div>
                     </div>
                 </div>

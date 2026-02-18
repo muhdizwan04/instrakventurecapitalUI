@@ -39,6 +39,7 @@ const LatestNews = () => {
                 title={hero?.title || defaultContent.hero.title}
                 subtitle={hero?.subtitle || defaultContent.hero.subtitle}
                 sectionStyles={hero?.styles || {}}
+                style={{ backgroundColor: hero?.styles?.bgColor }}
                 buttonLabel={hero?.buttonLabel || ''}
                 buttonLink={hero?.buttonLink || ''}
             />

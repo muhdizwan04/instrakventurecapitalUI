@@ -53,6 +53,25 @@ const JoinUs = () => {
 
     const renderJobs = (section) => {
         const styles = section.styles || {};
+        const titleColor = styles.titleColor || styles.textColor || '#1A365D';
+        const titleSizePx = styles.titleFontSize != null ? styles.titleFontSize : 32;
+        const cardStyle = styles.cardStyle || 'glass';
+        const isCardGlass = cardStyle !== 'solid';
+        const cardColorHex = (styles.cardColor || '#FFFFFF').replace(/^#/, '');
+        const hexToRgba = (hex, a) => {
+            if (hex.length === 6) {
+                const r = parseInt(hex.slice(0, 2), 16), g = parseInt(hex.slice(2, 4), 16), b = parseInt(hex.slice(4, 6), 16);
+                return `rgba(${r},${g},${b},${a})`;
+            }
+            return 'rgba(255,255,255,0.9)';
+        };
+        const cardBg = isCardGlass ? hexToRgba(cardColorHex, 0.42) : (styles.cardColor || '#FFFFFF');
+        const glassStyle = isCardGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {};
+        const iconColor = styles.iconColor || '#1A365D';
+        const buttonColor = styles.buttonColor || styles.iconColor || '#1A365D';
+        const buttonIconColor = styles.buttonIconColor || '#B8860B';
+        const buttonOutlineColor = styles.buttonOutlineColor || styles.buttonIconColor || '#B8860B';
+        const buttonBgColor = styles.buttonBgColor || 'transparent';
         return (
             <div key={section.id} className="container-wrapper" style={{
                 padding: '80px 20px',
@@ -71,37 +90,52 @@ const JoinUs = () => {
                     }} />
                 )}
                 <div style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto' }}>
-                    {/* Open Positions Section */}
                     {jobs.length > 0 ? (
                         <div style={{ marginBottom: '4rem' }}>
-                            <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem', color: styles.textColor || '#1A365D', textAlign: styles.textAlign || 'center' }}>{section.title || 'Open Positions'}</h2>
+                            <h2 style={{ fontSize: `${titleSizePx}px`, marginBottom: '0.5rem', color: titleColor, textAlign: styles.textAlign || 'center' }}>{section.title || 'Open Positions'}</h2>
                             <p style={{ color: styles.textColor ? styles.textColor : 'var(--text-secondary)', opacity: 0.8, textAlign: styles.textAlign || 'center', marginBottom: '3rem' }}>Current opportunities at Instrak Venture Capital</p>
 
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem' }}>
                                 {jobs.map((job, i) => (
-                                    <div key={i} className="glass-card" style={{ padding: '2rem', borderLeft: '4px solid #B8860B', background: 'white' }}>
+                                    <div key={i} className="glass-card" style={{ padding: '2rem', borderLeft: `4px solid ${iconColor}`, background: cardBg, border: '1px solid rgba(0,0,0,0.06)', ...glassStyle }}>
                                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                                            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'linear-gradient(135deg, #1A365D, #2D5A8B)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: iconColor, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                                                 <Briefcase size={24} color="white" />
                                             </div>
                                             <div style={{ flex: 1 }}>
-                                                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: '#1A365D', fontWeight: '700' }}>{job.title}</h3>
+                                                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: styles.textColor || titleColor, fontWeight: '700' }}>{job.title}</h3>
                                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                                                        <MapPin size={14} /> {job.location || 'Location TBD'}
+                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.85rem', color: styles.textColor ? styles.textColor : 'var(--text-secondary)', opacity: 0.9 }}>
+                                                        <MapPin size={14} color={iconColor} /> {job.location || 'Location TBD'}
                                                     </span>
-                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                                                        <Clock size={14} /> {job.type || 'Full-time'}
+                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.85rem', color: styles.textColor ? styles.textColor : 'var(--text-secondary)', opacity: 0.9 }}>
+                                                        <Clock size={14} color={iconColor} /> {job.type || 'Full-time'}
                                                     </span>
                                                 </div>
-                                                <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '1rem' }}>{job.summary}</p>
-                                                <button
-                                                    onClick={() => window.location.href = `mailto:${null}?subject=Application for ${job.title}`}
-                                                    // email logic handled in Intro usually, or we can look it up
-                                                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#B8860B', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}
-                                                >
-                                                    Apply Now <ArrowRight size={16} />
-                                                </button>
+                                                <p style={{ color: styles.textColor ? styles.textColor : 'var(--text-secondary)', opacity: 0.9, fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '1rem' }}>{job.summary}</p>
+                                                {(() => {
+                                                    const introSection = content?.sections?.find(s => s.type === 'intro');
+                                                    const applyUrl = job.applyLink || styles.defaultApplyLink || (introSection?.email ? `mailto:${introSection.email}?subject=Application for ${encodeURIComponent(job.title || '')}` : '');
+                                                    const applyLabel = styles.applyButtonLabel || 'Apply Now';
+                                                    const openNewTab = !!styles.openApplyInNewTab;
+                                                    if (!applyUrl) return null;
+                                                    return (
+                                                        <a
+                                                            href={applyUrl}
+                                                            target={openNewTab ? '_blank' : undefined}
+                                                            rel={openNewTab ? 'noopener noreferrer' : undefined}
+                                                            className="career-apply-btn"
+                                                            style={{
+                                                                color: buttonColor,
+                                                                borderColor: buttonOutlineColor,
+                                                                backgroundColor: buttonBgColor,
+                                                                cursor: 'pointer'
+                                                            }}
+                                                        >
+                                                            {applyLabel} <ArrowRight size={16} color={buttonIconColor} />
+                                                        </a>
+                                                    );
+                                                })()}
                                             </div>
                                         </div>
                                     </div>
@@ -110,10 +144,10 @@ const JoinUs = () => {
                         </div>
                     ) : !loading && (
                         <div style={{ marginBottom: '4rem', textAlign: 'center' }}>
-                            <div className="glass-card" style={{ padding: '3rem', maxWidth: '600px', margin: '0 auto', background: 'white' }}>
-                                <Briefcase size={48} style={{ color: 'var(--text-muted)', marginBottom: '1rem' }} />
-                                <h3 style={{ color: '#1A365D', marginBottom: '0.5rem' }}>No Open Positions</h3>
-                                <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+                            <div className="glass-card" style={{ padding: '3rem', maxWidth: '600px', margin: '0 auto', background: cardBg, border: '1px solid rgba(0,0,0,0.06)', ...glassStyle }}>
+                                <Briefcase size={48} style={{ color: iconColor, marginBottom: '1rem' }} />
+                                <h3 style={{ color: titleColor, marginBottom: '0.5rem' }}>No Open Positions</h3>
+                                <p style={{ color: styles.textColor ? styles.textColor : 'var(--text-secondary)', marginBottom: '1.5rem' }}>
                                     We don't have any open positions at the moment, but we're always looking for talented professionals.
                                 </p>
                             </div>
@@ -160,9 +194,41 @@ const JoinUs = () => {
                                 </>
                             )}
                         </div>
-                        <div className="glass-card" style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #F5F7FA 0%, #FFFFFF 100%)' }}>
-                            <p style={{ fontStyle: 'italic', color: 'var(--accent-secondary)', textAlign: 'center', padding: '2rem', fontSize: '1.2rem' }}>"Integrity is the bedrock of our institutional success."</p>
-                        </div>
+                        {(() => {
+                            const boxText = (section.rightBoxContent != null && section.rightBoxContent.trim() !== '')
+                                ? section.rightBoxContent.trim()
+                                : (section.rightBoxContent === undefined ? '"Integrity is the bedrock of our institutional success."' : null);
+                            if (!boxText) return null;
+                            const isGlass = styles.rightBoxStyle === 'glass';
+                            const bgHex = (styles.rightBoxBgColor != null && styles.rightBoxBgColor !== '') ? styles.rightBoxBgColor.replace(/^#/, '') : 'FFFFFF';
+                            const hexToRgba = (hex, a) => {
+                                if (hex.length === 6) {
+                                    const r = parseInt(hex.slice(0, 2), 16), g = parseInt(hex.slice(2, 4), 16), b = parseInt(hex.slice(4, 6), 16);
+                                    return `rgba(${r},${g},${b},${a})`;
+                                }
+                                return 'rgba(255,255,255,0.42)';
+                            };
+                            const boxBg = isGlass ? hexToRgba(bgHex, 0.42) : (styles.rightBoxBgColor || 'linear-gradient(135deg, #F5F7FA 0%, #FFFFFF 100%)');
+                            const glassStyle = isGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.2)' } : {};
+                            return (
+                                <div
+                                    className="glass-card"
+                                    style={{
+                                        minHeight: '300px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        background: (styles.rightBoxBgColor != null && styles.rightBoxBgColor !== '') ? boxBg : (isGlass ? 'rgba(255,255,255,0.42)' : 'linear-gradient(135deg, #F5F7FA 0%, #FFFFFF 100%)'),
+                                        color: (styles.rightBoxTextColor != null && styles.rightBoxTextColor !== '') ? styles.rightBoxTextColor : 'var(--accent-secondary)',
+                                        ...glassStyle
+                                    }}
+                                >
+                                    <p style={{ fontStyle: 'italic', textAlign: 'center', padding: '2rem', fontSize: '1.2rem', lineHeight: 1.6, whiteSpace: 'pre-wrap', margin: 0 }}>
+                                        {boxText}
+                                    </p>
+                                </div>
+                            );
+                        })()}
                     </div>
                 </div>
             </div>

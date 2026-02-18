@@ -30,19 +30,36 @@ const CareerManager = () => {
                 title: 'Career at Instrak',
                 description: 'We look for professionals who embody our values of integrity, transparency, and strategic foresight.\n\nTo those who are interested, kindly drop your resume by direct email.',
                 email: 'vacancy@instrakventurecapital.com',
-                styles: { textAlign: 'left', textColor: '#1A365D', bgColor: '#FFFFFF' }
+                rightBoxContent: '"Integrity is the bedrock of our institutional success."',
+                styles: { textAlign: 'left', textColor: '#1A365D', bgColor: '#FFFFFF', rightBoxBgColor: '#FFFFFF', rightBoxTextColor: '#fde68a', rightBoxStyle: 'solid' }
             },
             {
                 id: 'jobs',
                 type: 'jobs',
                 title: 'Open Positions',
-                styles: { textAlign: 'center', textColor: '#1A365D', bgColor: '#FAFBFC' }
+                styles: {
+                    textAlign: 'center',
+                    textColor: '#1A365D',
+                    bgColor: '#FAFBFC',
+                    titleColor: '#1A365D',
+                    titleFontSize: 32,
+                    cardStyle: 'glass',
+                    cardColor: '#FFFFFF',
+                    iconColor: '#1A365D',
+                    buttonColor: '#1A365D',
+                    buttonIconColor: '#B8860B',
+                    buttonOutlineColor: '#B8860B',
+                    buttonBgColor: 'transparent',
+                    defaultApplyLink: '',
+                    applyButtonLabel: 'Apply Now',
+                    openApplyInNewTab: false
+                }
             }
         ],
         jobs: [
-            { id: 1, title: 'Senior Financial Analyst', location: 'Kuala Lumpur', type: 'Full-time', summary: 'Seeking an experienced analyst for our equity team.' },
-            { id: 2, title: 'Legal Counsel', location: 'Singapore', type: 'Contract', summary: 'Corporate law specialist needed for corporate financing.' },
-            { id: 3, title: 'Investment Manager', location: 'Jakarta', type: 'Full-time', summary: 'Leading our expansion into Indonesian markets.' },
+            { id: 1, title: 'Senior Financial Analyst', location: 'Kuala Lumpur', type: 'Full-time', summary: 'Seeking an experienced analyst for our equity team.', applyLink: '' },
+            { id: 2, title: 'Legal Counsel', location: 'Singapore', type: 'Contract', summary: 'Corporate law specialist needed for corporate financing.', applyLink: '' },
+            { id: 3, title: 'Investment Manager', location: 'Jakarta', type: 'Full-time', summary: 'Leading our expansion into Indonesian markets.', applyLink: '' },
         ],
         applications: []
     };
@@ -212,6 +229,44 @@ const CareerManager = () => {
                                     className="input-field"
                                 />
                             </div>
+                            <div className="border-t border-gray-200 pt-4 mt-4">
+                                <h4 className="text-sm font-bold text-gray-600 mb-3">Right box (quote / custom content)</h4>
+                                <div>
+                                    <label className="label text-xs">Box content</label>
+                                    <textarea
+                                        rows={3}
+                                        value={section.rightBoxContent || ''}
+                                        onChange={(e) => updateSection(section.id, { rightBoxContent: e.target.value })}
+                                        className="input-field text-sm"
+                                        placeholder='"Integrity is the bedrock of our institutional success."'
+                                    />
+                                    <p className="text-[10px] text-gray-400 mt-1">Text shown in the white box on the right. Leave empty to hide the box.</p>
+                                </div>
+                                <div className="mt-3">
+                                    <label className="label text-xs">Box style</label>
+                                    <div className="flex gap-2">
+                                        <button type="button" onClick={() => updateSection(section.id, { styles: { ...(section.styles || {}), rightBoxStyle: 'solid' } })} className={`flex-1 py-2 rounded-lg border text-xs font-medium ${(section.styles || {}).rightBoxStyle !== 'glass' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-600 border-gray-200'}`}>Solid</button>
+                                        <button type="button" onClick={() => updateSection(section.id, { styles: { ...(section.styles || {}), rightBoxStyle: 'glass' } })} className={`flex-1 py-2 rounded-lg border text-xs font-medium ${(section.styles || {}).rightBoxStyle === 'glass' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-600 border-gray-200'}`}>Glass (transparent)</button>
+                                    </div>
+                                    <p className="text-[10px] text-gray-400 mt-1">Glass = semi-transparent with blur.</p>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                                    <div>
+                                        <label className="label text-xs">Box background colour</label>
+                                        <div className="flex items-center gap-2">
+                                            <input type="color" value={(section.styles || {}).rightBoxBgColor || '#FFFFFF'} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), rightBoxBgColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" />
+                                            <input type="text" value={(section.styles || {}).rightBoxBgColor || ''} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), rightBoxBgColor: e.target.value } })} className="input-field text-xs flex-1 py-1.5 font-mono" placeholder="#FFFFFF" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="label text-xs">Box text colour</label>
+                                        <div className="flex items-center gap-2">
+                                            <input type="color" value={(section.styles || {}).rightBoxTextColor || '#fde68a'} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), rightBoxTextColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" />
+                                            <input type="text" value={(section.styles || {}).rightBoxTextColor || ''} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), rightBoxTextColor: e.target.value } })} className="input-field text-xs flex-1 py-1.5 font-mono" placeholder="#fde68a" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </>
                     )}
 
@@ -226,6 +281,121 @@ const CareerManager = () => {
                             />
                         </div>
                     )}
+
+                    {section.type === 'jobs' && (
+                        <div className="border-t border-gray-200 pt-4 mt-4">
+                            <h4 className="text-sm font-bold text-gray-600 mb-3">Open Position section (title & cards)</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="label text-xs">Title colour</label>
+                                    <div className="flex items-center gap-2">
+                                        <input type="color" value={(section.styles || {}).titleColor || '#1A365D'} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), titleColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" />
+                                        <input type="text" value={(section.styles || {}).titleColor || ''} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), titleColor: e.target.value } })} className="input-field text-xs flex-1 py-1.5 font-mono" placeholder="#1A365D" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="label text-xs">Title font size (px)</label>
+                                    <input type="number" min={18} max={48} value={(section.styles || {}).titleFontSize ?? 32} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), titleFontSize: e.target.value ? parseInt(e.target.value, 10) : undefined } })} className="input-field text-sm w-full py-1.5" />
+                                </div>
+                                <div>
+                                    <label className="label text-xs">Card / box style</label>
+                                    <div className="flex gap-2">
+                                        <button type="button" onClick={() => updateSection(section.id, { styles: { ...(section.styles || {}), cardStyle: 'glass' } })} className={`flex-1 py-2 rounded-lg border text-xs font-medium ${(section.styles || {}).cardStyle !== 'solid' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-600 border-gray-200'}`}>Glass (transparent)</button>
+                                        <button type="button" onClick={() => updateSection(section.id, { styles: { ...(section.styles || {}), cardStyle: 'solid' } })} className={`flex-1 py-2 rounded-lg border text-xs font-medium ${(section.styles || {}).cardStyle === 'solid' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-600 border-gray-200'}`}>Solid</button>
+                                    </div>
+                                    <p className="text-[10px] text-gray-400 mt-1">Glass = semi-transparent when job listings are shown.</p>
+                                </div>
+                                <div>
+                                    <label className="label text-xs">Card colour</label>
+                                    <div className="flex items-center gap-2">
+                                        <input type="color" value={(section.styles || {}).cardColor || '#FFFFFF'} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), cardColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" />
+                                        <input type="text" value={(section.styles || {}).cardColor || ''} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), cardColor: e.target.value } })} className="input-field text-xs flex-1 py-1.5 font-mono" placeholder="#FFFFFF" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="label text-xs">Big icon colour (Briefcase)</label>
+                                    <div className="flex items-center gap-2">
+                                        <input type="color" value={(section.styles || {}).iconColor || '#1A365D'} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), iconColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" />
+                                        <input type="text" value={(section.styles || {}).iconColor || ''} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), iconColor: e.target.value } })} className="input-field text-xs flex-1 py-1.5 font-mono" placeholder="#1A365D" />
+                                    </div>
+                                    <p className="text-[10px] text-gray-400 mt-1">Card Briefcase icon + location/clock icons + left border.</p>
+                                </div>
+                                <div>
+                                    <label className="label text-xs">Button text colour</label>
+                                    <div className="flex items-center gap-2">
+                                        <input type="color" value={(section.styles || {}).buttonColor || '#1A365D'} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), buttonColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" />
+                                        <input type="text" value={(section.styles || {}).buttonColor || ''} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), buttonColor: e.target.value } })} className="input-field text-xs flex-1 py-1.5 font-mono" placeholder="#1A365D" />
+                                    </div>
+                                    <p className="text-[10px] text-gray-400 mt-1">Apply button label text.</p>
+                                </div>
+                                <div>
+                                    <label className="label text-xs">Small icon colour (arrow)</label>
+                                    <div className="flex items-center gap-2">
+                                        <input type="color" value={(section.styles || {}).buttonIconColor || '#B8860B'} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), buttonIconColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" />
+                                        <input type="text" value={(section.styles || {}).buttonIconColor || ''} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), buttonIconColor: e.target.value } })} className="input-field text-xs flex-1 py-1.5 font-mono" placeholder="#B8860B" />
+                                    </div>
+                                    <p className="text-[10px] text-gray-400 mt-1">Arrow icon next to Apply button.</p>
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="label text-xs">Default apply link (URL)</label>
+                                    <input type="text" value={(section.styles || {}).defaultApplyLink || ''} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), defaultApplyLink: e.target.value.trim() } })} className="input-field text-sm w-full py-1.5 font-mono" placeholder="https://form.url or mailto:vacancy@company.com" />
+                                    <p className="text-[10px] text-gray-400 mt-1">Used when a job has no per-job apply link. Can be a form URL or mailto: email.</p>
+                                </div>
+                                <div>
+                                    <label className="label text-xs">Apply button label</label>
+                                    <input type="text" value={(section.styles || {}).applyButtonLabel || 'Apply Now'} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), applyButtonLabel: e.target.value || 'Apply Now' } })} className="input-field text-sm w-full py-1.5" placeholder="Apply Now" />
+                                </div>
+                                <div>
+                                    <label className="label text-xs">Button outline colour</label>
+                                    <div className="flex items-center gap-2">
+                                        <input type="color" value={(section.styles || {}).buttonOutlineColor || '#B8860B'} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), buttonOutlineColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" />
+                                        <input type="text" value={(section.styles || {}).buttonOutlineColor || ''} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), buttonOutlineColor: e.target.value } })} className="input-field text-xs flex-1 py-1.5 font-mono" placeholder="#B8860B" />
+                                    </div>
+                                    <p className="text-[10px] text-gray-400 mt-1">Border around Apply button.</p>
+                                </div>
+                                <div>
+                                    <label className="label text-xs">Button background colour</label>
+                                    <div className="flex items-center gap-2">
+                                        <input type="color" value={((section.styles || {}).buttonBgColor && (section.styles || {}).buttonBgColor !== 'transparent') ? (section.styles || {}).buttonBgColor : '#f0f4f8'} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), buttonBgColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" />
+                                        <input type="text" value={(section.styles || {}).buttonBgColor || ''} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), buttonBgColor: e.target.value.trim() || 'transparent' } })} className="input-field text-xs flex-1 py-1.5 font-mono" placeholder="transparent or #hex" />
+                                    </div>
+                                    <p className="text-[10px] text-gray-400 mt-1">Fill behind Apply button. Use transparent for none.</p>
+                                </div>
+                                <div className="flex items-center gap-2 pt-6">
+                                    <input type="checkbox" id="openApplyNewTab" checked={!!(section.styles || {}).openApplyInNewTab} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), openApplyInNewTab: e.target.checked } })} className="rounded border-gray-300" />
+                                    <label htmlFor="openApplyNewTab" className="text-xs font-medium text-gray-600">Open apply link in new tab</label>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="border-t border-gray-200 pt-4 mt-4">
+                        <h4 className="text-sm font-bold text-gray-600 mb-3">Section style (font colour, align, background)</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label className="label text-xs">Font colour</label>
+                                <div className="flex items-center gap-2">
+                                    <input type="color" value={(section.styles || {}).textColor || '#1A365D'} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), textColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" />
+                                    <input type="text" value={(section.styles || {}).textColor || ''} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), textColor: e.target.value } })} className="input-field text-xs flex-1 py-1.5 font-mono" placeholder="#1A365D" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="label text-xs">Align</label>
+                                <select value={(section.styles || {}).textAlign || 'center'} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), textAlign: e.target.value } })} className="input-field text-sm w-full py-1.5 bg-white">
+                                    <option value="left">Left</option>
+                                    <option value="center">Center</option>
+                                    <option value="right">Right</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="label text-xs">Background colour</label>
+                                <div className="flex items-center gap-2">
+                                    <input type="color" value={(section.styles || {}).bgColor || '#FFFFFF'} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), bgColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" />
+                                    <input type="text" value={(section.styles || {}).bgColor || ''} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), bgColor: e.target.value } })} className="input-field text-xs flex-1 py-1.5 font-mono" placeholder="#FFFFFF" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -259,6 +429,11 @@ const CareerManager = () => {
                     <div>
                         <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Location</label>
                         <input type="text" value={editingJob.location} onChange={e => setEditingJob({ ...editingJob, location: e.target.value })} className="input-field" />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Apply link (URL)</label>
+                        <input type="url" value={editingJob.applyLink || ''} onChange={e => setEditingJob({ ...editingJob, applyLink: e.target.value.trim() })} className="input-field" placeholder="https://... or mailto:email@company.com" />
+                        <p className="text-[10px] text-gray-400 mt-1">Link for the &quot;Apply Now&quot; button. Leave empty to use the default from Open Position section.</p>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Description</label>
@@ -322,14 +497,11 @@ const CareerManager = () => {
                 {activeTab === 'sections' && (
                     <div className="flex-1 overflow-y-auto min-h-0 bg-transparent">
                         <div className="w-full space-y-8 pb-10">
-                            {sections
-                                .filter(s => s.type !== 'jobs')
-                                .map(section => (
-                                    <div key={section.id} className="animate-in fade-in slide-in-from-bottom-2">
-                                        {renderSectionEditor(section)}
-                                    </div>
-                                ))
-                            }
+                            {sections.map(section => (
+                                <div key={section.id} className="animate-in fade-in slide-in-from-bottom-2">
+                                    {renderSectionEditor(section)}
+                                </div>
+                            ))}
                         </div>
                     </div>
                 )}
@@ -349,7 +521,7 @@ const CareerManager = () => {
                                 />
                             </div>
                             <button
-                                onClick={() => { setEditingJob({ id: Date.now(), title: '', location: '', type: 'Full-time', summary: '' }); setView('edit'); }}
+                                onClick={() => { setEditingJob({ id: Date.now(), title: '', location: '', type: 'Full-time', summary: '', applyLink: '' }); setView('edit'); }}
                                 className="flex items-center gap-2 px-4 py-2 bg-[#1A365D] text-white rounded-lg hover:bg-[#08304e] transition-all shadow-md text-sm font-medium"
                             >
                                 <Plus size={16} /> <span>Post Job</span>

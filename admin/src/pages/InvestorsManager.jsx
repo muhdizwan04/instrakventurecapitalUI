@@ -8,7 +8,8 @@ const InvestorsManager = () => {
     const defaultData = {
         pageHero: {
             title: 'For Investors',
-            subtitle: 'Exclusive opportunities for institutional growth and wealth preservation through strategic capital.'
+            subtitle: 'Exclusive opportunities for institutional growth and wealth preservation through strategic capital.',
+            styles: { titleColor: '#FFFFFF', textAlign: 'center', bgColor: '#0b1120' }
         },
         mainContent: {
             headline: 'The Institutional Advantage',
@@ -41,6 +42,16 @@ const InvestorsManager = () => {
 
     const handleSave = async () => {
         await saveContent(formData);
+    };
+
+    const updatePageHeroStyles = (key, value) => {
+        setFormData(prev => ({
+            ...prev,
+            pageHero: {
+                ...prev.pageHero,
+                styles: { ...(prev.pageHero.styles || {}), [key]: value }
+            }
+        }));
     };
 
     // Portfolio item handlers
@@ -188,6 +199,33 @@ const InvestorsManager = () => {
                                             onChange={(e) => setFormData(prev => ({ ...prev, pageHero: { ...prev.pageHero, subtitle: e.target.value } }))}
                                             className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
                                         />
+                                    </div>
+                                    <div className="border-t border-[var(--border-light)] pt-4 mt-4">
+                                        <h4 className="text-sm font-bold text-[var(--text-secondary)] mb-3">Header style</h4>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div>
+                                                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Font colour</label>
+                                                <div className="flex items-center gap-2">
+                                                    <input type="color" value={(formData.pageHero.styles || {}).titleColor || '#FFFFFF'} onChange={(e) => updatePageHeroStyles('titleColor', e.target.value)} className="w-9 h-9 rounded border border-[var(--border-light)] cursor-pointer" />
+                                                    <input type="text" value={(formData.pageHero.styles || {}).titleColor || ''} onChange={(e) => updatePageHeroStyles('titleColor', e.target.value)} className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm font-mono" placeholder="#FFFFFF" />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Align</label>
+                                                <select value={(formData.pageHero.styles || {}).textAlign || 'center'} onChange={(e) => updatePageHeroStyles('textAlign', e.target.value)} className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm bg-white">
+                                                    <option value="left">Left</option>
+                                                    <option value="center">Center</option>
+                                                    <option value="right">Right</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Background colour</label>
+                                                <div className="flex items-center gap-2">
+                                                    <input type="color" value={(formData.pageHero.styles || {}).bgColor || '#0b1120'} onChange={(e) => updatePageHeroStyles('bgColor', e.target.value)} className="w-9 h-9 rounded border border-[var(--border-light)] cursor-pointer" />
+                                                    <input type="text" value={(formData.pageHero.styles || {}).bgColor || ''} onChange={(e) => updatePageHeroStyles('bgColor', e.target.value)} className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm font-mono" placeholder="#0b1120" />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

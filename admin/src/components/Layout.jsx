@@ -8,6 +8,7 @@ import {
     Users,
     Calendar,
     MessageSquare,
+    Mail,
     LogOut,
     Menu,
     X,
@@ -86,6 +87,7 @@ const Layout = () => {
     // Other items that might not be in the nav but we want to show
     const fixedAdminItems = {
         '/careers': { icon: Calendar, label: "Careers", path: "/career", section: 'Pages' },
+        '/contact': { icon: Mail, label: "Contact Us", path: "/contact", section: 'Pages' },
         '/inquiries': { icon: MessageSquare, label: "Inquiries", path: "/inquiries", section: 'Content' },
         '/users': { icon: Users, label: "Registered Users", path: "/users", section: 'Content' },
     };

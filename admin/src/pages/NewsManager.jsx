@@ -14,6 +14,7 @@ const DEFAULT_DATA = {
         buttonLabel: '',
         buttonLink: '',
         styles: {
+            bgColor: '#FAFBFC',
             titleFontFamily: 'var(--font-heading)',
             titleFontSize: '2.8rem',
             titleFontWeight: '700',
@@ -243,7 +244,17 @@ const NewsManager = () => {
                     </div>
                 </div>
                 <div className="border-t border-gray-200 pt-4 mt-4">
-                    <h4 className="text-sm font-bold text-gray-600 mb-3">Hero font & alignment</h4>
+                    <h4 className="text-sm font-bold text-gray-600 mb-3">Header background & font</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label className="text-[10px] font-bold text-gray-500 uppercase block mb-1">Header background colour</label>
+                            <div className="flex items-center gap-2">
+                                <input type="color" value={(hero.styles || {}).bgColor || '#FAFBFC'} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), bgColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" />
+                                <input type="text" value={(hero.styles || {}).bgColor || ''} onChange={(e) => setHero({ ...hero, styles: { ...(hero.styles || {}), bgColor: e.target.value } })} className="input-field text-xs flex-1 font-mono" placeholder="#FAFBFC" />
+                            </div>
+                        </div>
+                    </div>
+                    <h4 className="text-sm font-bold text-gray-600 mb-3 mt-2">Hero font & alignment</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
                             <span className="text-xs font-bold text-gray-500 uppercase block mb-2">Title</span>

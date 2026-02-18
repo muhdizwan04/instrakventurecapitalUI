@@ -71,7 +71,8 @@ const HomeManager = () => {
         servicesSectionStyles: {
             backgroundColor: '',
             textColor: '',
-            boxColor: ''
+            boxColor: '',
+            cardStyle: 'glass'
         },
         industriesSectionStyles: {
             backgroundColor: '',
@@ -669,9 +670,23 @@ const HomeManager = () => {
                                                 <input type="text" value={formData.servicesSectionStyles?.textColor || ''} onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), textColor: e.target.value } }))} className="input-field text-sm flex-1" placeholder="#e5e7eb" />
                                             </div>
                                         </div>
+                                        {/* Card style: solid vs see-through (glass) */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-medium text-[var(--text-secondary)]">Card style</label>
+                                            <select
+                                                value={formData.servicesSectionStyles?.cardStyle || 'glass'}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, servicesSectionStyles: { ...(prev.servicesSectionStyles || {}), cardStyle: e.target.value } }))}
+                                                className="input-field text-sm w-full"
+                                            >
+                                                <option value="glass">See-through (glass) — modern, background shows through</option>
+                                                <option value="solid">Solid — opaque card using box colour below</option>
+                                            </select>
+                                            <p className="text-xs text-[var(--text-secondary)]">See-through gives a modern glass effect; solid uses the card/box colour.</p>
+                                        </div>
                                         {/* Box colour */}
                                         <div className="space-y-2">
                                             <label className="block text-sm font-medium text-[var(--text-secondary)]">Card / box colour</label>
+                                            <p className="text-xs text-[var(--text-secondary)] mb-1">Used only when Card style is Solid.</p>
                                             {(() => {
                                                 const boxVal = formData.servicesSectionStyles?.boxColor || '';
                                                 const isBoxGrad = boxVal.includes('linear-gradient');

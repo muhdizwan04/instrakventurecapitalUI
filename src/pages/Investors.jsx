@@ -11,7 +11,8 @@ const Investors = () => {
     const defaultContent = {
         pageHero: {
             title: 'FOR INVESTORS',
-            subtitle: ''
+            subtitle: '',
+            styles: { titleColor: '#FFFFFF', textAlign: 'center', bgColor: '#0b1120' }
         },
         mainContent: {
             headline: 'The Institutional Advantage',
@@ -78,8 +79,8 @@ const Investors = () => {
         }
     };
 
-    const inputStyle = { width: '100%', padding: '0.9rem', background: '#FFFFFF', border: '1px solid rgba(26, 54, 93, 0.2)', color: '#1A365D', borderRadius: '6px', fontSize: '0.95rem' };
-    const labelStyle = { display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500', color: '#1A365D' };
+    const inputStyle = { width: '100%', padding: '0.9rem', background: 'rgba(255, 255, 255, 0.12)', border: '1px solid rgba(255, 255, 255, 0.2)', color: '#F1F5F9', borderRadius: '8px', fontSize: '0.95rem' };
+    const labelStyle = { display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500', color: 'rgba(241, 245, 249, 0.95)' };
 
     // Use loaded content or defaults
     const pageHero = content?.pageHero || defaultContent.pageHero;
@@ -100,7 +101,15 @@ const Investors = () => {
             <Toaster position="top-right" />
             <PageHero
                 title={pageHero.title}
-                subtitle=""
+                subtitle={pageHero.subtitle || ''}
+                style={{ backgroundColor: pageHero.styles?.bgColor }}
+                sectionStyles={{
+                    titleColor: pageHero.styles?.titleColor,
+                    titleAlign: pageHero.styles?.textAlign,
+                    textAlign: pageHero.styles?.textAlign,
+                    subtitleColor: pageHero.styles?.titleColor
+                }}
+                textColor={pageHero.styles?.titleColor}
             />
             <div className="container" style={{ padding: '80px 20px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '4rem', alignItems: 'start' }}>
@@ -122,10 +131,10 @@ const Investors = () => {
                         </div>
                     </div>
 
-                    <div className="glass-card" style={{ padding: '3rem', background: '#FFFFFF', border: '1px solid rgba(26, 54, 93, 0.12)', boxShadow: '0 4px 20px rgba(26, 54, 93, 0.08)' }}>
-                        <h3 style={{ marginBottom: '2rem', color: '#1A365D' }}>{formSettings.title}</h3>
+                    <div className="glass-card" style={{ padding: '3rem', background: 'rgba(15, 23, 42, 0.42)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', border: '1px solid rgba(148, 163, 184, 0.2)', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)' }}>
+                        <h3 style={{ marginBottom: '2rem', color: '#F1F5F9' }}>{formSettings.title}</h3>
                         <ProtectedFormSection serviceName="Investor Relations">
-                            <form onSubmit={handleSubmit}>
+                            <form className="investors-form-glass" onSubmit={handleSubmit}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
                                 <div>
                                     <label style={labelStyle}>First Name</label>

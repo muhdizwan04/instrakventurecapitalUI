@@ -4,7 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import Layout from './components/Layout';
 import ScrollToTop from './components/ScrollToTop';
 import PageTransition from './components/PageTransition';
-import { AuthProvider } from './context/AuthContext';
+import { useContentPrefetch } from './hooks/usePageContent';
 import Home from './pages/Home';
 import AboutUs from './pages/AboutUs';
 import ServicesPage from './pages/Services';
@@ -83,8 +83,11 @@ const MainLayout = () => {
 };
 
 function App() {
+  // Fetch ALL site_content rows in one query and seed react-query cache
+  useContentPrefetch();
+
   return (
-    <AuthProvider>
+    <>
       <EmailVerificationListener />
       <Routes>
         {/* Auth routes - outside Layout (cleaner login/register pages) */}
@@ -93,7 +96,7 @@ function App() {
         {/* All other routes - with Layout */}
         <Route path="/*" element={<MainLayout />} />
       </Routes>
-    </AuthProvider>
+    </>
   );
 }
 

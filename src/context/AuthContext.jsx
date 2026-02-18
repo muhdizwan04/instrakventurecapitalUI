@@ -58,28 +58,36 @@ export const AuthProvider = ({ children }) => {
         }
 
         // Get initial session (runs in parallel with earlyProfileCheck)
+        const t0 = performance.now();
+        console.log('[Auth] 🔄 getSession START');
         supabase.auth.getSession().then(async ({ data: { session }, error }) => {
+            console.log(`[Auth] ✅ getSession done in ${Math.round(performance.now() - t0)}ms, user=${session?.user?.email || 'none'}`);
             setUser(session?.user ?? null);
             
-            // Check if this is a client user (not admin)
             if (session?.user) {
+                const t1 = performance.now();
                 if (earlyProfileCheck) {
                     await earlyProfileCheck;
                 } else {
                     await checkClientProfile(session.user.id);
                 }
+                console.log(`[Auth] ✅ checkClientProfile done in ${Math.round(performance.now() - t1)}ms`);
             }
             
+            setLoading(false);
+        }).catch(err => {
+            console.error(`[Auth] ❌ getSession FAILED after ${Math.round(performance.now() - t0)}ms:`, err.message);
             setLoading(false);
         });
 
         // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            console.log('[AuthContext] Auth state changed:', _event, session?.user?.email);
+        // CRITICAL: Do NOT await inside onAuthStateChange callback.
+        // Awaiting a Supabase call here blocks the auth state machine (deadlock).
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null);
             
             if (session?.user) {
-                await checkClientProfile(session.user.id);
+                checkClientProfile(session.user.id);
             } else {
                 setClientProfile(null);
             }

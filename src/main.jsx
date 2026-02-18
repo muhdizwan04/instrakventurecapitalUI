@@ -29,9 +29,10 @@ const persister = createSyncStoragePersister({
 
 const HydrationWrapper = ({ children }) => {
   const isRestoring = useIsRestoring();
-  if (isRestoring) {
-    return null; // Or a loading spinner
-  }
+  // While restoring from localStorage, react-query pauses all queries so persisted
+  // cache data loads first (avoids unnecessary network requests). The sync persister
+  // makes this nearly instant (<50ms), so the blank flash is imperceptible.
+  if (isRestoring) return null;
   return children;
 };
 
@@ -41,7 +42,11 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <PersistQueryClientProvider 
       client={queryClient} 
-      persistOptions={{ persister }}
+      persistOptions={{
+        persister,
+        maxAge: 1000 * 60 * 60 * 24, // 24 hours — discard stale persisted cache
+        buster: 'v2', // bump to invalidate old cache from fallback-only mode
+      }}
     >
       <HelmetProvider>
         <HydrationWrapper>

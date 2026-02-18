@@ -75,7 +75,7 @@ const Layout = () => {
     // Mapping of navigation links to admin sidebar items
     const linkToAdminItem = {
         '/': { icon: Home, label: "Home Page", path: "/home", section: 'Pages' },
-        '/mission-vision-values': { icon: User, label: "About Us", path: "/about", section: 'Pages' },
+        '/about': { icon: User, label: "About Us", path: "/about", section: 'Pages' },
 
         '/investors': { icon: DollarSign, label: "Investors", path: "/investors", section: 'Pages' },
         '/services': { icon: Briefcase, label: "Services", path: "/services", section: 'Pages' },

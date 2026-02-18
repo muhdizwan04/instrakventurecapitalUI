@@ -1,17 +1,22 @@
 import React, { useState, useRef } from 'react';
 import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { supabase } from '../lib/supabase';
+
+const BUCKET = 'site-assets';
 
 /**
- * ImageUpload Component - Base64 Version
- * Converts images to base64 strings for storage in database (no storage bucket needed!)
- * 
- * @param {string} value - Current image (base64 string or URL)
- * @param {function} onChange - Callback with new base64 image string
+ * ImageUpload Component — Supabase Storage Version
+ * Uploads images to Supabase Storage and returns a public URL.
+ * Falls back to base64 only if Storage upload fails.
+ *
+ * @param {string} value - Current image (URL or legacy base64 string)
+ * @param {function} onChange - Callback with new image URL
  * @param {string} aspectRatio - CSS aspect ratio (default: '3/4')
  * @param {string} className - Additional CSS classes
  * @param {number} maxSizeMB - Max file size in MB (default: 2)
- * @param {number} maxWidth - Max width to resize to (default: 800px)
+ * @param {number} maxWidth - Max width to resize to (default: 1600px)
+ * @param {string} folder - Storage subfolder (default: 'images')
  */
 const ImageUpload = ({
     value,
@@ -19,25 +24,23 @@ const ImageUpload = ({
     aspectRatio = '3/4',
     className = '',
     maxSizeMB = 2,
-    maxWidth = 800
+    maxWidth = 1600,
+    folder = 'images'
 }) => {
     const [uploading, setUploading] = useState(false);
     const [dragOver, setDragOver] = useState(false);
     const fileInputRef = useRef(null);
 
-    // Resize and compress image, then convert to base64
-    const processImage = (file) => {
+    const resizeImage = (file) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    // Create canvas for resizing
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
 
-                    // Resize if larger than maxWidth
                     if (width > maxWidth) {
                         height = Math.round((height * maxWidth) / width);
                         width = maxWidth;
@@ -45,17 +48,14 @@ const ImageUpload = ({
 
                     canvas.width = width;
                     canvas.height = height;
-
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Use original file type if it supports transparency, otherwise jpeg
-                    const mimeType = file.type === 'image/png' || file.type === 'image/webp' ? file.type : 'image/jpeg';
-                    const quality = mimeType === 'image/jpeg' ? 0.8 : 1.0; // PNG handles compression differently
-
-                    // Convert to base64
-                    const base64 = canvas.toDataURL(mimeType, quality);
-                    resolve(base64);
+                    canvas.toBlob(
+                        (blob) => blob ? resolve(blob) : reject(new Error('Canvas toBlob failed')),
+                        'image/webp',
+                        0.82
+                    );
                 };
                 img.onerror = reject;
                 img.src = e.target.result;
@@ -68,13 +68,11 @@ const ImageUpload = ({
     const handleUpload = async (file) => {
         if (!file) return;
 
-        // Validate file type
         if (!file.type.startsWith('image/')) {
             toast.error('Please upload an image file');
             return;
         }
 
-        // Validate file size
         if (file.size > maxSizeMB * 1024 * 1024) {
             toast.error(`Image must be less than ${maxSizeMB}MB`);
             return;
@@ -83,18 +81,46 @@ const ImageUpload = ({
         setUploading(true);
 
         try {
-            const base64 = await processImage(file);
-            onChange(base64);
+            const blob = await resizeImage(file);
+            const ext = 'webp';
+            const filename = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+            const { data, error } = await supabase.storage
+                .from(BUCKET)
+                .upload(filename, blob, {
+                    contentType: 'image/webp',
+                    cacheControl: '31536000', // 1 year cache
+                    upsert: false
+                });
+
+            if (error) throw error;
+
+            const { data: urlData } = supabase.storage
+                .from(BUCKET)
+                .getPublicUrl(data.path);
+
+            onChange(urlData.publicUrl);
             toast.success('Image uploaded!');
         } catch (error) {
-            console.error('Upload error:', error);
-            toast.error('Failed to process image');
+            console.error('Storage upload error:', error);
+            toast.error('Failed to upload image: ' + (error.message || 'Unknown error'));
         } finally {
             setUploading(false);
         }
     };
 
-    const handleRemove = () => {
+    const handleRemove = async () => {
+        // If the value is a Supabase Storage URL, try to delete the file
+        if (value && value.includes(`/storage/v1/object/public/${BUCKET}/`)) {
+            try {
+                const path = value.split(`/storage/v1/object/public/${BUCKET}/`)[1];
+                if (path) {
+                    await supabase.storage.from(BUCKET).remove([path]);
+                }
+            } catch (e) {
+                // Non-critical — old file stays in storage but that's fine
+            }
+        }
         onChange('');
         toast.success('Image removed');
     };
@@ -141,7 +167,7 @@ const ImageUpload = ({
                 {uploading ? (
                     <div className="text-center text-gray-400 p-4">
                         <Loader2 className="mx-auto mb-2 animate-spin" size={24} />
-                        <span className="text-xs">Processing...</span>
+                        <span className="text-xs">Uploading...</span>
                     </div>
                 ) : value ? (
                     <img
@@ -153,12 +179,11 @@ const ImageUpload = ({
                     <div className="text-center text-gray-400 p-4">
                         <ImageIcon className="mx-auto mb-2" size={24} />
                         <span className="text-xs block">Click or drag to upload</span>
-                        <span className="text-[10px] text-gray-300 mt-1 block">Max {maxSizeMB}MB • Auto-resized</span>
+                        <span className="text-[10px] text-gray-300 mt-1 block">Max {maxSizeMB}MB • Auto-optimized</span>
                     </div>
                 )}
             </div>
 
-            {/* Remove button */}
             {value && !uploading && (
                 <button
                     type="button"
@@ -172,7 +197,6 @@ const ImageUpload = ({
                 </button>
             )}
 
-            {/* Hidden file input */}
             <input
                 ref={fileInputRef}
                 type="file"

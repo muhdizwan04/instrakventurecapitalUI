@@ -1,82 +1,118 @@
-import { useQuery, useQueries } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 
-/**
- * Hook for fetching page content on client-side
- * @param {string} contentId - Unique identifier for the content
- * @param {object} defaultContent - Fallback content if database fetch fails or while loading
- * @param {object} options - Options object
- * @param {boolean} options.forceDefaults - If true, skip database and use defaults
- */
-export const usePageContent = (contentId, defaultContent = {}, options = {}) => {
-    const { forceDefaults = false } = options;
+function isEmptyContent(value) {
+    if (value == null) return true;
+    if (typeof value !== 'object') return false;
+    return Object.keys(value).length === 0;
+}
 
-    const { data: content, isLoading: loading, error } = useQuery({
-        queryKey: ['site_content', contentId],
-        queryFn: async () => {
-            const { data, error: fetchError } = await supabase
-                .from('site_content')
-                .select('content')
-                .eq('id', contentId)
-                .maybeSingle();
+const forceFallbackOnly = import.meta.env.VITE_FORCE_CONTENT_FALLBACK === 'true' || import.meta.env.VITE_FORCE_CONTENT_FALLBACK === '1';
 
-            if (fetchError && fetchError.code !== 'PGRST116') {
-                throw fetchError;
-            }
+const ALL_CONTENT_KEY = ['site_content_all'];
 
-            return data?.content || defaultContent;
-        },
-        enabled: !forceDefaults,
-        placeholderData: defaultContent, // Show default content immediately while background fetching
-        // Use the global 5-minute staleTime from QueryClient for fast repeat loads.
-        // refetchOnMount ensures we still get fresh data in the background.
-        refetchOnMount: 'always',
-        refetchOnWindowFocus: true
+async function fetchAllContent() {
+    const t0 = performance.now();
+    console.log('[Content] 🔄 fetchAllContent START');
+
+    const { data, error } = await supabase
+        .from('site_content')
+        .select('id, content');
+
+    const elapsed = Math.round(performance.now() - t0);
+
+    if (error) {
+        console.error(`[Content] ❌ fetchAllContent FAILED after ${elapsed}ms:`, error.message);
+        throw error;
+    }
+
+    const map = {};
+    for (const row of data || []) {
+        if (row.id && !isEmptyContent(row.content)) {
+            map[row.id] = row.content;
+        }
+    }
+    console.log(`[Content] ✅ fetchAllContent OK in ${elapsed}ms — ${Object.keys(map).length} rows`);
+    return map;
+}
+
+function useAllContent() {
+    return useQuery({
+        queryKey: ALL_CONTENT_KEY,
+        queryFn: fetchAllContent,
+        enabled: !forceFallbackOnly,
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 60 * 24,
+        refetchOnMount: false,
+        refetchOnWindowFocus: true,
+        retry: 2,
     });
+}
 
-    // If forceDefaults is true, we just return the default content and not loading
-    const finalContent = forceDefaults ? defaultContent : (content || defaultContent);
-    const finalLoading = forceDefaults ? false : loading;
+/**
+ * Call once near the app root to kick off the bulk fetch as early as possible
+ * and keep the Supabase connection warm to avoid free-tier cold starts (~12s).
+ */
+export const useContentPrefetch = () => {
+    const queryClient = useQueryClient();
+    const started = useRef(false);
+    useEffect(() => {
+        if (started.current || forceFallbackOnly) return;
+        started.current = true;
 
-    return { content: finalContent, loading: finalLoading, error };
+        queryClient.prefetchQuery({
+            queryKey: ALL_CONTENT_KEY,
+            queryFn: fetchAllContent,
+        });
+
+        // Keep Supabase warm: lightweight ping every 4 minutes prevents cold start
+        const keepAlive = setInterval(() => {
+            supabase.from('site_content').select('id', { count: 'exact', head: true }).then(() => {});
+        }, 4 * 60 * 1000);
+
+        return () => clearInterval(keepAlive);
+    }, [queryClient]);
 };
 
 /**
- * Hook for fetching multiple content items at once
- * @param {string[]} contentIds - Array of content IDs to fetch
- * @param {object} defaults - Object with default content keyed by contentId
+ * Hook for fetching page content on client-side.
+ * Reads from the single shared bulk query — zero individual network requests.
+ */
+export const usePageContent = (contentId, defaultContent = {}, options = {}) => {
+    const { forceDefaults = false } = options;
+    const skipDb = forceDefaults || forceFallbackOnly;
+
+    const { data: allContent, isLoading, error } = useAllContent();
+
+    if (skipDb) {
+        return { content: defaultContent, loading: false, error: null };
+    }
+
+    const dbContent = allContent?.[contentId];
+    const content = isEmptyContent(dbContent) ? defaultContent : dbContent;
+    const loading = isLoading && !allContent;
+
+    return { content, loading, error };
+};
+
+/**
+ * Hook for fetching multiple content items at once.
+ * Also reads from the single shared bulk query.
  */
 export const useMultipleContent = (contentIds, defaults = {}) => {
-    // using useQueries for parallel fetching with individual caching
-    const queries = useQueries({
-        queries: contentIds.map(id => ({
-            queryKey: ['site_content', id],
-            queryFn: async () => {
-                const { data, error } = await supabase
-                    .from('site_content')
-                    .select('content')
-                    .eq('id', id)
-                    .maybeSingle();
-                
-                if (error && error.code !== 'PGRST116') throw error;
-                return { id, content: data?.content || defaults[id] };
-            },
-            refetchOnMount: 'always',
-        }))
-    });
+    const { data: allContent, isLoading } = useAllContent();
 
-    const isLoading = queries.some(query => query.isLoading);
-    
-    // Construct the result object
     const contents = { ...defaults };
-    queries.forEach((query, index) => {
-        const id = contentIds[index];
-        if (query.data?.content) {
-            contents[id] = query.data.content;
+    if (!forceFallbackOnly && allContent) {
+        for (const id of contentIds) {
+            if (allContent[id] && !isEmptyContent(allContent[id])) {
+                contents[id] = allContent[id];
+            }
         }
-    });
+    }
 
-    return { contents, loading: isLoading };
+    return { contents, loading: !forceFallbackOnly && isLoading && !allContent };
 };
 
 export default usePageContent;

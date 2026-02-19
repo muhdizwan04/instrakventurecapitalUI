@@ -15,7 +15,13 @@ const DynamicForm = ({ fields = [], title, onSubmit, loading, formStyles = {} })
     const [formData, setFormData] = useState(() => {
         const initial = {};
         fields.forEach(field => {
-            initial[field.id] = field.type === 'checkbox' ? false : '';
+            if (field.type === 'checkbox') {
+                initial[field.id] = false;
+            } else if (field.type === 'select') {
+                initial[field.id] = ''; // Empty string for select to show placeholder
+            } else {
+                initial[field.id] = '';
+            }
         });
         return initial;
     });
@@ -153,7 +159,41 @@ const DynamicForm = ({ fields = [], title, onSubmit, loading, formStyles = {} })
         };
     };
 
+    const placeholderColor = fs.placeholderColor || '#9CA3AF';
+    
     const focusCss = `
+        .df-input::placeholder { 
+            color: ${placeholderColor} !important; 
+            opacity: 1;
+        }
+        .df-input::-webkit-input-placeholder { 
+            color: ${placeholderColor} !important; 
+            opacity: 1;
+        }
+        .df-input::-moz-placeholder { 
+            color: ${placeholderColor} !important; 
+            opacity: 1;
+        }
+        .df-input:-ms-input-placeholder { 
+            color: ${placeholderColor} !important; 
+            opacity: 1;
+        }
+        .df-textarea::placeholder { 
+            color: ${placeholderColor} !important; 
+            opacity: 1;
+        }
+        .df-textarea::-webkit-input-placeholder { 
+            color: ${placeholderColor} !important; 
+            opacity: 1;
+        }
+        .df-textarea::-moz-placeholder { 
+            color: ${placeholderColor} !important; 
+            opacity: 1;
+        }
+        .df-textarea:-ms-input-placeholder { 
+            color: ${placeholderColor} !important; 
+            opacity: 1;
+        }
         .df-input:focus { 
             border-color: ${inputFocus} !important; 
             box-shadow: 0 0 0 4px ${inputFocus}15, 0 2px 8px ${inputFocus}10 !important; 
@@ -266,7 +306,7 @@ const DynamicForm = ({ fields = [], title, onSubmit, loading, formStyles = {} })
                                         <select 
                                             id={field.id} 
                                             name={field.id} 
-                                            value={formData[field.id]} 
+                                            value={formData[field.id] || ''} 
                                             onChange={handleChange}
                                             className="df-select" 
                                             style={{
@@ -276,14 +316,17 @@ const DynamicForm = ({ fields = [], title, onSubmit, loading, formStyles = {} })
                                                 MozAppearance: 'none',
                                                 paddingRight: '3rem',
                                                 cursor: 'pointer',
-                                                backgroundImage: `url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='${encodeURIComponent(fs.labelColor || '#1A365D')}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+                                                color: formData[field.id] ? (fs.labelColor || '#1A365D') : placeholderColor,
+                                                backgroundImage: `url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='${encodeURIComponent(formData[field.id] ? (fs.labelColor || '#1A365D') : placeholderColor)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
                                                 backgroundRepeat: 'no-repeat',
                                                 backgroundPosition: 'right 1rem center',
                                                 backgroundSize: '12px 8px',
                                             }} 
                                             required={field.required}
                                         >
-                                            <option value="" disabled style={{ color: '#9CA3AF' }}>Select option...</option>
+                                            <option value="" style={{ color: placeholderColor }}>
+                                                {field.placeholder || 'Select option...'}
+                                            </option>
                                             {field.options?.map((opt, i) => (
                                                 <option key={`${field.id}-opt-${i}`} value={opt} style={{ color: fs.labelColor || '#1A365D' }}>
                                                     {opt}

@@ -44,6 +44,7 @@ BEGIN
             'inputBg', '#FFFFFF',  -- White input background
             'inputBorderColor', 'rgba(26,54,93,0.2)',  -- Subtle border
             'inputFocusColor', '#C9A227',  -- Gold focus ring (brand accent)
+            'placeholderColor', '#9CA3AF',  -- Gray placeholder text
             'inputRadius', 'md',  -- Medium rounded inputs (12px)
             
             -- Headings

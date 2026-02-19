@@ -106,7 +106,7 @@ const FORM_DEFAULTS = {
     sectionBg: '#F5F7FA', sectionTitle: '', sectionSubtitle: '', sectionTitleColor: '#1A365D', sectionSubtitleColor: '#4A5568',
     cardBg: '#FFFFFF', cardBorderColor: 'rgba(26,54,93,0.1)', cardRadius: 'md', cardShadow: 'subtle',
     labelColor: '#1A365D', inputBg: '#FFFFFF', inputBorderColor: 'rgba(26,54,93,0.2)', inputFocusColor: '#B8860B', inputRadius: 'sm',
-    headingColor: '#1A365D', headingSeparator: true,
+    placeholderColor: '#9CA3AF', headingColor: '#1A365D', headingSeparator: true,
     btnBg: '#1A365D', btnText: '#FFFFFF', btnLabel: 'Submit Inquiry', btnRadius: 'sm', btnStyle: 'solid',
     btnHoverBg: '#152c4a',
 };
@@ -187,6 +187,7 @@ const FormAppearanceEditor = ({ formStyles = {}, onChange }) => {
                     <ColorField label="Focus Ring" value={fs.inputFocusColor} defaultValue="#B8860B" onChange={v => upd('inputFocusColor', v)} />
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <ColorField label="Placeholder Color" value={fs.placeholderColor} defaultValue="#9CA3AF" onChange={v => upd('placeholderColor', v)} hint="Color for placeholder text in inputs" />
                     <ColorField label="Heading Color" value={fs.headingColor} defaultValue="#1A365D" onChange={v => upd('headingColor', v)} />
                     <div>
                         <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Input Radius</label>

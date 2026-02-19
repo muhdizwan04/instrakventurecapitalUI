@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Plus, Trash2, Loader2, GripVertical, Target, Users, Handshake, Edit, Building2, LayoutTemplate, Star, Lightbulb, Award, Eye, Scale, ChevronDown, ChevronUp, Palette, Type, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, Minus, AArrowUp, Globe, Shield, FileText, UserCheck, Briefcase, MessageSquare, X, Columns, List, Grid3X3, Image, LayoutGrid } from 'lucide-react';
+import { Save, Plus, Trash2, Loader2, GripVertical, Target, Users, Handshake, Edit, Building2, LayoutTemplate, Star, Lightbulb, Award, Eye, Scale, ChevronDown, ChevronUp, Palette, Type, AlignLeft, AlignCenter, AlignRight, Globe, Shield, FileText, UserCheck, Briefcase, MessageSquare, X, Columns, List, Grid3X3, Image, LayoutGrid } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
 import IconPicker from '../components/IconPicker';
 import ImageUpload from '../components/ImageUpload';
+import AppearanceEditor from '../components/AppearanceEditor';
+import LayoutPicker, { LAYOUT_META } from '../components/LayoutPicker';
 
 // ──────────────────────────────────────────────
 // DEFAULT DATA — All user-provided content
@@ -181,290 +183,16 @@ const DEFAULT_PARTNERS = {
     }
 };
 
-// ──────────────────────────────────────────────
-// LAYOUT OPTIONS (only what the client already supports)
-// ──────────────────────────────────────────────
-const LAYOUT_OPTIONS = [
-    { value: 'standard', label: 'Standard Text' },
-    { value: 'mission-card', label: 'Mission-style Card (glass card like Our Mission & Vision)' },
-    { value: 'list', label: 'Professional List' },
-    { value: 'grid', label: 'Feature Grid' },
-    { value: 'cards', label: 'Interactive Cards' },
-    { value: 'accordion', label: 'Accordion' },
-    { value: 'boxed-group', label: 'Command Box' },
-    { value: 'mind-map', label: 'Mind Map' },
-    { value: 'icon-group', label: 'Icon Group' },
-    { value: 'image-grid', label: 'Image Grid' },
-    { value: 'profile-cards', label: 'Profile Cards' },
-    { value: 'statement-block', label: 'Statement Block' },
+const LAYOUT_OPTIONS = LAYOUT_META;
+
+const ABOUT_COLOR_FIELDS = [
+    { key: 'bgColor', label: 'Background', default: '#FFFFFF', gradient: true },
+    { key: 'titleColor', label: 'Title Color', default: '#1A365D' },
+    { key: 'textColor', label: 'Text Color', default: '#64748B' },
+    { key: 'itemTitleColor', label: 'Item Title Color', default: '#1A365D' },
+    { key: 'iconColor', label: 'Icon Color', default: '#C9A227', hint: 'Applied to icons in this section.' },
 ];
-
-// ──────────────────────────────────────────────
-// INLINE STYLE CONTROLS (embedded in each editor)
-// ──────────────────────────────────────────────
-const InlineStyleControls = ({ styles = {}, onUpdate }) => {
-    const [showGradient, setShowGradient] = useState(styles.bgGradient ? true : false);
-
-    const update = (field, value) => onUpdate({ ...styles, [field]: value });
-
-    return (
-        <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-4">
-            <div className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                <Palette size={14} /> Appearance
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {/* Background */}
-                <div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Background</label>
-                    <div className="flex items-center gap-2">
-                        <input type="color" value={styles.bgColor || '#FFFFFF'} onChange={e => update('bgColor', e.target.value)} className="w-8 h-8 rounded border cursor-pointer" />
-                        <input type="text" value={styles.bgColor || '#FFFFFF'} onChange={e => update('bgColor', e.target.value)} className="input-field text-[10px] font-mono flex-1 py-1" />
-                    </div>
-                    <button onClick={() => setShowGradient(!showGradient)} className="text-[10px] text-blue-500 mt-1 hover:underline">
-                        {showGradient ? 'Hide gradient' : '+ Gradient'}
-                    </button>
-                </div>
-
-                {/* Gradient end color */}
-                {showGradient && (
-                    <div>
-                        <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Gradient To</label>
-                        <div className="flex items-center gap-2">
-                            <input type="color" value={styles.bgGradient || '#1A365D'} onChange={e => update('bgGradient', e.target.value)} className="w-8 h-8 rounded border cursor-pointer" />
-                            <input type="text" value={styles.bgGradient || '#1A365D'} onChange={e => update('bgGradient', e.target.value)} className="input-field text-[10px] font-mono flex-1 py-1" />
-                        </div>
-                    </div>
-                )}
-
-                {/* Title Color */}
-                <div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Title Color</label>
-                    <div className="flex items-center gap-2">
-                        <input type="color" value={styles.titleColor || '#1A365D'} onChange={e => update('titleColor', e.target.value)} className="w-8 h-8 rounded border cursor-pointer" />
-                        <input type="text" value={styles.titleColor || '#1A365D'} onChange={e => update('titleColor', e.target.value)} className="input-field text-[10px] font-mono flex-1 py-1" />
-                    </div>
-                </div>
-
-                {/* Text Color */}
-                <div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Text Color</label>
-                    <div className="flex items-center gap-2">
-                        <input type="color" value={styles.textColor || '#64748B'} onChange={e => update('textColor', e.target.value)} className="w-8 h-8 rounded border cursor-pointer" />
-                        <input type="text" value={styles.textColor || '#64748B'} onChange={e => update('textColor', e.target.value)} className="input-field text-[10px] font-mono flex-1 py-1" />
-                    </div>
-                </div>
-
-                {/* Item Title Color */}
-                <div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Item Title Color</label>
-                    <div className="flex items-center gap-2">
-                        <input type="color" value={styles.itemTitleColor || '#1A365D'} onChange={e => update('itemTitleColor', e.target.value)} className="w-8 h-8 rounded border cursor-pointer" />
-                        <input type="text" value={styles.itemTitleColor || '#1A365D'} onChange={e => update('itemTitleColor', e.target.value)} className="input-field text-[10px] font-mono flex-1 py-1" />
-                    </div>
-                </div>
-
-                {/* Icon Color */}
-                <div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Icon Color</label>
-                    <div className="flex items-center gap-2">
-                        <input type="color" value={styles.iconColor || '#C9A227'} onChange={e => update('iconColor', e.target.value)} className="w-8 h-8 rounded border cursor-pointer" />
-                        <input type="text" value={styles.iconColor || '#C9A227'} onChange={e => update('iconColor', e.target.value)} className="input-field text-[10px] font-mono flex-1 py-1" placeholder="#C9A227" />
-                    </div>
-                    <p className="text-[10px] text-gray-400 mt-0.5">Applied to icons in this section.</p>
-                </div>
-
-                {/* Card/box style — glass or solid */}
-                <div className="col-span-2">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Card / box style</label>
-                    <div className="flex gap-2 mb-1.5">
-                        <button type="button" onClick={() => update('cardStyle', 'glass')}
-                            className={`flex-1 py-2 rounded-lg border text-xs font-medium transition-all ${(styles.cardStyle || 'glass') === 'glass' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}>
-                            Glass
-                        </button>
-                        <button type="button" onClick={() => update('cardStyle', 'solid')}
-                            className={`flex-1 py-2 rounded-lg border text-xs font-medium transition-all ${styles.cardStyle === 'solid' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}>
-                            Solid
-                        </button>
-                    </div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Card colour</label>
-                    <div className="flex items-center gap-2">
-                        <input type="color" value={styles.cardColor || '#FFFFFF'} onChange={e => update('cardColor', e.target.value)} className="w-8 h-8 rounded border cursor-pointer" />
-                        <input type="text" value={styles.cardColor || '#FFFFFF'} onChange={e => update('cardColor', e.target.value)} className="input-field text-[10px] font-mono flex-1 py-1" placeholder="#FFFFFF" />
-                    </div>
-                    <p className="text-[10px] text-gray-400 mt-0.5">Glass = tint; Solid = opaque background.</p>
-                </div>
-
-                {/* Title Alignment */}
-                <div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Title Align</label>
-                    <div className="flex bg-white p-1 rounded-lg border border-gray-200 h-8">
-                        {[{ v: 'left', icon: AlignLeft }, { v: 'center', icon: AlignCenter }, { v: 'right', icon: AlignRight }].map(({ v, icon: Icon }) => (
-                            <button key={v} onClick={() => update('textAlign', v)}
-                                className={`flex-1 flex items-center justify-center rounded text-xs transition-all ${styles.textAlign === v ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}>
-                                <Icon size={14} />
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Subtitle Alignment */}
-                <div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Subtitle Align</label>
-                    <div className="flex bg-white p-1 rounded-lg border border-gray-200 h-8">
-                        {[{ v: 'left', icon: AlignLeft }, { v: 'center', icon: AlignCenter }, { v: 'right', icon: AlignRight }].map(({ v, icon: Icon }) => (
-                            <button key={v} onClick={() => update('subtitleAlign', v)}
-                                className={`flex-1 flex items-center justify-center rounded text-xs transition-all ${(styles.subtitleAlign || 'center') === v ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}>
-                                <Icon size={14} />
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Content Alignment */}
-                <div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Content Align</label>
-                    <div className="flex bg-white p-1 rounded-lg border border-gray-200 h-8">
-                        {[{ v: 'left', icon: AlignLeft }, { v: 'center', icon: AlignCenter }, { v: 'right', icon: AlignRight }].map(({ v, icon: Icon }) => (
-                            <button key={v} onClick={() => update('contentAlign', v)}
-                                className={`flex-1 flex items-center justify-center rounded text-xs transition-all ${styles.contentAlign === v ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}>
-                                <Icon size={14} />
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            {/* Title Formatting */}
-            <div>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                    <Type size={12} /> Title Style
-                </div>
-                <div className="flex bg-white p-1 rounded-lg border border-gray-200 h-9 gap-0.5">
-                    <button onClick={() => update('titleFontWeight', styles.titleFontWeight === 'bold' ? 'normal' : 'bold')}
-                        className={`flex-1 flex items-center justify-center rounded text-xs font-bold transition-all ${styles.titleFontWeight === 'bold' ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}
-                        title="Bold">
-                        <Bold size={14} />
-                    </button>
-                    <button onClick={() => update('titleFontStyle', styles.titleFontStyle === 'italic' ? 'normal' : 'italic')}
-                        className={`flex-1 flex items-center justify-center rounded text-xs transition-all ${styles.titleFontStyle === 'italic' ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}
-                        title="Italic">
-                        <Italic size={14} />
-                    </button>
-                    <button onClick={() => update('titleTextDecoration', styles.titleTextDecoration === 'underline' ? 'none' : 'underline')}
-                        className={`flex-1 flex items-center justify-center rounded text-xs transition-all ${styles.titleTextDecoration === 'underline' ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}
-                        title="Underline">
-                        <Underline size={14} />
-                    </button>
-                    <button onClick={() => { update('titleFontWeight', 'normal'); update('titleFontStyle', 'normal'); update('titleTextDecoration', 'none'); }}
-                        className={`flex-1 flex items-center justify-center rounded text-xs transition-all ${(!styles.titleFontWeight || styles.titleFontWeight === 'normal') && (!styles.titleFontStyle || styles.titleFontStyle === 'normal') && (!styles.titleTextDecoration || styles.titleTextDecoration === 'none') ? 'bg-gray-200 text-gray-700' : 'text-gray-400 hover:text-gray-600'}`}
-                        title="Reset to Normal">
-                        <Minus size={14} />
-                    </button>
-                </div>
-                {/* Preview */}
-                <div className="mt-2 px-3 py-2 bg-white rounded border border-gray-100">
-                    <span className="text-xs text-gray-400">Preview: </span>
-                    <span style={{
-                        fontWeight: styles.titleFontWeight || 'normal',
-                        fontStyle: styles.titleFontStyle || 'normal',
-                        textDecoration: styles.titleTextDecoration || 'none',
-                        textAlign: styles.textAlign || 'left',
-                        fontSize: '14px',
-                        color: styles.textColor || '#1A365D'
-                    }}>Sample Title Text</span>
-                </div>
-            </div>
-
-            {/* Title Font Size */}
-            <div>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                    <AArrowUp size={12} /> Title Size
-                </div>
-                <div className="flex items-center gap-3">
-                    <input type="range" min="20" max="48" step="1" value={styles.titleFontSize || 32}
-                        onChange={e => update('titleFontSize', parseInt(e.target.value))} className="flex-1 h-2 accent-blue-500" />
-                    <span className="text-xs font-bold text-gray-600 bg-white border border-gray-200 px-2 py-1 rounded min-w-[42px] text-center">
-                        {styles.titleFontSize || 32}px
-                    </span>
-                </div>
-            </div>
-
-            {/* Subtitle Font Size */}
-            <div>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                    <AArrowUp size={12} /> Subtitle Size
-                </div>
-                <div className="flex items-center gap-3">
-                    <input type="range" min="12" max="28" step="1" value={styles.subtitleFontSize || 17}
-                        onChange={e => update('subtitleFontSize', parseInt(e.target.value))} className="flex-1 h-2 accent-purple-500" />
-                    <span className="text-xs font-bold text-gray-600 bg-white border border-gray-200 px-2 py-1 rounded min-w-[42px] text-center">
-                        {styles.subtitleFontSize || 17}px
-                    </span>
-                </div>
-            </div>
-
-            {/* Content Font Size */}
-            <div>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                    <AArrowUp size={12} /> Content Size
-                </div>
-                <div className="flex items-center gap-3">
-                    <input type="range" min="12" max="24" step="1" value={styles.contentFontSize || 16}
-                        onChange={e => update('contentFontSize', parseInt(e.target.value))} className="flex-1 h-2 accent-green-500" />
-                    <span className="text-xs font-bold text-gray-600 bg-white border border-gray-200 px-2 py-1 rounded min-w-[42px] text-center">
-                        {styles.contentFontSize || 16}px
-                    </span>
-                </div>
-            </div>
-
-            {/* Box Width */}
-            <div>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                    <Columns size={12} /> Box Width
-                </div>
-                <div className="flex bg-white p-1 rounded-lg border border-gray-200 h-9 gap-0.5">
-                    {[{ v: 'short', label: 'Short' }, { v: 'medium', label: 'Medium' }, { v: 'full', label: 'Full' }].map(({ v, label }) => (
-                        <button key={v} onClick={() => update('boxWidth', v)}
-                            className={`flex-1 flex items-center justify-center rounded text-[11px] font-bold transition-all ${(styles.boxWidth || 'medium') === v ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}>
-                            {label}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Box Position */}
-            <div>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                    <AlignCenter size={12} /> Box Position
-                </div>
-                <div className="flex bg-white p-1 rounded-lg border border-gray-200 h-9 gap-0.5">
-                    {[{ v: 'left', icon: AlignLeft }, { v: 'center', icon: AlignCenter }, { v: 'right', icon: AlignRight }].map(({ v, icon: Icon }) => (
-                        <button key={v} onClick={() => update('boxPosition', v)}
-                            className={`flex-1 flex items-center justify-center rounded text-xs transition-all ${(styles.boxPosition || 'center') === v ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}>
-                            <Icon size={14} />
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Content Position */}
-            <div>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                    <Type size={12} /> Content Position
-                </div>
-                <div className="flex bg-white p-1 rounded-lg border border-gray-200 h-9 gap-0.5">
-                    {[{ v: 'header', label: 'Header' }, { v: 'footer', label: 'Footer' }, { v: 'both', label: 'Both' }].map(({ v, label }) => (
-                        <button key={v} onClick={() => update('contentPosition', v)}
-                            className={`flex-1 flex items-center justify-center rounded text-[11px] font-bold transition-all ${(styles.contentPosition || 'footer') === v ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-gray-600'}`}>
-                            {label}
-                        </button>
-                    ))}
-                </div>
-            </div>
-        </div>
-    );
-};
+const ABOUT_FEATURES = ['cardStyle', 'alignment', 'titleStyle', 'titleSize', 'subtitleSize', 'contentSize', 'boxWidth', 'boxPosition', 'contentPosition'];
 
 // ──────────────────────────────────────────────
 // ITEMS MANAGER — shared items editor
@@ -785,7 +513,7 @@ const AboutManager = () => {
                 <textarea rows={3} value={s.subtitle || ''} onChange={e => updateSection(s.id, { subtitle: e.target.value })} className="input-field" />
                 <p className="text-[10px] text-gray-400 mt-1">Press Enter for new line. Press Enter twice for paragraph gap.</p>
             </div>
-            <InlineStyleControls styles={s.styles || {}} onUpdate={(st) => updateSectionStyles(s.id, st)} />
+            <AppearanceEditor styles={s.styles || {}} onChange={(st) => updateSectionStyles(s.id, st)} colorFields={ABOUT_COLOR_FIELDS} features={ABOUT_FEATURES} />
         </div>
     );
 
@@ -834,7 +562,7 @@ const AboutManager = () => {
                 </div>
             </div>
 
-            <InlineStyleControls styles={s.styles || {}} onUpdate={(st) => updateSectionStyles(s.id, st)} />
+            <AppearanceEditor styles={s.styles || {}} onChange={(st) => updateSectionStyles(s.id, st)} colorFields={ABOUT_COLOR_FIELDS} features={ABOUT_FEATURES} />
         </div>
     );
 
@@ -941,7 +669,7 @@ const AboutManager = () => {
                 )}
             </Droppable>
 
-            <InlineStyleControls styles={s.styles || {}} onUpdate={(st) => updateSectionStyles(s.id, st)} />
+            <AppearanceEditor styles={s.styles || {}} onChange={(st) => updateSectionStyles(s.id, st)} colorFields={ABOUT_COLOR_FIELDS} features={ABOUT_FEATURES} />
         </div>
     );
 
@@ -957,7 +685,7 @@ const AboutManager = () => {
                 <div><label className="label">Subtitle</label><input value={milestone.subtitle || ''} onChange={e => updateMilestone('subtitle', e.target.value)} className="input-field text-amber-700 font-bold" /></div>
                 <div><label className="label">Description</label><textarea rows={4} value={milestone.description || ''} onChange={e => updateMilestone('description', e.target.value)} className="input-field" /></div>
             </div>
-            <InlineStyleControls styles={s.styles || {}} onUpdate={(st) => updateSectionStyles(s.id, st)} />
+            <AppearanceEditor styles={s.styles || {}} onChange={(st) => updateSectionStyles(s.id, st)} colorFields={ABOUT_COLOR_FIELDS} features={ABOUT_FEATURES} />
         </div>
     );
 
@@ -1038,7 +766,7 @@ const AboutManager = () => {
                 </Droppable>
             </div>
 
-            <InlineStyleControls styles={s.styles || {}} onUpdate={(st) => updateSectionStyles(s.id, st)} />
+            <AppearanceEditor styles={s.styles || {}} onChange={(st) => updateSectionStyles(s.id, st)} colorFields={ABOUT_COLOR_FIELDS} features={ABOUT_FEATURES} />
         </div>
     );
 
@@ -1053,15 +781,41 @@ const AboutManager = () => {
                 <div><label className="label">Subtitle</label><input value={s.subtitle || ''} onChange={e => updateSection(s.id, { subtitle: e.target.value })} className="input-field" placeholder="Brief description..." /></div>
 
                 {/* Layout Type */}
-                <div>
-                    <label className="label">Layout Type</label>
-                    <select value={layoutType} onChange={e => updateSectionStyles(s.id, { ...(s.styles || {}), layoutType: e.target.value })} className="input-field">
-                        {LAYOUT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                    </select>
-                </div>
+                <LayoutPicker value={layoutType} onChange={v => updateSectionStyles(s.id, { ...(s.styles || {}), layoutType: v })} />
 
                 {layoutType === 'boxed-group' && (
                     <div><label className="label">Group Header</label><input value={s.groupTitle || ''} onChange={e => updateSection(s.id, { groupTitle: e.target.value })} className="input-field font-bold" placeholder="e.g. STRATEGIC PILLARS" /></div>
+                )}
+
+                {layoutType === 'dialog' && (
+                    <div className="p-4 bg-blue-50 rounded-xl border border-blue-200 space-y-4">
+                        <div className="text-xs font-bold text-blue-600 uppercase tracking-wider">Dialog / Quote Settings</div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="label">Person Name</label>
+                                <input value={s.dialogName || ''} onChange={e => updateSection(s.id, { dialogName: e.target.value })} className="input-field font-bold" placeholder="e.g. John Smith" />
+                            </div>
+                            <div>
+                                <label className="label">Person Role / Title</label>
+                                <input value={s.dialogRole || ''} onChange={e => updateSection(s.id, { dialogRole: e.target.value })} className="input-field" placeholder="e.g. CEO, Company Name" />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="label">Person Photo (optional)</label>
+                            <div className="max-w-[200px]">
+                                <ImageUpload
+                                    value={s.dialogImage || ''}
+                                    onChange={val => updateSection(s.id, { dialogImage: val })}
+                                    aspectRatio="1/1"
+                                    maxSizeMB={2}
+                                    maxWidth={400}
+                                    folder="dialog"
+                                    previewFit="contain"
+                                />
+                            </div>
+                            <p className="text-[10px] text-gray-400 mt-1">Square photo works best. Leave empty for a silhouette placeholder.</p>
+                        </div>
+                    </div>
                 )}
 
                 {/* Content — for standard layout or as additional text */}
@@ -1076,7 +830,7 @@ const AboutManager = () => {
                     <ItemsManager items={s.items || []} onChange={items => updateSection(s.id, { items })} />
                 )}
 
-                <InlineStyleControls styles={s.styles || {}} onUpdate={(st) => updateSectionStyles(s.id, st)} />
+                <AppearanceEditor styles={s.styles || {}} onChange={(st) => updateSectionStyles(s.id, st)} colorFields={ABOUT_COLOR_FIELDS} features={ABOUT_FEATURES} />
             </div>
         );
     };
@@ -1207,22 +961,7 @@ const AboutManager = () => {
                             </div>
 
                             {/* Layout Type */}
-                            <div>
-                                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-2">Layout Type</label>
-                                <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
-                                    {LAYOUT_OPTIONS.map(o => {
-                                        const layoutIcons = { standard: Type, 'mission-card': Target, list: List, grid: Grid3X3, cards: Columns, accordion: ChevronDown, 'boxed-group': LayoutGrid, 'mind-map': Globe, 'icon-group': Star, 'image-grid': Image, 'profile-cards': Users, 'statement-block': FileText };
-                                        const LIcon = layoutIcons[o.value] || Type;
-                                        return (
-                                            <button key={o.value} onClick={() => setNewSectionForm(p => ({ ...p, layoutType: o.value }))}
-                                                className={`p-3 rounded-xl border-2 text-center transition-all ${newSectionForm.layoutType === o.value ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 hover:border-gray-300 text-gray-500'}`}>
-                                                <LIcon size={18} className="mx-auto mb-1" />
-                                                <span className="text-[10px] font-bold block">{o.label}</span>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
+                            <LayoutPicker value={newSectionForm.layoutType} onChange={v => setNewSectionForm(p => ({ ...p, layoutType: v }))} />
 
                             {/* Icon Picker */}
                             <div>

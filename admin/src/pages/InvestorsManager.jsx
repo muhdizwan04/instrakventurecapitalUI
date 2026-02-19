@@ -3,6 +3,7 @@ import { Save, Plus, Trash2, GripVertical, Loader2, Eye } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
+import AppearanceEditor from '../components/AppearanceEditor';
 
 const InvestorsManager = () => {
     const defaultData = {
@@ -200,33 +201,15 @@ const InvestorsManager = () => {
                                             className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
                                         />
                                     </div>
-                                    <div className="border-t border-[var(--border-light)] pt-4 mt-4">
-                                        <h4 className="text-sm font-bold text-[var(--text-secondary)] mb-3">Header style</h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <div>
-                                                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Font colour</label>
-                                                <div className="flex items-center gap-2">
-                                                    <input type="color" value={(formData.pageHero.styles || {}).titleColor || '#FFFFFF'} onChange={(e) => updatePageHeroStyles('titleColor', e.target.value)} className="w-9 h-9 rounded border border-[var(--border-light)] cursor-pointer" />
-                                                    <input type="text" value={(formData.pageHero.styles || {}).titleColor || ''} onChange={(e) => updatePageHeroStyles('titleColor', e.target.value)} className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm font-mono" placeholder="#FFFFFF" />
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Align</label>
-                                                <select value={(formData.pageHero.styles || {}).textAlign || 'center'} onChange={(e) => updatePageHeroStyles('textAlign', e.target.value)} className="w-full px-3 py-2 rounded border border-[var(--border-light)] text-sm bg-white">
-                                                    <option value="left">Left</option>
-                                                    <option value="center">Center</option>
-                                                    <option value="right">Right</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Background colour</label>
-                                                <div className="flex items-center gap-2">
-                                                    <input type="color" value={(formData.pageHero.styles || {}).bgColor || '#0b1120'} onChange={(e) => updatePageHeroStyles('bgColor', e.target.value)} className="w-9 h-9 rounded border border-[var(--border-light)] cursor-pointer" />
-                                                    <input type="text" value={(formData.pageHero.styles || {}).bgColor || ''} onChange={(e) => updatePageHeroStyles('bgColor', e.target.value)} className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm font-mono" placeholder="#0b1120" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <AppearanceEditor
+                                        styles={formData.pageHero.styles || {}}
+                                        onChange={(st) => setFormData(prev => ({ ...prev, pageHero: { ...prev.pageHero, styles: st } }))}
+                                        colorFields={[
+                                            { key: 'titleColor', label: 'Font Colour', default: '#FFFFFF' },
+                                            { key: 'bgColor', label: 'Background', default: '#0b1120' },
+                                        ]}
+                                        features={['alignment']}
+                                    />
                                 </div>
                             </div>
 

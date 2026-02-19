@@ -895,7 +895,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                     height: '280px',
                                     background: isDarkBg ? 'rgba(255,255,255,0.05)' : 'linear-gradient(to bottom, #F8FAFC, #E2E8F0)',
                                     display: 'flex',
-                                    alignItems: 'flex-end',
+                                    alignItems: 'center',
                                     justifyContent: 'center',
                                     position: 'relative',
                                     overflow: 'hidden'
@@ -904,7 +904,9 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                         <img
                                             src={item.image}
                                             alt={item.title}
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', transition: 'transform 0.8s ease' }}
+                                            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top center', transition: 'transform 0.4s ease' }}
+                                            loading="lazy"
+                                            decoding="async"
                                         />
                                     ) : (
                                         <div style={{ textAlign: 'center', paddingBottom: '2rem', opacity: 0.15 }}>
@@ -1033,6 +1035,148 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                         </div>
                     </motion.div>
                 );
+
+            case 'dialog': {
+                const dialogImage = section.dialogImage;
+                const dialogName = section.dialogName || '';
+                const dialogRole = section.dialogRole || '';
+                const bubbleBg = isCardGlass
+                    ? hexToRgba(cardColorHex, 0.85)
+                    : cardColorHex;
+                const bubbleStyle = isCardGlass
+                    ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }
+                    : {};
+                const photoSize = 'clamp(100px, 20vw, 180px)';
+
+                return (
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        style={{ maxWidth: '900px', margin: '0 auto' }}
+                    >
+                        <div style={{
+                            display: 'flex',
+                            gap: 'clamp(1.5rem, 3vw, 2.5rem)',
+                            alignItems: 'flex-start',
+                            flexWrap: 'wrap'
+                        }}>
+                            {/* Person photo / placeholder */}
+                            <div style={{ flexShrink: 0, textAlign: 'center', minWidth: '100px' }}>
+                                <div style={{
+                                    width: photoSize,
+                                    height: photoSize,
+                                    borderRadius: '50%',
+                                    overflow: 'hidden',
+                                    border: `4px solid ${accentColor}`,
+                                    background: isDarkBg ? 'rgba(255,255,255,0.1)' : '#E2E8F0',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    margin: '0 auto'
+                                }}>
+                                    {dialogImage ? (
+                                        <img
+                                            src={dialogImage}
+                                            alt={dialogName}
+                                            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
+                                        />
+                                    ) : (
+                                        <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                                            <circle cx="30" cy="22" r="12" fill={isDarkBg ? 'rgba(255,255,255,0.2)' : '#CBD5E1'} />
+                                            <ellipse cx="30" cy="52" rx="20" ry="14" fill={isDarkBg ? 'rgba(255,255,255,0.2)' : '#CBD5E1'} />
+                                        </svg>
+                                    )}
+                                </div>
+                                {dialogName && (
+                                    <div style={{ marginTop: '0.75rem' }}>
+                                        <div style={{
+                                            fontWeight: 800,
+                                            fontSize: 'clamp(0.9rem, 1.5vw, 1.1rem)',
+                                            color: titleColor,
+                                            letterSpacing: '0.02em'
+                                        }}>{dialogName}</div>
+                                        {dialogRole && (
+                                            <div style={{
+                                                fontSize: 'clamp(0.7rem, 1.2vw, 0.85rem)',
+                                                color: accentColor,
+                                                fontWeight: 600,
+                                                marginTop: '0.15rem'
+                                            }}>{dialogRole}</div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Speech bubble */}
+                            <div style={{
+                                flex: 1,
+                                minWidth: '250px',
+                                position: 'relative',
+                                background: bubbleBg,
+                                borderRadius: '20px',
+                                padding: 'clamp(1.5rem, 3vw, 2.5rem)',
+                                boxShadow: isDarkBg ? 'none' : '0 4px 30px rgba(0,0,0,0.06)',
+                                border: isDarkBg ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(226,232,240,0.8)',
+                                ...bubbleStyle
+                            }}>
+                                {/* Bubble tail pointing to person */}
+                                <div style={{
+                                    position: 'absolute',
+                                    left: '-12px',
+                                    top: '30px',
+                                    width: 0,
+                                    height: 0,
+                                    borderTop: '10px solid transparent',
+                                    borderBottom: '10px solid transparent',
+                                    borderRight: `14px solid ${isCardGlass ? cardColorHex : bubbleBg}`,
+                                    filter: isDarkBg ? 'none' : 'drop-shadow(-2px 0px 2px rgba(0,0,0,0.04))'
+                                }} />
+
+                                {/* Large quote mark */}
+                                <div style={{
+                                    fontSize: 'clamp(3rem, 6vw, 5rem)',
+                                    lineHeight: 0.8,
+                                    fontFamily: 'Georgia, serif',
+                                    color: accentColor,
+                                    opacity: 0.35,
+                                    marginBottom: '0.5rem',
+                                    userSelect: 'none'
+                                }}>{'\u201C'}</div>
+
+                                {content && content.split('\n').map((paragraph, idx) => (
+                                    paragraph.trim() ? (
+                                        <p key={idx} style={{
+                                            fontSize: `${styles.contentFontSize || 16}px`,
+                                            lineHeight: 1.8,
+                                            color: subtitleColor,
+                                            marginBottom: '0.75rem'
+                                        }}>{paragraph}</p>
+                                    ) : <div key={idx} style={{ height: '0.5rem' }} />
+                                ))}
+
+                                {displayItems.length > 0 && (
+                                    <div style={{ marginTop: '1rem' }}>
+                                        {displayItems.map((item, i) => (
+                                            <div key={`${section.id}-dialog-item-${i}`} style={{
+                                                display: 'flex',
+                                                alignItems: 'flex-start',
+                                                gap: '0.5rem',
+                                                marginBottom: '0.5rem'
+                                            }}>
+                                                {getIcon(item.icon)}
+                                                <span style={{ color: itemDescColor, fontSize: `${styles.contentFontSize || 16}px` }}>
+                                                    {item.title}{item.description ? ` — ${item.description}` : ''}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </motion.div>
+                );
+            }
         }
     };
 
@@ -1073,7 +1217,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                 {renderHeader()}
 
                 {/* Header content — above items */}
-                {content && layoutType !== 'standard' && (styles.contentPosition === 'header' || styles.contentPosition === 'both') && (
+                {content && layoutType !== 'standard' && layoutType !== 'dialog' && (styles.contentPosition === 'header' || styles.contentPosition === 'both') && (
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -1099,7 +1243,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                 {renderLayout()}
 
                 {/* Footer content — below items */}
-                {content && layoutType !== 'standard' && layoutType !== 'boxed-group' && layoutType !== 'mind-map' && (styles.contentPosition === 'footer' || styles.contentPosition === 'both' || !styles.contentPosition) && (
+                {content && layoutType !== 'standard' && layoutType !== 'boxed-group' && layoutType !== 'mind-map' && layoutType !== 'dialog' && (styles.contentPosition === 'footer' || styles.contentPosition === 'both' || !styles.contentPosition) && (
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}

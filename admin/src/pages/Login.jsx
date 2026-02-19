@@ -22,13 +22,23 @@ const Login = () => {
             navigate('/');
         } catch (err) {
             console.error('Login error:', err);
-            let message = err.message || 'Invalid email or password';
-            if (message.includes('AbortError') || message.includes('Failed to fetch')) {
-                message = 'Network error: Unable to connect to authentication server.';
-            } else if (message.includes('timed out')) {
-                message = 'Connection timed out. Please check your internet.';
+            const msg = (err.message || '').toLowerCase();
+            const name = (err.name || '').toLowerCase();
+
+            if (msg.includes('invalid login') || msg.includes('invalid email or password')) {
+                setError('Invalid email or password.');
+            } else if (msg.includes('access denied')) {
+                setError(err.message);
+            } else if (
+                msg.includes('network') || msg.includes('load failed') ||
+                msg.includes('failed to fetch') || name.includes('retryablefetch')
+            ) {
+                setError('Unable to reach the server after multiple attempts. Please check your internet connection and try again.');
+            } else if (msg.includes('timed out')) {
+                setError('Connection timed out. The server may be waking up — please try again in a few seconds.');
+            } else {
+                setError(err.message || 'An unexpected error occurred.');
             }
-            setError(message);
         } finally {
             setLoading(false);
         }

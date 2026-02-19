@@ -7,42 +7,42 @@ import toast from 'react-hot-toast';
 const contentCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-// Save operation timeout (15 seconds)
-const SAVE_TIMEOUT = 15000;
+const SAVE_TIMEOUT = 20000;
 
-// Helper to check if error is a network error
 const isNetworkError = (error) => {
     if (!error) return false;
-    const message = error.message?.toLowerCase() || '';
-    const code = error.code?.toLowerCase() || '';
+    const msg = (error.message || '').toLowerCase();
+    const code = (error.code || '').toLowerCase();
     return (
-        message.includes('network') ||
-        message.includes('connection') ||
-        message.includes('failed to fetch') ||
-        message.includes('load failed') ||
+        msg.includes('network') ||
+        msg.includes('connection') ||
+        msg.includes('failed to fetch') ||
+        msg.includes('load failed') ||
+        msg.includes('networkerror') ||
+        msg.includes('timeout') ||
+        msg.includes('aborted') ||
         code === 'network_error' ||
         code === 'fetch_error'
     );
 };
 
-// Retry helper with exponential backoff
-const retryWithBackoff = async (fn, maxRetries = 3, baseDelay = 500) => {
+const warmUp = async () => {
+    try {
+        await supabase.from('site_content').select('id').limit(1).maybeSingle();
+    } catch (_) { /* ignore */ }
+};
+
+const retryWithBackoff = async (fn, { maxRetries = 4, baseDelay = 600, onRetry } = {}) => {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
             return await fn();
         } catch (error) {
-            const isLastAttempt = attempt === maxRetries;
-            const isNetwork = isNetworkError(error);
-            
-            // Only retry network errors
-            if (!isNetwork || isLastAttempt) {
-                throw error;
-            }
-            
-            // Exponential backoff: 500ms, 1000ms, 2000ms
+            if (attempt === maxRetries || !isNetworkError(error)) throw error;
             const delay = baseDelay * Math.pow(2, attempt);
-            console.log(`[Content] Network error, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries + 1})...`);
-            await new Promise(resolve => setTimeout(resolve, delay));
+            console.warn(`[useContent] Retry ${attempt + 1}/${maxRetries} in ${delay}ms – ${error.message}`);
+            onRetry?.(attempt + 1, maxRetries);
+            await new Promise(r => setTimeout(r, delay));
+            if (attempt >= 1) await warmUp();
         }
     }
 };
@@ -102,22 +102,26 @@ export const useContent = (contentId, defaultContent = {}, options = {}) => {
 
     const fetchContent = async () => {
         try {
-            const { data, error } = await supabase
-                .from('site_content')
-                .select('content')
-                .eq('id', contentId)
-                .single();
+            const result = await retryWithBackoff(async () => {
+                const { data, error } = await supabase
+                    .from('site_content')
+                    .select('content')
+                    .eq('id', contentId)
+                    .single();
 
-            if (error && error.code !== 'PGRST116') {
-                console.error('Error fetching content:', error);
-            }
+                if (error && error.code !== 'PGRST116') {
+                    if (isNetworkError(error)) throw error;
+                    console.error('Error fetching content:', error);
+                }
+                return data;
+            }, { maxRetries: 3, baseDelay: 500 });
 
-            if (data?.content && isMountedRef.current) {
-                setContent(data.content);
-                contentCache.set(contentId, { data: data.content, timestamp: Date.now() });
+            if (result?.content && isMountedRef.current) {
+                setContent(result.content);
+                contentCache.set(contentId, { data: result.content, timestamp: Date.now() });
             }
         } catch (err) {
-            console.error('Error:', err);
+            console.error('Error fetching content:', err);
         } finally {
             if (isMountedRef.current) {
                 setLoading(false);
@@ -140,12 +144,10 @@ export const useContent = (contentId, defaultContent = {}, options = {}) => {
             timeoutIdRef.current = null;
         }
         
+        let retryToastId = null;
         try {
-            // DO NOT call supabase.auth.getSession() here!
-            // It causes a deadlock when onAuthStateChange is processing checkAdminStatus.
-            // The Supabase client automatically includes auth headers in every request.
+            await warmUp();
 
-            // Wrap save operation with retry logic for network errors
             const result = await retryWithBackoff(async () => {
                 const savePromise = supabase
                     .from('site_content')
@@ -165,9 +167,18 @@ export const useContent = (contentId, defaultContent = {}, options = {}) => {
                 });
 
                 return await Promise.race([savePromise, timeoutPromise]);
+            }, {
+                maxRetries: 4,
+                baseDelay: 800,
+                onRetry: (attempt, max) => {
+                    if (!silent) {
+                        retryToastId = toast.loading(`Connection issue — retrying (${attempt}/${max})...`, { id: retryToastId || undefined });
+                    }
+                }
             });
+
+            if (retryToastId) toast.dismiss(retryToastId);
             
-            // Clear timeout on success
             if (timeoutIdRef.current) {
                 clearTimeout(timeoutIdRef.current);
                 timeoutIdRef.current = null;
@@ -188,10 +199,11 @@ export const useContent = (contentId, defaultContent = {}, options = {}) => {
         } catch (err) {
             if (!isMountedRef.current) return false;
 
+            if (retryToastId) toast.dismiss(retryToastId);
             console.error('Error saving content:', err);
             if (!silent) {
                 if (isNetworkError(err)) {
-                    toast.error('Network connection lost. Please check your internet and try again.');
+                    toast.error('Network connection lost after multiple retries. Please check your internet and try again.');
                 } else if (err.message?.includes('timed out')) {
                     toast.error('Save timed out. Please check your connection and try again.');
                 } else {

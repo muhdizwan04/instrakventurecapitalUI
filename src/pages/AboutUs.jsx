@@ -425,7 +425,7 @@ const AboutUs = () => {
                                     height: '320px',
                                     background: 'linear-gradient(to bottom, #F8FAFC, #E2E8F0)',
                                     display: 'flex',
-                                    alignItems: 'flex-end',
+                                    alignItems: 'center',
                                     justifyContent: 'center',
                                     position: 'relative',
                                     overflow: 'hidden'
@@ -434,8 +434,10 @@ const AboutUs = () => {
                                         <img
                                             src={d.image}
                                             alt={d.name}
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', transition: 'transform 0.8s ease' }}
-                                            className="group-hover:scale-110"
+                                            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'top center', transition: 'transform 0.4s ease' }}
+                                            className="group-hover:scale-[1.02]"
+                                            loading="lazy"
+                                            decoding="async"
                                         />
                                     ) : (
                                         <div style={{ textAlign: 'center', paddingBottom: '3rem', opacity: 0.2 }}>

@@ -1,9 +1,41 @@
 import React, { useState, useRef } from 'react';
-import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
+import { X, Loader2, Image as ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { supabase } from '../lib/supabase';
 
 const BUCKET = 'site-assets';
+
+const isNetworkError = (err) => {
+    if (!err) return false;
+    const msg = (err.message || '').toLowerCase();
+    const code = (err.code || '').toLowerCase();
+    return (
+        msg.includes('network') || msg.includes('connection') || msg.includes('load failed') ||
+        msg.includes('failed to fetch') || msg.includes('timeout') || msg.includes('aborted') ||
+        code === 'network_error' || code === 'fetch_error'
+    );
+};
+
+const warmUpStorage = async () => {
+    try {
+        await supabase.storage.from(BUCKET).list('', { limit: 1 });
+    } catch (_) { /* ignore */ }
+};
+
+const retryUpload = async (uploadFn, { maxRetries = 4, baseDelay = 800 } = {}) => {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+            return await uploadFn();
+        } catch (err) {
+            if (attempt === maxRetries || !isNetworkError(err)) throw err;
+            const delay = baseDelay * Math.pow(2, attempt);
+            console.warn(`[ImageUpload] Retry ${attempt + 1}/${maxRetries} in ${delay}ms`);
+            toast.loading(`Connection issue — retrying upload (${attempt + 1}/${maxRetries})...`, { id: 'image-upload-retry' });
+            await new Promise(r => setTimeout(r, delay));
+            if (attempt >= 1) await warmUpStorage();
+        }
+    }
+};
 
 /**
  * ImageUpload Component — Supabase Storage Version
@@ -25,7 +57,8 @@ const ImageUpload = ({
     className = '',
     maxSizeMB = 2,
     maxWidth = 1600,
-    folder = 'images'
+    folder = 'images',
+    previewFit = 'cover' // 'cover' | 'contain' — use 'contain' for person photos so face isn't cropped
 }) => {
     const [uploading, setUploading] = useState(false);
     const [dragOver, setDragOver] = useState(false);
@@ -81,29 +114,36 @@ const ImageUpload = ({
         setUploading(true);
 
         try {
+            await warmUpStorage();
+
             const blob = await resizeImage(file);
             const ext = 'webp';
             const filename = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
-            const { data, error } = await supabase.storage
-                .from(BUCKET)
-                .upload(filename, blob, {
-                    contentType: 'image/webp',
-                    cacheControl: '31536000', // 1 year cache
-                    upsert: false
-                });
+            const result = await retryUpload(async () => {
+                const { data, error } = await supabase.storage
+                    .from(BUCKET)
+                    .upload(filename, blob, {
+                        contentType: 'image/webp',
+                        cacheControl: '31536000',
+                        upsert: false
+                    });
+                if (error) throw error;
+                return data;
+            }, { maxRetries: 4, baseDelay: 800 });
 
-            if (error) throw error;
-
-            const { data: urlData } = supabase.storage
-                .from(BUCKET)
-                .getPublicUrl(data.path);
-
+            toast.dismiss('image-upload-retry');
+            const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(result.path);
             onChange(urlData.publicUrl);
             toast.success('Image uploaded!');
         } catch (error) {
+            toast.dismiss('image-upload-retry');
             console.error('Storage upload error:', error);
-            toast.error('Failed to upload image: ' + (error.message || 'Unknown error'));
+            if (isNetworkError(error)) {
+                toast.error('Upload failed after retries. Check your connection and try again.');
+            } else {
+                toast.error('Failed to upload image: ' + (error.message || 'Unknown error'));
+            }
         } finally {
             setUploading(false);
         }
@@ -173,7 +213,8 @@ const ImageUpload = ({
                     <img
                         src={value}
                         alt="Uploaded"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full"
+                        style={{ objectFit: previewFit }}
                     />
                 ) : (
                     <div className="text-center text-gray-400 p-4">

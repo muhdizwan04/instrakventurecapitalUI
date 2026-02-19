@@ -4,6 +4,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
 import ImageUpload from '../components/ImageUpload';
+import AppearanceEditor from '../components/AppearanceEditor';
 
 // Default director images from client assets
 const DEFAULT_IMAGES = {
@@ -100,32 +101,15 @@ const BoardManager = () => {
             <div className="glass-card p-6 mb-8">
                 <h3 className="font-bold text-[var(--accent-primary)] mb-3">Custom font colours</h3>
                 <p className="text-sm text-[var(--text-secondary)] mb-4">Set colours for name, role, and bio on the public Board of Directors section. Leave empty to use the site default.</p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Name</label>
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-lg border-2 border-[var(--border-light)] shrink-0 flex items-center justify-center text-xs font-bold" style={{ background: styleColors.nameColor || '#0b1120', color: styleColors.nameColor && (styleColors.nameColor.toLowerCase() === '#ffffff' || styleColors.nameColor.toLowerCase() === '#fff') ? '#333' : '#fff' }}>Aa</div>
-                            <input type="color" value={styleColors.nameColor || '#0b1120'} onChange={(e) => setStyleColors(prev => ({ ...prev, nameColor: e.target.value }))} className="h-10 w-12 rounded border border-[var(--border-light)] cursor-pointer" />
-                            <input type="text" value={styleColors.nameColor || ''} onChange={(e) => setStyleColors(prev => ({ ...prev, nameColor: e.target.value }))} className="input-field text-sm flex-1" placeholder="#0b1120" />
-                        </div>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Role</label>
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-lg border-2 border-[var(--border-light)] shrink-0 flex items-center justify-center text-xs font-bold" style={{ background: styleColors.roleColor || '#b8860b', color: '#fff' }}>Aa</div>
-                            <input type="color" value={styleColors.roleColor || '#b8860b'} onChange={(e) => setStyleColors(prev => ({ ...prev, roleColor: e.target.value }))} className="h-10 w-12 rounded border border-[var(--border-light)] cursor-pointer" />
-                            <input type="text" value={styleColors.roleColor || ''} onChange={(e) => setStyleColors(prev => ({ ...prev, roleColor: e.target.value }))} className="input-field text-sm flex-1" placeholder="#b8860b" />
-                        </div>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Bio</label>
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-lg border-2 border-[var(--border-light)] shrink-0 flex items-center justify-center text-xs font-bold" style={{ background: styleColors.bioColor || '#64748b', color: '#fff' }}>Aa</div>
-                            <input type="color" value={styleColors.bioColor || '#64748b'} onChange={(e) => setStyleColors(prev => ({ ...prev, bioColor: e.target.value }))} className="h-10 w-12 rounded border border-[var(--border-light)] cursor-pointer" />
-                            <input type="text" value={styleColors.bioColor || ''} onChange={(e) => setStyleColors(prev => ({ ...prev, bioColor: e.target.value }))} className="input-field text-sm flex-1" placeholder="#64748b" />
-                        </div>
-                    </div>
-                </div>
+                <AppearanceEditor
+                    styles={styleColors}
+                    onChange={(st) => setStyleColors(st)}
+                    colorFields={[
+                        { key: 'nameColor', label: 'Name', default: '#0b1120' },
+                        { key: 'roleColor', label: 'Role', default: '#b8860b' },
+                        { key: 'bioColor', label: 'Bio', default: '#64748b' },
+                    ]}
+                />
             </div>
 
             <div className="grid grid-cols-1  gap-8">

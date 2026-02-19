@@ -4,6 +4,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
 import ImageUpload from '../components/ImageUpload';
+import AppearanceEditor from '../components/AppearanceEditor';
 
 const FooterManager = () => {
     const defaultData = {
@@ -190,63 +191,18 @@ const FooterManager = () => {
                     </div>
 
                     {/* Footer appearance – text and background colours */}
-                    <div className="border-t border-[var(--border-light)] pt-6 mt-6">
-                        <h4 className="text-sm font-bold text-[var(--text-secondary)] mb-3">Footer appearance</h4>
-                        <div className="space-y-3">
-                            <div>
-                                <label className="block text-xs text-[var(--text-muted)] mb-1">Footer background colour</label>
-                                <div className="flex gap-2">
-                                    <input
-                                        type="color"
-                                        value={footerData.styles?.footerBgColor || '#FAFBFC'}
-                                        onChange={(e) => updateStyle('footerBgColor', e.target.value)}
-                                        className="w-10 h-10 rounded border border-[var(--border-light)] cursor-pointer"
-                                    />
-                                    <input
-                                        type="text"
-                                        value={footerData.styles?.footerBgColor || ''}
-                                        onChange={(e) => updateStyle('footerBgColor', e.target.value)}
-                                        className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm font-mono"
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-xs text-[var(--text-muted)] mb-1">Company description text colour</label>
-                                <div className="flex gap-2">
-                                    <input type="color" value={footerData.styles?.descriptionTextColor || '#4A5568'} onChange={(e) => updateStyle('descriptionTextColor', e.target.value)} className="w-10 h-10 rounded border cursor-pointer" />
-                                    <input type="text" value={footerData.styles?.descriptionTextColor || ''} onChange={(e) => updateStyle('descriptionTextColor', e.target.value)} className="flex-1 px-3 py-2 rounded border text-sm font-mono" />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-xs text-[var(--text-muted)] mb-1">Official office address text colour</label>
-                                <div className="flex gap-2">
-                                    <input type="color" value={footerData.styles?.addressTextColor || '#4A5568'} onChange={(e) => updateStyle('addressTextColor', e.target.value)} className="w-10 h-10 rounded border cursor-pointer" />
-                                    <input type="text" value={footerData.styles?.addressTextColor || ''} onChange={(e) => updateStyle('addressTextColor', e.target.value)} className="flex-1 px-3 py-2 rounded border text-sm font-mono" />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-xs text-[var(--text-muted)] mb-1">Phone number text colour</label>
-                                <div className="flex gap-2">
-                                    <input type="color" value={footerData.styles?.phoneTextColor || '#4A5568'} onChange={(e) => updateStyle('phoneTextColor', e.target.value)} className="w-10 h-10 rounded border cursor-pointer" />
-                                    <input type="text" value={footerData.styles?.phoneTextColor || ''} onChange={(e) => updateStyle('phoneTextColor', e.target.value)} className="flex-1 px-3 py-2 rounded border text-sm font-mono" />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-xs text-[var(--text-muted)] mb-1">Email address text colour</label>
-                                <div className="flex gap-2">
-                                    <input type="color" value={footerData.styles?.emailTextColor || '#1A365D'} onChange={(e) => updateStyle('emailTextColor', e.target.value)} className="w-10 h-10 rounded border cursor-pointer" />
-                                    <input type="text" value={footerData.styles?.emailTextColor || ''} onChange={(e) => updateStyle('emailTextColor', e.target.value)} className="flex-1 px-3 py-2 rounded border text-sm font-mono" />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-xs text-[var(--text-muted)] mb-1">Quick links text colour</label>
-                                <div className="flex gap-2">
-                                    <input type="color" value={footerData.styles?.quickLinkTextColor || '#4A5568'} onChange={(e) => updateStyle('quickLinkTextColor', e.target.value)} className="w-10 h-10 rounded border cursor-pointer" />
-                                    <input type="text" value={footerData.styles?.quickLinkTextColor || ''} onChange={(e) => updateStyle('quickLinkTextColor', e.target.value)} className="flex-1 px-3 py-2 rounded border text-sm font-mono" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <AppearanceEditor
+                        styles={footerData.styles || {}}
+                        onChange={(st) => setFooterData(prev => ({ ...prev, styles: st }))}
+                        colorFields={[
+                            { key: 'footerBgColor', label: 'Background', default: '#FAFBFC' },
+                            { key: 'descriptionTextColor', label: 'Description Text', default: '#4A5568' },
+                            { key: 'addressTextColor', label: 'Address Text', default: '#4A5568' },
+                            { key: 'phoneTextColor', label: 'Phone Text', default: '#4A5568' },
+                            { key: 'emailTextColor', label: 'Email Text', default: '#1A365D' },
+                            { key: 'quickLinkTextColor', label: 'Quick Links Text', default: '#4A5568' },
+                        ]}
+                    />
                 </div>
 
                 {/* Right Column */}

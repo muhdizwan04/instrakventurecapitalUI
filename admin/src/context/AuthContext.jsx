@@ -1,64 +1,73 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { toast } from 'react-hot-toast';
 
 const AuthContext = createContext();
 
+const AUTH_SAFETY_TIMEOUT_MS = 18000; // 18s when session may be slow (e.g. after tab switch)
+
+const isNetworkError = (error) => {
+    if (!error) return false;
+    const msg = (error.message || '').toLowerCase();
+    const name = (error.name || '').toLowerCase();
+    return (
+        msg.includes('network') ||
+        msg.includes('failed to fetch') ||
+        msg.includes('load failed') ||
+        msg.includes('connection') ||
+        name.includes('retryablefetch')
+    );
+};
+
+async function retryAsync(fn, { retries = 3, baseDelay = 800, shouldRetry = isNetworkError } = {}) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+            return await fn();
+        } catch (err) {
+            if (attempt === retries || !shouldRetry(err)) throw err;
+            const delay = baseDelay * Math.pow(2, attempt);
+            console.log(`[Auth] Retrying in ${delay}ms (attempt ${attempt + 1}/${retries})...`);
+            await new Promise(r => setTimeout(r, delay));
+        }
+    }
+}
+
+async function warmUpSupabase() {
+    try {
+        await supabase.from('site_content').select('id', { count: 'exact', head: true });
+    } catch (_) { /* ignore — just a wake-up ping */ }
+}
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const [loading, setLoading] = useState(true);
+    const hadLocalSessionRef = useRef(false);
 
-    // Check if the logged-in user is in the admin_users whitelist
-    const checkAdminStatus = async (userEmail) => {
-        console.log('[Auth] Checking admin status for:', userEmail);
+    const checkAdminStatus = useCallback(async (userEmail) => {
         if (!userEmail) {
             setIsAdmin(false);
             return false;
         }
 
         try {
-            // Use RPC to avoid RLS recursion on admin_users table
-            const { data, error } = await supabase.rpc('is_admin');
+            const result = await retryAsync(async () => {
+                const { data, error } = await supabase.rpc('is_admin');
+                if (error) throw error;
+                return data;
+            }, { retries: 2, baseDelay: 600 });
 
-            if (error) {
-                // Don't log network errors as errors - they're expected when connection is lost
-                const isNetworkError = error.message?.toLowerCase().includes('network') || 
-                                     error.message?.toLowerCase().includes('connection') ||
-                                     error.message?.toLowerCase().includes('failed to fetch');
-                
-                if (!isNetworkError) {
-                    console.error('[Auth] Error checking admin status via RPC:', error);
-                }
-                // Keep current admin status on network errors (don't reset to false)
-                // This prevents kicking out admins when connection is temporarily lost
-                if (!isNetworkError) {
-                    setIsAdmin(false);
-                }
-                return false;
-            }
-
-            console.log('[Auth] Admin check result (RPC):', data);
-
-            const adminStatus = !!data;
+            const adminStatus = !!result;
             setIsAdmin(adminStatus);
             return adminStatus;
         } catch (err) {
-            // Don't log network errors as errors
-            const isNetworkError = err.message?.toLowerCase().includes('network') || 
-                                 err.message?.toLowerCase().includes('connection') ||
-                                 err.message?.toLowerCase().includes('failed to fetch');
-            
-            if (!isNetworkError) {
-                console.error('[Auth] Admin check panic:', err);
-            }
-            // Keep current admin status on network errors
-            if (!isNetworkError) {
+            if (!isNetworkError(err)) {
+                console.error('[Auth] Admin check failed:', err);
                 setIsAdmin(false);
             }
             return false;
         }
-    };
+    }, []);
 
     useEffect(() => {
         // OPTIMIZATION: Check for local session immediately to unblock guests
@@ -78,6 +87,7 @@ export const AuthProvider = ({ children }) => {
             console.warn('[Admin Auth] Local storage check failed', e);
         }
 
+        hadLocalSessionRef.current = !!hasLocalSession;
         if (!hasLocalSession) {
             setLoading(false);
         }
@@ -98,21 +108,17 @@ export const AuthProvider = ({ children }) => {
             }
         }
 
-        // Get initial session
-        supabase.auth.getSession().then(async ({ data: { session } }) => {
+        retryAsync(
+            () => supabase.auth.getSession(),
+            { retries: 2, baseDelay: 800 }
+        ).then(async ({ data: { session } }) => {
             setUser(session?.user ?? null);
-            // If early check was for the same email, await it.
-            // However, if early check FAILED (returned false), but we have a valid session,
-            // we should TRY AGAIN with the verified session token to be sure.
             if (session?.user?.email) {
-                // await checkAdminStatus(session.user.email);
-                // Temporarily disabling automatic check to debug network issues
-                 await checkAdminStatus(session.user.email);
+                await checkAdminStatus(session.user.email);
             }
             setLoading(false);
         }).catch(err => {
             console.error('[Admin Auth] getSession failed:', err);
-            toast.error('Unable to verify login session. You may be working offline.');
             setLoading(false);
         });
 
@@ -133,34 +139,68 @@ export const AuthProvider = ({ children }) => {
         return () => subscription.unsubscribe();
     }, []);
 
-    // Safety timeout: If auth check hangs for more than 2.5 seconds, stop loading
+    // When user returns to the tab: if we have no user but had a local session, re-check session (request may have been throttled while tab was in background).
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setLoading((currentLoading) => {
-                if (currentLoading) {
-                    console.warn('[Admin Auth] Auth check timed out, forcing loading=false');
-                    toast.error('Authentication check timed out. Proceeding in offline mode.');
-                    return false;
+        const onVisibilityChange = () => {
+            if (document.visibilityState !== 'visible') return;
+            if (user !== null) return; // already have session
+            if (!hadLocalSessionRef.current) return;
+            retryAsync(() => supabase.auth.getSession(), { retries: 2, baseDelay: 600 })
+                .then(({ data: { session } }) => {
+                    if (session?.user) {
+                        setUser(session.user);
+                        checkAdminStatus(session.user.email);
+                        setLoading(false);
+                    }
+                })
+                .catch(() => {});
+        };
+        document.addEventListener('visibilitychange', onVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+    }, [user, checkAdminStatus]);
+
+    // Safety timeout: give getSession time to complete (e.g. after tab resume). If still no user and we had local session, try once more before giving up.
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            setLoading((cur) => {
+                if (!cur) return cur;
+                // If we had a stored session but getSession hasn't resolved, try one more time (tab may have been in background)
+                if (hadLocalSessionRef.current) {
+                    retryAsync(() => supabase.auth.getSession(), { retries: 1, baseDelay: 1000 })
+                        .then(({ data: { session } }) => {
+                            setUser(session?.user ?? null);
+                            if (session?.user?.email) {
+                                checkAdminStatus(session.user.email);
+                            }
+                        })
+                        .catch(() => {
+                            console.warn('[Admin Auth] Auth check timed out, forcing loading=false');
+                        })
+                        .finally(() => setLoading(false));
+                    return true; // keep loading until the retry settles
                 }
-                return currentLoading;
+                console.warn('[Admin Auth] Auth check timed out, forcing loading=false');
+                return false;
             });
-        }, 2500);
+        }, AUTH_SAFETY_TIMEOUT_MS);
         return () => clearTimeout(timer);
-    }, []);
+    }, [checkAdminStatus]);
 
     const login = async (email, password) => {
-        // Race the login against the timeout
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password
-        });
-        
-        if (error) throw error;
+        // Wake up Supabase if it's been idle (free-tier cold start)
+        await warmUpSupabase();
 
-        // After successful auth, verify this user is an admin
+        const data = await retryAsync(async () => {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
+            if (error) throw error;
+            return data;
+        }, { retries: 3, baseDelay: 1000 });
+
         const adminStatus = await checkAdminStatus(email);
         if (!adminStatus) {
-            // Not an admin — sign them out immediately
             await supabase.auth.signOut();
             throw new Error('Access denied. This account is not authorized to access the admin panel.');
         }

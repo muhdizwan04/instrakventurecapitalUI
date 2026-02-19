@@ -4,6 +4,7 @@ import { Plus, Save, Trash2, Loader2, GripVertical, Newspaper, Calendar, Link as
 import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
 import ImageUpload from '../components/ImageUpload';
+import AppearanceEditor from '../components/AppearanceEditor';
 
 const makeId = (prefix) => `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
@@ -371,43 +372,14 @@ const NewsManager = () => {
                                 </div>
 
                                 {/* Block styles */}
-                                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                                    <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Appearance</div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Background</label>
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    type="color"
-                                                    value={activeBlock.styles?.bgColor || '#FFFFFF'}
-                                                    onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), bgColor: e.target.value })}
-                                                    className="w-9 h-9 rounded border cursor-pointer"
-                                                />
-                                                <input
-                                                    value={activeBlock.styles?.bgColor || '#FFFFFF'}
-                                                    onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), bgColor: e.target.value })}
-                                                    className="input-field text-xs font-mono"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Text</label>
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    type="color"
-                                                    value={activeBlock.styles?.textColor || '#1A365D'}
-                                                    onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), textColor: e.target.value })}
-                                                    className="w-9 h-9 rounded border cursor-pointer"
-                                                />
-                                                <input
-                                                    value={activeBlock.styles?.textColor || '#1A365D'}
-                                                    onChange={e => updateBlockStyles(activeBlock.id, { ...(activeBlock.styles || {}), textColor: e.target.value })}
-                                                    className="input-field text-xs font-mono"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <AppearanceEditor
+                                    styles={activeBlock.styles || {}}
+                                    onChange={(st) => updateBlockStyles(activeBlock.id, st)}
+                                    colorFields={[
+                                        { key: 'bgColor', label: 'Background', default: '#FFFFFF' },
+                                        { key: 'textColor', label: 'Text', default: '#1A365D' },
+                                    ]}
+                                />
 
                                 {/* Block font & alignment (title, subtitle, button) */}
                                 <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">

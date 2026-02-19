@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Save, Plus, Trash2, GripVertical, Loader2, MapPin, Phone, Mail, Layout } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useContent } from '../hooks/useContent';
+import AppearanceEditor from '../components/AppearanceEditor';
 
 const ContactManager = () => {
     const defaultData = {
@@ -235,58 +236,16 @@ const ContactManager = () => {
                                 className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
                             />
                         </div>
-                        <div className="border-t border-[var(--border-light)] pt-4 mt-4">
-                            <h4 className="text-xs font-bold text-[var(--text-secondary)] uppercase mb-3">Hero style</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                                <div>
-                                    <label className="block text-xs text-[var(--text-secondary)] mb-1">Title colour</label>
-                                    <div className="flex gap-2 items-center">
-                                        <input
-                                            type="color"
-                                            value={(formData.pageHero.styles || {}).titleColor || '#FFFFFF'}
-                                            onChange={(e) => updateHeroStyle('titleColor', e.target.value)}
-                                            className="shrink-0 rounded border border-[var(--border-light)] cursor-pointer bg-transparent"
-                                            style={{ width: 40, height: 40, padding: 2 }}
-                                        />
-                                        <input type="text" value={(formData.pageHero.styles || {}).titleColor || ''} onChange={(e) => updateHeroStyle('titleColor', e.target.value)} className="flex-1 min-w-0 px-2 py-1 rounded border text-xs font-mono" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-[var(--text-secondary)] mb-1">Subtitle colour</label>
-                                    <div className="flex gap-2 items-center">
-                                        <input
-                                            type="color"
-                                            value={(formData.pageHero.styles || {}).subtitleColor || '#e2e8f0'}
-                                            onChange={(e) => updateHeroStyle('subtitleColor', e.target.value)}
-                                            className="shrink-0 rounded border border-[var(--border-light)] cursor-pointer bg-transparent"
-                                            style={{ width: 40, height: 40, padding: 2 }}
-                                        />
-                                        <input type="text" value={(formData.pageHero.styles || {}).subtitleColor || ''} onChange={(e) => updateHeroStyle('subtitleColor', e.target.value)} className="flex-1 min-w-0 px-2 py-1 rounded border text-xs font-mono" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-[var(--text-secondary)] mb-1">Align</label>
-                                    <select value={(formData.pageHero.styles || {}).textAlign || 'center'} onChange={(e) => updateHeroStyle('textAlign', e.target.value)} className="w-full px-2 py-1.5 rounded border text-sm bg-white">
-                                        <option value="left">Left</option>
-                                        <option value="center">Center</option>
-                                        <option value="right">Right</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-[var(--text-secondary)] mb-1">Background colour</label>
-                                    <div className="flex gap-2 items-center">
-                                        <input
-                                            type="color"
-                                            value={(formData.pageHero.styles || {}).bgColor || '#0b1120'}
-                                            onChange={(e) => updateHeroStyle('bgColor', e.target.value)}
-                                            className="shrink-0 rounded border border-[var(--border-light)] cursor-pointer bg-transparent"
-                                            style={{ width: 40, height: 40, padding: 2 }}
-                                        />
-                                        <input type="text" value={(formData.pageHero.styles || {}).bgColor || ''} onChange={(e) => updateHeroStyle('bgColor', e.target.value)} className="flex-1 min-w-0 px-2 py-1 rounded border text-xs font-mono" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <AppearanceEditor
+                            styles={formData.pageHero.styles || {}}
+                            onChange={(st) => setFormData(prev => ({ ...prev, pageHero: { ...prev.pageHero, styles: st } }))}
+                            colorFields={[
+                                { key: 'titleColor', label: 'Title Colour', default: '#FFFFFF' },
+                                { key: 'subtitleColor', label: 'Subtitle Colour', default: '#e2e8f0' },
+                                { key: 'bgColor', label: 'Background', default: '#0b1120' },
+                            ]}
+                            features={['alignment']}
+                        />
                     </div>
                 </div>
 

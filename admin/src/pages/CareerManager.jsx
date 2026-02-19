@@ -3,6 +3,7 @@ import { Plus, Edit2, Trash2, Search, Briefcase, ArrowLeft, ArrowRight, Save, Ma
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
+import AppearanceEditor from '../components/AppearanceEditor';
 
 
 const CareerManager = () => {
@@ -369,33 +370,15 @@ const CareerManager = () => {
                         </div>
                     )}
 
-                    <div className="border-t border-gray-200 pt-4 mt-4">
-                        <h4 className="text-sm font-bold text-gray-600 mb-3">Section style (font colour, align, background)</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label className="label text-xs">Font colour</label>
-                                <div className="flex items-center gap-2">
-                                    <input type="color" value={(section.styles || {}).textColor || '#1A365D'} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), textColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" />
-                                    <input type="text" value={(section.styles || {}).textColor || ''} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), textColor: e.target.value } })} className="input-field text-xs flex-1 py-1.5 font-mono" placeholder="#1A365D" />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="label text-xs">Align</label>
-                                <select value={(section.styles || {}).textAlign || 'center'} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), textAlign: e.target.value } })} className="input-field text-sm w-full py-1.5 bg-white">
-                                    <option value="left">Left</option>
-                                    <option value="center">Center</option>
-                                    <option value="right">Right</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="label text-xs">Background colour</label>
-                                <div className="flex items-center gap-2">
-                                    <input type="color" value={(section.styles || {}).bgColor || '#FFFFFF'} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), bgColor: e.target.value } })} className="w-8 h-8 rounded border cursor-pointer" />
-                                    <input type="text" value={(section.styles || {}).bgColor || ''} onChange={(e) => updateSection(section.id, { styles: { ...(section.styles || {}), bgColor: e.target.value } })} className="input-field text-xs flex-1 py-1.5 font-mono" placeholder="#FFFFFF" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <AppearanceEditor
+                        styles={section.styles || {}}
+                        onChange={(st) => updateSection(section.id, { styles: st })}
+                        colorFields={[
+                            { key: 'textColor', label: 'Font Colour', default: '#1A365D' },
+                            { key: 'bgColor', label: 'Background', default: '#FFFFFF' },
+                        ]}
+                        features={['alignment']}
+                    />
                 </div>
             </div>
         );

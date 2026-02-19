@@ -270,7 +270,7 @@ const AboutUs = () => {
                 id="mission"
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
+                viewport={{ once: true, margin: "-100px", amount: 0.1 }}
                 variants={sectionVariants}
                 style={{
                     padding: '100px 0',
@@ -351,7 +351,7 @@ const AboutUs = () => {
                 id="board"
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
+                viewport={{ once: true, margin: "-100px", amount: 0.1 }}
                 variants={sectionVariants}
                 style={{
                     padding: '100px 0',
@@ -481,7 +481,7 @@ const AboutUs = () => {
                 id="partners"
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
+                viewport={{ once: true, margin: "-100px", amount: 0.1 }}
                 variants={sectionVariants}
                 style={{
                     paddingBottom: '100px',
@@ -591,7 +591,7 @@ const AboutUs = () => {
                 key={section.id}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
+                viewport={{ once: true, margin: "-100px", amount: 0.1 }}
                 variants={sectionVariants}
                 style={{
                     scrollMarginTop: '80px'

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { CheckCircle2, ChevronDown, ChevronUp, Image as ImageIcon, Building2, ArrowRight } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 
@@ -8,6 +8,17 @@ const UniversalSection = ({ section, containerClass = "" }) => {
     const layoutType = styles.layoutType || 'standard';
 
     const [openItems, setOpenItems] = useState({});
+    const sectionRef = useRef(null);
+    const [isInitiallyVisible, setIsInitiallyVisible] = useState(false);
+
+    // Check if section is already visible on mount (above the fold)
+    useEffect(() => {
+        if (sectionRef.current) {
+            const rect = sectionRef.current.getBoundingClientRect();
+            const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+            setIsInitiallyVisible(isVisible);
+        }
+    }, []);
 
     const toggleAccordion = (index) => {
         setOpenItems(prev => ({
@@ -74,8 +85,10 @@ const UniversalSection = ({ section, containerClass = "" }) => {
             {title && (
                 <motion.h2
                     initial={{ opacity: 0, y: 20 }}
+                    animate={isInitiallyVisible ? { opacity: 1, y: 0 } : undefined}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
+                    viewport={{ once: true, amount: 0.1 }}
+                    transition={{ duration: 0.6 }}
                     style={{
                         fontSize: styles.titleFontSize ? `${styles.titleFontSize}px` : 'clamp(1.75rem, 4vw, 2.5rem)',
                         fontFamily: 'var(--font-heading)',
@@ -95,8 +108,9 @@ const UniversalSection = ({ section, containerClass = "" }) => {
             {sectionLabel && (
                 <motion.h6
                     initial={{ opacity: 0, y: 10 }}
+                    animate={isInitiallyVisible ? { opacity: 1, y: 0 } : undefined}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
+                    viewport={{ once: true, amount: 0.1 }}
                     transition={{ delay: 0.05 }}
                     style={{
                         color: '#D4AF37',
@@ -115,8 +129,9 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                 subtitle && (
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
+                        animate={isInitiallyVisible ? { opacity: 1, y: 0 } : undefined}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        viewport={{ once: true, amount: 0.1 }}
                         transition={{ delay: 0.1 }}
                         style={{
                             fontSize: `${styles.subtitleFontSize || 17}px`,
@@ -135,8 +150,9 @@ const UniversalSection = ({ section, containerClass = "" }) => {
             {/* Gold accent line */}
             <motion.div
                 initial={{ scaleX: 0 }}
+                animate={isInitiallyVisible ? { scaleX: 1 } : undefined}
                 whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
+                viewport={{ once: true, amount: 0.1 }}
                 transition={{ delay: 0.2, duration: 0.6 }}
                 style={{
                     height: '3px',
@@ -152,12 +168,99 @@ const UniversalSection = ({ section, containerClass = "" }) => {
 
     const renderLayout = () => {
         switch (layoutType) {
+            case 'hero':
+                return (
+                    <motion.section
+                        ref={sectionRef}
+                        id={section.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={isInitiallyVisible ? { opacity: 1, y: 0 } : undefined}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.1 }}
+                        transition={{ duration: 0.6 }}
+                        style={{
+                            padding: 'clamp(5rem, 10vw, 8rem) clamp(1rem, 4vw, 2rem)',
+                            textAlign: styles.textAlign || 'center',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            backgroundColor: styles.bgColor || 'transparent',
+                            backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : 'none',
+                            backgroundSize: styles.backgroundSize || 'cover',
+                            backgroundPosition: 'center'
+                        }}
+                    >
+                        {styles.backgroundImage && (
+                            <div style={{ position: 'absolute', inset: 0, backgroundColor: 'black', opacity: styles.overlayOpacity || 0.4, zIndex: 0, pointerEvents: 'none' }} />
+                        )}
+                        <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
+                        {title && (
+                            <motion.h1
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={isInitiallyVisible ? { opacity: 1, y: 0 } : undefined}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, amount: 0.1 }}
+                                transition={{ duration: 0.6, delay: 0.1 }}
+                                style={{
+                                    fontSize: styles.titleFontSize ? `${styles.titleFontSize}px` : 'clamp(2.5rem, 6vw, 4rem)',
+                                    fontFamily: 'var(--font-heading)',
+                                    fontWeight: styles.titleFontWeight || 800,
+                                    fontStyle: styles.titleFontStyle || 'normal',
+                                    textDecoration: styles.titleTextDecoration || 'none',
+                                    color: titleColor,
+                                    marginBottom: subtitle ? '1.5rem' : '0',
+                                    lineHeight: 1.2,
+                                    letterSpacing: '-0.02em'
+                                }}
+                            >
+                                {title}
+                            </motion.h1>
+                        )}
+                        {subtitle && (
+                            <motion.p
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={isInitiallyVisible ? { opacity: 1, y: 0 } : undefined}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, amount: 0.1 }}
+                                transition={{ duration: 0.6, delay: 0.1 }}
+                                style={{
+                                    fontSize: styles.subtitleFontSize ? `${styles.subtitleFontSize}px` : 'clamp(1.125rem, 2vw, 1.5rem)',
+                                    color: subtitleColor,
+                                    lineHeight: 1.7,
+                                    maxWidth: '800px',
+                                    margin: subtitle ? '0 auto' : '0',
+                                    whiteSpace: 'pre-line'
+                                }}
+                            >
+                                {subtitle}
+                            </motion.p>
+                        )}
+                        {content && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={isInitiallyVisible ? { opacity: 1, y: 0 } : undefined}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, amount: 0.1 }}
+                                transition={{ delay: 0.2 }}
+                                style={{
+                                    fontSize: `${styles.contentFontSize || 18}px`,
+                                    lineHeight: 1.8,
+                                    color: subtitleColor,
+                                    maxWidth: '900px',
+                                    margin: '2rem auto 0',
+                                    whiteSpace: 'pre-line'
+                                }}
+                                dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
+                            />
+                        )}
+                        </div>
+                    </motion.section>
+                );
             case 'mission-card':
                 return (
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        viewport={{ once: true, amount: 0.1 }}
                         className="luxury-border-gold"
                         style={{
                             borderRadius: '24px',
@@ -218,7 +321,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                 key={`${section.id || 'section'}-${layoutType}-${i}-${item.id || item.title || i}`}
                                 initial={{ opacity: 0, x: -20 }}
                                 whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
+                                viewport={{ once: true, amount: 0.1 }}
                                 transition={{ delay: i * 0.08 }}
                                 style={{
                                     display: 'flex',
@@ -281,7 +384,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                 key={`${section.id || 'section'}-${layoutType}-${i}-${item.id || item.title || i}`}
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
+                                viewport={{ once: true, amount: 0.1 }}
                                 transition={{ delay: i * 0.1 }}
                                 whileHover={{ y: -6, boxShadow: '0 12px 35px rgba(10, 61, 98, 0.12)' }}
                                 style={{
@@ -349,7 +452,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                 key={`${section.id || 'section'}-${layoutType}-${i}-${item.id || item.title || i}`}
                                 initial={{ opacity: 0, y: 25 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
+                                viewport={{ once: true, amount: 0.1 }}
                                 transition={{ delay: i * 0.12 }}
                                 whileHover={{ y: -8, boxShadow: '0 20px 50px rgba(10, 61, 98, 0.15)' }}
                                 style={{
@@ -426,7 +529,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                 key={`${section.id || 'section'}-${layoutType}-${i}-${item.id || item.title || i}`}
                                 initial={{ opacity: 0, y: 10 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
+                                viewport={{ once: true, amount: 0.1 }}
                                 transition={{ delay: i * 0.08 }}
                                 style={{
                                     background: cardBg,
@@ -516,7 +619,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                 key={`${section.id || 'section'}-${layoutType}-${i}-${item.id || item.title || i}`}
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
+                                viewport={{ once: true, amount: 0.1 }}
                                 transition={{ delay: i * 0.1 }}
                                 whileHover={{ y: -4, boxShadow: '0 8px 25px rgba(10, 61, 98, 0.1)' }}
                                 style={{
@@ -576,7 +679,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
+                            viewport={{ once: true, amount: 0.1 }}
                             style={{
                                 textAlign: 'center',
                                 marginBottom: '2rem'
@@ -613,7 +716,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                     key={i}
                                     initial={{ opacity: 0, y: 15 }}
                                     whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
+                                    viewport={{ once: true, amount: 0.1 }}
                                     transition={{ delay: i * 0.1 }}
                                     whileHover={{ scale: 1.03, boxShadow: '0 8px 25px rgba(10, 61, 98, 0.1)' }}
                                     style={{
@@ -648,7 +751,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
+                            viewport={{ once: true, amount: 0.1 }}
                             style={{
                                 background: 'white',
                                 border: '1px solid rgba(10, 61, 98, 0.1)',
@@ -765,7 +868,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                 key={`${section.id || 'section'}-${layoutType}-${i}-${item.id || item.title || i}`}
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ once: true }}
+                                viewport={{ once: true, amount: 0.1 }}
                                 transition={{ delay: i * 0.1 }}
                                 whileHover={{ y: -6, boxShadow: '0 15px 40px rgba(10, 61, 98, 0.15)' }}
                                 style={{
@@ -842,7 +945,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                             <motion.div
                                 initial={{ opacity: 0, y: 15 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
+                                viewport={{ once: true, amount: 0.1 }}
                                 style={{
                                     padding: '2.5rem',
                                     background: cardBg,
@@ -878,7 +981,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                 key={`${section.id || 'section'}-${layoutType}-${i}-${item.id || item.title || i}`}
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
+                                viewport={{ once: true, amount: 0.1 }}
                                 transition={{ delay: i * 0.1 }}
                                 className="group"
                                 style={{
@@ -949,7 +1052,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        viewport={{ once: true, amount: 0.1 }}
                         style={{
                             position: 'relative',
                             background: isDarkBg ? 'rgba(255,255,255,0.06)' : '#FFFFFF',
@@ -1009,7 +1112,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                     <motion.div
                                         initial={{ opacity: 0, y: 15 }}
                                         whileInView={{ opacity: 1, y: 0 }}
-                                        viewport={{ once: true }}
+                                        viewport={{ once: true, amount: 0.1 }}
                                         transition={{ delay: i * 0.15 }}
                                     >
                                         <h3 style={{
@@ -1052,7 +1155,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        viewport={{ once: true, amount: 0.1 }}
                         style={{ maxWidth: '900px', margin: '0 auto' }}
                     >
                         <div style={{
@@ -1180,10 +1283,21 @@ const UniversalSection = ({ section, containerClass = "" }) => {
         }
     };
 
+    // Hero layout renders its own section wrapper
+    if (layoutType === 'hero') {
+        return renderLayout();
+    }
+
     return (
-        <section
+        <motion.section
+            ref={sectionRef}
             id={section.id}
             className={containerClass}
+            initial={{ opacity: 0 }}
+            animate={isInitiallyVisible ? { opacity: 1 } : undefined}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.3 }}
             style={{
                 padding: 'clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem)',
                 position: 'relative',
@@ -1214,14 +1328,15 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                 position: 'relative',
                 zIndex: 10
             }}>
-                {renderHeader()}
+                {layoutType !== 'hero' && renderHeader()}
 
                 {/* Header content — above items */}
                 {content && layoutType !== 'standard' && layoutType !== 'dialog' && (styles.contentPosition === 'header' || styles.contentPosition === 'both') && (
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
+                        animate={isInitiallyVisible ? { opacity: 1, y: 0 } : undefined}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        viewport={{ once: true, amount: 0.1 }}
                         style={{
                             textAlign: styles.contentAlign || 'center',
                             maxWidth: '800px',
@@ -1246,8 +1361,9 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                 {content && layoutType !== 'standard' && layoutType !== 'boxed-group' && layoutType !== 'mind-map' && layoutType !== 'dialog' && (styles.contentPosition === 'footer' || styles.contentPosition === 'both' || !styles.contentPosition) && (
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
+                        animate={isInitiallyVisible ? { opacity: 1, y: 0 } : undefined}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        viewport={{ once: true, amount: 0.1 }}
                         transition={{ delay: 0.3 }}
                         style={{
                             textAlign: styles.contentAlign || 'center',
@@ -1268,7 +1384,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                     </motion.div>
                 )}
             </div>
-        </section>
+        </motion.section>
     );
 };
 

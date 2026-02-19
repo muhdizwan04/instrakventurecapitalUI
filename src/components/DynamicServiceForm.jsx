@@ -8,13 +8,8 @@ import { useFormSubmit } from '../hooks/useFormSubmit';
  * or falls back to a provided static form.
  */
 const DynamicServiceForm = ({ serviceId, fallbackForm, title }) => {
-    // Fetch all service pages content
     const { content, loading: contentLoading } = usePageContent('service_pages', { pages: [] });
-
-    // Find the current service
     const service = content?.pages?.find(p => p.id === serviceId);
-
-    // Use the dynamic form submit hook
     const { submitForm, loading: submitLoading } = useFormSubmit(serviceId);
 
     const handleDynamicSubmit = async (formData) => {
@@ -29,7 +24,6 @@ const DynamicServiceForm = ({ serviceId, fallbackForm, title }) => {
         );
     }
 
-    // If dynamic fields are configured and not empty, use DynamicForm
     if (service?.fields && service.fields.length > 0) {
         return (
             <DynamicForm
@@ -37,11 +31,11 @@ const DynamicServiceForm = ({ serviceId, fallbackForm, title }) => {
                 title={title || `Inquiry for ${service.title}`}
                 onSubmit={handleDynamicSubmit}
                 loading={submitLoading}
+                formStyles={service.formStyles || {}}
             />
         );
     }
 
-    // Fallback to the original hardcoded form
     return fallbackForm;
 };
 

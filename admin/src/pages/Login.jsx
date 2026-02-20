@@ -16,7 +16,6 @@ const Login = () => {
         e.preventDefault();
         setError('');
         setLoading(true);
-
         try {
             await login(email, password);
             navigate('/');
@@ -24,18 +23,14 @@ const Login = () => {
             console.error('Login error:', err);
             const msg = (err.message || '').toLowerCase();
             const name = (err.name || '').toLowerCase();
-
             if (msg.includes('invalid login') || msg.includes('invalid email or password')) {
                 setError('Invalid email or password.');
             } else if (msg.includes('access denied')) {
                 setError(err.message);
-            } else if (
-                msg.includes('network') || msg.includes('load failed') ||
-                msg.includes('failed to fetch') || name.includes('retryablefetch')
-            ) {
-                setError('Unable to reach the server after multiple attempts. Please check your internet connection and try again.');
+            } else if (msg.includes('network') || msg.includes('load failed') || msg.includes('failed to fetch') || name.includes('retryablefetch')) {
+                setError('Unable to reach the server. Check your connection and try again.');
             } else if (msg.includes('timed out')) {
-                setError('Connection timed out. The server may be waking up — please try again in a few seconds.');
+                setError('Connection timed out. Please try again.');
             } else {
                 setError(err.message || 'An unexpected error occurred.');
             }
@@ -45,136 +40,98 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[var(--bg-secondary)]">
-            {/* Premium Background Accents */}
-            <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
-                <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[var(--accent-secondary)] opacity-[0.03] blur-[100px]" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[var(--accent-primary)] opacity-[0.05] blur-[100px]" />
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#F5F6F8] px-4 py-12">
+            {/* Subtle background depth */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-[#1A365D]/[0.03]" />
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-[#1A365D]/[0.02]" />
             </div>
 
-            <div className="w-full max-w-md p-8 relative z-10">
+            <div className="w-full max-w-[420px] relative z-10">
+                <div className="bg-white rounded-2xl border border-gray-200/80 shadow-lg shadow-gray-200/50 overflow-hidden">
+                    {/* Accent */}
+                    <div className="h-1 w-full bg-gradient-to-r from-[#1A365D] to-[#0A3D62]" />
+                    <div className="p-8 sm:p-10">
+                        <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Welcome back</h1>
+                        <p className="text-gray-500 text-sm mt-1 mb-8">Sign in to the management portal</p>
 
-
-                {/* Login Card */}
-                <div className="glass-card shadow-2xl border-white/50 animate-in fade-in zoom-in duration-500">
-                    <div className="mb-8">
-                        <h2 className="text-2xl font-heading font-bold text-[var(--text-primary)] mb-2">Welcome Back</h2>
-                        <p className="text-sm text-[var(--text-secondary)]">Please sign in to access the management portal.</p>
-                    </div>
-                    
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg text-red-700 text-sm flex items-center gap-3">
-                            <div className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
-                            {error}
-                        </div>
-                    )}
-
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] ml-1">
-                                Email Address
-                            </label>
-                            <div className="relative group">
-                                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-primary)] transition-colors" size={18} />
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="admin@instrak.com"
-                                    className="w-full pl-12 pr-4 py-3.5 bg-[var(--bg-tertiary)] border-transparent focus:bg-white border focus:border-[var(--accent-primary)] rounded-xl text-[var(--text-primary)] placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-[var(--accent-primary)]/5 transition-all outline-none"
-                                    required
-                                />
+                        {error && (
+                            <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-700 text-sm flex items-center gap-3">
+                                <div className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
+                                {error}
                             </div>
-                        </div>
+                        )}
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] ml-1">
-                                Password
-                            </label>
-                            <div className="relative group">
-                                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--accent-primary)] transition-colors" size={18} />
-                                <input
-                                    type={showPassword ? 'text' : 'password'}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="••••••••"
-                                    className="w-full pl-12 pr-12 py-3.5 bg-[var(--bg-tertiary)] border-transparent focus:bg-white border focus:border-[var(--accent-primary)] rounded-xl text-[var(--text-primary)] placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-[var(--accent-primary)]/5 transition-all outline-none"
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-colors"
-                                >
-                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                </button>
+                        <form onSubmit={handleSubmit} className="space-y-5">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Email address</label>
+                                <div className="relative">
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                                    <input
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="admin@instrak.com"
+                                        className="w-full pl-12 pr-4 py-3 bg-gray-50/80 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1A365D]/20 focus:border-[#1A365D] focus:bg-white transition-colors"
+                                        required
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="pt-2">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                                <div className="relative">
+                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="••••••••"
+                                        className="w-full pl-12 pr-12 py-3 bg-gray-50/80 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1A365D]/20 focus:border-[#1A365D] focus:bg-white transition-colors"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                                    >
+                                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                    </button>
+                                </div>
+                            </div>
+
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-4 bg-gradient-to-r from-[#0A3D62] to-[#1E6F9F] text-white font-bold rounded-xl hover:shadow-2xl hover:shadow-[#0A3D62]/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 active:scale-[0.98]"
+                                className="w-full py-3.5 bg-[#1A365D] text-white text-sm font-medium rounded-xl hover:bg-[#0F2942] focus:outline-none focus:ring-2 focus:ring-[#1A365D] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2.5 transition-colors shadow-sm"
                             >
                                 {loading ? (
                                     <>
                                         <Loader2 className="animate-spin" size={20} />
-                                        <span>Authenticating...</span>
+                                        <span>Signing in...</span>
                                     </>
                                 ) : (
                                     <>
-                                        <span>Sign Into Portal</span>
-                                        <ShieldCheck size={18} className="opacity-70" />
+                                        <span>Sign in</span>
+                                        <ShieldCheck size={18} className="opacity-80" />
                                     </>
                                 )}
                             </button>
-                        </div>
-                    </form>
-                </div>
-
-                {/* Footer */}
-                <div className="mt-10 text-center animate-in fade-in slide-in-from-bottom duration-1000">
-                    <p className="text-[var(--text-muted)] text-sm font-medium">
-                        © 2026 Instrak Venture Capital Berhad
-                    </p>
-                    <div className="mt-4 flex items-center justify-center gap-4 text-xs font-bold text-[var(--accent-primary)] opacity-50">
-                        <span className="hover:opacity-100 cursor-pointer transition-opacity">Privacy Policy</span>
-                        <span className="w-1 h-1 rounded-full bg-[var(--text-muted)]" />
-                        <span className="hover:opacity-100 cursor-pointer transition-opacity">Security Standards</span>
+                        </form>
                     </div>
                 </div>
-            </div>
 
-            <style>{`
-                .glass-card {
-                    background: white;
-                    border: 1px solid rgba(0,0,0,0.05);
-                    border-radius: 24px;
-                    padding: 3rem;
-                    position: relative;
-                    overflow: hidden;
-                }
-                .glass-card::after {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 5px;
-                    background: linear-gradient(90deg, #0A3D62, #C9A227);
-                }
-                @font-face {
-                  font-family: 'Playfair Display';
-                  font-style: normal;
-                  font-weight: 400;
-                  font-display: swap;
-                  src: url(https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD7K6E1n0beWSM3N6knrv-P7VatZfOTX6.woff2) format('woff2');
-                }
-            `}</style>
+                <p className="mt-8 text-center text-sm text-gray-500">
+                    © 2026 Instrak Venture Capital Berhad
+                </p>
+                <p className="mt-2 text-center text-xs text-gray-400">
+                    <button type="button" className="hover:text-gray-600 transition-colors">Privacy Policy</button>
+                    <span className="mx-2">·</span>
+                    <button type="button" className="hover:text-gray-600 transition-colors">Security</button>
+                </p>
+            </div>
         </div>
     );
 };
 
 export default Login;
-

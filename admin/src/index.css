@@ -14,11 +14,20 @@
   }
 
   .btn-save {
-    @apply flex items-center gap-2 px-6 py-2.5 bg-[#22c55e] text-white rounded-lg hover:bg-[#16a34a] transition-all shadow-md font-medium disabled:opacity-50;
+    @apply flex items-center gap-2 px-6 py-2.5 text-white rounded-xl font-medium disabled:opacity-50 transition-all duration-300;
+    background: linear-gradient(135deg, #0A3D62 0%, #1E6F9F 100%);
+    box-shadow: 0 4px 14px rgba(10, 61, 98, 0.25);
+  }
+  .btn-save:hover:not(:disabled) {
+    box-shadow: 0 8px 24px rgba(10, 61, 98, 0.35);
   }
 
   .btn-add {
-    @apply flex items-center gap-2 px-4 py-2.5 bg-[#1A365D] text-white rounded-lg hover:bg-[#08304e] transition-all shadow-md font-medium;
+    @apply flex items-center gap-2 px-4 py-2.5 text-white rounded-xl transition-all shadow-md font-medium;
+    background: linear-gradient(135deg, #0A3D62 0%, #1E6F9F 100%);
+  }
+  .btn-add:hover {
+    box-shadow: 0 8px 24px rgba(10, 61, 98, 0.3);
   }
 }
 
@@ -165,33 +174,30 @@ ul {
 .glass-card {
   background: var(--bg-primary);
   border: 1px solid var(--border-light);
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 2rem;
   transition: var(--transition-slow);
   position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
+/* Theme strip: navy → gold (match login card) */
 .glass-card::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 3px;
-  background: var(--gradient-gold);
-  border-radius: 16px 16px 0 0;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  height: 4px;
+  background: linear-gradient(90deg, #0A3D62 0%, #1A365D 50%, #C9A227 100%);
+  border-radius: 20px 20px 0 0;
+  opacity: 1;
 }
 
 .glass-card:hover {
-  transform: translateY(-8px);
   box-shadow: var(--shadow-lg);
-  border-color: rgba(201, 162, 39, 0.3);
-}
-
-.glass-card:hover::before {
-  opacity: 1;
+  border-color: rgba(10, 61, 98, 0.12);
 }
 
 /* Button Styles - Premium */

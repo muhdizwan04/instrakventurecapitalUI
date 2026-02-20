@@ -1,133 +1,132 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Plus, Trash2, GripVertical, Loader2, Eye } from 'lucide-react';
+import { Save, Plus, Trash2, GripVertical, Loader2, LayoutTemplate, FileText, Briefcase } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
 import AppearanceEditor from '../components/AppearanceEditor';
+import FormBuilder from '../components/FormBuilder';
+import FormAppearanceEditor, { FORM_DEFAULTS } from '../components/FormAppearanceEditor';
+
+// Default content (same shape as frontend expects)
+const defaultPageHero = {
+    title: 'FOR INVESTORS',
+    subtitle: '',
+    styles: { titleColor: '#FFFFFF', textAlign: 'center', bgColor: '#1A365D' }
+};
+const defaultMainContent = {
+    headline: 'The Institutional Advantage',
+    description: 'Instrak Venture Capital Berhad offers qualified investors access to a curated portfolio of high-growth industrial assets in the ASEAN region. Our approach is defined by rigorous due diligence and institutional-grade governance.'
+};
+const defaultPortfolioSection = {
+    title: 'Institutional Portfolio',
+    items: [
+        { id: 'port-1', text: 'Energy & Infrastructure' },
+        { id: 'port-2', text: 'Advanced Manufacturing' },
+        { id: 'port-3', text: 'Logistics & Distribution' }
+    ]
+};
+const defaultFormSettings = {
+    title: 'Investment Inquiry',
+    submitButtonText: 'Submit Inquiry',
+    interestOptions: ['Investment', 'Loan', 'Partnership', 'Others']
+};
+
+const defaultFields = [
+    { id: 'firstName', label: 'First Name', type: 'text', required: true, width: 'half', placeholder: 'First Name' },
+    { id: 'lastName', label: 'Last Name', type: 'text', required: true, width: 'half', placeholder: 'Last Name' },
+    { id: 'email', label: 'Email Address', type: 'email', required: true, width: 'half', placeholder: 'Email Address' },
+    { id: 'phone', label: 'Phone Number', type: 'tel', required: true, width: 'half', placeholder: 'Phone Number' },
+    { id: 'companyName', label: 'Company Name', type: 'text', required: true, width: 'half', placeholder: 'Company Name' },
+    { id: 'companyWebsite', label: 'Company Website', type: 'text', required: false, width: 'half', placeholder: 'Company Website' },
+    { id: 'interestType', label: 'Nature of Interest', type: 'select', required: true, width: 'full', options: ['Investment', 'Loan', 'Partnership', 'Others'] },
+    { id: 'message', label: 'Other Details / Message', type: 'textarea', required: false, width: 'full', placeholder: 'How can we assist you today?' }
+];
+
+const defaultData = {
+    pageHero: defaultPageHero,
+    mainContent: defaultMainContent,
+    portfolioSection: defaultPortfolioSection,
+    formSettings: defaultFormSettings,
+    fields: defaultFields,
+    formStyles: { ...FORM_DEFAULTS, sectionTitle: defaultFormSettings.title, btnLabel: defaultFormSettings.submitButtonText }
+};
+
+const CONTENT_SECTIONS = [
+    { id: 'hero', label: 'Page Hero', icon: LayoutTemplate },
+    { id: 'main', label: 'Main Content', icon: FileText },
+    { id: 'portfolio', label: 'Portfolio Section', icon: Briefcase }
+];
 
 const InvestorsManager = () => {
-    const defaultData = {
-        pageHero: {
-            title: 'For Investors',
-            subtitle: 'Exclusive opportunities for institutional growth and wealth preservation through strategic capital.',
-            styles: { titleColor: '#FFFFFF', textAlign: 'center', bgColor: '#0b1120' }
-        },
-        mainContent: {
-            headline: 'The Institutional Advantage',
-            description: 'Instrak Venture Capital Berhad offers qualified investors access to a curated portfolio of high-growth industrial assets in the ASEAN region. Our approach is defined by rigorous due diligence and institutional-grade governance.'
-        },
-        portfolioSection: {
-            title: 'Institutional Portfolio',
-            items: [
-                { id: 'port-1', text: 'Energy & Infrastructure' },
-                { id: 'port-2', text: 'Advanced Manufacturing' },
-                { id: 'port-3', text: 'Logistics & Distribution' }
-            ]
-        },
-        formSettings: {
-            title: 'Investment Inquiry',
-            submitButtonText: 'Submit Inquiry',
-            interestOptions: ['Investment', 'Loan', 'Partnership', 'Others']
-        }
-    };
-
     const { content, loading, saving, saveContent } = useContent('investors', defaultData);
     const [formData, setFormData] = useState(defaultData);
     const [activeTab, setActiveTab] = useState('content');
+    const [activeSection, setActiveSection] = useState('hero');
 
     useEffect(() => {
         if (content && !loading) {
-            setFormData({ ...defaultData, ...content });
+            const merged = {
+                ...defaultData,
+                ...content,
+                pageHero: { ...defaultPageHero, ...content.pageHero },
+                mainContent: { ...defaultMainContent, ...content.mainContent },
+                portfolioSection: { ...defaultPortfolioSection, ...content.portfolioSection },
+                formSettings: { ...defaultFormSettings, ...content.formSettings },
+                fields: Array.isArray(content.fields) && content.fields.length ? content.fields : defaultFields,
+                formStyles: { ...FORM_DEFAULTS, ...content.formStyles }
+            };
+            setFormData(merged);
         }
     }, [content, loading]);
 
+    // Sync formSettings from formStyles + fields (for frontend backward compatibility)
+    const buildPayload = () => {
+        const payload = { ...formData };
+        if (payload.formStyles) {
+            payload.formSettings = {
+                ...payload.formSettings,
+                title: payload.formStyles.sectionTitle || payload.formSettings?.title || defaultFormSettings.title,
+                submitButtonText: payload.formStyles.btnLabel || payload.formSettings?.submitButtonText || defaultFormSettings.submitButtonText,
+                interestOptions: (payload.fields || []).find(f => f.id === 'interestType' && f.type === 'select')?.options || payload.formSettings?.interestOptions || defaultFormSettings.interestOptions
+            };
+        }
+        return payload;
+    };
+
     const handleSave = async () => {
-        await saveContent(formData);
+        const ok = await saveContent(buildPayload());
+        if (ok) toast.success('Investors page saved.');
     };
 
-    const updatePageHeroStyles = (key, value) => {
-        setFormData(prev => ({
-            ...prev,
-            pageHero: {
-                ...prev.pageHero,
-                styles: { ...(prev.pageHero.styles || {}), [key]: value }
-            }
-        }));
-    };
-
-    // Portfolio item handlers
+    // Portfolio
     const handleAddPortfolioItem = () => {
         const newItem = { id: `port-${Date.now()}`, text: 'New Portfolio Item' };
         setFormData(prev => ({
             ...prev,
-            portfolioSection: {
-                ...prev.portfolioSection,
-                items: [...prev.portfolioSection.items, newItem]
-            }
+            portfolioSection: { ...prev.portfolioSection, items: [...prev.portfolioSection.items, newItem] }
         }));
     };
-
     const handleUpdatePortfolioItem = (id, value) => {
         setFormData(prev => ({
             ...prev,
             portfolioSection: {
                 ...prev.portfolioSection,
-                items: prev.portfolioSection.items.map(item =>
-                    item.id === id ? { ...item, text: value } : item
-                )
+                items: prev.portfolioSection.items.map(item => (item.id === id ? { ...item, text: value } : item))
             }
         }));
     };
-
     const handleDeletePortfolioItem = (id) => {
         setFormData(prev => ({
             ...prev,
-            portfolioSection: {
-                ...prev.portfolioSection,
-                items: prev.portfolioSection.items.filter(item => item.id !== id)
-            }
+            portfolioSection: { ...prev.portfolioSection, items: prev.portfolioSection.items.filter(item => item.id !== id) }
         }));
     };
-
-    const handleDragEnd = (result) => {
+    const handlePortfolioDragEnd = (result) => {
         if (!result.destination) return;
         const items = Array.from(formData.portfolioSection.items);
-        const [reorderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reorderedItem);
-        setFormData(prev => ({
-            ...prev,
-            portfolioSection: { ...prev.portfolioSection, items }
-        }));
-    };
-
-    // Interest options handlers
-    const handleAddInterestOption = () => {
-        setFormData(prev => ({
-            ...prev,
-            formSettings: {
-                ...prev.formSettings,
-                interestOptions: [...prev.formSettings.interestOptions, 'New Option']
-            }
-        }));
-    };
-
-    const handleUpdateInterestOption = (index, value) => {
-        const options = [...formData.formSettings.interestOptions];
-        options[index] = value;
-        setFormData(prev => ({
-            ...prev,
-            formSettings: { ...prev.formSettings, interestOptions: options }
-        }));
-    };
-
-    const handleDeleteInterestOption = (index) => {
-        setFormData(prev => ({
-            ...prev,
-            formSettings: {
-                ...prev.formSettings,
-                interestOptions: prev.formSettings.interestOptions.filter((_, i) => i !== index)
-            }
-        }));
+        const [reordered] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, reordered);
+        setFormData(prev => ({ ...prev, portfolioSection: { ...prev.portfolioSection, items } }));
     };
 
     if (loading) {
@@ -139,34 +138,35 @@ const InvestorsManager = () => {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
+        <div className="flex flex-col w-full" style={{ height: 'calc(100vh - 56px - 48px)', overflow: 'hidden' }}>
+            {/* Action row — same pattern as About / Service */}
+            <div className="shrink-0 flex items-center justify-between bg-white px-4 py-2 border-b border-gray-100">
                 <div>
-                    <h1 className="text-3xl font-heading text-[var(--accent-primary)] mb-2">Investors Page Manager</h1>
-                    <p className="text-[var(--text-secondary)]">Manage the "For Investors" page content and form settings.</p>
+                    <h1 className="text-sm font-bold text-gray-700 tracking-wide uppercase">Investors Page Manager</h1>
+                    <p className="text-xs text-gray-500">Manage the &quot;For Investors&quot; page content and form.</p>
                 </div>
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="btn-save"
+                    className="flex items-center gap-2 px-4 py-1.5 bg-[#22c55e] text-white rounded-lg hover:bg-[#16a34a] text-xs font-bold disabled:opacity-50 shadow-md transition-all"
                 >
-                    {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-                    <span>{saving ? 'Saving...' : 'Save Changes'}</span>
+                    {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                    {saving ? 'Saving...' : 'Save All'}
                 </button>
             </div>
 
-            {/* Tabs */}
-            <div className="flex border-b border-[var(--border-light)]">
+            {/* Tabs: Page Content | Form */}
+            <div className="shrink-0 flex border-b border-gray-200 bg-white">
                 {[
                     { id: 'content', label: 'Page Content' },
-                    { id: 'form', label: 'Form Settings' }
+                    { id: 'form', label: 'Form' }
                 ].map(tab => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`px-6 py-3 font-medium transition-colors border-b-2 ${activeTab === tab.id
-                                ? 'border-[var(--accent-primary)] text-[var(--accent-primary)]'
-                                : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                        className={`px-6 py-3 text-sm font-bold border-b-2 transition-colors ${activeTab === tab.id
+                            ? 'border-[var(--accent-primary)] text-[var(--accent-primary)]'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                     >
                         {tab.label}
@@ -174,188 +174,173 @@ const InvestorsManager = () => {
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-                {/* Left Column - Editor */}
-                <div className=" space-y-6">
-                    {activeTab === 'content' && (
-                        <>
-                            {/* Page Hero */}
-                            <div className="glass-card p-6 border-l-4 border-l-blue-600">
-                                <h3 className="font-bold text-[var(--accent-primary)] mb-4">Page Hero</h3>
+            {/* Page Content tab: section list + editor (like AboutManager) */}
+            {activeTab === 'content' && (
+                <>
+                    <div className="shrink-0 bg-white border-b border-gray-200">
+                        <div className="flex gap-1 px-2 py-1.5">
+                            {CONTENT_SECTIONS.map(s => (
+                                <button
+                                    key={s.id}
+                                    onClick={() => setActiveSection(s.id)}
+                                    className={`flex items-center gap-1.5 px-3 py-2 rounded-t-lg text-xs font-bold transition-all
+                                        ${activeSection === s.id ? 'bg-white border border-b-white text-blue-700 shadow-sm z-10 -mb-px' : 'bg-gray-100 text-gray-500 hover:bg-gray-200 border border-transparent'}`}
+                                >
+                                    <s.icon size={14} />
+                                    <span>{s.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="flex-1 min-h-0 overflow-y-auto bg-gray-50/50 px-4 py-5">
+                        {activeSection === 'hero' && (
+                            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm max-w-3xl">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="p-2 bg-white border rounded-lg text-blue-700"><LayoutTemplate size={20} /></div>
+                                    <div>
+                                        <h2 className="text-lg font-bold text-gray-800">Page Hero</h2>
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Hero section</span>
+                                    </div>
+                                </div>
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Title</label>
+                                        <label className="label">Title</label>
                                         <input
-                                            type="text"
                                             value={formData.pageHero.title}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, pageHero: { ...prev.pageHero, title: e.target.value } }))}
-                                            className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
+                                            onChange={e => setFormData(prev => ({ ...prev, pageHero: { ...prev.pageHero, title: e.target.value } }))}
+                                            className="input-field font-bold"
+                                            placeholder="e.g. FOR INVESTORS"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Subtitle</label>
+                                        <label className="label">Subtitle</label>
                                         <textarea
                                             rows={2}
-                                            value={formData.pageHero.subtitle}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, pageHero: { ...prev.pageHero, subtitle: e.target.value } }))}
-                                            className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
+                                            value={formData.pageHero.subtitle || ''}
+                                            onChange={e => setFormData(prev => ({ ...prev, pageHero: { ...prev.pageHero, subtitle: e.target.value } }))}
+                                            className="input-field"
+                                            placeholder="Optional subtitle"
                                         />
                                     </div>
                                     <AppearanceEditor
                                         styles={formData.pageHero.styles || {}}
-                                        onChange={(st) => setFormData(prev => ({ ...prev, pageHero: { ...prev.pageHero, styles: st } }))}
+                                        onChange={st => setFormData(prev => ({ ...prev, pageHero: { ...prev.pageHero, styles: st } }))}
                                         colorFields={[
                                             { key: 'titleColor', label: 'Font Colour', default: '#FFFFFF' },
-                                            { key: 'bgColor', label: 'Background', default: '#0b1120' },
+                                            { key: 'bgColor', label: 'Background', default: '#1A365D' }
                                         ]}
                                         features={['alignment']}
                                     />
                                 </div>
                             </div>
-
-                            {/* Main Content */}
-                            <div className="glass-card p-6 border-l-4 border-l-green-600">
-                                <h3 className="font-bold text-[var(--accent-primary)] mb-4">Main Content</h3>
+                        )}
+                        {activeSection === 'main' && (
+                            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm max-w-3xl">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="p-2 bg-white border rounded-lg text-blue-700"><FileText size={20} /></div>
+                                    <div>
+                                        <h2 className="text-lg font-bold text-gray-800">Main Content</h2>
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Intro block</span>
+                                    </div>
+                                </div>
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Headline</label>
+                                        <label className="label">Headline</label>
                                         <input
-                                            type="text"
                                             value={formData.mainContent.headline}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, mainContent: { ...prev.mainContent, headline: e.target.value } }))}
-                                            className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
+                                            onChange={e => setFormData(prev => ({ ...prev, mainContent: { ...prev.mainContent, headline: e.target.value } }))}
+                                            className="input-field font-bold"
+                                            placeholder="e.g. The Institutional Advantage"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Description</label>
+                                        <label className="label">Description</label>
                                         <textarea
-                                            rows={4}
+                                            rows={6}
                                             value={formData.mainContent.description}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, mainContent: { ...prev.mainContent, description: e.target.value } }))}
-                                            className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
+                                            onChange={e => setFormData(prev => ({ ...prev, mainContent: { ...prev.mainContent, description: e.target.value } }))}
+                                            className="input-field text-sm"
+                                            placeholder="Main paragraph..."
                                         />
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Portfolio Items */}
-                            <div className="glass-card p-6 border-l-4 border-l-[#B8860B]">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h3 className="font-bold text-[var(--accent-primary)]">Portfolio Items</h3>
-                                    <button
-                                        onClick={handleAddPortfolioItem}
-                                        className="btn-add px-3 py-1.5 text-xs"
-                                    >
-                                        <Plus size={14} />
-                                        Add Item
-                                    </button>
-                                </div>
-                                <div className="mb-4">
-                                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Section Title</label>
-                                    <input
-                                        type="text"
-                                        value={formData.portfolioSection.title}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, portfolioSection: { ...prev.portfolioSection, title: e.target.value } }))}
-                                        className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
-                                    />
-                                </div>
-                                <DragDropContext onDragEnd={handleDragEnd}>
-                                    <Droppable droppableId="portfolio-items">
-                                        {(provided) => (
-                                            <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
-                                                {formData.portfolioSection.items.map((item, index) => (
-                                                    <Draggable key={item.id} draggableId={item.id} index={index}>
-                                                        {(provided, snapshot) => (
-                                                            <div
-                                                                ref={provided.innerRef}
-                                                                {...provided.draggableProps}
-                                                                className={`flex items-center gap-3 p-3 bg-[var(--bg-tertiary)] rounded-lg ${snapshot.isDragging ? 'shadow-lg' : ''}`}
-                                                            >
-                                                                <div {...provided.dragHandleProps} className="text-gray-400 hover:text-gray-600 cursor-grab">
-                                                                    <GripVertical size={16} />
-                                                                </div>
-                                                                <input
-                                                                    type="text"
-                                                                    value={item.text}
-                                                                    onChange={(e) => handleUpdatePortfolioItem(item.id, e.target.value)}
-                                                                    className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm"
-                                                                />
-                                                                <button
-                                                                    onClick={() => handleDeletePortfolioItem(item.id)}
-                                                                    className="p-1.5 text-gray-400 hover:text-red-500"
-                                                                >
-                                                                    <Trash2 size={16} />
-                                                                </button>
-                                                            </div>
-                                                        )}
-                                                    </Draggable>
-                                                ))}
-                                                {provided.placeholder}
-                                            </div>
-                                        )}
-                                    </Droppable>
-                                </DragDropContext>
-                            </div>
-                        </>
-                    )}
-
-                    {activeTab === 'form' && (
-                        <div className="glass-card p-6">
-                            <h3 className="font-bold text-[var(--accent-primary)] mb-4">Form Settings</h3>
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Form Title</label>
-                                    <input
-                                        type="text"
-                                        value={formData.formSettings.title}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, formSettings: { ...prev.formSettings, title: e.target.value } }))}
-                                        className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Submit Button Text</label>
-                                    <input
-                                        type="text"
-                                        value={formData.formSettings.submitButtonText}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, formSettings: { ...prev.formSettings, submitButtonText: e.target.value } }))}
-                                        className="w-full px-4 py-3 rounded-lg border border-[var(--border-light)] focus:ring-2 focus:ring-[var(--accent-primary)] outline-none"
-                                    />
-                                </div>
-                                <div>
-                                    <div className="flex justify-between items-center mb-2">
-                                        <label className="block text-sm font-medium text-[var(--text-secondary)]">Interest Options (Dropdown)</label>
-                                        <button
-                                            onClick={handleAddInterestOption}
-                                            className="btn-add px-3 py-1.5 text-xs"
-                                        >
-                                            <Plus size={14} />
-                                            Add
-                                        </button>
+                        )}
+                        {activeSection === 'portfolio' && (
+                            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm max-w-3xl">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="p-2 bg-white border rounded-lg text-blue-700"><Briefcase size={20} /></div>
+                                    <div>
+                                        <h2 className="text-lg font-bold text-gray-800">Portfolio Section</h2>
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">List of portfolio items</span>
                                     </div>
-                                    <div className="space-y-2">
-                                        {formData.formSettings.interestOptions.map((option, index) => (
-                                            <div key={index} className="flex items-center gap-2">
-                                                <input
-                                                    type="text"
-                                                    value={option}
-                                                    onChange={(e) => handleUpdateInterestOption(index, e.target.value)}
-                                                    className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm"
-                                                />
-                                                <button
-                                                    onClick={() => handleDeleteInterestOption(index)}
-                                                    className="p-1.5 text-gray-400 hover:text-red-500"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
-                                        ))}
+                                </div>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="label">Section Title</label>
+                                        <input
+                                            value={formData.portfolioSection.title}
+                                            onChange={e => setFormData(prev => ({ ...prev, portfolioSection: { ...prev.portfolioSection, title: e.target.value } }))}
+                                            className="input-field font-bold"
+                                            placeholder="e.g. Institutional Portfolio"
+                                        />
+                                    </div>
+                                    <div>
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Items</span>
+                                            <button type="button" onClick={handleAddPortfolioItem} className="text-xs text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 font-bold border border-blue-100">
+                                                <Plus size={14} className="inline mr-1" /> Add Item
+                                            </button>
+                                        </div>
+                                        <DragDropContext onDragEnd={handlePortfolioDragEnd}>
+                                            <Droppable droppableId="portfolio-items">
+                                                {(provided) => (
+                                                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                                                        {formData.portfolioSection.items.map((item, idx) => (
+                                                            <Draggable key={item.id} draggableId={item.id} index={idx}>
+                                                                {(prov, snap) => (
+                                                                    <div ref={prov.innerRef} {...prov.draggableProps} className={`p-3 bg-white rounded-lg border border-gray-200 flex items-center gap-3 ${snap.isDragging ? 'shadow-lg ring-2 ring-blue-400' : ''}`}>
+                                                                        <div {...prov.dragHandleProps} className="text-gray-300 cursor-grab"><GripVertical size={14} /></div>
+                                                                        <input
+                                                                            value={item.text}
+                                                                            onChange={e => handleUpdatePortfolioItem(item.id, e.target.value)}
+                                                                            className="input-field flex-1 py-1.5 text-sm"
+                                                                            placeholder="Item text"
+                                                                        />
+                                                                        <button type="button" onClick={() => handleDeletePortfolioItem(item.id)} className="text-gray-400 hover:text-red-500 p-1"><Trash2 size={14} /></button>
+                                                                    </div>
+                                                                )}
+                                                            </Draggable>
+                                                        ))}
+                                                        {provided.placeholder}
+                                                    </div>
+                                                )}
+                                            </Droppable>
+                                        </DragDropContext>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
+                </>
+            )}
+
+            {/* Form tab: FormBuilder + FormAppearanceEditor (like ServiceContentManager) */}
+            {activeTab === 'form' && (
+                <div className="flex-1 min-h-0 overflow-y-auto bg-gray-50/50 px-4 py-5 space-y-6">
+                    <div className="glass-card p-6 max-w-4xl">
+                        <h3 className="text-lg font-bold text-[var(--accent-primary)] mb-2">Inquiry Form Fields</h3>
+                        <p className="text-sm text-[var(--text-secondary)] mb-4">Configure the fields shown on the Investors inquiry form. Use the &quot;Nature of Interest&quot; select options for the dropdown (synced to the live page).</p>
+                        <FormBuilder fields={formData.fields || []} onChange={newFields => setFormData(prev => ({ ...prev, fields: newFields }))} />
+                    </div>
+                    <div className="glass-card p-6 max-w-4xl">
+                        <FormAppearanceEditor
+                            formStyles={formData.formStyles || {}}
+                            onChange={newStyles => setFormData(prev => ({ ...prev, formStyles: newStyles }))}
+                        />
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };

@@ -34,13 +34,13 @@ const SidebarItem = ({ icon: Icon, label, path }) => {
     return (
         <Link
             to={path}
-            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 group w-full box-border whitespace-nowrap overflow-hidden ${active
-                ? 'bg-[#1A365D] shadow-md'
-                : 'hover:bg-gray-100'
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group w-full box-border whitespace-nowrap overflow-hidden ${active
+                ? 'bg-gradient-to-r from-[#0A3D62] to-[#1A365D] text-white shadow-md'
+                : 'hover:bg-[#F8F9FC] text-gray-600 hover:text-[#1A365D]'
                 }`}
         >
-            <Icon size={18} className={`${active ? 'text-white' : 'text-gray-500 group-hover:text-[#1A365D]'}`} />
-            <span className={`font-medium text-sm ${active ? 'text-white' : 'text-gray-600 group-hover:text-[#1A365D]'}`}>
+            <Icon size={18} className={active ? 'text-white' : 'text-gray-500 group-hover:text-[#1A365D]'} />
+            <span className="font-medium text-sm">
                 {label}
             </span>
         </Link>
@@ -129,17 +129,19 @@ const Layout = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex relative">
+        <div className="min-h-screen bg-[#F8F9FC] flex relative">
             <Toaster position="top-right" />
 
-            {/* Sidebar */}
+            {/* Sidebar - theme: navy/gold strip, same as login */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 w-60 shrink-0 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                    } lg:relative lg:translate-x-0 overflow-y-auto`}
+                className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-100 w-60 shrink-0 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                    } lg:relative lg:translate-x-0 overflow-y-auto shadow-sm`}
             >
+                {/* Theme accent strip (match login card) */}
+                <div className="h-1 w-full bg-gradient-to-r from-[#0A3D62] via-[#1A365D] to-[#C9A227]" />
                 {/* Logo */}
                 <div className="p-4 border-b border-gray-100">
-                    <h1 className="text-lg font-bold text-[#1A365D]">Instrak Admin</h1>
+                    <h1 className="text-lg font-bold text-[#1A365D] font-heading">Instrak Admin</h1>
                 </div>
 
                 {/* Navigation */}
@@ -174,10 +176,10 @@ const Layout = () => {
                     <div className="pt-6 mt-4 border-t border-gray-100">
                         <button
                             onClick={handleLogout}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium text-sm"
                         >
                             <LogOut size={18} />
-                            <span className="font-medium text-sm">Logout</span>
+                            <span>Logout</span>
                         </button>
                     </div>
                 </nav>
@@ -185,21 +187,24 @@ const Layout = () => {
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-h-screen min-w-0 overflow-hidden">
-                {/* Header */}
-                <header className="bg-white border-b border-gray-200 h-14 px-6 flex items-center justify-between sticky top-0 z-40 shadow-sm">
-                    <button
-                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
-                    >
-                        {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-                    </button>
+                {/* Header - theme accent */}
+                <header className="bg-white border-b border-gray-100 h-14 px-6 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+                    <div className="h-full flex items-center gap-2">
+                        <div className="hidden lg:block w-1 h-8 rounded-full bg-gradient-to-b from-[#0A3D62] to-[#C9A227]" />
+                        <button
+                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                            className="lg:hidden p-2 hover:bg-[#F8F9FC] rounded-xl text-gray-600"
+                        >
+                            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+                        </button>
+                    </div>
 
                     <div className="flex items-center gap-4 ml-auto">
                         <a
-                            href="http://localhost:5173"
+                            href="/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-sm font-medium text-[#1A365D] hover:text-blue-700"
+                            className="flex items-center gap-2 text-sm font-medium text-[#1A365D] hover:text-[#0A3D62] px-3 py-2 rounded-xl hover:bg-[#F8F9FC] transition-colors"
                         >
                             <ExternalLink size={16} /> View Site
                         </a>
@@ -207,7 +212,7 @@ const Layout = () => {
                 </header>
 
                 {/* Page Content */}
-                <main className="p-6 flex-1 overflow-hidden min-w-0">
+                <main className="p-6 flex-1 overflow-hidden min-w-0 bg-[#F8F9FC]">
                     <div className="overflow-hidden">
                         <Outlet />
                     </div>

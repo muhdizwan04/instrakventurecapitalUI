@@ -1,0 +1,185 @@
+{
+  "intro": {
+    "title": "Investment Platforms",
+    "subtitle": "Structured Capital. Strategic Growth. Global Reach.",
+    "paragraphs": [
+      "At Instrak Venture Capital Berhad (IVC), our investment platforms are designed to address the diverse capital and strategic needs of corporations, institutions, and high-net-worth investors across global markets.",
+      "Each platform is structured with disciplined governance, transparent processes, and institutional-grade execution to ensure long-term value creation and risk-managed growth."
+    ]
+  },
+  "platforms": {
+    "aum": {
+      "title": "Asset Under Management (AUM)",
+      "intro": "IVC provides discretionary and advisory asset management services tailored to institutional investors, family offices, and high-net-worth individuals.",
+      "focus": "Our AUM platform focuses on:",
+      "focusItems": [
+        "Global equities and strategic sectors",
+        "Private market investments",
+        "Real estate and infrastructure",
+        "Structured financing opportunities",
+        "Alternative assets"
+      ],
+      "keyFeatures": [
+        "Institutional-grade portfolio construction",
+        "Risk-managed strategies",
+        "Global investment access",
+        "Performance monitoring and reporting"
+      ],
+      "idealFor": [
+        "Family offices",
+        "Institutional investors",
+        "Sovereign-linked entities",
+        "Corporate treasury portfolios"
+      ]
+    },
+    "private-wealth": {
+      "title": "Private Wealth Management – The Luxury Dubai",
+      "intro": "A premium investment and lifestyle platform designed for ultra-high-net-worth individuals (UHNWIs) seeking exclusive access to global investment opportunities and high-end lifestyle services.",
+      "keyOfferings": [
+        "Access to private investment deals",
+        "Real estate opportunities in prime global locations",
+        "Structured wealth solutions",
+        "Exclusive lifestyle privileges in Dubai"
+      ],
+      "targetClients": [
+        "Ultra-high-net-worth individuals",
+        "Family offices",
+        "Global entrepreneurs",
+        "Corporate principals"
+      ]
+    },
+    "share-financing": {
+      "title": "Stock Loan / Share Financing (SL/SF)",
+      "intro": "A structured financing solution that enables publicly listed companies and major shareholders to unlock liquidity using their listed shares as collateral.",
+      "keyBenefits": [
+        "Non-dilutive financing",
+        "Fast capital access",
+        "Flexible loan structures",
+        "Global institutional lenders"
+      ],
+      "useCases": [
+        "Corporate expansion",
+        "Strategic acquisitions",
+        "Debt restructuring",
+        "Working capital support"
+      ]
+    },
+    "equity-financing": {
+      "title": "Equity Financing (EF)",
+      "intro": "IVC connects growth-stage and established companies with strategic equity investors across global markets.",
+      "servicesInclude": [
+        "Private placements",
+        "Strategic investor introductions",
+        "Cross-border equity investments",
+        "Pre-IPO and growth capital funding"
+      ],
+      "idealFor": [
+        "Public listed companies",
+        "High-growth private companies",
+        "Expansion-stage enterprises"
+      ]
+    },
+    "real-estate-financing": {
+      "title": "Real Estate Financing (REF)",
+      "intro": "A global property financing platform supporting developers, asset owners, and institutional investors.",
+      "scope": [
+        "Development financing",
+        "Bridge financing",
+        "Asset refinancing",
+        "Cross-border property investments"
+      ],
+      "targetSegments": [
+        "Commercial real estate",
+        "Hospitality and hotels",
+        "Mixed-use developments",
+        "Luxury residential assets"
+      ]
+    },
+    "merger-acquisition": {
+      "title": "Merger & Acquisition (M&A)",
+      "intro": "IVC offers strategic advisory for mergers, acquisitions, and corporate restructuring.",
+      "capabilities": [
+        "Buy-side and sell-side advisory",
+        "Strategic investor matching",
+        "Valuation and negotiation support",
+        "Cross-border transaction execution"
+      ]
+    },
+    "gig": {
+      "title": "Global Investment Gateway (GIG)",
+      "intro": "A proprietary platform connecting companies with qualified global investors through a curated institutional network.",
+      "highlights": [
+        "Global investor database",
+        "Strategic capital matching",
+        "Cross-border deal introductions",
+        "Subscription-based corporate access"
+      ],
+      "idealFor": [
+        "Companies seeking international capital",
+        "Expansion-stage businesses",
+        "Strategic joint ventures"
+      ]
+    },
+    "virtual-cfo": {
+      "title": "Virtual CFO (VCFO)",
+      "intro": "A strategic financial management solution designed for companies that require high-level financial expertise without the cost of a full-time CFO.",
+      "servicesInclude": [
+        "Financial strategy and planning",
+        "Capital structure optimization",
+        "Investor relations support",
+        "Financial reporting and governance"
+      ],
+      "targetClients": [
+        "Growth-stage companies",
+        "Public listed firms",
+        "Cross-border enterprises"
+      ]
+    },
+    "asset-insurance": {
+      "title": "Asset Insurance (AI)",
+      "intro": "A structured risk-management solution designed to protect high-value assets, investment portfolios, and strategic holdings.",
+      "coverageAreas": [
+        "Corporate assets",
+        "Real estate portfolios",
+        "Investment-linked insurance",
+        "Structured protection solutions"
+      ]
+    },
+    "tokenization": {
+      "title": "Tokenization (Tz)",
+      "intro": "A digital asset structuring platform that enables the tokenization of real-world assets for fractional ownership and global investor access.",
+      "applications": [
+        "Real estate tokenization",
+        "Fund tokenization",
+        "Infrastructure assets",
+        "Private investment vehicles"
+      ],
+      "benefits": [
+        "Increased liquidity",
+        "Global investor participation",
+        "Transparent ownership structures",
+        "Blockchain-based settlement"
+      ]
+    },
+    "reits": {
+      "title": "Real Estate Investment Trust (REITs)",
+      "intro": "Institutional-grade real estate investment opportunities through structured REIT vehicles, offering diversified exposure to income-generating properties.",
+      "keyFeatures": [
+        "Income distribution",
+        "Portfolio diversification",
+        "Professional management",
+        "Liquidity through listed units"
+      ]
+    },
+    "ppli": {
+      "title": "Private Placement Life Insurance (PPLI)",
+      "intro": "Sophisticated life insurance solutions for wealth preservation and estate planning, integrating insurance into global wealth management and tax strategy.",
+      "keyFeatures": [
+        "Tax efficiency",
+        "Estate planning",
+        "Asset protection",
+        "Investment flexibility"
+      ]
+    }
+  }
+}

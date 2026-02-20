@@ -8,18 +8,18 @@ const ICON_MAP = { TrendingUp, Wallet, ShieldCheck, PieChart, Briefcase, Buildin
 
 const Services = () => {
     const defaultServices = [
-        { id: 1, title: 'Business Finance Consulting (Virtual CFO)', summary: 'Financial strategy & forecasting, budgeting & cash flow management, profitability analysis & cost control.', icon: 'Briefcase', link: '/services/virtual-cfo' },
-        { id: 3, title: 'Equity Financing (EF)', summary: 'Strategic capital injection through equity investment for high-growth companies.', icon: 'TrendingUp', link: '/services/equity-financing' },
-        { id: 4, title: 'Real Estate Financing (REF)', summary: 'Funding for high-yield property developments and real estate acquisitions.', icon: 'Building2', link: '/services/real-estate-financing' },
-        { id: 5, title: 'Real Estate Investment Trust (REITs)', summary: 'Institutional-grade real estate investment opportunities.', icon: 'Landmark', link: '/services/reits' },
-        { id: 6, title: 'Share Financing (SF)', summary: 'Strategic share financing solutions for shareholders.', icon: 'BarChart3', link: '/services/share-financing' },
-        { id: 7, title: 'Merger & Acquisition (M&A)', summary: 'Expert guidance through complex M&A transactions.', icon: 'Users', link: '/services/merger-acquisition' },
-        { id: 8, title: 'Tokenization', summary: 'Digital asset tokenization solutions for modern investments.', icon: 'Coins', link: '/services/tokenization' },
-        { id: 9, title: 'Asset Insurance (AI)', summary: 'Comprehensive asset protection and insurance solutions.', icon: 'Shield', link: '/services/asset-insurance' },
-        { id: 10, title: 'Private Placement Life Insurance (PPLI)', summary: 'Wealth preservation and estate planning solutions.', icon: 'ShieldCheck', link: '/services/ppli' },
-        { id: 11, title: 'Global Investment Gateway (GIG)', summary: 'Exclusive access to global investors and strategic partners.', icon: 'Globe', link: '/services/gig' },
-        { id: 12, title: 'Private Wealth Investment', summary: 'The Luxury Dubai - Premium real estate opportunities.', icon: 'Gem', link: '/services/private-wealth' },
-        { id: 13, title: 'Asset Under Management (AUM)', summary: 'Mandate-driven portfolio management for institutions.', icon: 'PieChart', link: '/services/aum' }
+        { id: 1, title: 'Business Finance Consulting (Virtual CFO)', summary: 'Strategic financial expertise without a full-time CFO. Planning, reporting, and investor relations.', icon: 'Briefcase', link: '/services/virtual-cfo' },
+        { id: 3, title: 'Equity Financing (EF)', summary: 'Strategic equity investment for growth-stage and established companies across global markets.', icon: 'TrendingUp', link: '/services/equity-financing' },
+        { id: 4, title: 'Real Estate Financing (REF)', summary: 'Global property financing for developers, asset owners, and institutional investors.', icon: 'Building2', link: '/services/real-estate-financing' },
+        { id: 5, title: 'Real Estate Investment Trust (REITs)', summary: 'Institutional-grade REITs for diversified exposure to income-generating real estate.', icon: 'Landmark', link: '/services/reits' },
+        { id: 6, title: 'Share Financing (SF)', summary: 'Unlock liquidity using listed shares as collateral. Non-dilutive financing for companies and shareholders.', icon: 'BarChart3', link: '/services/share-financing' },
+        { id: 7, title: 'Merger & Acquisition (M&A)', summary: 'Strategic advisory for mergers, acquisitions, and corporate restructuring.', icon: 'Users', link: '/services/merger-acquisition' },
+        { id: 8, title: 'Tokenization', summary: 'Tokenize real-world assets for fractional ownership and global investor access.', icon: 'Coins', link: '/services/tokenization' },
+        { id: 9, title: 'Asset Insurance (AI)', summary: 'Structured protection for high-value assets, investment portfolios, and strategic holdings.', icon: 'Shield', link: '/services/asset-insurance' },
+        { id: 10, title: 'Private Placement Life Insurance (PPLI)', summary: 'Wealth preservation and estate planning through life insurance and tax-efficient structures.', icon: 'ShieldCheck', link: '/services/ppli' },
+        { id: 11, title: 'Global Investment Gateway (GIG)', summary: 'Curated access to global investors and strategic partners for qualified companies.', icon: 'Globe', link: '/services/gig' },
+        { id: 12, title: 'Private Wealth Investment (The Luxury Dubai)', summary: 'Exclusive investment and lifestyle platform for ultra-high-net-worth individuals.', icon: 'Gem', link: '/services/private-wealth' },
+        { id: 13, title: 'Asset Under Management (AUM)', summary: 'Discretionary and advisory asset management for institutions, family offices, and high-net-worth clients.', icon: 'PieChart', link: '/services/aum' }
     ];
 
     // Fetch services list

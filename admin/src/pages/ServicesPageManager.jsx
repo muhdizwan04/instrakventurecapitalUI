@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { Save, Loader2, Layout, Palette, Layers, GripVertical } from 'lucide-react';
+import { Save, Loader2, Layout, Palette, Layers, GripVertical, Trash2, Plus, ChevronRight, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
+import LayoutPicker from '../components/LayoutPicker';
+import IconPicker from '../components/IconPicker';
 
 const PAGE_SECTION_IDS = ['solutions', 'leadMagnet'];
 const PAGE_SECTION_LABELS = { solutions: 'Solutions (service cards)', leadMagnet: 'Lead magnet block' };
+
+const getSectionLabel = (id, formData) => {
+    if (id === 'hero') return 'Hero';
+    if (PAGE_SECTION_LABELS[id]) return PAGE_SECTION_LABELS[id];
+    const custom = formData.customSections?.find(s => s.id === id);
+    return custom?.title || id;
+};
 
 // Parse hero background: return { type: 'solid'|'gradient', solid: '#hex', start: '#hex', end: '#hex' }
 const parseHeroBg = (bg) => {
@@ -76,21 +85,24 @@ const DEFAULT_PAGE = {
     leadMagnetDescFontSize: '1.1rem',
     leadMagnetTitleColor: '#1A365D',
     leadMagnetDescColor: '#4A5568',
-    pageContentOrder: ['solutions', 'leadMagnet']
+    pageContentOrder: ['solutions', 'leadMagnet'],
+    customSections: []
 };
 
 const ServicesPageManager = () => {
     const { content, loading, saving, saveContent } = useContent('services_page', DEFAULT_PAGE);
     const [formData, setFormData] = useState(DEFAULT_PAGE);
+    const [selectedSection, setSelectedSection] = useState('hero');
 
     useEffect(() => {
         if (content && Object.keys(content).length > 0 && !loading) {
-            const merged = { ...DEFAULT_PAGE, ...content };
+            const merged = { ...DEFAULT_PAGE, ...content, customSections: content.customSections || [] };
             const bg = parseHeroBg(merged.heroBackground);
             setFormData(prev => ({
                 ...DEFAULT_PAGE,
                 ...prev,
                 ...merged,
+                customSections: merged.customSections || [],
                 heroBackgroundType: merged.heroBackgroundType || bg.type,
                 heroBackgroundSolid: merged.heroBackgroundSolid || bg.solid,
                 heroBackgroundStart: merged.heroBackgroundStart || bg.start,
@@ -117,18 +129,92 @@ const ServicesPageManager = () => {
         await saveContent(formData);
     };
 
+    const customIds = (formData.customSections || []).map(s => s.id);
     const pageOrder = Array.isArray(formData.pageContentOrder) && formData.pageContentOrder.length
-        ? formData.pageContentOrder.filter(id => PAGE_SECTION_IDS.includes(id))
+        ? formData.pageContentOrder.filter(id => PAGE_SECTION_IDS.includes(id) || customIds.includes(id))
         : [...PAGE_SECTION_IDS];
-    const orderedIds = [...new Set([...pageOrder, ...PAGE_SECTION_IDS])];
+    const availableToAdd = PAGE_SECTION_IDS.filter(id => !pageOrder.includes(id));
 
     const handlePageOrderDragEnd = (result) => {
         if (!result.destination) return;
-        const next = Array.from(orderedIds);
+        const next = Array.from(pageOrder);
         const [removed] = next.splice(result.source.index, 1);
         next.splice(result.destination.index, 0, removed);
         handleChange('pageContentOrder', next);
     };
+
+    const handleRemoveSection = (id) => {
+        const newOrder = pageOrder.filter(sid => sid !== id);
+        handleChange('pageContentOrder', newOrder);
+        if (customIds.includes(id)) {
+            setFormData(prev => ({
+                ...prev,
+                customSections: (prev.customSections || []).filter(s => s.id !== id)
+            }));
+            if (selectedSection === id) setSelectedSection('hero');
+        }
+    };
+
+    const handleAddSection = (id) => {
+        handleChange('pageContentOrder', [...pageOrder, id]);
+    };
+
+    const handleAddCustomSection = () => {
+        const id = `custom-${Date.now()}`;
+        const newSection = {
+            id,
+            title: 'New Section',
+            subtitle: '',
+            content: '',
+            items: [],
+            styles: { layoutType: 'standard', bgColor: '#F8FAFC', textColor: '#1A365D', titleColor: '#1A365D', textAlign: 'center' }
+        };
+        setFormData(prev => ({
+            ...prev,
+            customSections: [...(prev.customSections || []), newSection],
+            pageContentOrder: [...pageOrder, id]
+        }));
+        setSelectedSection(id);
+        toast.success('Custom section added. Edit below.');
+    };
+
+    const updateCustomSection = (id, patch) => {
+        setFormData(prev => ({
+            ...prev,
+            customSections: (prev.customSections || []).map(s => s.id === id ? { ...s, ...patch } : s)
+        }));
+    };
+
+    const updateCustomSectionStyles = (id, stylePatch) => {
+        setFormData(prev => ({
+            ...prev,
+            customSections: (prev.customSections || []).map(s => {
+                if (s.id !== id) return s;
+                return { ...s, styles: { ...(s.styles || {}), ...stylePatch } };
+            })
+        }));
+    };
+
+    const addCustomItem = (sectionId) => {
+        updateCustomSection(sectionId, {
+            items: [...(formData.customSections?.find(s => s.id === sectionId)?.items || []), { id: `item-${Date.now()}`, title: 'New Item', description: '', icon: 'CheckCircle2' }]
+        });
+    };
+
+    const updateCustomItem = (sectionId, itemIdx, field, value) => {
+        const sec = formData.customSections?.find(s => s.id === sectionId);
+        if (!sec) return;
+        const items = (sec.items || []).map((it, i) => i === itemIdx ? { ...it, [field]: value } : it);
+        updateCustomSection(sectionId, { items });
+    };
+
+    const removeCustomItem = (sectionId, itemIdx) => {
+        const sec = formData.customSections?.find(s => s.id === sectionId);
+        if (!sec) return;
+        updateCustomSection(sectionId, { items: (sec.items || []).filter((_, i) => i !== itemIdx) });
+    };
+
+    const activeCustomSection = formData.customSections?.find(s => s.id === selectedSection);
 
     if (loading) {
         return (
@@ -139,11 +225,11 @@ const ServicesPageManager = () => {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-heading text-[var(--accent-primary)] mb-2">Services Page</h1>
-                    <p className="text-[var(--text-secondary)]">Customise the main Services page (/services): hero, section titles, and CTA. Service cards are managed in <strong>Services Manager</strong>.</p>
+                    <p className="text-[var(--text-secondary)]">Full custom: hero, sections order, and each block. Same style as service detail pages. Service cards are in <strong>Services Manager</strong>.</p>
                 </div>
                 <button onClick={handleSave} disabled={saving} className="btn-save">
                     {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
@@ -151,40 +237,78 @@ const ServicesPageManager = () => {
                 </button>
             </div>
 
-            <form onSubmit={handleSave} className="space-y-8">
-                {/* Page content order – drag to reorder */}
-                <div className="glass-card p-6">
-                    <h3 className="text-xl font-bold text-[var(--accent-primary)] mb-2">Page content order</h3>
-                    <p className="text-sm text-[var(--text-secondary)] mb-4">Drag to change the order of sections on the Services page. Hero is always first.</p>
-                    <DragDropContext onDragEnd={handlePageOrderDragEnd}>
-                        <Droppable droppableId="page-content-order">
-                            {(provided) => (
-                                <ul ref={provided.innerRef} {...provided.droppableProps} className="space-y-2">
-                                    {orderedIds.map((id, index) => (
-                                        <Draggable key={id} draggableId={id} index={index}>
-                                            {(provided, snapshot) => (
-                                                <li
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    className={`flex items-center gap-3 p-3 rounded-lg border bg-white ${snapshot.isDragging ? 'shadow-lg border-[var(--accent-primary)]' : 'border-gray-200'}`}
-                                                >
-                                                    <span {...provided.dragHandleProps} className="cursor-grab text-gray-400 hover:text-[var(--accent-primary)]">
-                                                        <GripVertical size={20} />
-                                                    </span>
-                                                    <span className="font-medium text-gray-800">{PAGE_SECTION_LABELS[id] || id}</span>
-                                                    <span className="text-xs text-gray-400">#{ index + 1 }</span>
-                                                </li>
-                                            )}
-                                        </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                </ul>
-                            )}
-                        </Droppable>
-                    </DragDropContext>
+            <form onSubmit={handleSave} className="flex flex-col lg:flex-row gap-6">
+                {/* Left: Section list (like service detail) */}
+                <div className="lg:w-72 shrink-0 space-y-2">
+                    <div className="glass-card p-4">
+                        <h3 className="text-sm font-bold text-[var(--accent-primary)] uppercase tracking-wider mb-3">Sections</h3>
+                        <button
+                            type="button"
+                            onClick={() => setSelectedSection('hero')}
+                            className={`w-full flex items-center gap-3 p-3 rounded-lg border text-left transition-colors ${selectedSection === 'hero' ? 'border-[var(--accent-primary)] bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}`}
+                        >
+                            <Layout size={18} className="text-[var(--accent-primary)]" />
+                            <span className="font-medium flex-1">Hero</span>
+                            {selectedSection === 'hero' && <ChevronRight size={16} />}
+                        </button>
+                        <DragDropContext onDragEnd={handlePageOrderDragEnd}>
+                            <Droppable droppableId="page-content-order">
+                                {(provided) => (
+                                    <ul ref={provided.innerRef} {...provided.droppableProps} className="mt-2 space-y-1">
+                                        {pageOrder.map((id, index) => (
+                                            <Draggable key={id} draggableId={id} index={index}>
+                                                {(provided, snapshot) => (
+                                                    <li
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        className={`flex items-center gap-2 rounded-lg border ${selectedSection === id ? 'border-[var(--accent-primary)] bg-blue-50' : 'border-gray-200'} ${snapshot.isDragging ? 'shadow-lg' : ''}`}
+                                                    >
+                                                        <span {...provided.dragHandleProps} className="p-2 cursor-grab text-gray-400 hover:text-[var(--accent-primary)]">
+                                                            <GripVertical size={16} />
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setSelectedSection(id)}
+                                                            className="flex-1 min-w-0 flex items-center gap-2 p-2 text-left"
+                                                        >
+                                                            <span className="text-sm font-medium truncate">{getSectionLabel(id, formData)}</span>
+                                                            {selectedSection === id && <ChevronRight size={14} />}
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveSection(id)}
+                                                            className="p-1.5 text-red-500 hover:bg-red-50 rounded"
+                                                            title="Remove from page"
+                                                        >
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    </li>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </ul>
+                                )}
+                            </Droppable>
+                        </DragDropContext>
+                        {availableToAdd.length > 0 && (
+                            <div className="mt-2 pt-2 border-t border-gray-200 flex flex-wrap gap-1">
+                                {availableToAdd.map(id => (
+                                    <button key={id} type="button" onClick={() => { handleAddSection(id); setSelectedSection(id); }} className="text-xs px-2 py-1.5 bg-gray-100 hover:bg-[var(--accent-primary)] hover:text-white rounded">
+                                        + {PAGE_SECTION_LABELS[id]}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                        <button type="button" onClick={handleAddCustomSection} className="mt-3 w-full flex items-center justify-center gap-2 py-2 border border-dashed border-gray-300 rounded-lg text-sm font-medium text-gray-600 hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)]">
+                            <Plus size={16} /> Add custom section
+                        </button>
+                    </div>
                 </div>
 
-                {/* Hero */}
+                {/* Right: Editor for selected section */}
+                <div className="flex-1 min-w-0 space-y-6">
+                {selectedSection === 'hero' && (
                 <div className="glass-card p-6">
                     <h3 className="text-xl font-bold text-[var(--accent-primary)] mb-4 flex items-center gap-2">
                         <Layout size={20} /> Hero
@@ -310,10 +434,12 @@ const ServicesPageManager = () => {
                         </div>
                     </div>
                 </div>
+                )}
 
-                {/* Section titles */}
+                {selectedSection === 'solutions' && (
+                <>
                 <div className="glass-card p-6">
-                    <h3 className="text-xl font-bold text-[var(--accent-primary)] mb-4">Section titles</h3>
+                    <h3 className="text-xl font-bold text-[var(--accent-primary)] mb-4 flex items-center gap-2"><Layers size={20} /> Solutions section</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="label">Solutions section title</label>
@@ -365,12 +491,8 @@ const ServicesPageManager = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Section tiles (solution cards) */}
                 <div className="glass-card p-6">
-                    <h3 className="text-xl font-bold text-[var(--accent-primary)] mb-4 flex items-center gap-2">
-                        <Layers size={20} /> Section tiles (solution cards)
-                    </h3>
+                    <h3 className="text-xl font-bold text-[var(--accent-primary)] mb-4">Section tiles (solution cards)</h3>
                     <p className="text-sm text-[var(--text-secondary)] mb-4">Style the title, description, button and icon on each solution card.</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
@@ -461,8 +583,10 @@ const ServicesPageManager = () => {
                         </div>
                     </div>
                 </div>
+                </>
+                )}
 
-                {/* Lead magnet (interstitial) */}
+                {selectedSection === 'leadMagnet' && (
                 <div className="glass-card p-6">
                     <h3 className="text-xl font-bold text-[var(--accent-primary)] mb-4">Lead magnet block</h3>
                     <div className="space-y-4">
@@ -525,7 +649,76 @@ const ServicesPageManager = () => {
                         </div>
                     </div>
                 </div>
+                )}
 
+                {activeCustomSection && (
+                <div className="glass-card p-6">
+                    <h3 className="text-xl font-bold text-[var(--accent-primary)] mb-4 flex items-center gap-2"><FileText size={20} /> Custom section</h3>
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="label">Title</label>
+                                <input value={activeCustomSection.title || ''} onChange={e => updateCustomSection(selectedSection, { title: e.target.value })} className="input-field" placeholder="Section title" />
+                            </div>
+                            <div>
+                                <label className="label">Subtitle</label>
+                                <input value={activeCustomSection.subtitle || ''} onChange={e => updateCustomSection(selectedSection, { subtitle: e.target.value })} className="input-field" placeholder="Optional subtitle" />
+                            </div>
+                        </div>
+                        <LayoutPicker value={activeCustomSection.styles?.layoutType || 'standard'} onChange={v => updateCustomSectionStyles(selectedSection, { layoutType: v })} />
+                        <div>
+                            <label className="label">Content / text</label>
+                            <textarea rows={4} value={activeCustomSection.content || ''} onChange={e => updateCustomSection(selectedSection, { content: e.target.value })} className="input-field" placeholder="Main body text..." />
+                        </div>
+                        <div className="border-t border-gray-200 pt-4">
+                            <div className="flex items-center justify-between mb-2">
+                                <label className="label mb-0">Items (list / cards)</label>
+                                <button type="button" onClick={() => addCustomItem(selectedSection)} className="text-xs flex items-center gap-1 text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 font-bold">
+                                    <Plus size={12} /> Add item
+                                </button>
+                            </div>
+                            <div className="space-y-2">
+                                {(activeCustomSection.items || []).map((item, i) => (
+                                    <div key={item.id || i} className="flex gap-2 items-start p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                        <div className="w-8 shrink-0"><IconPicker value={item.icon} onChange={v => updateCustomItem(selectedSection, i, 'icon', v)} /></div>
+                                        <input value={item.title || ''} onChange={e => updateCustomItem(selectedSection, i, 'title', e.target.value)} className="input-field flex-1 text-sm" placeholder="Item title" />
+                                        <textarea value={item.description || ''} onChange={e => updateCustomItem(selectedSection, i, 'description', e.target.value)} className="input-field flex-1 text-sm min-h-[60px]" placeholder="Description" />
+                                        <button type="button" onClick={() => removeCustomItem(selectedSection, i)} className="p-1.5 text-red-500 hover:bg-red-50 rounded shrink-0"><Trash2 size={14} /></button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="border-t border-gray-200 pt-4">
+                            <h4 className="text-sm font-semibold text-gray-600 mb-3">Section appearance</h4>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div>
+                                    <label className="text-xs font-medium text-gray-500">Background</label>
+                                    <input type="color" value={activeCustomSection.styles?.bgColor || '#F8FAFC'} onChange={e => updateCustomSectionStyles(selectedSection, { bgColor: e.target.value })} className="h-10 w-full rounded border" />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-medium text-gray-500">Title color</label>
+                                    <input type="color" value={activeCustomSection.styles?.titleColor || '#1A365D'} onChange={e => updateCustomSectionStyles(selectedSection, { titleColor: e.target.value })} className="h-10 w-full rounded border" />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-medium text-gray-500">Text color</label>
+                                    <input type="color" value={activeCustomSection.styles?.textColor || '#1A365D'} onChange={e => updateCustomSectionStyles(selectedSection, { textColor: e.target.value })} className="h-10 w-full rounded border" />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-medium text-gray-500">Icon color</label>
+                                    <input type="color" value={activeCustomSection.styles?.iconColor || '#C9A227'} onChange={e => updateCustomSectionStyles(selectedSection, { iconColor: e.target.value })} className="h-10 w-full rounded border" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                )}
+
+                {selectedSection !== 'hero' && selectedSection !== 'solutions' && selectedSection !== 'leadMagnet' && !activeCustomSection && (
+                    <div className="glass-card p-8 text-center text-[var(--text-secondary)]">
+                        Select a section from the list to edit.
+                    </div>
+                )}
+                </div>
             </form>
         </div>
     );

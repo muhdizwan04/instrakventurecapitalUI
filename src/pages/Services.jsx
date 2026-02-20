@@ -1,25 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import PageHero from '../components/PageHero';
 import { TrendingUp, Wallet, ShieldCheck, PieChart, ArrowRight, Briefcase, FileText, Building2, Landmark, Globe, Shield, Coins, Gem, Users, BarChart3 } from 'lucide-react';
 import { usePageContent } from '../hooks/usePageContent';
+import UniversalSection from '../components/UniversalSection';
 
 const ICON_MAP = { TrendingUp, Wallet, ShieldCheck, PieChart, Briefcase, FileText, Building2, Landmark, Globe, Shield, Coins, Gem, Users, BarChart3 };
 
 const ServicesPage = () => {
     const defaultServices = [
-        { id: 1, title: 'Business Finance Consulting (Virtual CFO)', summary: 'Financial strategy & forecasting, budgeting & cash flow management, profitability analysis & cost control, investment readiness & capital structuring, financial risk assessment & mitigation, KPI setting & performance monitoring, and board/investor reporting & stakeholder communication.', icon: 'Briefcase', link: '/services/virtual-cfo' },
-        { id: 3, title: 'Equity Financing (EF)', summary: 'Strategic capital injection through equity investment for high-growth companies seeking expansion and market leadership.', icon: 'TrendingUp', link: '/services/equity-financing' },
-        { id: 4, title: 'Real Estate Financing (REF)', summary: 'Funding for high-yield property developments and real estate acquisitions.', icon: 'Building2', link: '/services/real-estate-financing' },
-        { id: 5, title: 'Real Estate Investment Trust (REITs)', summary: 'Service details available upon request.', icon: 'Landmark', link: '/services/reits' },
-        { id: 6, title: 'Share Financing (SF)', summary: 'Service details available upon request.', icon: 'BarChart3', link: '/services/share-financing' },
-        { id: 7, title: 'Merger & Acquisition (M&A)', summary: 'Service details available upon request.', icon: 'Users', link: '/services/merger-acquisition' },
-        { id: 8, title: 'Tokenization', summary: 'Service details available upon request.', icon: 'Coins', link: '/services/tokenization' },
-        { id: 9, title: 'Asset Insurance (AI)', summary: 'Service details available upon request.', icon: 'Shield', link: '/services/asset-insurance' },
-        { id: 10, title: 'Private Placement Life Insurance (PPLI)', summary: 'Service details available upon request.', icon: 'ShieldCheck', link: '/services/ppli' },
-        { id: 11, title: 'Global Investment Gateway (GIG)', summary: 'An exclusive, subscription-based gateway for qualified companies to gain structured access to global investors and strategic partners through IVC\'s international network. Not a marketplace, crowdfunding platform, or brokerage.', icon: 'Globe', link: '/services/gig' },
-        { id: 12, title: 'Private Wealth Investment (The Luxury Dubai)', summary: 'Service details available upon request.', icon: 'Gem', link: '/services/private-wealth' },
-        { id: 13, title: 'Asset Under Management (AUM)', summary: 'Exclusive AUM mandates for corporations, institutional investors, family offices, and ultra-high-net-worth principals—mandate-driven, disciplined, and globally informed, with transparency and governance at the core.', icon: 'PieChart', link: '/services/aum' }
+        { id: 1, title: 'Business Finance Consulting (Virtual CFO)', summary: 'Strategic financial expertise without a full-time CFO. Planning, reporting, and investor relations.', icon: 'Briefcase', link: '/services/virtual-cfo' },
+        { id: 3, title: 'Equity Financing (EF)', summary: 'Strategic equity investment for growth-stage and established companies across global markets.', icon: 'TrendingUp', link: '/services/equity-financing' },
+        { id: 4, title: 'Real Estate Financing (REF)', summary: 'Global property financing for developers, asset owners, and institutional investors.', icon: 'Building2', link: '/services/real-estate-financing' },
+        { id: 5, title: 'Real Estate Investment Trust (REITs)', summary: 'Institutional-grade REITs for diversified exposure to income-generating real estate.', icon: 'Landmark', link: '/services/reits' },
+        { id: 6, title: 'Share Financing (SF)', summary: 'Unlock liquidity using listed shares as collateral. Non-dilutive financing for companies and shareholders.', icon: 'BarChart3', link: '/services/share-financing' },
+        { id: 7, title: 'Merger & Acquisition (M&A)', summary: 'Strategic advisory for mergers, acquisitions, and corporate restructuring.', icon: 'Users', link: '/services/merger-acquisition' },
+        { id: 8, title: 'Tokenization', summary: 'Tokenize real-world assets for fractional ownership and global investor access.', icon: 'Coins', link: '/services/tokenization' },
+        { id: 9, title: 'Asset Insurance (AI)', summary: 'Structured protection for high-value assets, investment portfolios, and strategic holdings.', icon: 'Shield', link: '/services/asset-insurance' },
+        { id: 10, title: 'Private Placement Life Insurance (PPLI)', summary: 'Wealth preservation and estate planning through life insurance and tax-efficient structures.', icon: 'ShieldCheck', link: '/services/ppli' },
+        { id: 11, title: 'Global Investment Gateway (GIG)', summary: 'Curated access to global investors and strategic partners for qualified companies.', icon: 'Globe', link: '/services/gig' },
+        { id: 12, title: 'Private Wealth Investment (The Luxury Dubai)', summary: 'Exclusive investment and lifestyle platform for ultra-high-net-worth individuals.', icon: 'Gem', link: '/services/private-wealth' },
+        { id: 13, title: 'Asset Under Management (AUM)', summary: 'Discretionary and advisory asset management for institutions, family offices, and high-net-worth clients.', icon: 'PieChart', link: '/services/aum' }
     ];
 
     const { content: servicesContent } = usePageContent('services', { items: defaultServices });
@@ -70,16 +70,17 @@ const ServicesPage = () => {
         leadMagnetDescFontSize: '1.1rem',
         leadMagnetTitleColor: '#1A365D',
         leadMagnetDescColor: '#4A5568',
-        pageContentOrder: ['solutions', 'leadMagnet']
+        pageContentOrder: ['solutions', 'leadMagnet'],
+        customSections: []
     };
     const { content: pageContent } = usePageContent('services_page', defaultPageContent);
     const p = { ...defaultPageContent, ...pageContent };
     const isGlass = (p.solutionsCardStyle || 'glass') !== 'solid';
     const PAGE_SECTION_IDS = ['solutions', 'leadMagnet'];
-    const contentOrder = Array.isArray(p.pageContentOrder) && p.pageContentOrder.length
-        ? p.pageContentOrder.filter(id => PAGE_SECTION_IDS.includes(id))
-        : PAGE_SECTION_IDS;
-    const orderedIds = [...new Set([...contentOrder, ...PAGE_SECTION_IDS])];
+    const customIds = (p.customSections || []).map(s => s.id);
+    const orderedIds = Array.isArray(p.pageContentOrder) && p.pageContentOrder.length
+        ? p.pageContentOrder.filter(id => PAGE_SECTION_IDS.includes(id) || customIds.includes(id))
+        : [...PAGE_SECTION_IDS];
 
     return (
         <div className="page-wrapper">
@@ -252,6 +253,14 @@ const ServicesPage = () => {
                     </Link>
                 </div>
                             </React.Fragment>
+                        );
+                    }
+                    const customSection = (p.customSections || []).find(s => s.id === sectionId);
+                    if (customSection) {
+                        return (
+                            <div key={sectionId} className="container" style={{ paddingBottom: '3rem' }}>
+                                <UniversalSection section={customSection} containerClass="container" />
+                            </div>
                         );
                     }
                     return null;

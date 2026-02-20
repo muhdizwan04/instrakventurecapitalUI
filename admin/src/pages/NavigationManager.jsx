@@ -4,6 +4,24 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
 
+const NAV_GRADIENT_DIRECTIONS = [
+    { label: 'To right', value: '90deg' },
+    { label: 'To bottom', value: '180deg' },
+    { label: 'To left', value: '270deg' },
+    { label: 'To top', value: '0deg' },
+    { label: 'Diagonal ↘', value: '135deg' },
+    { label: 'Diagonal ↗', value: '45deg' }
+];
+
+function buildNavGradient(direction, start, end) {
+    return `linear-gradient(${direction}, ${start || '#080808'}, ${end || '#3d3220'})`;
+}
+
+function safeHex(val, fallback) {
+    if (!val || typeof val !== 'string') return fallback;
+    return val.match(/^#[0-9A-Fa-f]{6}$/) ? val : fallback;
+}
+
 const NavigationManager = () => {
     const defaultData = {
         logo: {
@@ -11,7 +29,11 @@ const NavigationManager = () => {
             alt: 'Instrak Venture Capital'
         },
         navStyles: {
+            backgroundType: 'gradient',
             backgroundColor: '#020617',
+            gradientDirection: '90deg',
+            gradientStart: '#080808',
+            gradientEnd: '#3d3220',
             textColor: '#e5e7eb'
         },
         items: [
@@ -186,7 +208,11 @@ const NavigationManager = () => {
                 </div>
                 <div
                     className="p-4"
-                    style={{ backgroundColor: formData.navStyles?.backgroundColor || '#020617' }}
+                    style={
+                        formData.navStyles?.backgroundType === 'solid'
+                            ? { backgroundColor: formData.navStyles?.backgroundColor || '#020617' }
+                            : { background: buildNavGradient(formData.navStyles?.gradientDirection, formData.navStyles?.gradientStart, formData.navStyles?.gradientEnd) }
+                    }
                 >
                     <div className="flex items-center justify-between max-w-6xl mx-auto">
                         <div
@@ -218,22 +244,107 @@ const NavigationManager = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-                            Navigation background color
+                            Navigation background
                         </label>
-                        <input
-                            type="color"
-                            value={formData.navStyles?.backgroundColor || '#020617'}
-                            onChange={(e) =>
-                                setFormData(prev => ({
-                                    ...prev,
-                                    navStyles: {
-                                        ...(prev.navStyles || {}),
-                                        backgroundColor: e.target.value
+                        <div className="flex gap-2 mb-2">
+                            <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, navStyles: { ...(prev.navStyles || {}), backgroundType: 'gradient' } }))}
+                                className={`px-4 py-2 rounded-lg border text-sm font-medium ${(formData.navStyles?.backgroundType || 'gradient') === 'gradient' ? 'bg-[var(--accent-primary)] text-white border-[var(--accent-primary)]' : 'bg-white border-gray-300 text-gray-600'}`}
+                            >
+                                Gradient (black–gold)
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, navStyles: { ...(prev.navStyles || {}), backgroundType: 'solid' } }))}
+                                className={`px-4 py-2 rounded-lg border text-sm font-medium ${formData.navStyles?.backgroundType === 'solid' ? 'bg-[var(--accent-primary)] text-white border-[var(--accent-primary)]' : 'bg-white border-gray-300 text-gray-600'}`}
+                            >
+                                Solid colour
+                            </button>
+                        </div>
+                        {formData.navStyles?.backgroundType === 'solid' && (
+                            <div className="flex items-center gap-2 mt-2">
+                                <label className="text-xs text-[var(--text-muted)]">Colour:</label>
+                                <input
+                                    type="color"
+                                    value={formData.navStyles?.backgroundColor || '#020617'}
+                                    onChange={(e) =>
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            navStyles: { ...(prev.navStyles || {}), backgroundColor: e.target.value }
+                                        }))
                                     }
-                                }))
-                            }
-                            className="w-16 h-10 p-1 rounded border border-[var(--border-light)] cursor-pointer bg-transparent"
-                        />
+                                    className="w-12 h-10 p-1 rounded border border-[var(--border-light)] cursor-pointer bg-transparent"
+                                />
+                                <input
+                                    type="text"
+                                    value={formData.navStyles?.backgroundColor || ''}
+                                    onChange={(e) =>
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            navStyles: { ...(prev.navStyles || {}), backgroundColor: e.target.value }
+                                        }))
+                                    }
+                                    className="flex-1 px-2 py-1.5 rounded border border-[var(--border-light)] text-sm font-mono"
+                                    placeholder="#020617"
+                                />
+                            </div>
+                        )}
+                        {formData.navStyles?.backgroundType === 'gradient' && (
+                            <div className="mt-3 space-y-3 p-3 rounded-lg border border-[var(--border-light)] bg-[var(--bg-tertiary)]">
+                                <span className="text-xs font-medium text-[var(--text-muted)] block">Custom gradient colours</span>
+                                <div>
+                                    <label className="text-xs text-[var(--text-secondary)] block mb-1">Direction</label>
+                                    <select
+                                        value={formData.navStyles?.gradientDirection || '90deg'}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, navStyles: { ...(prev.navStyles || {}), gradientDirection: e.target.value } }))}
+                                        className="input-field text-sm w-full"
+                                    >
+                                        {NAV_GRADIENT_DIRECTIONS.map(d => (
+                                            <option key={d.value} value={d.value}>{d.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-xs text-[var(--text-secondary)] block mb-1">Start colour</label>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="color"
+                                                value={safeHex(formData.navStyles?.gradientStart, '#080808')}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, navStyles: { ...(prev.navStyles || {}), gradientStart: e.target.value } }))}
+                                                className="w-10 h-9 rounded border border-[var(--border-light)] cursor-pointer bg-transparent flex-shrink-0"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={formData.navStyles?.gradientStart || ''}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, navStyles: { ...(prev.navStyles || {}), gradientStart: e.target.value } }))}
+                                                className="flex-1 px-2 py-1.5 rounded border border-[var(--border-light)] text-xs font-mono"
+                                                placeholder="#080808"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-[var(--text-secondary)] block mb-1">End colour</label>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="color"
+                                                value={safeHex(formData.navStyles?.gradientEnd, '#3d3220')}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, navStyles: { ...(prev.navStyles || {}), gradientEnd: e.target.value } }))}
+                                                className="w-10 h-9 rounded border border-[var(--border-light)] cursor-pointer bg-transparent flex-shrink-0"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={formData.navStyles?.gradientEnd || ''}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, navStyles: { ...(prev.navStyles || {}), gradientEnd: e.target.value } }))}
+                                                className="flex-1 px-2 py-1.5 rounded border border-[var(--border-light)] text-xs font-mono"
+                                                placeholder="#3d3220"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">

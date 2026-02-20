@@ -117,7 +117,36 @@ const CareerManager = () => {
         setSections(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
     };
 
+    // When Enter or Tab in a textarea: Enter = newline + same leading whitespace (gap); Tab = insert tab at cursor
+    const handleTextareaEnter = (e, value, setValue) => {
+        const textarea = e.target;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = value ?? '';
 
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const newText = text.slice(0, start) + '\t' + text.slice(end);
+            setValue(newText);
+            requestAnimationFrame(() => {
+                const pos = start + 1;
+                textarea.setSelectionRange(pos, pos);
+            });
+            return;
+        }
+
+        if (e.key !== 'Enter') return;
+        const lineStart = text.lastIndexOf('\n', start - 1) + 1;
+        const lineFromStart = text.slice(lineStart, start);
+        const gap = (lineFromStart.match(/^\s*/) || [''])[0];
+        const newText = text.slice(0, start) + '\n' + gap + text.slice(end);
+        setValue(newText);
+        e.preventDefault();
+        requestAnimationFrame(() => {
+            const pos = start + 1 + gap.length;
+            textarea.setSelectionRange(pos, pos);
+        });
+    };
 
     // --- JOB MANAGERS ---
     const filteredJobs = useMemo(() => {
@@ -219,6 +248,7 @@ const CareerManager = () => {
                                     rows={5}
                                     value={section.description || ''}
                                     onChange={(e) => updateSection(section.id, { description: e.target.value })}
+                                    onKeyDown={(e) => handleTextareaEnter(e, section.description || '', (v) => updateSection(section.id, { description: v }))}
                                     className="input-field"
                                 />
                             </div>
@@ -238,6 +268,7 @@ const CareerManager = () => {
                                         rows={3}
                                         value={section.rightBoxContent || ''}
                                         onChange={(e) => updateSection(section.id, { rightBoxContent: e.target.value })}
+                                        onKeyDown={(e) => handleTextareaEnter(e, section.rightBoxContent || '', (v) => updateSection(section.id, { rightBoxContent: v }))}
                                         className="input-field text-sm"
                                         placeholder='"Integrity is the bedrock of our institutional success."'
                                     />
@@ -278,6 +309,7 @@ const CareerManager = () => {
                                 rows={8}
                                 value={section.content || ''}
                                 onChange={(e) => updateSection(section.id, { content: e.target.value })}
+                                onKeyDown={(e) => handleTextareaEnter(e, section.content || '', (v) => updateSection(section.id, { content: v }))}
                                 className="input-field font-mono text-sm"
                             />
                         </div>
@@ -420,7 +452,7 @@ const CareerManager = () => {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Description</label>
-                        <textarea rows={5} value={editingJob.summary} onChange={e => setEditingJob({ ...editingJob, summary: e.target.value })} className="input-field" />
+                        <textarea rows={5} value={editingJob.summary} onChange={e => setEditingJob({ ...editingJob, summary: e.target.value })} onKeyDown={e => handleTextareaEnter(e, editingJob.summary || '', v => setEditingJob({ ...editingJob, summary: v }))} className="input-field" />
                     </div>
                     <div className="flex justify-end gap-3 pt-4">
                         <button type="submit" className="btn-primary flex items-center gap-2"><Save size={18} /> Save Posting</button>

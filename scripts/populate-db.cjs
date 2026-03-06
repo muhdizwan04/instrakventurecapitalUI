@@ -71,8 +71,32 @@ const home = {
         { id: 'ind-7', icon: 'Factory', name: 'Manufacturing' },
         { id: 'ind-8', icon: 'Cpu', name: 'Digital Tech' }
     ],
+    trustTitle: 'Trust & Credibility',
+    trustSubtitle: 'Institutional-grade structuring, governance and investor alignment for cross-border capital.',
+    trustSignals: [
+        { id: 'sig-1', label: 'Cross-border capital structuring' },
+        { id: 'sig-2', label: 'Institutional governance framework' },
+        { id: 'sig-3', label: 'Global investor network' },
+        { id: 'sig-4', label: 'Strategic asset management' }
+    ],
+    trustMetrics: [
+        { id: 'met-1', label: 'Global Investor Network', description: 'Access to institutional investors, family offices, and strategic partners across multiple regions.' },
+        { id: 'met-2', label: 'Strategic Investment Mandates', description: 'Customised mandates aligned with institutional risk, governance, and return expectations.' },
+        { id: 'met-3', label: 'Cross-Border Transactions Facilitated', description: 'Structured capital flows and transactions executed across ASEAN and global markets.' }
+    ],
+    trustSectionStyles: {
+        backgroundColor: '',
+        textColor: '',
+        boxColor: '',
+        titleFontSize: 32,
+        subtitleFontSize: 16,
+        signalFontSize: 13,
+        metricLabelFontSize: 15,
+        metricDescFontSize: 13,
+        textAlign: 'left'
+    },
     customSections: [],
-    tabOrder: ['hero', 'services', 'industries']
+    tabOrder: ['hero', 'services', 'trust', 'industries']
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

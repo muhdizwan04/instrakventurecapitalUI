@@ -45,6 +45,23 @@ function buildGradient(direction, start, end) {
     return `linear-gradient(${direction}, ${start}, ${end})`;
 }
 
+function ensureTrustTabOrder(order) {
+    if (!Array.isArray(order) || order.length === 0) {
+        return ['hero', 'services', 'trust', 'industries'];
+    }
+    if (order.includes('trust')) {
+        return order;
+    }
+    const withoutTrust = order.filter(id => id !== 'trust');
+    const industriesIndex = withoutTrust.indexOf('industries');
+    if (industriesIndex === -1) {
+        return [...withoutTrust, 'trust'];
+    }
+    const next = [...withoutTrust];
+    next.splice(industriesIndex, 0, 'trust');
+    return next;
+}
+
 const HomeManager = () => {
     const [activeTab, setActiveTab] = useState('hero');
 
@@ -89,9 +106,46 @@ const HomeManager = () => {
             { id: "ind-7", icon: "Factory", name: "Manufacturing" },
             { id: "ind-8", icon: "Cpu", name: "Digital Tech" }
         ],
+        // Trust & Credibility strip
+        trustTitle: 'Trust & Credibility',
+        trustSubtitle: 'Institutional-grade structuring, governance and investor alignment for cross-border capital.',
+        trustSignals: [
+            { id: 'sig-1', label: 'Cross-border capital structuring' },
+            { id: 'sig-2', label: 'Institutional governance framework' },
+            { id: 'sig-3', label: 'Global investor network' },
+            { id: 'sig-4', label: 'Strategic asset management' }
+        ],
+        trustMetrics: [
+            {
+                id: 'met-1',
+                label: 'Global Investor Network',
+                description: 'Access to institutional investors, family offices, and strategic partners across multiple regions.'
+            },
+            {
+                id: 'met-2',
+                label: 'Strategic Investment Mandates',
+                description: 'Customised mandates aligned with institutional risk, governance, and return expectations.'
+            },
+            {
+                id: 'met-3',
+                label: 'Cross-Border Transactions Facilitated',
+                description: 'Structured capital flows and transactions executed across ASEAN and global markets.'
+            }
+        ],
+        trustSectionStyles: {
+            backgroundColor: '',
+            textColor: '',
+            boxColor: '',
+            titleFontSize: 32,
+            subtitleFontSize: 16,
+            signalFontSize: 13,
+            metricLabelFontSize: 15,
+            metricDescFontSize: 13,
+            textAlign: 'left'
+        },
         customSections: [],
         // Tab order - can be reordered via drag
-        tabOrder: ["hero", "services", "industries"]
+        tabOrder: ["hero", "services", "trust", "industries"]
     };
 
     // Use Supabase content hook
@@ -247,10 +301,11 @@ const HomeManager = () => {
     const staticTabs = {
         hero: { label: 'Hero Section', icon: Layout },
         services: { label: 'Services Section', icon: TrendingUp },
+        trust: { label: 'Trust & Credibility Strip', icon: ShieldCheck },
         industries: { label: 'Industries', icon: Building2 },
     };
 
-    const tabOrder = formData.tabOrder || ['hero', 'services', 'industries'];
+    const tabOrder = ensureTrustTabOrder(formData.tabOrder || ['hero', 'services', 'industries']);
 
     // Combined drag handler for both tabs and industries
     const handleDragEnd = (result) => {
@@ -585,7 +640,293 @@ const HomeManager = () => {
                             </div>
                         )}
 
+                        {/* TRUST & CREDIBILITY STRIP TAB */}
+                        {activeTab === 'trust' && (
+                            <div className="glass-card p-6 space-y-6">
+                                <div className="flex justify-between items-center mb-2">
+                                    <div>
+                                        <h3 className="text-xl font-bold flex items-center gap-2">
+                                            <ShieldCheck size={18} className="text-[var(--accent-primary)]" />
+                                            <span>Trust &amp; Credibility Strip</span>
+                                        </h3>
+                                        <p className="text-sm text-[var(--text-secondary)] mt-1">
+                                            Configure the institutional trust strip shown above the Focus Industries section on the public home page.
+                                        </p>
+                                    </div>
+                                </div>
 
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="label">Section Title</label>
+                                        <input
+                                            name="trustTitle"
+                                            value={formData.trustTitle || defaultFormData.trustTitle}
+                                            onChange={handleChange}
+                                            className="input-field"
+                                            placeholder="Trust &amp; Credibility"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="label">Section Subtitle</label>
+                                        <input
+                                            name="trustSubtitle"
+                                            value={formData.trustSubtitle || defaultFormData.trustSubtitle}
+                                            onChange={handleChange}
+                                            className="input-field"
+                                            placeholder="Institutional-grade structuring, governance and investor alignment..."
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+                                            Text alignment
+                                        </label>
+                                        <select
+                                            value={formData.trustSectionStyles?.textAlign || 'left'}
+                                            onChange={(e) =>
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    trustSectionStyles: {
+                                                        ...(prev.trustSectionStyles || {}),
+                                                        textAlign: e.target.value
+                                                    }
+                                                }))
+                                            }
+                                            className="input-field text-sm w-full"
+                                        >
+                                            <option value="left">Left</option>
+                                            <option value="center">Center</option>
+                                            <option value="right">Right</option>
+                                        </select>
+                                        <p className="text-xs text-[var(--text-secondary)] mt-1">
+                                            Controls how the subtitle and institutional signals align.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Institutional Signals */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <h4 className="font-semibold text-[var(--accent-primary)] flex items-center gap-2">
+                                            <ShieldCheck size={16} />
+                                            <span>Institutional Signals</span>
+                                        </h4>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const nextId = `sig-${Date.now()}`;
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    trustSignals: [
+                                                        ...(prev.trustSignals || defaultFormData.trustSignals),
+                                                        { id: nextId, label: 'New signal' }
+                                                    ]
+                                                }));
+                                            }}
+                                            className="text-xs bg-[var(--accent-primary)] text-white px-3 py-1.5 rounded hover:bg-[#08304e] flex items-center gap-1"
+                                        >
+                                            <Plus size={14} /> Add Signal
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        {(formData.trustSignals || defaultFormData.trustSignals).map((sig) => (
+                                            <div key={sig.id} className="flex items-center gap-2 p-2.5 border border-[var(--border-light)] rounded bg-white">
+                                                <ShieldCheck size={16} className="text-[var(--accent-primary)] shrink-0" />
+                                                <input
+                                                    value={sig.label}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            trustSignals: (prev.trustSignals || defaultFormData.trustSignals).map(s =>
+                                                                s.id === sig.id ? { ...s, label: value } : s
+                                                            )
+                                                        }));
+                                                    }}
+                                                    className="flex-1 text-sm outline-none border-b border-transparent focus:border-[var(--accent-primary)]"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            trustSignals: (prev.trustSignals || defaultFormData.trustSignals).filter(s => s.id !== sig.id)
+                                                        }));
+                                                    }}
+                                                    className="text-gray-400 hover:text-red-500"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Metrics */}
+                                <div className="space-y-3 border-t border-[var(--border-light)] pt-5 mt-4">
+                                    <div className="flex items-center justify-between">
+                                        <h4 className="font-semibold text-[var(--accent-primary)] flex items-center gap-2">
+                                            <Scale size={16} />
+                                            <span>Institutional Metrics</span>
+                                        </h4>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const nextId = `met-${Date.now()}`;
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    trustMetrics: [
+                                                        ...(prev.trustMetrics || defaultFormData.trustMetrics),
+                                                        { id: nextId, label: 'New metric', description: '' }
+                                                    ]
+                                                }));
+                                            }}
+                                            className="text-xs bg-[var(--accent-primary)] text-white px-3 py-1.5 rounded hover:bg-[#08304e] flex items-center gap-1"
+                                        >
+                                            <Plus size={14} /> Add Metric
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        {(formData.trustMetrics || defaultFormData.trustMetrics).map((met) => (
+                                            <div key={met.id} className="p-3 border border-[var(--border-light)] rounded-lg bg-white space-y-2">
+                                                <input
+                                                    value={met.label}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            trustMetrics: (prev.trustMetrics || defaultFormData.trustMetrics).map(m =>
+                                                                m.id === met.id ? { ...m, label: value } : m
+                                                            )
+                                                        }));
+                                                    }}
+                                                    className="w-full text-sm font-semibold outline-none border-b border-transparent focus:border-[var(--accent-primary)]"
+                                                    placeholder="Metric label"
+                                                />
+                                                <textarea
+                                                    value={met.description || ''}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            trustMetrics: (prev.trustMetrics || defaultFormData.trustMetrics).map(m =>
+                                                                m.id === met.id ? { ...m, description: value } : m
+                                                            )
+                                                        }));
+                                                    }}
+                                                    rows={3}
+                                                    className="w-full text-xs text-[var(--text-secondary)] border border-[var(--border-light)] rounded px-2 py-1.5 outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
+                                                    placeholder="Short description (optional)"
+                                                />
+                                                <div className="flex justify-end">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setFormData(prev => ({
+                                                                ...prev,
+                                                                trustMetrics: (prev.trustMetrics || defaultFormData.trustMetrics).filter(m => m.id !== met.id)
+                                                            }));
+                                                        }}
+                                                        className="text-gray-400 hover:text-red-500 text-xs flex items-center gap-1"
+                                                    >
+                                                        <Trash2 size={12} /> Remove
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Trust Section Colours & Fonts */}
+                                <div className="border-t border-[var(--border-light)] pt-6 mt-6">
+                                    <h4 className="font-bold text-[var(--accent-primary)] mb-3">Section Colours</h4>
+                                    <p className="text-sm text-[var(--text-secondary)] mb-4">Solid or gradient. Same pattern as Industries.</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-medium text-[var(--text-secondary)]">Background</label>
+                                            {(() => {
+                                                const bgVal = formData.trustSectionStyles?.backgroundColor || '';
+                                                const isBgGrad = bgVal.includes('linear-gradient');
+                                                const parsedBg = parseGradient(bgVal) || { direction: 'to bottom', start: '#020617', end: '#0f172a' };
+                                                return (
+                                                    <>
+                                                        <div className="flex gap-2 mb-2">
+                                                            <button type="button" onClick={() => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), backgroundColor: '#020617' } }))} className={`px-2 py-1 text-xs rounded ${!isBgGrad ? 'bg-[var(--accent-primary)] text-white' : 'bg-gray-200 text-gray-600'}`}>Solid</button>
+                                                            <button type="button" onClick={() => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), backgroundColor: buildGradient(parsedBg.direction, parsedBg.start, parsedBg.end) } }))} className={`px-2 py-1 text-xs rounded ${isBgGrad ? 'bg-[var(--accent-primary)] text-white' : 'bg-gray-200 text-gray-600'}`}>Gradient</button>
+                                                        </div>
+                                                        {!isBgGrad ? (
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-12 h-12 rounded-lg border-2 border-[var(--border-light)] shrink-0" style={{ background: bgVal || '#020617' }} />
+                                                                <input type="color" value={(bgVal || '#020617').match(/^#[0-9A-Fa-f]{6}$/) ? (bgVal || '#020617') : '#020617'} onChange={(e) => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), backgroundColor: e.target.value } }))} className="h-10 w-12 rounded border border-[var(--border-light)] cursor-pointer" />
+                                                                <input type="text" value={bgVal} onChange={(e) => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), backgroundColor: e.target.value } }))} className="input-field text-sm flex-1" placeholder="#020617" />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="space-y-2">
+                                                                <div className="w-full h-10 rounded-lg border-2 border-[var(--border-light)]" style={{ background: bgVal }} />
+                                                                <select value={parsedBg.direction} onChange={(e) => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), backgroundColor: buildGradient(e.target.value, parsedBg.start, parsedBg.end) } }))} className="input-field text-sm w-full">
+                                                                    {GRADIENT_DIRECTIONS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+                                                                </select>
+                                                                <div className="flex items-center gap-2">
+                                                                    <input type="color" value={safeHex(parsedBg.start, '#020617')} onChange={(e) => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), backgroundColor: buildGradient(parsedBg.direction, e.target.value, parsedBg.end) } }))} className="h-9 w-10 rounded border cursor-pointer" />
+                                                                    <input type="text" value={parsedBg.start} onChange={(e) => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), backgroundColor: buildGradient(parsedBg.direction, e.target.value, parsedBg.end) } }))} className="input-field text-xs flex-1" placeholder="Start" />
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <input type="color" value={safeHex(parsedBg.end, '#0f172a')} onChange={(e) => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), backgroundColor: buildGradient(parsedBg.direction, parsedBg.start, e.target.value) } }))} className="h-9 w-10 rounded border cursor-pointer" />
+                                                                    <input type="text" value={parsedBg.end} onChange={(e) => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), backgroundColor: buildGradient(parsedBg.direction, parsedBg.start, e.target.value) } }))} className="input-field text-xs flex-1" placeholder="End" />
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </>
+                                                );
+                                            })()}
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-medium text-[var(--text-secondary)]">Text colour</label>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 rounded-lg border-2 border-[var(--border-light)] shrink-0 flex items-center justify-center text-xs font-medium" style={{ background: formData.trustSectionStyles?.textColor || '#e5e7eb', color: ['#fff', '#ffffff', '#e5e7eb', '#f9fafb', '#f3f4f6', '#e0e0e0'].includes((formData.trustSectionStyles?.textColor || '').toLowerCase()) ? '#333' : '#fff' }}>Aa</div>
+                                                <input type="color" value={formData.trustSectionStyles?.textColor || '#e5e7eb'} onChange={(e) => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), textColor: e.target.value } }))} className="h-10 w-12 rounded border border-[var(--border-light)] cursor-pointer" />
+                                                <input type="text" value={formData.trustSectionStyles?.textColor || ''} onChange={(e) => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), textColor: e.target.value } }))} className="input-field text-sm flex-1" placeholder="#e5e7eb" />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-medium text-[var(--text-secondary)]">Card / pill colour</label>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 rounded-lg border-2 border-[var(--border-light)] shrink-0" style={{ background: formData.trustSectionStyles?.boxColor || '#0f172a' }} />
+                                                <input type="color" value={(formData.trustSectionStyles?.boxColor || '#0f172a').match(/^#[0-9A-Fa-f]{6}$/) ? (formData.trustSectionStyles?.boxColor || '#0f172a') : '#0f172a'} onChange={(e) => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), boxColor: e.target.value } }))} className="h-10 w-12 rounded border border-[var(--border-light)] cursor-pointer" />
+                                                <input type="text" value={formData.trustSectionStyles?.boxColor || ''} onChange={(e) => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), boxColor: e.target.value } }))} className="input-field text-sm flex-1" placeholder="#0f172a" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <h4 className="font-bold text-[var(--accent-primary)] mt-6 mb-3">Font sizes (px)</h4>
+                                    <p className="text-sm text-[var(--text-secondary)] mb-4">Customise title, subtitle, signal pills and metric text.</p>
+                                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                        <div>
+                                            <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Title</label>
+                                            <input type="number" min="18" max="48" value={formData.trustSectionStyles?.titleFontSize ?? 32} onChange={(e) => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), titleFontSize: parseInt(e.target.value) || 32 } }))} className="input-field text-sm w-full" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Subtitle</label>
+                                            <input type="number" min="12" max="24" value={formData.trustSectionStyles?.subtitleFontSize ?? 16} onChange={(e) => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), subtitleFontSize: parseInt(e.target.value) || 16 } }))} className="input-field text-sm w-full" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Signal pills</label>
+                                            <input type="number" min="10" max="20" value={formData.trustSectionStyles?.signalFontSize ?? 13} onChange={(e) => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), signalFontSize: parseInt(e.target.value) || 13 } }))} className="input-field text-sm w-full" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Metric label</label>
+                                            <input type="number" min="12" max="22" value={formData.trustSectionStyles?.metricLabelFontSize ?? 15} onChange={(e) => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), metricLabelFontSize: parseInt(e.target.value) || 15 } }))} className="input-field text-sm w-full" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Metric description</label>
+                                            <input type="number" min="11" max="18" value={formData.trustSectionStyles?.metricDescFontSize ?? 13} onChange={(e) => setFormData(prev => ({ ...prev, trustSectionStyles: { ...(prev.trustSectionStyles || {}), metricDescFontSize: parseInt(e.target.value) || 13 } }))} className="input-field text-sm w-full" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* SERVICES SECTION TAB */}
                         {activeTab === 'services' && (

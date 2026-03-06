@@ -3,12 +3,14 @@ import Hero from '../components/Hero';
 import About from '../components/About';
 import Services from '../components/Services';
 import Industries from '../components/Industries';
+import TrustStrip from '../components/TrustStrip';
 import { usePageContent } from '../hooks/usePageContent';
 
 // Map section IDs to components
 const SECTION_COMPONENTS = {
     hero: Hero,
     services: Services,
+    trust: TrustStrip,
     industries: Industries,
 };
 
@@ -19,14 +21,29 @@ const resolveAlign = (align, fallback = 'left') => {
     return align;
 };
 
+// Ensure Trust strip is always in the order and appears above Focus Industries
+const DEFAULT_SECTION_ORDER = ['hero', 'services', 'trust', 'industries'];
+function getSectionOrder(tabOrder) {
+    const order = Array.isArray(tabOrder) && tabOrder.length > 0 ? [...tabOrder] : [...DEFAULT_SECTION_ORDER];
+    if (order.includes('trust')) {
+        return order;
+    }
+    const industriesIndex = order.indexOf('industries');
+    if (industriesIndex === -1) {
+        return [...order, 'trust'];
+    }
+    order.splice(industriesIndex, 0, 'trust');
+    return order;
+}
+
 const Home = () => {
     // Fetch home content including section order
     const { content } = usePageContent('home', {
-        tabOrder: ['hero', 'services', 'industries']
+        tabOrder: DEFAULT_SECTION_ORDER
     });
 
-    // Get section order from database or use default
-    const sectionOrder = content.tabOrder || ['hero', 'services', 'industries'];
+    // Get section order from database; ensure Trust is always above Industries
+    const sectionOrder = getSectionOrder(content.tabOrder);
 
     return (
         <>

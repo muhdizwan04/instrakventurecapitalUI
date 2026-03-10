@@ -751,6 +751,42 @@ const investors = {
         headline: 'The Institutional Advantage',
         description: 'Instrak Venture Capital Berhad offers qualified investors access to a curated portfolio of high-growth industrial assets in the ASEAN region. Our approach is defined by rigorous due diligence and institutional-grade governance.'
     },
+    onboarding: {
+        title: 'Investor Onboarding Workflow',
+        subtitle: 'A clear, institutional process from registration to reporting.',
+        steps: [
+            {
+                id: 'step-1',
+                title: 'Step 1 — Investor Registration',
+                description: 'Submit basic investor and organisation information to initiate the relationship.'
+            },
+            {
+                id: 'step-2',
+                title: 'Step 2 — AI Investor Profiling',
+                description: 'Collects investment ticket size, risk tolerance, sector preferences, and geographic focus.'
+            },
+            {
+                id: 'step-3',
+                title: 'Step 3 — Compliance Verification',
+                description: 'Institutional KYC and AML checks to verify identity, source of funds, and regulatory eligibility.'
+            },
+            {
+                id: 'step-4',
+                title: 'Step 4 — Secure Investor Portal',
+                description: 'Approved investors receive access to a secure deal room, curated opportunities, and key reports.'
+            },
+            {
+                id: 'step-5',
+                title: 'Step 5 — Capital Allocation',
+                description: 'Investor selects funds, projects, and investment programmes aligned to their mandate.'
+            },
+            {
+                id: 'step-6',
+                title: 'Step 6 — Portfolio Dashboard',
+                description: 'Real-time view of capital deployed, performance reports, and institutional updates.'
+            }
+        ]
+    },
     portfolioSection: {
         title: 'Institutional Portfolio',
         items: [

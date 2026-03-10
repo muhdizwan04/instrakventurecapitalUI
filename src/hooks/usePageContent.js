@@ -42,9 +42,10 @@ function useAllContent() {
         queryKey: ALL_CONTENT_KEY,
         queryFn: fetchAllContent,
         enabled: !forceFallbackOnly,
-        staleTime: 1000 * 30,
+        staleTime: 1000 * 15,
         gcTime: 1000 * 60 * 60 * 24,
-        refetchOnWindowFocus: 'always',
+        refetchOnWindowFocus: true,
+        refetchInterval: 1000 * 45,
         retry: 2,
     });
 }

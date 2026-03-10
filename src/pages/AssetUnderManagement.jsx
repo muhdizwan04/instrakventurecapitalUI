@@ -106,19 +106,10 @@ const AssetUnderManagement = () => {
             <StyledFormSection
                 serviceId="aum"
                 serviceName="Asset Under Management"
-                title=""
-                subtitle=""
+                title={pageContent?.formStyles?.sectionTitle || 'AUM CLIENT INTAKE FORM & DECLARATION'}
+                subtitle={pageContent?.formStyles?.sectionSubtitle || 'CONFIDENTIAL | INSTITUTIONAL USE ONLY'}
                 sectionId="application-form"
                 maxWidth="1000px"
-                customHeader={
-                    <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-                        <h2 style={{ fontSize: '2.5rem', color: '#1A365D', marginBottom: '1rem' }}>AUM CLIENT INTAKE FORM & DECLARATION</h2>
-                        <p style={{ color: '#B8860B', fontWeight: '600', letterSpacing: '1px' }}>CONFIDENTIAL | INSTITUTIONAL USE ONLY</p>
-                        <div style={{ maxWidth: '700px', margin: '1.5rem auto', padding: '1.5rem', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0', fontSize: '0.95rem', color: '#64748B', lineHeight: '1.6' }}>
-                            <strong>Purpose Statement:</strong> This document serves as a preliminary assessment tool to evaluate strategic fit, governance readiness, regulatory compliance, and investment alignment for potential Asset Under Management (AUM) mandates with {siteName}.
-                        </div>
-                    </div>
-                }
                 fallbackForm={
                                 <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '3rem' }}>
                                     <Toaster position="top-right" />
@@ -364,16 +355,6 @@ const AssetUnderManagement = () => {
                             }
                         />
 
-            {/* Disclaimer */}
-            <section style={{ padding: '40px 20px', background: '#F5F7FA', borderTop: '1px solid rgba(26, 54, 93, 0.1)' }}>
-                <div className="container">
-                    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-                        <p style={{ fontSize: '0.8rem', color: '#718096', lineHeight: '1.7', textAlign: 'center', fontStyle: 'italic' }}>
-                            {siteName.split(' ').map(w => w[0]).join('')} provides information for general purposes only. This does not constitute an offer, solicitation, or recommendation for investment. Engagements are subject to formal mandate agreements, regulatory approvals, and professional due diligence. Only institutional investors, corporations, shareholders, or high-net-worth individuals are considered for consultation. All discussions and information shared are strictly confidential.
-                        </p>
-                    </div>
-                </div>
-            </section>
         </div>
     );
 };

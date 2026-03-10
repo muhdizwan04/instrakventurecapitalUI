@@ -64,14 +64,17 @@ const Navbar = () => {
     // Use loaded data or defaults
     const rawItems = navData?.items || defaultNav.items;
 
-    // Navigation color styles (configurable from admin Navigation Manager)
+    // Navigation styles from admin. Gradient (custom or default) vs solid: when solid, use backgroundColor; when gradient, use custom gradient from admin or fall back to CSS default.
     const navStylesConfig = navData?.navStyles || {};
     const navStyleVars = {};
-    if (navStylesConfig.backgroundColor) {
-        navStyleVars['--nav-bg-color'] = navStylesConfig.backgroundColor;
-    }
     if (navStylesConfig.textColor) {
         navStyleVars['--nav-link-color'] = navStylesConfig.textColor;
+    }
+    if (navStylesConfig.backgroundType === 'solid' && navStylesConfig.backgroundColor) {
+        navStyleVars.background = navStylesConfig.backgroundColor;
+    } else if (navStylesConfig.backgroundType !== 'solid' && navStylesConfig.gradientStart != null && navStylesConfig.gradientEnd != null) {
+        const dir = navStylesConfig.gradientDirection || '90deg';
+        navStyleVars.background = `linear-gradient(${dir}, ${navStylesConfig.gradientStart}, ${navStylesConfig.gradientEnd})`;
     }
 
     // FORCE UPDATE: Ensure About Us links point to the consolidated page
@@ -91,7 +94,7 @@ const Navbar = () => {
     });
 
     return (
-        <nav className={`${styles.nav} glass`} style={navStyleVars}>
+        <nav className={styles.nav} style={navStyleVars}>
             <div className={styles.container}>
                 <Link to="/" className={styles.logo} onClick={closeAll}>
                     {settings?.siteIdentity?.logoUrl ? (

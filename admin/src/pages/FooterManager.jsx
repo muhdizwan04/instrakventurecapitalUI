@@ -6,6 +6,24 @@ import { useContent } from '../hooks/useContent';
 import ImageUpload from '../components/ImageUpload';
 import AppearanceEditor from '../components/AppearanceEditor';
 
+const FOOTER_GRADIENT_DIRECTIONS = [
+    { label: 'To right', value: '90deg' },
+    { label: 'To bottom', value: '180deg' },
+    { label: 'To left', value: '270deg' },
+    { label: 'To top', value: '0deg' },
+    { label: 'Diagonal ↘', value: '135deg' },
+    { label: 'Diagonal ↗', value: '45deg' }
+];
+
+function buildFooterGradient(direction, start, end) {
+    return `linear-gradient(${direction}, ${start || '#0f172a'}, ${end || '#1e293b'})`;
+}
+
+function safeHex(val, fallback) {
+    if (!val || typeof val !== 'string') return fallback;
+    return val.match(/^#[0-9A-Fa-f]{6}$/) ? val : fallback;
+}
+
 const FooterManager = () => {
     const defaultData = {
         logo: '',
@@ -14,6 +32,8 @@ const FooterManager = () => {
         address: 'Level 27 Penthouse, Centrepoint North\nMid Valley City\n59200 Kuala Lumpur, Malaysia',
         phone: '',
         email: 'admin@instrakventurecapital.com',
+        quickLinksTitle: 'Quick Links',
+        contactUsTitle: 'Contact Us',
         socials: { facebook: '', linkedin: '', twitter: '', instagram: '' },
         quickLinks: [
             { id: 'ql-1', label: 'Home', url: '/' },
@@ -23,12 +43,21 @@ const FooterManager = () => {
             { id: 'ql-5', label: 'Contact Us', url: '/contact' }
         ],
         styles: {
+            footerBackgroundType: 'solid',
             footerBgColor: '#FAFBFC',
+            footerGradientDirection: '90deg',
+            footerGradientStart: '#0f172a',
+            footerGradientEnd: '#1e293b',
             descriptionTextColor: '#4A5568',
             addressTextColor: '#4A5568',
             phoneTextColor: '#4A5568',
             emailTextColor: '#1A365D',
-            quickLinkTextColor: '#4A5568'
+            quickLinkTextColor: '#4A5568',
+            quickLinksHeadingColor: '#1A365D',
+            contactUsHeadingColor: '#1A365D',
+            sectionHeadingFontFamily: '',
+            sectionHeadingFontSize: '',
+            sectionHeadingFontWeight: 'bold'
         }
     };
 
@@ -190,12 +219,208 @@ const FooterManager = () => {
                         </div>
                     </div>
 
-                    {/* Footer appearance – text and background colours */}
+                    {/* Section titles (shown in footer) */}
+                    <div className="space-y-3">
+                        <h4 className="text-sm font-bold text-[var(--text-secondary)] border-b border-[var(--border-light)] pb-1">Section titles</h4>
+                        <div>
+                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Quick Links heading</label>
+                            <input
+                                type="text"
+                                value={footerData.quickLinksTitle ?? 'Quick Links'}
+                                onChange={(e) => setFooterData(prev => ({ ...prev, quickLinksTitle: e.target.value }))}
+                                className="w-full px-4 py-2 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                                placeholder="Quick Links"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Contact Us heading</label>
+                            <input
+                                type="text"
+                                value={footerData.contactUsTitle ?? 'Contact Us'}
+                                onChange={(e) => setFooterData(prev => ({ ...prev, contactUsTitle: e.target.value }))}
+                                className="w-full px-4 py-2 rounded-lg border border-[var(--border-light)] outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                                placeholder="Contact Us"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Section heading colour & font (Quick Links & Contact Us titles) */}
+                    <div className="space-y-3">
+                        <h4 className="text-sm font-bold text-[var(--text-secondary)] border-b border-[var(--border-light)] pb-1">Section heading style</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">Quick Links heading colour</label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="color"
+                                        value={footerData.styles?.quickLinksHeadingColor || '#1A365D'}
+                                        onChange={(e) => updateStyle('quickLinksHeadingColor', e.target.value)}
+                                        className="w-10 h-9 rounded border border-[var(--border-light)] cursor-pointer bg-transparent flex-shrink-0"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={footerData.styles?.quickLinksHeadingColor || ''}
+                                        onChange={(e) => updateStyle('quickLinksHeadingColor', e.target.value)}
+                                        className="flex-1 px-2 py-1.5 rounded border border-[var(--border-light)] text-xs font-mono"
+                                        placeholder="#1A365D"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">Contact Us heading colour</label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="color"
+                                        value={footerData.styles?.contactUsHeadingColor || '#1A365D'}
+                                        onChange={(e) => updateStyle('contactUsHeadingColor', e.target.value)}
+                                        className="w-10 h-9 rounded border border-[var(--border-light)] cursor-pointer bg-transparent flex-shrink-0"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={footerData.styles?.contactUsHeadingColor || ''}
+                                        onChange={(e) => updateStyle('contactUsHeadingColor', e.target.value)}
+                                        className="flex-1 px-2 py-1.5 rounded border border-[var(--border-light)] text-xs font-mono"
+                                        placeholder="#1A365D"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">Font family</label>
+                                <input
+                                    type="text"
+                                    value={footerData.styles?.sectionHeadingFontFamily || ''}
+                                    onChange={(e) => updateStyle('sectionHeadingFontFamily', e.target.value)}
+                                    className="w-full px-2 py-1.5 rounded border border-[var(--border-light)] text-sm"
+                                    placeholder="e.g. Poppins, sans-serif"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">Font size</label>
+                                <input
+                                    type="text"
+                                    value={footerData.styles?.sectionHeadingFontSize || ''}
+                                    onChange={(e) => updateStyle('sectionHeadingFontSize', e.target.value)}
+                                    className="w-full px-2 py-1.5 rounded border border-[var(--border-light)] text-sm"
+                                    placeholder="e.g. 1rem or 18px"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">Font weight</label>
+                                <select
+                                    value={footerData.styles?.sectionHeadingFontWeight || 'bold'}
+                                    onChange={(e) => updateStyle('sectionHeadingFontWeight', e.target.value)}
+                                    className="w-full px-2 py-1.5 rounded border border-[var(--border-light)] text-sm"
+                                >
+                                    <option value="normal">Normal</option>
+                                    <option value="600">Semi-bold (600)</option>
+                                    <option value="bold">Bold</option>
+                                    <option value="700">Bold (700)</option>
+                                    <option value="800">Extra bold (800)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Footer background: Solid vs Gradient */}
+                    <div className="space-y-3">
+                        <h4 className="text-sm font-bold text-[var(--text-secondary)] border-b border-[var(--border-light)] pb-1">Footer background</h4>
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={() => updateStyle('footerBackgroundType', 'solid')}
+                                className={`px-4 py-2 rounded-lg border text-sm font-medium ${(footerData.styles?.footerBackgroundType || 'solid') === 'solid' ? 'bg-[var(--accent-primary)] text-white border-[var(--accent-primary)]' : 'bg-white border-gray-300 text-gray-600'}`}
+                            >
+                                Solid colour
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => updateStyle('footerBackgroundType', 'gradient')}
+                                className={`px-4 py-2 rounded-lg border text-sm font-medium ${footerData.styles?.footerBackgroundType === 'gradient' ? 'bg-[var(--accent-primary)] text-white border-[var(--accent-primary)]' : 'bg-white border-gray-300 text-gray-600'}`}
+                            >
+                                Gradient
+                            </button>
+                        </div>
+                        {(footerData.styles?.footerBackgroundType || 'solid') === 'solid' && (
+                            <div className="flex items-center gap-2">
+                                <label className="text-xs text-[var(--text-muted)]">Colour:</label>
+                                <input
+                                    type="color"
+                                    value={footerData.styles?.footerBgColor || '#FAFBFC'}
+                                    onChange={(e) => updateStyle('footerBgColor', e.target.value)}
+                                    className="w-12 h-10 p-1 rounded border border-[var(--border-light)] cursor-pointer bg-transparent"
+                                />
+                                <input
+                                    type="text"
+                                    value={footerData.styles?.footerBgColor || ''}
+                                    onChange={(e) => updateStyle('footerBgColor', e.target.value)}
+                                    className="flex-1 px-2 py-1.5 rounded border border-[var(--border-light)] text-sm font-mono"
+                                    placeholder="#FAFBFC"
+                                />
+                            </div>
+                        )}
+                        {footerData.styles?.footerBackgroundType === 'gradient' && (
+                            <div className="space-y-3 p-3 rounded-lg border border-[var(--border-light)] bg-[var(--bg-tertiary)]">
+                                <div>
+                                    <label className="text-xs text-[var(--text-secondary)] block mb-1">Direction</label>
+                                    <select
+                                        value={footerData.styles?.footerGradientDirection || '90deg'}
+                                        onChange={(e) => updateStyle('footerGradientDirection', e.target.value)}
+                                        className="input-field text-sm w-full"
+                                    >
+                                        {FOOTER_GRADIENT_DIRECTIONS.map(d => (
+                                            <option key={d.value} value={d.value}>{d.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-xs text-[var(--text-secondary)] block mb-1">Start colour</label>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="color"
+                                                value={safeHex(footerData.styles?.footerGradientStart, '#0f172a')}
+                                                onChange={(e) => updateStyle('footerGradientStart', e.target.value)}
+                                                className="w-10 h-9 rounded border border-[var(--border-light)] cursor-pointer bg-transparent flex-shrink-0"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={footerData.styles?.footerGradientStart || ''}
+                                                onChange={(e) => updateStyle('footerGradientStart', e.target.value)}
+                                                className="flex-1 px-2 py-1.5 rounded border border-[var(--border-light)] text-xs font-mono"
+                                                placeholder="#0f172a"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-[var(--text-secondary)] block mb-1">End colour</label>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="color"
+                                                value={safeHex(footerData.styles?.footerGradientEnd, '#1e293b')}
+                                                onChange={(e) => updateStyle('footerGradientEnd', e.target.value)}
+                                                className="w-10 h-9 rounded border border-[var(--border-light)] cursor-pointer bg-transparent flex-shrink-0"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={footerData.styles?.footerGradientEnd || ''}
+                                                onChange={(e) => updateStyle('footerGradientEnd', e.target.value)}
+                                                className="flex-1 px-2 py-1.5 rounded border border-[var(--border-light)] text-xs font-mono"
+                                                placeholder="#1e293b"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Footer appearance – text colours */}
                     <AppearanceEditor
                         styles={footerData.styles || {}}
                         onChange={(st) => setFooterData(prev => ({ ...prev, styles: st }))}
                         colorFields={[
-                            { key: 'footerBgColor', label: 'Background', default: '#FAFBFC' },
                             { key: 'descriptionTextColor', label: 'Description Text', default: '#4A5568' },
                             { key: 'addressTextColor', label: 'Address Text', default: '#4A5568' },
                             { key: 'phoneTextColor', label: 'Phone Text', default: '#4A5568' },
@@ -210,7 +435,7 @@ const FooterManager = () => {
                     {/* Quick Links with CRUD & Drag-Drop */}
                     <div className="glass-card p-6">
                         <div className="flex justify-between items-center border-b border-[var(--border-light)] pb-2 mb-4">
-                            <h3 className="text-lg font-bold">Quick Links</h3>
+                            <h3 className="text-lg font-bold">Quick Links (items)</h3>
                             <button
                                 onClick={handleAddLink}
                                 className="btn-add px-3 py-1.5 text-sm"

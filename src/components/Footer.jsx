@@ -33,15 +33,24 @@ const Footer = () => {
     const addressLines = (content.address || defaultContent.address).split('\n');
     const logoSrc = settings?.siteIdentity?.logoUrl || content.logo || logo;
     const s = content?.styles || {};
-    const footerBg = s.footerBgColor || '#FAFBFC';
+    const footerBg = s.footerBackgroundType === 'gradient' && s.footerGradientStart != null && s.footerGradientEnd != null
+        ? `linear-gradient(${s.footerGradientDirection || '90deg'}, ${s.footerGradientStart}, ${s.footerGradientEnd})`
+        : (s.footerBgColor || '#FAFBFC');
     const descColor = s.descriptionTextColor || '#4A5568';
     const addressColor = s.addressTextColor || '#4A5568';
     const phoneColor = s.phoneTextColor || '#4A5568';
     const emailColor = s.emailTextColor || '#1A365D';
     const quickLinkColor = s.quickLinkTextColor || '#4A5568';
+    const quickLinksHeadingColor = s.quickLinksHeadingColor || '#1A365D';
+    const contactUsHeadingColor = s.contactUsHeadingColor || '#1A365D';
+    const headingFontStyle = {
+        ...(s.sectionHeadingFontFamily ? { fontFamily: s.sectionHeadingFontFamily } : {}),
+        ...(s.sectionHeadingFontSize ? { fontSize: s.sectionHeadingFontSize } : {}),
+        ...(s.sectionHeadingFontWeight ? { fontWeight: s.sectionHeadingFontWeight } : {}),
+    };
 
     return (
-        <footer id="contact" className={styles.footer} style={{ backgroundColor: footerBg }}>
+        <footer id="contact" className={styles.footer} style={s.footerBackgroundType === 'gradient' ? { background: footerBg } : { backgroundColor: footerBg }}>
             <div className={`container ${styles.grid}`}>
                 <div className={styles.brand}>
                     <div className={styles.footerLogo}>
@@ -52,7 +61,7 @@ const Footer = () => {
                 </div>
 
                 <div className={styles.links}>
-                    <h4>Quick Links</h4>
+                    <h4 style={{ color: quickLinksHeadingColor, ...headingFontStyle }}>{content.quickLinksTitle ?? 'Quick Links'}</h4>
                     <ul>
                         {(content.quickLinks || defaultContent.quickLinks).map((link, i) => (
                             <li key={i}>
@@ -63,7 +72,7 @@ const Footer = () => {
                 </div>
 
                 <div className={styles.contact}>
-                    <h4>Contact Us</h4>
+                    <h4 style={{ color: contactUsHeadingColor, ...headingFontStyle }}>{content.contactUsTitle ?? 'Contact Us'}</h4>
                     {addressLines.map((line, i) => (
                         <p key={i} style={{ color: addressColor }}>{line}</p>
                     ))}

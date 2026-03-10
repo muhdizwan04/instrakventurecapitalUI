@@ -31,6 +31,7 @@ const ServicesPage = () => {
         heroBackground: 'linear-gradient(135deg, #1A365D 0%, #0F2942 100%)',
         heroTextColor: '#FFFFFF',
         heroTextAlign: 'center',
+        heroSubtitleAlign: 'center',
         heroFontFamily: 'var(--font-heading)',
         heroTitleFontSize: '3.5rem',
         heroSubtitleFontSize: '1.25rem',
@@ -107,12 +108,15 @@ const ServicesPage = () => {
                     </h1>
                     <p style={{ 
                         fontSize: p.heroSubtitleFontSize || '1.25rem', 
-                        maxWidth: '700px', 
-                        margin: p.heroTextAlign === 'center' ? '0 auto 2.5rem' : (p.heroTextAlign === 'right' ? '0 0 2.5rem auto' : '0 auto 2.5rem 0'), 
+                        width: '100%',
+                        maxWidth: '100%',
+                        boxSizing: 'border-box',
+                        margin: (p.heroSubtitleAlign || p.heroTextAlign || 'center') === 'center' ? '0 0 2.5rem 0' : ((p.heroSubtitleAlign || p.heroTextAlign) === 'right' ? '0 0 2.5rem 0' : '0 0 2.5rem 0'), 
                         color: p.heroTextColor ? `${p.heroTextColor}dd` : 'rgba(255,255,255,0.85)', 
                         lineHeight: '1.6',
                         fontFamily: p.heroFontFamily || 'var(--font-heading)',
-                        textAlign: p.heroTextAlign || 'center'
+                        textAlign: p.heroSubtitleAlign || p.heroTextAlign || 'center',
+                        whiteSpace: 'pre-line'
                     }}>
                         {p.heroSubtitle}
                     </p>

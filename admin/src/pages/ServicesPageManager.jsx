@@ -46,6 +46,7 @@ const DEFAULT_PAGE = {
     heroBackgroundEnd: '#0F2942',
     heroTextColor: '#FFFFFF',
     heroTextAlign: 'center',
+    heroSubtitleAlign: 'center',
     heroFontFamily: 'var(--font-heading)',
     heroTitleFontSize: '3.5rem',
     heroSubtitleFontSize: '1.25rem',
@@ -127,6 +128,28 @@ const ServicesPageManager = () => {
     const handleSave = async (e) => {
         e.preventDefault();
         await saveContent(formData);
+    };
+
+    // Enter = newline + same leading whitespace (gap); Tab = insert tab at cursor
+    const handleTextareaEnter = (e, value, setValue) => {
+        const textarea = e.target;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = value ?? '';
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const newText = text.slice(0, start) + '\t' + text.slice(end);
+            setValue(newText);
+            requestAnimationFrame(() => { textarea.setSelectionRange(start + 1, start + 1); });
+            return;
+        }
+        if (e.key !== 'Enter') return;
+        const lineStart = text.lastIndexOf('\n', start - 1) + 1;
+        const gap = (text.slice(lineStart, start).match(/^\s*/) || [''])[0];
+        const newText = text.slice(0, start) + '\n' + gap + text.slice(end);
+        setValue(newText);
+        e.preventDefault();
+        requestAnimationFrame(() => { textarea.setSelectionRange(start + 1 + gap.length, start + 1 + gap.length); });
     };
 
     const customIds = (formData.customSections || []).map(s => s.id);
@@ -320,7 +343,15 @@ const ServicesPageManager = () => {
                         </div>
                         <div className="md:col-span-2">
                             <label className="label">Hero subtitle</label>
-                            <textarea value={formData.heroSubtitle || ''} onChange={(e) => handleChange('heroSubtitle', e.target.value)} className="input-field" rows={2} placeholder="Comprehensive financial pathways..." />
+                            <textarea value={formData.heroSubtitle || ''} onChange={(e) => handleChange('heroSubtitle', e.target.value)} onKeyDown={(e) => handleTextareaEnter(e, formData.heroSubtitle || '', (v) => handleChange('heroSubtitle', v))} className="input-field" rows={2} placeholder="Comprehensive financial pathways..." />
+                        </div>
+                        <div>
+                            <label className="label">Subtitle alignment</label>
+                            <select value={formData.heroSubtitleAlign || 'center'} onChange={(e) => handleChange('heroSubtitleAlign', e.target.value)} className="input-field">
+                                <option value="left">Left</option>
+                                <option value="center">Centre</option>
+                                <option value="right">Right</option>
+                            </select>
                         </div>
                         {/* Background: type + colour pickers */}
                         <div className="md:col-span-2 flex items-center gap-2">

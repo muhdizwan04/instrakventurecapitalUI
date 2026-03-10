@@ -387,12 +387,19 @@ const AboutUs = () => {
                         }}>{section.title || 'Board of Directors'}</h2>
                         {section.subtitle && (
                             <p style={{
-                                maxWidth: '600px',
-                                margin: (styles.subtitleAlign === 'left') ? '1rem auto 0 0' : (styles.subtitleAlign === 'right') ? '1rem 0 0 auto' : '1rem auto 0',
-                                textAlign: styles.subtitleAlign || 'center',
+                                width: '100%',
+                                maxWidth: '100%',
+                                margin: '1rem 0 0 0',
+                                textAlign: styles.subtitleAlign === 'left'
+                                    ? 'left'
+                                    : styles.subtitleAlign === 'right'
+                                        ? 'right'
+                                        : 'justify',
                                 color: styles.textColor ? styles.textColor : '#64748B',
                                 opacity: styles.textColor ? 0.8 : 1,
-                                fontSize: styles.subtitleFontSize ? `${styles.subtitleFontSize}px` : undefined
+                                fontSize: styles.subtitleFontSize ? `${styles.subtitleFontSize}px` : undefined,
+                                whiteSpace: 'pre-line',
+                                lineHeight: 1.7
                             }}>
                                 {section.subtitle}
                             </p>

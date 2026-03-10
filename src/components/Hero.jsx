@@ -20,14 +20,34 @@ const Hero = () => {
 
     // Default hero blocks
     const defaultBlocks = [
-        { id: 'hb-1', type: 'title', content: 'Instrak Venture\nCapital Partners', color: '#f9fafb', highlightColor: '#facc15' },
-        { id: 'hb-2', type: 'subtitle', content: 'Governance • Transparency • Integrity', color: '#fde68a' },
-        { id: 'hb-3', type: 'text', content: 'We structure institutional-grade capital for founders and families building enduring assets across ASEAN and beyond.', color: '#9ca3af' },
         {
-            id: 'hb-4', type: 'buttons', buttons: [
-                { id: 1, text: 'Register as Investor', link: '/investors', variant: 'solid' },
-                { id: 2, text: 'Potential Project Listing', link: '/project-listings', variant: 'outline' }
-            ], solidBg: '#facc15', outlineColor: '#fde68a'
+            id: 'hb-1',
+            type: 'title',
+            content: 'Engineering Capital\nfor Global Growth',
+            color: '#f9fafb',
+            highlightColor: '#facc15'
+        },
+        {
+            id: 'hb-2',
+            type: 'subtitle',
+            content: 'Governance • Transparency • AI-Driven Intelligence',
+            color: '#fde68a'
+        },
+        {
+            id: 'hb-3',
+            type: 'text',
+            content: 'Instrak Venture Capital (IVC) structures institutional-grade capital across Asia and the Middle East, combining disciplined governance with AI-driven investment intelligence.',
+            color: '#9ca3af'
+        },
+        {
+            id: 'hb-4',
+            type: 'buttons',
+            buttons: [
+                { id: 1, text: 'Start AI Capital Assessment', link: '/ai-capital-assessment', variant: 'solid' },
+                { id: 2, text: 'Speak With An Advisor', link: '/contact', variant: 'outline' }
+            ],
+            solidBg: '#facc15',
+            outlineColor: '#fde68a'
         }
     ];
 

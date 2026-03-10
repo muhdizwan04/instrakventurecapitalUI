@@ -53,7 +53,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
     // Determine section colors
     const isDarkBg = styles.bgColor === '#0A2540' || styles.bgColor === '#0A1628' || styles.bgColor === '#1A365D';
     const titleColor = styles.titleColor || (isDarkBg ? '#FFFFFF' : '#0A3D62');
-    const subtitleColor = styles.textColor || (isDarkBg ? 'rgba(255,255,255,0.7)' : '#64748B');
+    const subtitleColor = styles.subtitleColor ?? styles.textColor ?? (isDarkBg ? 'rgba(255,255,255,0.7)' : '#64748B');
     const itemTextColor = styles.itemTitleColor || (isDarkBg ? '#FFFFFF' : '#1A365D');
     const itemDescColor = styles.textColor || (isDarkBg ? 'rgba(255,255,255,0.65)' : '#64748B');
     const accentColor = '#C9A227';

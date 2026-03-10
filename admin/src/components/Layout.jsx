@@ -90,6 +90,8 @@ const Layout = () => {
         '/contact': { icon: Mail, label: "Contact Us", path: "/contact", section: 'Pages' },
         '/inquiries': { icon: MessageSquare, label: "Inquiries", path: "/inquiries", section: 'Content' },
         '/users': { icon: Users, label: "Registered Users", path: "/users", section: 'Content' },
+        // Single combined manager for AI Capital Assessment (under Pages)
+        '/ai-capital-assessment': { icon: FileText, label: "AI Capital Assessment", path: "/ai-assessment", section: 'Pages' },
     };
 
     // Group items by section

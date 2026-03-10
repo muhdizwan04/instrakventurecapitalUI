@@ -19,6 +19,7 @@ import NavigationManager from './pages/NavigationManager';
 import InvestorsManager from './pages/InvestorsManager';
 import ProjectListingManager from './pages/ProjectListingManager';
 import UsersManager from './pages/UsersManager';
+import AIAssessmentPageManager from './pages/AIAssessmentPageManager';
 import { Loader2 } from 'lucide-react';
 
 // Protected Route wrapper component — requires both auth + admin status
@@ -67,6 +68,7 @@ function AppRoutes() {
         <Route path="inquiries" element={<InquiriesManager />} />
         <Route path="global-settings" element={<GlobalSettingsManager />} />
         <Route path="navigation" element={<NavigationManager />} />
+        <Route path="ai-assessment" element={<AIAssessmentPageManager />} />
         <Route path="investors" element={<InvestorsManager />} />
         <Route path="projects" element={<ProjectListingManager />} />
         <Route path="users" element={<UsersManager />} />

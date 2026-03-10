@@ -180,11 +180,12 @@ const InquiriesManager = () => {
         }
     };
 
+    const TYPE_LABELS = { 'ai-capital-assessment': 'AI Capital Assessment' };
     const inquiryTypes = useMemo(() => {
         const typesFromData = [...new Set(inquiries.map(i => i.type))];
         return typesFromData.map(type => ({
             id: type,
-            label: type.charAt(0).toUpperCase() + type.slice(1).replace(/_/g, ' ')
+            label: TYPE_LABELS[type] || type.charAt(0).toUpperCase() + type.slice(1).replace(/_/g, ' ')
         }));
     }, [inquiries]);
 
@@ -521,6 +522,62 @@ const InquiriesManager = () => {
 
                             {/* Detail Content */}
                             <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                                {/* AI Capital Assessment result summary */}
+                                {selectedInquiry.type === 'ai-capital-assessment' && selectedInquiry.metadata && (
+                                    <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 space-y-4">
+                                        <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide flex items-center gap-2">
+                                            Capital Readiness Assessment
+                                        </h3>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="bg-white rounded-lg p-3 border border-amber-100">
+                                                <p className="text-[10px] text-gray-500 uppercase">Score</p>
+                                                <p className="text-xl font-bold text-[var(--accent-primary)]">
+                                                    {selectedInquiry.metadata.assessmentScore ?? '—'} / 100
+                                                </p>
+                                            </div>
+                                            <div className="bg-white rounded-lg p-3 border border-amber-100">
+                                                <p className="text-[10px] text-gray-500 uppercase">Band</p>
+                                                <p className="text-sm font-semibold text-gray-900">
+                                                    {selectedInquiry.metadata.assessmentBand ?? '—'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        {Array.isArray(selectedInquiry.metadata.recommendedServices) && selectedInquiry.metadata.recommendedServices.length > 0 && (
+                                            <div>
+                                                <p className="text-[10px] text-gray-500 uppercase mb-1">Recommended services</p>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {selectedInquiry.metadata.recommendedServices.map((s, i) => (
+                                                        <span key={i} className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-xs font-medium">{s}</span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                        {Array.isArray(selectedInquiry.metadata.risks) && selectedInquiry.metadata.risks.length > 0 && (
+                                            <div>
+                                                <p className="text-[10px] text-gray-500 uppercase mb-1">Risks / considerations</p>
+                                                <ul className="list-disc list-inside text-sm text-gray-700 space-y-0.5">
+                                                    {selectedInquiry.metadata.risks.map((r, i) => (
+                                                        <li key={i}>{r}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+                                        {selectedInquiry.metadata.answers && typeof selectedInquiry.metadata.answers === 'object' && Object.keys(selectedInquiry.metadata.answers).length > 0 && (
+                                            <details className="bg-white rounded-lg border border-amber-100">
+                                                <summary className="p-3 cursor-pointer text-xs font-semibold text-gray-700 hover:bg-amber-50/50 rounded-lg">View answers</summary>
+                                                <div className="px-3 pb-3 pt-0 space-y-1.5 text-xs text-gray-600">
+                                                    {Object.entries(selectedInquiry.metadata.answers).map(([key, value]) => (
+                                                        <div key={key} className="flex gap-2">
+                                                            <span className="font-medium text-gray-500 shrink-0">{key}:</span>
+                                                            <span>{Array.isArray(value) ? value.join(', ') : String(value ?? '')}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </details>
+                                        )}
+                                    </div>
+                                )}
+
                                 {/* Message */}
                                 <div className="prose prose-sm max-w-none">
                                     <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-2">Message</h3>
@@ -570,7 +627,7 @@ const InquiriesManager = () => {
                                             </div>
                                         )}
                                         {Object.entries(selectedInquiry.metadata)
-                                            .filter(([k, v]) => v && !['notes', 'companyName', 'phone', 'accountEmail', 'userId'].includes(k))
+                                            .filter(([k, v]) => v && !['notes', 'companyName', 'phone', 'accountEmail', 'userId', 'assessmentScore', 'assessmentBand', 'recommendedServices', 'risks', 'answers'].includes(k))
                                             .map(([key, value]) => (
                                                 <div key={key} className="p-3 bg-white border border-gray-200 rounded-lg">
                                                     <p className="text-[10px] text-gray-400 uppercase mb-1">{key.replace(/([A-Z])/g, ' $1')}</p>

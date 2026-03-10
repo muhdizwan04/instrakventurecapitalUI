@@ -15,7 +15,8 @@ const AVAILABLE_ROUTES = [
     { label: 'Contact Us', path: '/contact' },
     { label: 'Join Us', path: '/join-us' },
     { label: 'Board of Directors', path: '/board-of-directors' },
-    { label: 'Project Listing', path: '/project-listings' }
+    { label: 'Project Listing', path: '/project-listings' },
+    { label: 'AI Capital Assessment', path: '/ai-capital-assessment' }
 ];
 
 const GRADIENT_DIRECTIONS = [
@@ -52,14 +53,34 @@ const HomeManager = () => {
     const defaultFormData = {
         // Hero blocks – ordered content elements
         heroBlocks: [
-            { id: 'hb-1', type: 'title', content: 'Your Venture\nCapital Partner', color: '#1A365D', highlightColor: '#B8860B' },
-            { id: 'hb-2', type: 'subtitle', content: 'Governance • Transparency • Integrity', color: '#B8860B' },
-            { id: 'hb-3', type: 'text', content: 'Providing foundational governance and integrity essential for scaling visionary industrial leaders across the ASEAN region.', color: '#4A5568' },
             {
-                id: 'hb-4', type: 'buttons', buttons: [
-                    { id: 1, text: 'Register as Investor', link: '/investors', variant: 'solid' },
-                    { id: 2, text: 'Potential Project Listing', link: '/project-listings', variant: 'outline' }
-                ], solidBg: '#1A365D', outlineColor: '#B8860B'
+                id: 'hb-1',
+                type: 'title',
+                content: 'Engineering Capital\nfor Global Growth',
+                color: '#1A365D',
+                highlightColor: '#B8860B'
+            },
+            {
+                id: 'hb-2',
+                type: 'subtitle',
+                content: 'Governance • Transparency • AI-Driven Intelligence',
+                color: '#B8860B'
+            },
+            {
+                id: 'hb-3',
+                type: 'text',
+                content: 'Instrak Venture Capital (IVC) structures institutional-grade capital across Asia and the Middle East, combining disciplined governance with AI-driven investment intelligence.',
+                color: '#4A5568'
+            },
+            {
+                id: 'hb-4',
+                type: 'buttons',
+                buttons: [
+                    { id: 1, text: 'Start AI Capital Assessment', link: '/ai-capital-assessment', variant: 'solid' },
+                    { id: 2, text: 'Speak With An Advisor', link: '/contact', variant: 'outline' }
+                ],
+                solidBg: '#1A365D',
+                outlineColor: '#B8860B'
             }
         ],
         // Hero background settings

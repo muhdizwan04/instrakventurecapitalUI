@@ -9,7 +9,7 @@ const ALLOWED_ORIGINS = [
   "https://www.instrakventurecapital.com",
   "https://instrakventurecapital.com",
   "https://instrakventurecapitalui.vercel.app",
-  "http://localhost:5173",
+  "http://localhost:5174",
   "http://localhost:4173",
 ];
 
@@ -71,6 +71,204 @@ function getClientIP(req: Request): string {
     req.headers.get("x-real-ip") ||
     "unknown"
   );
+}
+
+// ============================================================
+// 🎯 INTENT DETECTION
+// ============================================================
+
+async function detectIntent(
+  userMessage: string,
+  conversationHistory: { role: string; content: string }[],
+  openaiKey: string
+): Promise<{ intent: string; serviceMentioned: string | null }> {
+  try {
+    // Build context from recent messages
+    const recentContext = conversationHistory
+      .slice(-3)
+      .map(m => `${m.role}: ${m.content}`)
+      .join("\n");
+
+    const intentPrompt = `Analyze this user message and classify it into ONE of these categories:
+- SERVICE_INQUIRY: Questions about specific services (equity financing, virtual CFO, etc.)
+- FUNDING_REQUEST: User needs funding/investment/loan
+- CONTACT_REQUEST: Wants to contact team, schedule meeting, get in touch
+- GENERAL_INFO: General company information, about us, mission/vision
+- FORM_SUBMISSION: Ready to fill inquiry form, wants to apply
+
+Recent conversation context:
+${recentContext}
+
+Current message: "${userMessage}"
+
+Respond with ONLY a JSON object:
+{
+  "intent": "ONE_OF_THE_CATEGORIES_ABOVE",
+  "service": "service-name-if-mentioned-or-null"
+}
+
+Examples:
+- "Tell me about equity financing" → {"intent": "SERVICE_INQUIRY", "service": "equity-financing"}
+- "I need funding" → {"intent": "FUNDING_REQUEST", "service": null}
+- "How do I contact you?" → {"intent": "CONTACT_REQUEST", "service": null}
+- "What is your mission?" → {"intent": "GENERAL_INFO", "service": null}
+- "I want to apply" → {"intent": "FORM_SUBMISSION", "service": null}`;
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${openaiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo", // Cheaper model for classification
+        messages: [{ role: "user", content: intentPrompt }],
+        temperature: 0.1,
+        max_tokens: 100,
+      }),
+    });
+
+    if (!response.ok) {
+      console.warn("Intent detection failed, defaulting to GENERAL_INFO");
+      return { intent: "GENERAL_INFO", serviceMentioned: null };
+    }
+
+    const data = await response.json();
+    const content = data.choices[0]?.message?.content?.trim() || "{}";
+    
+    // Try to parse JSON response
+    try {
+      const parsed = JSON.parse(content);
+      return {
+        intent: parsed.intent || "GENERAL_INFO",
+        serviceMentioned: parsed.service || null,
+      };
+    } catch {
+      // Fallback: simple keyword matching
+      const lowerMsg = userMessage.toLowerCase();
+      if (lowerMsg.includes("funding") || lowerMsg.includes("loan") || lowerMsg.includes("invest")) {
+        return { intent: "FUNDING_REQUEST", serviceMentioned: null };
+      }
+      if (lowerMsg.includes("contact") || lowerMsg.includes("email") || lowerMsg.includes("phone")) {
+        return { intent: "CONTACT_REQUEST", serviceMentioned: null };
+      }
+      if (lowerMsg.includes("apply") || lowerMsg.includes("form") || lowerMsg.includes("submit")) {
+        return { intent: "FORM_SUBMISSION", serviceMentioned: null };
+      }
+      return { intent: "GENERAL_INFO", serviceMentioned: null };
+    }
+  } catch (error) {
+    console.error("Intent detection error:", error);
+    return { intent: "GENERAL_INFO", serviceMentioned: null };
+  }
+}
+
+// ============================================================
+// 💾 CONVERSATION PERSISTENCE
+// ============================================================
+
+async function loadConversation(
+  sessionId: string,
+  supabase: any
+): Promise<{ role: string; content: string }[]> {
+  try {
+    const { data, error } = await supabase
+      .from("chat_conversations")
+      .select("messages")
+      .eq("session_id", sessionId)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error || !data) {
+      return [];
+    }
+
+    return Array.isArray(data.messages) ? data.messages : [];
+  } catch (error) {
+    console.error("Error loading conversation:", error);
+    return [];
+  }
+}
+
+async function saveConversation(
+  sessionId: string,
+  messages: { role: string; content: string }[],
+  intent: string,
+  serviceMentioned: string | null,
+  userId: string | null,
+  supabase: any
+): Promise<string | null> {
+  try {
+    // Check if conversation exists
+    const { data: existing } = await supabase
+      .from("chat_conversations")
+      .select("id")
+      .eq("session_id", sessionId)
+      .limit(1)
+      .single();
+
+    const conversationData = {
+      session_id: sessionId,
+      messages: messages.slice(-MAX_MESSAGES_COUNT), // Keep last N messages
+      intent,
+      service_mentioned: serviceMentioned,
+      user_id: userId || null,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (existing) {
+      // Update existing
+      const { data, error } = await supabase
+        .from("chat_conversations")
+        .update(conversationData)
+        .eq("id", existing.id)
+        .select("id")
+        .single();
+
+      if (error) throw error;
+      return data?.id || null;
+    } else {
+      // Create new
+      const { data, error } = await supabase
+        .from("chat_conversations")
+        .insert(conversationData)
+        .select("id")
+        .single();
+
+      if (error) throw error;
+      return data?.id || null;
+    }
+  } catch (error) {
+    console.error("Error saving conversation:", error);
+    return null;
+  }
+}
+
+async function saveAnalytics(
+  sessionId: string,
+  conversationId: string | null,
+  intent: string,
+  serviceMentioned: string | null,
+  userMessage: string,
+  assistantResponse: string,
+  responseTimeMs: number,
+  supabase: any
+): Promise<void> {
+  try {
+    await supabase.from("chat_analytics").insert({
+      session_id: sessionId,
+      conversation_id: conversationId,
+      intent,
+      service_mentioned: serviceMentioned,
+      user_message: userMessage.slice(0, 500), // Limit length
+      assistant_response: assistantResponse.slice(0, 1000),
+      response_time_ms: responseTimeMs,
+    });
+  } catch (error) {
+    console.error("Error saving analytics:", error);
+    // Don't throw - analytics failures shouldn't break the chat
+  }
 }
 
 // ============================================================
@@ -297,7 +495,7 @@ Deno.serve(async (req: Request) => {
     }
 
     // ── 7. Parse & Validate Input ──
-    let body: { messages?: unknown };
+    let body: { messages?: unknown; sessionId?: string; userId?: string };
     try {
       body = await req.json();
     } catch {
@@ -307,7 +505,7 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const { messages } = body;
+    const { messages, sessionId, userId } = body;
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return new Response(
         JSON.stringify({ error: "Messages array is required" }),
@@ -315,7 +513,18 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // ── 8. Sanitize Messages ──
+    // ── 8. Initialize Supabase Client ──
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+
+    // ── 9. Load Previous Conversation (if sessionId provided) ──
+    let conversationHistory: { role: string; content: string }[] = [];
+    if (sessionId && supabase) {
+      conversationHistory = await loadConversation(sessionId, supabase);
+    }
+
+    // ── 10. Sanitize & Merge Messages ──
     const sanitizedMessages = messages
       .slice(-MAX_MESSAGES_COUNT)
       .map(sanitizeMessage)
@@ -328,16 +537,31 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // ── 9. Fetch Live Content & Build System Prompt ──
+    // Merge with conversation history (avoid duplicates)
+    const lastUserMessage = sanitizedMessages[sanitizedMessages.length - 1];
+    const allMessages = [
+      ...conversationHistory.filter(m => m.role !== "system"),
+      ...sanitizedMessages,
+    ].slice(-MAX_MESSAGES_COUNT);
+
+    // ── 11. Detect Intent ──
+    const startTime = Date.now();
+    const { intent, serviceMentioned } = await detectIntent(
+      lastUserMessage.content,
+      allMessages,
+      OPENAI_API_KEY
+    );
+
+    // ── 12. Fetch Live Content & Build System Prompt ──
     const systemPrompt = await fetchSiteContent();
 
     const fullMessages = [
       { role: "system", content: systemPrompt },
-      ...sanitizedMessages,
+      ...allMessages,
     ];
 
-    // ── 10. Call OpenAI ──
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    // ── 13. Call OpenAI ──
+    const aiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${OPENAI_API_KEY}`,
@@ -352,23 +576,113 @@ Deno.serve(async (req: Request) => {
       }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error("OpenAI API error:", response.status, errorData);
+    if (!aiResponse.ok) {
+      const errorData = await aiResponse.text();
+      console.error("OpenAI API error:", aiResponse.status, errorData);
       return new Response(
         JSON.stringify({ error: "AI service temporarily unavailable" }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // ── 11. Stream Response ──
-    return new Response(response.body, {
+    // ── 14. Stream Response with Intent Metadata ──
+    // Create a stream that collects response while forwarding to client
+    let fullAssistantResponse = "";
+    const reader = aiResponse.body?.getReader();
+    const decoder = new TextDecoder();
+
+    if (!reader) {
+      return new Response(
+        JSON.stringify({ error: "Failed to read response stream" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        // Send intent metadata as first event
+        controller.enqueue(
+          new TextEncoder().encode(
+            `data: ${JSON.stringify({ type: "metadata", intent, service: serviceMentioned })}\n\n`
+          )
+        );
+
+        let buffer = "";
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+              // Stream ended - save conversation asynchronously
+              if (sessionId && supabase && fullAssistantResponse) {
+                const finalMessages = [
+                  ...allMessages,
+                  { role: "assistant", content: fullAssistantResponse },
+                ];
+                saveConversation(
+                  sessionId,
+                  finalMessages,
+                  intent,
+                  serviceMentioned,
+                  userId || null,
+                  supabase
+                ).then(conversationId => {
+                  const responseTime = Date.now() - startTime;
+                  saveAnalytics(
+                    sessionId,
+                    conversationId,
+                    intent,
+                    serviceMentioned,
+                    lastUserMessage.content,
+                    fullAssistantResponse,
+                    responseTime,
+                    supabase
+                  ).catch(err => console.error("Analytics save error:", err));
+                }).catch(err => console.error("Conversation save error:", err));
+              }
+              controller.close();
+              break;
+            }
+
+            // Forward chunk to client
+            controller.enqueue(value);
+
+            // Collect content for saving
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || ""; // Keep incomplete line
+
+            for (const line of lines) {
+              if (line.startsWith("data: ")) {
+                const jsonStr = line.slice(6).trim();
+                if (jsonStr === "[DONE]") continue;
+                try {
+                  const parsed = JSON.parse(jsonStr);
+                  const delta = parsed.choices?.[0]?.delta?.content;
+                  if (delta) {
+                    fullAssistantResponse += delta;
+                  }
+                } catch {
+                  // Not a content delta, ignore
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Stream error:", error);
+          controller.error(error);
+        }
+      },
+    });
+
+    return new Response(stream, {
       headers: {
         ...corsHeaders,
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache, no-store, must-revalidate",
         "Connection": "keep-alive",
         "X-RateLimit-Remaining": String(remaining),
+        "X-Intent": intent,
+        "X-Service": serviceMentioned || "",
       },
     });
   } catch (error) {

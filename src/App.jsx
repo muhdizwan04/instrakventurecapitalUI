@@ -12,6 +12,7 @@ import Investors from './pages/Investors';
 import JoinUs from './pages/JoinUs';
 import LatestNews from './pages/LatestNews';
 import Contact from './pages/Contact';
+import AICapitalAssessment from './pages/AICapitalAssessment';
 import StrategicPartners from './pages/StrategicPartners';
 import ProjectListing from './pages/ProjectListing';
 import Login from './pages/Login';
@@ -55,6 +56,7 @@ const MainLayout = () => {
             <Route path="/mission-vision-values" element={<Navigate to="/about#mission" replace />} />
             <Route path="/board-of-directors" element={<Navigate to="/about#board" replace />} />
             <Route path="/services" element={<PageTransition><ServicesPage /></PageTransition>} />
+            <Route path="/ai-capital-assessment" element={<PageTransition><AICapitalAssessment /></PageTransition>} />
             <Route path="/investors" element={<PageTransition><Investors /></PageTransition>} />
             <Route path="/join-us" element={<PageTransition><JoinUs /></PageTransition>} />
             <Route path="/latest-news-2" element={<PageTransition><LatestNews /></PageTransition>} />

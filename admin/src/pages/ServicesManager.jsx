@@ -27,18 +27,126 @@ const ServicesManager = ({ embedded = false } = {}) => {
     const [selectedService, setSelectedService] = useState(null);
 
     const defaultServices = [
-        { id: 1, title: 'Business Finance Consulting (Virtual CFO)', summary: 'Strategic financial expertise without a full-time CFO. Planning, reporting, and investor relations.', icon: 'Briefcase', link: '/services/virtual-cfo', linkText: 'Learn More', fields: [] },
-        { id: 2, title: 'Equity Financing (EF)', summary: 'Strategic equity investment for growth-stage and established companies across global markets.', icon: 'TrendingUp', link: '/services/equity-financing', linkText: 'Learn More', fields: [] },
-        { id: 3, title: 'Real Estate Financing (REF)', summary: 'Global property financing for developers, asset owners, and institutional investors.', icon: 'Building2', link: '/services/real-estate-financing', linkText: 'Learn More', fields: [] },
-        { id: 4, title: 'Real Estate Investment Trust (REITs)', summary: 'Institutional-grade REITs for diversified exposure to income-generating real estate.', icon: 'Landmark', link: '/services/reits', linkText: 'Learn More', fields: [] },
-        { id: 5, title: 'Share Financing (SF)', summary: 'Unlock liquidity using listed shares as collateral. Non-dilutive financing for companies and shareholders.', icon: 'BarChart3', link: '/services/share-financing', linkText: 'Learn More', fields: [] },
-        { id: 6, title: 'Merger & Acquisition (M&A)', summary: 'Strategic advisory for mergers, acquisitions, and corporate restructuring.', icon: 'Users', link: '/services/merger-acquisition', linkText: 'Learn More', fields: [] },
-        { id: 7, title: 'Tokenization', summary: 'Tokenize real-world assets for fractional ownership and global investor access.', icon: 'Coins', link: '/services/tokenization', linkText: 'Learn More', fields: [] },
-        { id: 8, title: 'Asset Insurance (AI)', summary: 'Structured protection for high-value assets, investment portfolios, and strategic holdings.', icon: 'Shield', link: '/services/asset-insurance', linkText: 'Learn More', fields: [] },
-        { id: 9, title: 'Private Placement Life Insurance (PPLI)', summary: 'Wealth preservation and estate planning through life insurance and tax-efficient structures.', icon: 'ShieldCheck', link: '/services/ppli', linkText: 'Learn More', fields: [] },
-        { id: 10, title: 'Global Investment Gateway (GIG)', summary: 'Curated access to global investors and strategic partners for qualified companies.', icon: 'Globe', link: '/services/gig', linkText: 'Learn More', fields: [] },
-        { id: 11, title: 'Private Wealth Investment (The Luxury Dubai)', summary: 'Exclusive investment and lifestyle platform for ultra-high-net-worth individuals.', icon: 'Gem', link: '/services/private-wealth', linkText: 'Learn More', fields: [] },
-        { id: 12, title: 'Asset Under Management (AUM)', summary: 'Discretionary and advisory asset management for institutions, family offices, and high-net-worth clients.', icon: 'PieChart', link: '/services/aum', linkText: 'Learn More', fields: [] }
+        {
+            id: 1,
+            title: 'Business Finance Consulting (Virtual CFO)',
+            summary: 'Strategic financial expertise without a full-time CFO. Planning, reporting, and investor relations.',
+            icon: 'Briefcase',
+            link: '/services/virtual-cfo',
+            linkText: 'Learn More',
+            category: 'Financial Structuring',
+            fields: []
+        },
+        {
+            id: 2,
+            title: 'Equity Financing (EF)',
+            summary: 'Strategic equity investment for growth-stage and established companies across global markets.',
+            icon: 'TrendingUp',
+            link: '/services/equity-financing',
+            linkText: 'Learn More',
+            category: 'Financial Structuring',
+            fields: []
+        },
+        {
+            id: 3,
+            title: 'Real Estate Financing (REF)',
+            summary: 'Global property financing for developers, asset owners, and institutional investors.',
+            icon: 'Building2',
+            link: '/services/real-estate-financing',
+            linkText: 'Learn More',
+            category: 'Real Estate & Asset Platforms',
+            fields: []
+        },
+        {
+            id: 4,
+            title: 'Real Estate Investment Trust (REITs)',
+            summary: 'Institutional-grade REITs for diversified exposure to income-generating real estate.',
+            icon: 'Landmark',
+            link: '/services/reits',
+            linkText: 'Learn More',
+            category: 'Real Estate & Asset Platforms',
+            fields: []
+        },
+        {
+            id: 5,
+            title: 'Share Financing (SF)',
+            summary: 'Unlock liquidity using listed shares as collateral. Non-dilutive financing for companies and shareholders.',
+            icon: 'BarChart3',
+            link: '/services/share-financing',
+            linkText: 'Learn More',
+            category: 'Financial Structuring',
+            fields: []
+        },
+        {
+            id: 6,
+            title: 'Merger & Acquisition (M&A)',
+            summary: 'Strategic advisory for mergers, acquisitions, and corporate restructuring.',
+            icon: 'Users',
+            link: '/services/merger-acquisition',
+            linkText: 'Learn More',
+            category: 'Strategic Transactions',
+            fields: []
+        },
+        {
+            id: 7,
+            title: 'Tokenization',
+            summary: 'Tokenize real-world assets for fractional ownership and global investor access.',
+            icon: 'Coins',
+            link: '/services/tokenization',
+            linkText: 'Learn More',
+            category: 'Digital & Financial Innovation',
+            fields: []
+        },
+        {
+            id: 8,
+            title: 'Asset Insurance (AI)',
+            summary: 'Structured protection for high-value assets, investment portfolios, and strategic holdings.',
+            icon: 'Shield',
+            link: '/services/asset-insurance',
+            linkText: 'Learn More',
+            category: 'Digital & Financial Innovation',
+            fields: []
+        },
+        {
+            id: 9,
+            title: 'Private Placement Life Insurance (PPLI)',
+            summary: 'Wealth preservation and estate planning through life insurance and tax-efficient structures.',
+            icon: 'ShieldCheck',
+            link: '/services/ppli',
+            linkText: 'Learn More',
+            category: 'Financial Structuring',
+            fields: []
+        },
+        {
+            id: 10,
+            title: 'Global Investment Gateway (GIG)',
+            summary: 'Curated access to global investors and strategic partners for qualified companies.',
+            icon: 'Globe',
+            link: '/services/gig',
+            linkText: 'Learn More',
+            category: 'Global Investment Ecosystem',
+            fields: []
+        },
+        {
+            id: 11,
+            title: 'Private Wealth Investment (The Luxury Dubai)',
+            summary: 'Exclusive investment and lifestyle platform for ultra-high-net-worth individuals.',
+            icon: 'Gem',
+            link: '/services/private-wealth',
+            linkText: 'Learn More',
+            category: 'Global Investment Ecosystem',
+            fields: []
+        },
+        {
+            id: 12,
+            title: 'Asset Under Management (AUM)',
+            summary: 'Discretionary and advisory asset management for institutions, family offices, and high-net-worth clients.',
+            icon: 'PieChart',
+            link: '/services/aum',
+            linkText: 'Learn More',
+            category: 'Global Investment Ecosystem',
+            fields: []
+        }
     ];
 
     const { content, loading, saving, saveContent } = useContent('services', { items: defaultServices });
@@ -165,6 +273,11 @@ const ServicesManager = ({ embedded = false } = {}) => {
                                                             }`}>
                                                                 {service.title}
                                                             </p>
+                                                            {service.category && (
+                                                                <p className="text-[10px] text-blue-500 font-semibold uppercase tracking-wide truncate">
+                                                                    {service.category}
+                                                                </p>
+                                                            )}
                                                             <p className="text-[10px] text-gray-400 truncate">{service.summary || 'No description'}</p>
                                                         </div>
                                                         <ChevronRight size={14} className={`text-gray-300 shrink-0 ${selectedService?.id === service.id ? 'text-blue-400' : ''}`} />
@@ -267,6 +380,22 @@ const ServicesManager = ({ embedded = false } = {}) => {
                                                 placeholder="Learn More"
                                             />
                                         </div>
+                                    </div>
+
+                                    {/* Main Service Group (Category) */}
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">
+                                            Main service group (parent)
+                                        </label>
+                                        <input
+                                            value={selectedService.category || ''}
+                                            onChange={(e) => handleUpdateService(selectedService.id, 'category', e.target.value)}
+                                            className="input-field text-sm"
+                                            placeholder="e.g. Financial Structuring"
+                                        />
+                                        <p className="text-[10px] text-gray-400 mt-1">
+                                            Use: Financial Structuring, Real Estate & Asset Platforms, Strategic Transactions, Digital & Financial Innovation, Global Investment Ecosystem.
+                                        </p>
                                     </div>
 
                                     {/* Info Note */}

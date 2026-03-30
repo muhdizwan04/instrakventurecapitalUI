@@ -34,12 +34,31 @@
 }
 
 /* Services Grid */
+.groupedServices {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.categoryBlock {
+    border-radius: 16px;
+}
+
+.categoryHeading {
+    font-size: 0.9rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(249, 250, 251, 0.8);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
 .servicesGrid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
-    position: relative;
-    z-index: 1;
 }
 
 /* Service Item */

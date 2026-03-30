@@ -8,22 +8,122 @@ const ICON_MAP = { TrendingUp, Wallet, ShieldCheck, PieChart, Briefcase, FileTex
 
 const ServicesPage = () => {
     const defaultServices = [
-        { id: 1, title: 'Business Finance Consulting (Virtual CFO)', summary: 'Strategic financial expertise without a full-time CFO. Planning, reporting, and investor relations.', icon: 'Briefcase', link: '/services/virtual-cfo' },
-        { id: 3, title: 'Equity Financing (EF)', summary: 'Strategic equity investment for growth-stage and established companies across global markets.', icon: 'TrendingUp', link: '/services/equity-financing' },
-        { id: 4, title: 'Real Estate Financing (REF)', summary: 'Global property financing for developers, asset owners, and institutional investors.', icon: 'Building2', link: '/services/real-estate-financing' },
-        { id: 5, title: 'Real Estate Investment Trust (REITs)', summary: 'Institutional-grade REITs for diversified exposure to income-generating real estate.', icon: 'Landmark', link: '/services/reits' },
-        { id: 6, title: 'Share Financing (SF)', summary: 'Unlock liquidity using listed shares as collateral. Non-dilutive financing for companies and shareholders.', icon: 'BarChart3', link: '/services/share-financing' },
-        { id: 7, title: 'Merger & Acquisition (M&A)', summary: 'Strategic advisory for mergers, acquisitions, and corporate restructuring.', icon: 'Users', link: '/services/merger-acquisition' },
-        { id: 8, title: 'Tokenization', summary: 'Tokenize real-world assets for fractional ownership and global investor access.', icon: 'Coins', link: '/services/tokenization' },
-        { id: 9, title: 'Asset Insurance (AI)', summary: 'Structured protection for high-value assets, investment portfolios, and strategic holdings.', icon: 'Shield', link: '/services/asset-insurance' },
-        { id: 10, title: 'Private Placement Life Insurance (PPLI)', summary: 'Wealth preservation and estate planning through life insurance and tax-efficient structures.', icon: 'ShieldCheck', link: '/services/ppli' },
-        { id: 11, title: 'Global Investment Gateway (GIG)', summary: 'Curated access to global investors and strategic partners for qualified companies.', icon: 'Globe', link: '/services/gig' },
-        { id: 12, title: 'Private Wealth Investment (The Luxury Dubai)', summary: 'Exclusive investment and lifestyle platform for ultra-high-net-worth individuals.', icon: 'Gem', link: '/services/private-wealth' },
-        { id: 13, title: 'Asset Under Management (AUM)', summary: 'Discretionary and advisory asset management for institutions, family offices, and high-net-worth clients.', icon: 'PieChart', link: '/services/aum' }
+        {
+            id: 1,
+            title: 'Business Finance Consulting (Virtual CFO)',
+            summary: 'Strategic financial expertise without a full-time CFO. Planning, reporting, and investor relations.',
+            icon: 'Briefcase',
+            link: '/services/virtual-cfo',
+            category: 'Financial Structuring'
+        },
+        {
+            id: 3,
+            title: 'Equity Financing (EF)',
+            summary: 'Strategic equity investment for growth-stage and established companies across global markets.',
+            icon: 'TrendingUp',
+            link: '/services/equity-financing',
+            category: 'Financial Structuring'
+        },
+        {
+            id: 4,
+            title: 'Real Estate Financing (REF)',
+            summary: 'Global property financing for developers, asset owners, and institutional investors.',
+            icon: 'Building2',
+            link: '/services/real-estate-financing',
+            category: 'Real Estate & Asset Platforms'
+        },
+        {
+            id: 5,
+            title: 'Real Estate Investment Trust (REITs)',
+            summary: 'Institutional-grade REITs for diversified exposure to income-generating real estate.',
+            icon: 'Landmark',
+            link: '/services/reits',
+            category: 'Real Estate & Asset Platforms'
+        },
+        {
+            id: 6,
+            title: 'Share Financing (SF)',
+            summary: 'Unlock liquidity using listed shares as collateral. Non-dilutive financing for companies and shareholders.',
+            icon: 'BarChart3',
+            link: '/services/share-financing',
+            category: 'Financial Structuring'
+        },
+        {
+            id: 7,
+            title: 'Merger & Acquisition (M&A)',
+            summary: 'Strategic advisory for mergers, acquisitions, and corporate restructuring.',
+            icon: 'Users',
+            link: '/services/merger-acquisition',
+            category: 'Strategic Transactions'
+        },
+        {
+            id: 8,
+            title: 'Tokenization',
+            summary: 'Tokenize real-world assets for fractional ownership and global investor access.',
+            icon: 'Coins',
+            link: '/services/tokenization',
+            category: 'Digital & Financial Innovation'
+        },
+        {
+            id: 9,
+            title: 'Asset Insurance (AI)',
+            summary: 'Structured protection for high-value assets, investment portfolios, and strategic holdings.',
+            icon: 'Shield',
+            link: '/services/asset-insurance',
+            category: 'Digital & Financial Innovation'
+        },
+        {
+            id: 10,
+            title: 'Private Placement Life Insurance (PPLI)',
+            summary: 'Wealth preservation and estate planning through life insurance and tax-efficient structures.',
+            icon: 'ShieldCheck',
+            link: '/services/ppli',
+            category: 'Financial Structuring'
+        },
+        {
+            id: 11,
+            title: 'Global Investment Gateway (GIG)',
+            summary: 'Curated access to global investors and strategic partners for qualified companies.',
+            icon: 'Globe',
+            link: '/services/gig',
+            category: 'Global Investment Ecosystem'
+        },
+        {
+            id: 12,
+            title: 'Private Wealth Investment (The Luxury Dubai)',
+            summary: 'Exclusive investment and lifestyle platform for ultra-high-net-worth individuals.',
+            icon: 'Gem',
+            link: '/services/private-wealth',
+            category: 'Global Investment Ecosystem'
+        },
+        {
+            id: 13,
+            title: 'Asset Under Management (AUM)',
+            summary: 'Discretionary and advisory asset management for institutions, family offices, and high-net-worth clients.',
+            icon: 'PieChart',
+            link: '/services/aum',
+            category: 'Global Investment Ecosystem'
+        }
     ];
 
     const { content: servicesContent } = usePageContent('services', { items: defaultServices });
     const services = servicesContent.items || defaultServices;
+
+    // Group services by category for clearer hierarchy on services page
+    const grouped = services.reduce((acc, svc) => {
+        const key = svc.category || 'Other';
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(svc);
+        return acc;
+    }, {});
+    const orderedCategories = [
+        'Financial Structuring',
+        'Real Estate & Asset Platforms',
+        'Strategic Transactions',
+        'Digital & Financial Innovation',
+        'Global Investment Ecosystem',
+        'Other'
+    ].filter(cat => grouped[cat] && grouped[cat].length > 0);
 
     const defaultPageContent = {
         heroTitle: 'Strategic Financial Services',
@@ -39,7 +139,8 @@ const ServicesPage = () => {
         ctaPrimaryText: 'Speak to an Advisor',
         ctaPrimaryLink: '/contact',
         ctaSecondaryText: 'Explore Solutions',
-        sectionSolutionsTitle: 'Our Specialized Solutions',
+        sectionSolutionsTitle: 'Integrated Capital & Investment Solutions',
+        sectionSolutionsSubtitle: 'IVC provides a comprehensive range of institutional financial services designed to support capital formation, asset growth, and cross-border investment opportunities.',
         sectionTitleFontFamily: 'var(--font-heading)',
         sectionTitleFontSize: '2.5rem',
         sectionTitleColor: '#1A365D',
@@ -158,9 +259,27 @@ const ServicesPage = () => {
                     if (sectionId === 'solutions') {
                         return (
                             <React.Fragment key="solutions">
-                                <h2 style={{ fontSize: p.sectionTitleFontSize || '2.5rem', marginBottom: '3rem', textAlign: p.sectionTitleAlign || 'center', fontFamily: p.sectionTitleFontFamily || 'var(--font-heading)', color: p.sectionTitleColor || '#1A365D', fontWeight: p.sectionTitleFontWeight || '700' }}>{p.sectionSolutionsTitle}</h2>
-                                <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', marginBottom: '100px' }}>
-                                    {services.map((s, i) => {
+                                <h2 style={{ fontSize: p.sectionTitleFontSize || '2.5rem', marginBottom: '1rem', textAlign: p.sectionTitleAlign || 'center', fontFamily: p.sectionTitleFontFamily || 'var(--font-heading)', color: p.sectionTitleColor || '#1A365D', fontWeight: p.sectionTitleFontWeight || '700' }}>{p.sectionSolutionsTitle}</h2>
+                                {p.sectionSolutionsSubtitle && (
+                                    <p style={{ maxWidth: '720px', margin: '0 auto 2.5rem', textAlign: p.sectionTitleAlign || 'center', color: '#4A5568', fontSize: '1rem', lineHeight: 1.7 }}>
+                                        {p.sectionSolutionsSubtitle}
+                                    </p>
+                                )}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', marginBottom: '100px' }}>
+                                    {orderedCategories.map((category) => (
+                                        <div key={category}>
+                                            <h3 style={{
+                                                fontSize: '0.9rem',
+                                                letterSpacing: '0.16em',
+                                                textTransform: 'uppercase',
+                                                color: '#718096',
+                                                marginBottom: '1rem',
+                                                fontWeight: 700
+                                            }}>
+                                                {category}
+                                            </h3>
+                                            <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
+                                                {grouped[category].map((s, i) => {
                         const IconComponent = ICON_MAP[s.icon] || Briefcase;
                         const link = s.link || p.tileButtonLink || `/services/${s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
                         const buttonText = s.linkText || p.tileButtonText || 'Learn More';
@@ -209,6 +328,11 @@ const ServicesPage = () => {
                                     <IconComponent size={32} style={{ color: p.tileIconColor || '#1A365D' }} />
                                 </div>
                                 
+                                {s.category && (
+                                    <div style={{ marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#718096' }}>
+                                        {s.category}
+                                    </div>
+                                )}
                                 <h3 style={{ marginBottom: '1rem', color: p.tileTitleColor || '#1A365D', fontSize: p.tileTitleFontSize || '1.4rem', fontFamily: p.tileTitleFontFamily || 'var(--font-heading)' }}>{s.title}</h3>
                                 <p style={{ color: p.tileDescColor || '#4A5568', lineHeight: '1.7', flex: 1, marginBottom: '1.5rem', fontSize: p.tileDescFontSize || '0.95rem' }}>{s.summary}</p>
                                 
@@ -220,6 +344,9 @@ const ServicesPage = () => {
                             </Link>
                         );
                     })}
+                                </div>
+                            </div>
+                        ))}
                                 </div>
                             </React.Fragment>
                         );

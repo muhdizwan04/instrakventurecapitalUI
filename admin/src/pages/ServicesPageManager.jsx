@@ -57,7 +57,8 @@ const DEFAULT_PAGE = {
     ctaPrimaryLink: '/contact',
     ctaSecondaryText: 'Explore Solutions',
     ctaSecondaryLink: '#services-list',
-    sectionSolutionsTitle: 'Our Specialized Solutions',
+    sectionSolutionsTitle: 'Integrated Capital & Investment Solutions',
+    sectionSolutionsSubtitle: 'IVC provides a comprehensive range of institutional financial services designed to support capital formation, asset growth, and cross-border investment opportunities.',
     sectionTitleFontFamily: 'var(--font-heading)',
     sectionTitleFontSize: '2.5rem',
     sectionTitleColor: '#1A365D',
@@ -474,7 +475,17 @@ const ServicesPageManager = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="label">Solutions section title</label>
-                            <input value={formData.sectionSolutionsTitle || ''} onChange={(e) => handleChange('sectionSolutionsTitle', e.target.value)} className="input-field" placeholder="Our Specialized Solutions" />
+                            <input value={formData.sectionSolutionsTitle || ''} onChange={(e) => handleChange('sectionSolutionsTitle', e.target.value)} className="input-field" placeholder="Integrated Capital & Investment Solutions" />
+                        </div>
+                        <div className="md:col-span-2">
+                            <label className="label">Solutions section subtitle</label>
+                            <textarea
+                                value={formData.sectionSolutionsSubtitle || ''}
+                                onChange={(e) => handleChange('sectionSolutionsSubtitle', e.target.value)}
+                                className="input-field"
+                                rows={3}
+                                placeholder="IVC provides a comprehensive range of institutional financial services designed to support capital formation, asset growth, and cross-border investment opportunities."
+                            />
                         </div>
                         <div className="md:col-span-2">
                             <label className="label">Solutions card style</label>

@@ -36,6 +36,14 @@ const Contact = () => {
             subject: 'Subject',
             message: 'Message',
             submitButton: 'Send Message'
+        },
+        meetingScheduler: {
+            enabled: false,
+            required: false,
+            dateLabel: 'Preferred Meeting Date',
+            timeLabel: 'Preferred Meeting Time',
+            helperText: 'Optional — pick a convenient time and our team will confirm availability.',
+            minDaysAhead: 1
         }
     };
 
@@ -45,7 +53,9 @@ const Contact = () => {
         name: '',
         email: '',
         subject: '',
-        message: ''
+        message: '',
+        meetingDate: '',
+        meetingTime: ''
     });
     const { submitForm, loading: formLoading } = useFormSubmit('contact');
 
@@ -55,15 +65,20 @@ const Contact = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const meetingScheduler = { ...defaultContent.meetingScheduler, ...(content?.meetingScheduler || {}) };
+        if (meetingScheduler.enabled && meetingScheduler.required) {
+            if (!formData.meetingDate || !formData.meetingTime) return;
+        }
         const submitted = await submitForm(formData);
         if (submitted) {
-            setFormData({ name: '', email: '', subject: '', message: '' });
+            setFormData({ name: '', email: '', subject: '', message: '', meetingDate: '', meetingTime: '' });
         }
     };
 
     const pageHero = content?.pageHero || defaultContent.pageHero;
     const contactInfo = content?.contactInfo || defaultContent.contactInfo;
     const formLabels = content?.formLabels || defaultContent.formLabels;
+    const meetingScheduler = { ...defaultContent.meetingScheduler, ...(content?.meetingScheduler || {}) };
     const styles = content?.styles || {};
 
     const sectionTitle = styles.sectionTitle ?? 'Get in Touch';
@@ -98,6 +113,20 @@ const Contact = () => {
         fontSize: styles.formInputFontSize ?? '0.95rem'
     };
     const labelStyle = { display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500', color: styles.formLabelColor || '#1A365D' };
+
+    const toDateInputValue = (d) => {
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    };
+    const minMeetingDate = (() => {
+        const days = Number.isFinite(meetingScheduler.minDaysAhead) ? meetingScheduler.minDaysAhead : 0;
+        const dt = new Date();
+        dt.setHours(0, 0, 0, 0);
+        dt.setDate(dt.getDate() + Math.max(0, days));
+        return toDateInputValue(dt);
+    })();
 
     if (contentLoading) {
         return (
@@ -234,6 +263,41 @@ const Contact = () => {
                                     required
                                 ></textarea>
                             </div>
+                            {meetingScheduler.enabled && (
+                                <div style={{ marginBottom: '2rem' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <div>
+                                            <label style={labelStyle}>{meetingScheduler.dateLabel}</label>
+                                            <input
+                                                type="date"
+                                                name="meetingDate"
+                                                value={formData.meetingDate}
+                                                onChange={handleChange}
+                                                style={inputStyle}
+                                                min={minMeetingDate}
+                                                required={!!meetingScheduler.required}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={labelStyle}>{meetingScheduler.timeLabel}</label>
+                                            <input
+                                                type="time"
+                                                name="meetingTime"
+                                                value={formData.meetingTime}
+                                                onChange={handleChange}
+                                                style={inputStyle}
+                                                step={900}
+                                                required={!!meetingScheduler.required}
+                                            />
+                                        </div>
+                                    </div>
+                                    {meetingScheduler.helperText && (
+                                        <p style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: sectionTextColor }}>
+                                            {meetingScheduler.helperText}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                             <button
                                 className="btn-solid"
                                 type="submit"

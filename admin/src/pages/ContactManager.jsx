@@ -74,6 +74,14 @@ const ContactManager = () => {
             subject: 'Subject',
             message: 'Message',
             submitButton: 'Send Message'
+        },
+        meetingScheduler: {
+            enabled: false,
+            required: false,
+            dateLabel: 'Preferred Meeting Date',
+            timeLabel: 'Preferred Meeting Time',
+            helperText: 'Optional — pick a convenient time and our team will confirm availability.',
+            minDaysAhead: 1
         }
     };
 
@@ -300,6 +308,126 @@ const ContactManager = () => {
                                 onChange={(e) => setFormData(prev => ({ ...prev, formLabels: { ...prev.formLabels, submitButton: e.target.value } }))}
                                 className="w-full px-4 py-2 rounded-lg border border-[var(--border-light)] text-sm"
                             />
+                        </div>
+                    </div>
+                    <div className="mt-6 pt-5 border-t border-gray-100">
+                        <h4 className="text-sm font-bold text-gray-700 mb-3">Meeting scheduler (date & time)</h4>
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-4">
+                                <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={!!formData.meetingScheduler?.enabled}
+                                        onChange={(e) =>
+                                            setFormData((prev) => ({
+                                                ...prev,
+                                                meetingScheduler: {
+                                                    ...(prev.meetingScheduler || defaultData.meetingScheduler),
+                                                    enabled: e.target.checked,
+                                                },
+                                            }))
+                                        }
+                                        className="w-4 h-4"
+                                    />
+                                    Enable date & time picker
+                                </label>
+                                <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={!!formData.meetingScheduler?.required}
+                                        onChange={(e) =>
+                                            setFormData((prev) => ({
+                                                ...prev,
+                                                meetingScheduler: {
+                                                    ...(prev.meetingScheduler || defaultData.meetingScheduler),
+                                                    required: e.target.checked,
+                                                },
+                                            }))
+                                        }
+                                        className="w-4 h-4"
+                                        disabled={!formData.meetingScheduler?.enabled}
+                                    />
+                                    Required
+                                </label>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Date label</label>
+                                    <input
+                                        type="text"
+                                        value={formData.meetingScheduler?.dateLabel || defaultData.meetingScheduler.dateLabel}
+                                        onChange={(e) =>
+                                            setFormData((prev) => ({
+                                                ...prev,
+                                                meetingScheduler: {
+                                                    ...(prev.meetingScheduler || defaultData.meetingScheduler),
+                                                    dateLabel: e.target.value,
+                                                },
+                                            }))
+                                        }
+                                        className="w-full px-4 py-2 rounded-lg border border-[var(--border-light)] text-sm"
+                                        disabled={!formData.meetingScheduler?.enabled}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Time label</label>
+                                    <input
+                                        type="text"
+                                        value={formData.meetingScheduler?.timeLabel || defaultData.meetingScheduler.timeLabel}
+                                        onChange={(e) =>
+                                            setFormData((prev) => ({
+                                                ...prev,
+                                                meetingScheduler: {
+                                                    ...(prev.meetingScheduler || defaultData.meetingScheduler),
+                                                    timeLabel: e.target.value,
+                                                },
+                                            }))
+                                        }
+                                        className="w-full px-4 py-2 rounded-lg border border-[var(--border-light)] text-sm"
+                                        disabled={!formData.meetingScheduler?.enabled}
+                                    />
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Helper text</label>
+                                    <input
+                                        type="text"
+                                        value={formData.meetingScheduler?.helperText || defaultData.meetingScheduler.helperText}
+                                        onChange={(e) =>
+                                            setFormData((prev) => ({
+                                                ...prev,
+                                                meetingScheduler: {
+                                                    ...(prev.meetingScheduler || defaultData.meetingScheduler),
+                                                    helperText: e.target.value,
+                                                },
+                                            }))
+                                        }
+                                        className="w-full px-4 py-2 rounded-lg border border-[var(--border-light)] text-sm"
+                                        disabled={!formData.meetingScheduler?.enabled}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Minimum days ahead</label>
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        max={365}
+                                        value={Number.isFinite(formData.meetingScheduler?.minDaysAhead) ? formData.meetingScheduler.minDaysAhead : defaultData.meetingScheduler.minDaysAhead}
+                                        onChange={(e) => {
+                                            const v = e.target.value === '' ? 0 : Math.max(0, Math.min(365, parseInt(e.target.value, 10) || 0));
+                                            setFormData((prev) => ({
+                                                ...prev,
+                                                meetingScheduler: {
+                                                    ...(prev.meetingScheduler || defaultData.meetingScheduler),
+                                                    minDaysAhead: v,
+                                                },
+                                            }));
+                                        }}
+                                        className="w-full px-4 py-2 rounded-lg border border-[var(--border-light)] text-sm"
+                                        disabled={!formData.meetingScheduler?.enabled}
+                                    />
+                                    <p className="text-xs text-gray-400 mt-1">Prevents selecting dates too soon (e.g. 1 = tomorrow onwards).</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

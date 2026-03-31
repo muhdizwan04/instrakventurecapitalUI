@@ -96,8 +96,12 @@ const HomeManager = () => {
                     { id: 1, text: 'Start AI Capital Assessment', link: '/ai-capital-assessment', variant: 'solid' },
                     { id: 2, text: 'Speak With An Advisor', link: '/contact', variant: 'outline' }
                 ],
+                solidStyle: 'solid', // 'solid' | 'gradient'
                 solidBg: '#1A365D',
-                outlineColor: '#B8860B'
+                solidBgTo: '#0F2942',
+                solidTextColor: '#FFFFFF',
+                outlineColor: '#B8860B',
+                outlineTextColor: '#B8860B'
             }
         ],
         // Hero background settings
@@ -210,7 +214,18 @@ const HomeManager = () => {
                 newBlock = { id, type: 'text', content: 'Enter your text here...', color: '#4A5568', align: 'left' };
                 break;
             case 'buttons':
-                newBlock = { id, type: 'buttons', buttons: [{ id: Date.now(), text: 'New Button', link: '/contact', variant: 'solid' }], solidBg: '#1A365D', outlineColor: '#B8860B', align: 'left' };
+                newBlock = {
+                    id,
+                    type: 'buttons',
+                    buttons: [{ id: Date.now(), text: 'New Button', link: '/contact', variant: 'solid' }],
+                    solidStyle: 'solid',
+                    solidBg: '#1A365D',
+                    solidBgTo: '#0F2942',
+                    solidTextColor: '#FFFFFF',
+                    outlineColor: '#B8860B',
+                    outlineTextColor: '#B8860B',
+                    align: 'left'
+                };
                 break;
             case 'spacer':
                 newBlock = { id, type: 'spacer', height: 24 };
@@ -579,12 +594,37 @@ const HomeManager = () => {
                                                                         <div className="flex items-center gap-4">
                                                                             <button onClick={() => addButtonToBlock(block.id)} className="text-xs text-[var(--accent-primary)] font-bold flex items-center gap-1 hover:underline"><Plus size={14} /> Add Button</button>
                                                                             <div className="flex items-center gap-2 ml-auto">
-                                                                                <span className="text-xs text-gray-500">Solid BG</span>
+                                                                                <span className="text-xs text-gray-500">Solid/Gradient</span>
+                                                                                <select
+                                                                                    value={block.solidStyle || 'solid'}
+                                                                                    onChange={(e) => updateHeroBlock(block.id, { solidStyle: e.target.value })}
+                                                                                    className="input-field text-xs w-28 bg-white text-gray-900 border-gray-300"
+                                                                                >
+                                                                                    <option value="solid">Solid</option>
+                                                                                    <option value="gradient">Gradient</option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div className="flex items-center gap-2">
+                                                                                <span className="text-xs text-gray-500">BG From</span>
                                                                                 <input type="color" value={block.solidBg || '#1A365D'} onChange={(e) => updateHeroBlock(block.id, { solidBg: e.target.value })} className="h-7 w-9 p-0.5 rounded border border-gray-200 cursor-pointer" />
+                                                                            </div>
+                                                                            {(block.solidStyle || 'solid') === 'gradient' && (
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <span className="text-xs text-gray-500">BG To</span>
+                                                                                    <input type="color" value={block.solidBgTo || '#0F2942'} onChange={(e) => updateHeroBlock(block.id, { solidBgTo: e.target.value })} className="h-7 w-9 p-0.5 rounded border border-gray-200 cursor-pointer" />
+                                                                                </div>
+                                                                            )}
+                                                                            <div className="flex items-center gap-2">
+                                                                                <span className="text-xs text-gray-500">Text</span>
+                                                                                <input type="color" value={block.solidTextColor || '#FFFFFF'} onChange={(e) => updateHeroBlock(block.id, { solidTextColor: e.target.value })} className="h-7 w-9 p-0.5 rounded border border-gray-200 cursor-pointer" />
                                                                             </div>
                                                                             <div className="flex items-center gap-2">
                                                                                 <span className="text-xs text-gray-500">Outline</span>
                                                                                 <input type="color" value={block.outlineColor || '#B8860B'} onChange={(e) => updateHeroBlock(block.id, { outlineColor: e.target.value })} className="h-7 w-9 p-0.5 rounded border border-gray-200 cursor-pointer" />
+                                                                            </div>
+                                                                            <div className="flex items-center gap-2">
+                                                                                <span className="text-xs text-gray-500">Outline Text</span>
+                                                                                <input type="color" value={block.outlineTextColor || block.outlineColor || '#B8860B'} onChange={(e) => updateHeroBlock(block.id, { outlineTextColor: e.target.value })} className="h-7 w-9 p-0.5 rounded border border-gray-200 cursor-pointer" />
                                                                             </div>
                                                                         </div>
                                                                     </div>

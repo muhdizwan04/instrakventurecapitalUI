@@ -46,8 +46,12 @@ const Hero = () => {
                 { id: 1, text: 'Start AI Capital Assessment', link: '/ai-capital-assessment', variant: 'solid' },
                 { id: 2, text: 'Speak With An Advisor', link: '/contact', variant: 'outline' }
             ],
+            solidStyle: 'solid', // 'solid' | 'gradient'
             solidBg: '#facc15',
-            outlineColor: '#fde68a'
+            solidBgTo: '#B8860B',
+            solidTextColor: '#0b1120',
+            outlineColor: '#fde68a',
+            outlineTextColor: '#fde68a'
         }
     ];
 
@@ -70,7 +74,17 @@ const Hero = () => {
             { id: 'legacy-title', type: 'title', content: content.heroTitle || defaultBlocks[0].content, color: content.heroTitleColor || '#f9fafb', highlightColor: content.heroHighlightColor || '#facc15' },
             { id: 'legacy-subtitle', type: 'subtitle', content: content.heroSubtitle || defaultBlocks[1].content, color: content.heroSubtitleColor || '#fde68a' },
             { id: 'legacy-text', type: 'text', content: content.heroDescription || defaultBlocks[2].content, color: content.heroDescriptionColor || '#9ca3af' },
-            { id: 'legacy-buttons', type: 'buttons', buttons: content.buttons || defaultBlocks[3].buttons, solidBg: content.heroBtnSolidBg || '#facc15', outlineColor: content.heroBtnOutlineColor || '#fde68a' }
+            {
+                id: 'legacy-buttons',
+                type: 'buttons',
+                buttons: content.buttons || defaultBlocks[3].buttons,
+                solidStyle: content.heroBtnSolidStyle || defaultBlocks[3].solidStyle || 'solid',
+                solidBg: content.heroBtnSolidBg || defaultBlocks[3].solidBg || '#facc15',
+                solidBgTo: content.heroBtnSolidBgTo || defaultBlocks[3].solidBgTo || '#B8860B',
+                solidTextColor: content.heroBtnSolidTextColor || defaultBlocks[3].solidTextColor || '#0b1120',
+                outlineColor: content.heroBtnOutlineColor || defaultBlocks[3].outlineColor || '#fde68a',
+                outlineTextColor: content.heroBtnOutlineTextColor || defaultBlocks[3].outlineTextColor || '#fde68a'
+            }
         ];
     } else {
         heroBlocks = defaultBlocks;
@@ -154,14 +168,26 @@ const Hero = () => {
                     <motion.div className={styles.cta} variants={itemVariant}>
                         {btns.map(btn => {
                             const isSolid = btn.variant === 'solid';
+                            const solidStyle = block.solidStyle || 'solid';
+                            const solidBgFrom = block.solidBg || '#1A365D';
+                            const solidBgTo = block.solidBgTo || '#0F2942';
+                            const solidTextColor = block.solidTextColor || '#FFFFFF';
+                            const outlineColor = block.outlineColor || '#B8860B';
+                            const outlineTextColor = block.outlineTextColor || outlineColor;
                             return (
                                 <Link
                                     key={btn.id}
                                     to={btn.link}
                                     className={isSolid ? 'btn-solid' : 'btn-outline-gold'}
                                     style={isSolid
-                                        ? { backgroundColor: block.solidBg || '#1A365D', borderColor: block.solidBg || '#1A365D' }
-                                        : { borderColor: block.outlineColor || '#B8860B', color: block.outlineColor || '#B8860B' }
+                                        ? {
+                                            background: solidStyle === 'gradient'
+                                                ? `linear-gradient(135deg, ${solidBgFrom}, ${solidBgTo})`
+                                                : solidBgFrom,
+                                            borderColor: solidBgFrom,
+                                            color: solidTextColor
+                                        }
+                                        : { borderColor: outlineColor, color: outlineTextColor }
                                     }
                                 >
                                     {btn.text}

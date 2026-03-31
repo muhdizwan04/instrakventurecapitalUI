@@ -55,8 +55,14 @@ const DEFAULT_PAGE = {
     heroShowSecondaryCta: true,
     ctaPrimaryText: 'Speak to an Advisor',
     ctaPrimaryLink: '/contact',
+    ctaPrimaryStyle: 'solid', // 'solid' | 'gradient'
+    ctaPrimaryBg: '#B8860B',
+    ctaPrimaryBgTo: '#1A365D',
+    ctaPrimaryTextColor: '#FFFFFF',
     ctaSecondaryText: 'Explore Solutions',
     ctaSecondaryLink: '#services-list',
+    ctaSecondaryBorderColor: 'rgba(255,255,255,0.3)',
+    ctaSecondaryTextColor: '#FFFFFF',
     sectionSolutionsTitle: 'Integrated Capital & Investment Solutions',
     sectionSolutionsSubtitle: 'IVC provides a comprehensive range of institutional financial services designed to support capital formation, asset growth, and cross-border investment opportunities.',
     sectionTitleFontFamily: 'var(--font-heading)',
@@ -444,6 +450,27 @@ const ServicesPageManager = () => {
                                                 <span className="text-sm text-[var(--text-secondary)]">Navigate to</span>
                                                 <input value={formData.ctaPrimaryLink || ''} onChange={(e) => handleChange('ctaPrimaryLink', e.target.value)} className="input-field w-48" placeholder="/contact" title="Existing link is shown here" />
                                             </div>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm text-[var(--text-secondary)]">Style</span>
+                                                <select value={formData.ctaPrimaryStyle || 'solid'} onChange={(e) => handleChange('ctaPrimaryStyle', e.target.value)} className="input-field w-32">
+                                                    <option value="solid">Solid</option>
+                                                    <option value="gradient">Gradient</option>
+                                                </select>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm text-[var(--text-secondary)]">BG</span>
+                                                <input type="color" value={formData.ctaPrimaryBg || '#B8860B'} onChange={(e) => handleChange('ctaPrimaryBg', e.target.value)} className="h-10 w-12 rounded border border-gray-300 cursor-pointer" />
+                                            </div>
+                                            {String(formData.ctaPrimaryStyle || 'solid') === 'gradient' && (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm text-[var(--text-secondary)]">To</span>
+                                                    <input type="color" value={formData.ctaPrimaryBgTo || '#1A365D'} onChange={(e) => handleChange('ctaPrimaryBgTo', e.target.value)} className="h-10 w-12 rounded border border-gray-300 cursor-pointer" />
+                                                </div>
+                                            )}
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm text-[var(--text-secondary)]">Text</span>
+                                                <input type="color" value={formData.ctaPrimaryTextColor || '#FFFFFF'} onChange={(e) => handleChange('ctaPrimaryTextColor', e.target.value)} className="h-10 w-12 rounded border border-gray-300 cursor-pointer" />
+                                            </div>
                                         </>
                                     )}
                                 </div>
@@ -458,6 +485,14 @@ const ServicesPageManager = () => {
                                             <div className="flex items-center gap-2">
                                                 <span className="text-sm text-[var(--text-secondary)]">Navigate to</span>
                                                 <input value={formData.ctaSecondaryLink ?? '#services-list'} onChange={(e) => handleChange('ctaSecondaryLink', e.target.value)} className="input-field w-48" placeholder="#services-list or /path" title="Existing link is shown here" />
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm text-[var(--text-secondary)]">Border</span>
+                                                <input type="color" value={formData.ctaSecondaryBorderColor || '#FFFFFF'} onChange={(e) => handleChange('ctaSecondaryBorderColor', e.target.value)} className="h-10 w-12 rounded border border-gray-300 cursor-pointer" />
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm text-[var(--text-secondary)]">Text</span>
+                                                <input type="color" value={formData.ctaSecondaryTextColor || '#FFFFFF'} onChange={(e) => handleChange('ctaSecondaryTextColor', e.target.value)} className="h-10 w-12 rounded border border-gray-300 cursor-pointer" />
                                             </div>
                                         </>
                                     )}

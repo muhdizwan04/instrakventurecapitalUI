@@ -22,7 +22,7 @@ const Navbar = () => {
                 link: '/about',
                 isDropdown: true,
                 children: [
-                    { id: 'sub-1', label: 'Mission, Vision & Values', link: '/about#mission' },
+                    { id: 'sub-1', label: 'Mission, Vision & Philosophy', link: '/about#mission' },
                     { id: 'sub-2', label: 'Board of Directors', link: '/about#board' },
                     { id: 'sub-3', label: 'Strategic Partners', link: '/about#partners' }
                 ]
@@ -77,20 +77,23 @@ const Navbar = () => {
         navStyleVars.background = `linear-gradient(${dir}, ${navStylesConfig.gradientStart}, ${navStylesConfig.gradientEnd})`;
     }
 
-    // FORCE UPDATE: Ensure About Us links point to the consolidated page
-    const items = rawItems.map(item => {
-        if (item.label === 'About Us' || item.id === 'nav-2') {
-            return {
-                ...item,
-                link: '/about',
-                children: [
-                    { id: 'sub-1', label: 'Mission, Vision & Values', link: '/about#mission' },
-                    { id: 'sub-2', label: 'Board of Directors', link: '/about#board' },
-                    { id: 'sub-3', label: 'Strategic Partners', link: '/about#partners' }
-                ]
-            };
-        }
-        return item;
+    // Keep admin-provided labels; only normalize About Us links if needed.
+    const items = rawItems.map((item) => {
+        if (item.id !== 'nav-2' && item.label !== 'About Us') return item;
+
+        const children = Array.isArray(item.children) ? item.children : [];
+        const normalizedChildren = children.map((sub) => {
+            const l = String(sub.link || '');
+            // If admin already points to /about, keep it. Otherwise, if it targets legacy /about, normalize to /about.
+            if (l.startsWith('/about')) return sub;
+            return sub;
+        });
+
+        return {
+            ...item,
+            link: item.link?.startsWith('/about') ? item.link : '/about',
+            children: normalizedChildren
+        };
     });
 
     return (

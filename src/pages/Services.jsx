@@ -229,8 +229,11 @@ const ServicesPage = () => {
                     }}>
                         {p.heroShowPrimaryCta !== false && (
                             <Link to={p.ctaPrimaryLink || '/contact'} className="btn-solid" style={{ 
-                                background: '#B8860B', 
-                                color: '#FFFFFF', 
+                                background: (p.ctaPrimaryStyle || 'solid') === 'gradient'
+                                    ? `linear-gradient(135deg, ${p.ctaPrimaryBg || '#B8860B'}, ${p.ctaPrimaryBgTo || '#1A365D'})`
+                                    : (p.ctaPrimaryBg || '#B8860B'), 
+                                color: p.ctaPrimaryTextColor || '#FFFFFF', 
+                                borderColor: p.ctaPrimaryBg || '#B8860B',
                                 padding: '1rem 2rem', 
                                 fontSize: '1.1rem',
                                 display: 'inline-flex',
@@ -242,8 +245,8 @@ const ServicesPage = () => {
                         )}
                         {p.heroShowSecondaryCta !== false && (
                             <a href={p.ctaSecondaryLink || '#services-list'} className="btn-outline" style={{ 
-                                borderColor: 'rgba(255,255,255,0.3)', 
-                                color: p.heroTextColor || '#FFFFFF', 
+                                borderColor: p.ctaSecondaryBorderColor || 'rgba(255,255,255,0.3)', 
+                                color: p.ctaSecondaryTextColor || p.heroTextColor || '#FFFFFF', 
                                 padding: '1rem 2rem', 
                                 fontSize: '1.1rem' 
                             }}>

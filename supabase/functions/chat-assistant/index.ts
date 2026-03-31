@@ -8,8 +8,10 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const ALLOWED_ORIGINS = [
   "https://www.instrakventurecapital.com",
   "https://instrakventurecapital.com",
+  "https://instrak-client.vercel.app",
   "https://instrakventurecapitalui.vercel.app",
   "http://localhost:5174",
+  "http://localhost:5173",
   "http://localhost:4173",
 ];
 
@@ -20,6 +22,7 @@ function getCorsHeaders(req: Request) {
     "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Expose-Headers": "X-Intent, X-Service, X-RateLimit-Remaining",
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
     "Referrer-Policy": "strict-origin-when-cross-origin",
@@ -96,6 +99,10 @@ async function detectIntent(
 - GENERAL_INFO: General company information, about us, mission/vision
 - FORM_SUBMISSION: Ready to fill inquiry form, wants to apply
 
+If intent is SERVICE_INQUIRY or FORM_SUBMISSION and a specific service is mentioned, "service" MUST be EXACTLY one of these URL slugs (hyphenated, lowercase) or null:
+virtual-cfo, business-finance-consulting, equity-financing, real-estate-financing, reits, share-financing, merger-acquisition, tokenization, asset-insurance, ppli, gig, private-wealth, aum
+Examples: Virtual CFO / BFC → virtual-cfo. Equity Financing → equity-financing.
+
 Recent conversation context:
 ${recentContext}
 
@@ -104,10 +111,11 @@ Current message: "${userMessage}"
 Respond with ONLY a JSON object:
 {
   "intent": "ONE_OF_THE_CATEGORIES_ABOVE",
-  "service": "service-name-if-mentioned-or-null"
+  "service": "exact-slug-from-list-above-or-null"
 }
 
 Examples:
+- "Tell me about Virtual CFO" → {"intent": "SERVICE_INQUIRY", "service": "virtual-cfo"}
 - "Tell me about equity financing" → {"intent": "SERVICE_INQUIRY", "service": "equity-financing"}
 - "I need funding" → {"intent": "FUNDING_REQUEST", "service": null}
 - "How do I contact you?" → {"intent": "CONTACT_REQUEST", "service": null}
@@ -330,12 +338,15 @@ async function fetchSiteContent(): Promise<string> {
     const services = contentMap["services"]?.items;
     if (services && Array.isArray(services) && services.length > 0) {
       dynamicInfo += "\n## Services (from live database)\n";
+      dynamicInfo += "When listing services, use this exact format per item:\n";
+      dynamicInfo += '"1. Service Name — short summary. [Learn more](/services/slug)"\n\n';
       services.forEach((s: any, i: number) => {
         const title = s.title || "Untitled Service";
         const summary = s.summary || "Details available upon request.";
-        const link = s.link || "#";
-        dynamicInfo += `${i + 1}. **${title}** (${link})\n   - ${summary}\n\n`;
+        const link = s.link || "/contact";
+        dynamicInfo += `${i + 1}. ${title} — ${summary} [Learn more](${link})\n`;
       });
+      dynamicInfo += "\n";
     } else {
       dynamicInfo += "\n## Services\n- No services found in database. Please direct users to the website at www.instrakventurecapital.com\n";
     }
@@ -419,10 +430,18 @@ const BASE_PROMPT = `You are the official AI assistant for **Instrak Venture Cap
 
 const RESPONSE_GUIDELINES = `
 ## Response Guidelines
-- When a user asks about a service, provide a brief summary and include the page link in markdown format, e.g. [Equity Financing](/services/equity-financing)
+- For service list answers, use this exact structure:
+  1) One-line intro sentence
+  2) Numbered list (max 5 items)
+  3) Each item format: "1. Service Name — one short summary. [Learn more](/services/service-slug)"
+  4) Use plain text service names (no bold, no incomplete markdown)
+- Only use valid markdown links in the format [Learn more](/services/slug) or [Learn more](https://...)
+- Never output raw markdown symbols like unmatched "**", "[" or "]"
+- Do not include malformed link formats like "Learn more(/services/slug)"
+- If you are not confident about a link, use [Contact us](/contact) instead of guessing
 - When a user seems ready to apply or inquire, direct them to the specific service page which has an inquiry form
 - For general contact: direct to [Contact page](/contact)
-- Keep responses under 200 words unless the user asks for detail
+- Keep responses under 160 words unless the user asks for detail
 - Use bullet points for clarity when listing multiple items
 - Be enthusiastic but professional — this is a premium financial firm
 `;
@@ -537,12 +556,16 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // Merge with conversation history (avoid duplicates)
     const lastUserMessage = sanitizedMessages[sanitizedMessages.length - 1];
-    const allMessages = [
-      ...conversationHistory.filter(m => m.role !== "system"),
-      ...sanitizedMessages,
-    ].slice(-MAX_MESSAGES_COUNT);
+
+    // Use whichever source has more messages; the frontend sends the full
+    // session already, so prefer its copy over the DB copy.
+    const historyMsgs = conversationHistory.filter(m => m.role !== "system");
+    const allMessages = (
+      sanitizedMessages.length >= historyMsgs.length
+        ? sanitizedMessages
+        : [...historyMsgs, lastUserMessage]
+    ).slice(-MAX_MESSAGES_COUNT);
 
     // ── 11. Detect Intent ──
     const startTime = Date.now();

@@ -1,12 +1,70 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { MessageCircle, X, Send, Bot, ExternalLink } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import styles from './ChatWidget.module.css';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../lib/supabase';
+
+/** Must match `src/App.jsx` service routes */
+const VALID_SERVICE_SLUGS = new Set([
+  'virtual-cfo',
+  'business-finance-consulting',
+  'equity-financing',
+  'real-estate-financing',
+  'reits',
+  'share-financing',
+  'merger-acquisition',
+  'tokenization',
+  'asset-insurance',
+  'ppli',
+  'gig',
+  'private-wealth',
+  'aum',
+]);
+
+/**
+ * Intent / headers often return human text ("Virtual CFO") or bad slugs.
+ * Maps to a real `/services/:slug` path or null.
+ */
+function normalizeServiceSlug(raw) {
+  if (raw == null) return null;
+  let s = String(raw).trim();
+  if (!s || /^null$/i.test(s) || /^undefined$/i.test(s)) return null;
+  s = s.replace(/^["']|["']$/g, '');
+  const pathMatch = s.match(/\/services\/([^/?#]+)/i);
+  if (pathMatch) s = pathMatch[1];
+  s = s.toLowerCase().replace(/_/g, '-').replace(/\s+/g, '-');
+  s = s.replace(/-+/g, '-').replace(/^-|-$/g, '');
+  if (VALID_SERVICE_SLUGS.has(s)) return s;
+  if (s.includes('virtual') && s.includes('cfo')) return 'virtual-cfo';
+  if (s.includes('business') && s.includes('finance') && s.includes('consult')) return 'business-finance-consulting';
+  if (s.includes('equity') && s.includes('financ')) return 'equity-financing';
+  if (s.includes('real') && s.includes('estate') && s.includes('financ')) return 'real-estate-financing';
+  if (s === 'reit' || s === 'reits') return 'reits';
+  if (s.includes('share') && s.includes('financ')) return 'share-financing';
+  if (s.includes('merger') || s.includes('m&a') || s.includes('acquisition')) return 'merger-acquisition';
+  if (s.includes('token')) return 'tokenization';
+  if (s.includes('asset') && s.includes('insurance')) return 'asset-insurance';
+  if (s.includes('private') && s.includes('wealth')) return 'private-wealth';
+  if (s === 'aum' || s.includes('asset-under-management')) return 'aum';
+  if (s === 'gig') return 'gig';
+  if (s === 'ppli') return 'ppli';
+  return null;
+}
+
+function formatServiceTitle(raw) {
+  if (!raw) return 'this service';
+  const slug = normalizeServiceSlug(raw);
+  const token = slug || String(raw).trim().replace(/^["']|["']$/g, '');
+  return token
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+}
 
 const WELCOME_MESSAGE = {
   role: 'assistant',
-  content: "Welcome to **Instrak Venture Capital**! 👋\n\nI'm here to help you explore our services — from Equity Financing to Virtual CFO and more.\n\nHow can I assist you today?"
+  content: "Hi! I am Maya, your AI Assistant!"
 };
 
 const QUICK_ACTIONS = [
@@ -16,7 +74,6 @@ const QUICK_ACTIONS = [
   'How to contact you?'
 ];
 
-// Intent-based quick actions
 const INTENT_ACTIONS = {
   SERVICE_INQUIRY: [
     'Tell me more about this service',
@@ -45,7 +102,6 @@ const INTENT_ACTIONS = {
   ]
 };
 
-// Generate or retrieve session ID
 const getSessionId = () => {
   const stored = localStorage.getItem('chat_session_id');
   if (stored) return stored;
@@ -54,16 +110,7 @@ const getSessionId = () => {
   return newId;
 };
 
-// Initialize Supabase client
-const getSupabaseClient = () => {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseKey) return null;
-  return createClient(supabaseUrl, supabaseKey);
-};
-
 const ChatWidget = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([WELCOME_MESSAGE]);
@@ -73,53 +120,80 @@ const ChatWidget = () => {
   const [sessionId] = useState(() => getSessionId());
   const [currentIntent, setCurrentIntent] = useState(null);
   const [suggestedService, setSuggestedService] = useState(null);
-  const messagesEndRef = useRef(null);
+  const resolvedServiceSlug = useMemo(() => normalizeServiceSlug(suggestedService), [suggestedService]);
+  const serviceDetailPath = resolvedServiceSlug ? `/services/${resolvedServiceSlug}` : '/services';
+  const messagesAreaRef = useRef(null);
   const inputRef = useRef(null);
-  const supabase = getSupabaseClient();
+  const autoScrollRef = useRef(true);
+  const programmaticScrollRef = useRef(false);
+
+  // Scroll to bottom helper — sets programmatic flag so onScroll ignores it
+  const scrollToBottom = useCallback(() => {
+    const el = messagesAreaRef.current;
+    if (!el) return;
+    programmaticScrollRef.current = true;
+    el.scrollTop = el.scrollHeight;
+  }, []);
+
+  // When user scrolls, decide if they scrolled away from bottom
+  const handleMessagesScroll = useCallback(() => {
+    if (programmaticScrollRef.current) {
+      programmaticScrollRef.current = false;
+      return;
+    }
+    const el = messagesAreaRef.current;
+    if (!el) return;
+    const distFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    autoScrollRef.current = distFromBottom < 40;
+  }, []);
+
+  // Auto-scroll only when user is at the bottom
+  useEffect(() => {
+    if (autoScrollRef.current) scrollToBottom();
+  }, [messages, isLoading, scrollToBottom]);
 
   // Load conversation history on mount
   useEffect(() => {
-    const loadConversation = async () => {
-      if (!supabase || !sessionId) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('chat_conversations')
-          .select('messages, intent, service_mentioned')
-          .eq('session_id', sessionId)
-          .order('updated_at', { ascending: false })
-          .limit(1)
-          .single();
-
-        if (!error && data && Array.isArray(data.messages) && data.messages.length > 0) {
-          // Filter out system messages and load conversation
-          const conversationMessages = data.messages.filter(m => m.role !== 'system');
-          if (conversationMessages.length > 0) {
-            setMessages(conversationMessages);
-            setShowQuickActions(false);
-            if (data.intent) setCurrentIntent(data.intent);
-            if (data.service_mentioned) setSuggestedService(data.service_mentioned);
-          }
+    if (!sessionId) return;
+    supabase
+      .from('chat_conversations')
+      .select('messages, intent, service_mentioned')
+      .eq('session_id', sessionId)
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .single()
+      .then(({ data, error }) => {
+        if (error || !data || !Array.isArray(data.messages) || data.messages.length === 0) return;
+        const msgs = data.messages.filter(m => m.role !== 'system');
+        if (msgs.length > 0) {
+          setMessages(msgs);
+          setShowQuickActions(false);
+          if (data.intent) setCurrentIntent(data.intent);
+          if (data.service_mentioned) setSuggestedService(data.service_mentioned);
         }
-      } catch (err) {
-        console.error('Error loading conversation:', err);
-      }
-    };
-
-    loadConversation();
-  }, [sessionId, supabase]);
-
-  // Auto-scroll to bottom
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading]);
+      })
+      .catch(() => {});
+  }, [sessionId]);
 
   // Focus input when chat opens
   useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 100);
-    }
+    if (isOpen) setTimeout(() => inputRef.current?.focus(), 100);
   }, [isOpen]);
+
+  // Intercept link clicks inside messages for SPA navigation
+  const handleMessageAreaClick = useCallback((e) => {
+    const anchor = e.target.closest('a');
+    if (!anchor) return;
+    const href = anchor.getAttribute('href');
+    if (!href) return;
+
+    // Internal paths start with /
+    if (href.startsWith('/')) {
+      e.preventDefault();
+      navigate(href);
+      setIsOpen(false);
+    }
+  }, [navigate]);
 
   const sendMessage = async (text) => {
     const userMessage = text || input.trim();
@@ -127,26 +201,26 @@ const ChatWidget = () => {
 
     setInput('');
     setShowQuickActions(false);
+    autoScrollRef.current = true;
 
     const newMessages = [...messages, { role: 'user', content: userMessage }];
     setMessages(newMessages);
     setIsLoading(true);
 
     try {
-      // Prepare messages for the API (only role + content)
       const apiMessages = newMessages
         .filter(m => m.role !== 'error')
         .map(({ role, content }) => ({ role, content }));
 
-      // Use fetch directly for proper SSE streaming support
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-      // Get user ID if authenticated (optional)
       let userId = null;
-      if (supabase) {
+      try {
         const { data: { user } } = await supabase.auth.getUser();
         userId = user?.id || null;
+      } catch {
+        // optional
       }
 
       const response = await fetch(`${supabaseUrl}/functions/v1/chat-assistant`, {
@@ -155,24 +229,16 @@ const ChatWidget = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${supabaseAnonKey}`,
         },
-        body: JSON.stringify({ 
-          messages: apiMessages,
-          sessionId,
-          userId 
-        }),
+        body: JSON.stringify({ messages: apiMessages, sessionId, userId }),
       });
 
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
-      // Get intent from headers
       const intent = response.headers.get('X-Intent');
       const service = response.headers.get('X-Service');
       if (intent) setCurrentIntent(intent);
       if (service) setSuggestedService(service);
 
-      // Read the streamed response
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let fullContent = '';
@@ -189,32 +255,26 @@ const ChatWidget = () => {
           if (line.startsWith('data: ')) {
             const jsonStr = line.slice(6).trim();
             if (jsonStr === '[DONE]') continue;
-            
             try {
               const parsed = JSON.parse(jsonStr);
-              
-              // Handle metadata event
               if (parsed.type === 'metadata' && !metadataReceived) {
                 metadataReceived = true;
                 if (parsed.intent) setCurrentIntent(parsed.intent);
                 if (parsed.service) setSuggestedService(parsed.service);
                 continue;
               }
-              
-              // Handle content delta
               const delta = parsed.choices?.[0]?.delta?.content;
               if (delta) fullContent += delta;
             } catch {
-              // Skip malformed JSON
+              // skip
             }
           }
         }
 
-        // Live update the message as chunks arrive
         if (fullContent) {
           setMessages(prev => {
-            const lastMsg = prev[prev.length - 1];
-            if (lastMsg?.role === 'assistant' && lastMsg?._streaming) {
+            const last = prev[prev.length - 1];
+            if (last?.role === 'assistant' && last?._streaming) {
               return [...prev.slice(0, -1), { role: 'assistant', content: fullContent, _streaming: true }];
             }
             return [...prev, { role: 'assistant', content: fullContent, _streaming: true }];
@@ -222,11 +282,10 @@ const ChatWidget = () => {
         }
       }
 
-      // Finalize the message (remove streaming flag)
       if (fullContent) {
         setMessages(prev => {
-          const lastMsg = prev[prev.length - 1];
-          if (lastMsg?._streaming) {
+          const last = prev[prev.length - 1];
+          if (last?._streaming) {
             return [...prev.slice(0, -1), { role: 'assistant', content: fullContent }];
           }
           return prev;
@@ -238,10 +297,7 @@ const ChatWidget = () => {
       console.error('Chat error:', err);
       setMessages(prev => [
         ...prev,
-        {
-          role: 'error',
-          content: 'Sorry, I encountered an issue. Please try again or contact us directly.'
-        }
+        { role: 'error', content: 'Sorry, I encountered an issue. Please try again or contact us directly.' }
       ]);
     } finally {
       setIsLoading(false);
@@ -255,25 +311,21 @@ const ChatWidget = () => {
     }
   };
 
-  // Simple markdown-to-HTML for links and bold
   const renderContent = (text) => {
-    let html = text
-      // Bold
+    const safeLinkRegex = /\[([^\]]+)\]\(((?:\/|https?:\/\/)[^\s)]+)\)/g;
+    let s = text
+      .replace(/Learn more\(((?:\/|https?:\/\/)[^)]+)\)/gi, '[Learn more]($1)')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      // Links: [text](url)
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_self">$1</a>')
-      // Line breaks
+      .replace(safeLinkRegex, '<a href="$2">$1</a>')
+      .replace(/\*{2,}/g, '')
       .replace(/\n/g, '<br/>');
-
-    return <span dangerouslySetInnerHTML={{ __html: html }} />;
+    return <span dangerouslySetInnerHTML={{ __html: s }} />;
   };
 
   return (
     <>
-      {/* Chat Window */}
       {isOpen && (
         <div className={styles.chatWindow}>
-          {/* Header */}
           <div className={styles.header}>
             <div className={styles.headerIcon}>
               <Bot size={22} />
@@ -287,9 +339,12 @@ const ChatWidget = () => {
             </div>
           </div>
 
-          {/* Messages */}
-          <div className={styles.messagesArea}>
-            {/* Welcome */}
+          <div
+            className={styles.messagesArea}
+            ref={messagesAreaRef}
+            onScroll={handleMessagesScroll}
+            onClick={handleMessageAreaClick}
+          >
             {messages.length <= 1 && (
               <div className={styles.welcome}>
                 <p className={styles.welcomeTitle}>Instrak Venture Capital</p>
@@ -321,82 +376,66 @@ const ChatWidget = () => {
                 <div className={styles.typingDot}></div>
               </div>
             )}
-
-            <div ref={messagesEndRef} />
           </div>
 
-          {/* Intent-based Quick Actions */}
           {showQuickActions && messages.length <= 1 && (
             <div className={styles.quickActions}>
               {QUICK_ACTIONS.map((action, i) => (
-                <button
-                  key={i}
-                  className={styles.quickAction}
-                  onClick={() => sendMessage(action)}
-                >
+                <button key={i} className={styles.quickAction} onClick={() => sendMessage(action)}>
                   {action}
                 </button>
               ))}
             </div>
           )}
 
-          {/* Intent-based Suggestions */}
           {currentIntent && messages.length > 1 && !isLoading && (
             <div className={styles.intentSuggestions}>
               <div className={styles.intentLabel}>
                 {currentIntent === 'SERVICE_INQUIRY' && suggestedService && (
                   <>
-                    <span>Interested in {suggestedService.replace(/-/g, ' ')}?</span>
-                    <button
+                    <span>Interested in {formatServiceTitle(suggestedService)}?</span>
+                    <Link
                       className={styles.intentButton}
-                      onClick={() => navigate(`/services/${suggestedService}`)}
+                      to={serviceDetailPath}
+                      onClick={() => setIsOpen(false)}
                     >
                       View Service <ExternalLink size={14} />
-                    </button>
+                    </Link>
                   </>
                 )}
                 {currentIntent === 'FUNDING_REQUEST' && (
                   <>
                     <span>Ready to explore funding options?</span>
-                    <button
-                      className={styles.intentButton}
-                      onClick={() => navigate('/investors')}
-                    >
+                    <Link className={styles.intentButton} to="/investors" onClick={() => setIsOpen(false)}>
                       For Investors <ExternalLink size={14} />
-                    </button>
+                    </Link>
                   </>
                 )}
                 {currentIntent === 'CONTACT_REQUEST' && (
                   <>
                     <span>Want to get in touch?</span>
-                    <button
-                      className={styles.intentButton}
-                      onClick={() => navigate('/contact')}
-                    >
+                    <Link className={styles.intentButton} to="/contact" onClick={() => setIsOpen(false)}>
                       Contact Us <ExternalLink size={14} />
-                    </button>
+                    </Link>
                   </>
                 )}
                 {currentIntent === 'FORM_SUBMISSION' && suggestedService && (
                   <>
                     <span>Ready to apply?</span>
-                    <button
+                    <Link
                       className={styles.intentButton}
-                      onClick={() => navigate(`/services/${suggestedService}`)}
+                      to={serviceDetailPath}
+                      onClick={() => setIsOpen(false)}
                     >
                       Fill Inquiry Form <ExternalLink size={14} />
-                    </button>
+                    </Link>
                   </>
                 )}
               </div>
               {INTENT_ACTIONS[currentIntent] && (
                 <div className={styles.intentActions}>
                   {INTENT_ACTIONS[currentIntent].slice(0, 2).map((action, i) => (
-                    <button
-                      key={i}
-                      className={styles.quickAction}
-                      onClick={() => sendMessage(action)}
-                    >
+                    <button key={i} className={styles.quickAction} onClick={() => sendMessage(action)}>
                       {action}
                     </button>
                   ))}
@@ -405,7 +444,6 @@ const ChatWidget = () => {
             </div>
           )}
 
-          {/* Input Area */}
           <div className={styles.inputArea}>
             <input
               ref={inputRef}
@@ -427,7 +465,6 @@ const ChatWidget = () => {
         </div>
       )}
 
-      {/* Floating Button */}
       <button
         className={`${styles.chatButton} ${isOpen ? styles.open : ''}`}
         onClick={() => setIsOpen(!isOpen)}

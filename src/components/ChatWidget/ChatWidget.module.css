@@ -48,8 +48,11 @@
   50% { transform: scale(1.3); opacity: 0.7; }
 }
 
-/* Chat Window */
+/* Chat window — vibrant gold accent (#FFC700) scoped to this panel */
 .chatWindow {
+  --chat-gold: #ffc700;
+  --chat-gold-bright: #ffd54d;
+  --chat-gold-ring: rgba(255, 199, 0, 0.35);
   position: fixed;
   bottom: 100px;
   right: 28px;
@@ -58,7 +61,7 @@
   background: var(--bg-primary);
   border-radius: 20px;
   border: 1px solid var(--border-light);
-  box-shadow: 0 20px 60px rgba(10, 61, 98, 0.18), 0 0 0 1px rgba(201, 162, 39, 0.08);
+  box-shadow: 0 20px 60px rgba(10, 61, 98, 0.18), 0 0 0 1px rgba(255, 199, 0, 0.12);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -108,7 +111,7 @@
   font-weight: 700;
   letter-spacing: 0.02em;
   margin: 0;
-  color: #E8D48B;
+  color: var(--chat-gold);
 }
 
 .headerStatus {
@@ -137,8 +140,7 @@
   flex-direction: column;
   gap: 12px;
   background: var(--bg-secondary);
-  min-height: 280px;
-  max-height: 360px;
+  min-height: 0;
 }
 
 .messagesArea::-webkit-scrollbar {
@@ -165,13 +167,25 @@
 }
 
 .message a {
-  color: var(--accent-primary);
+  color: var(--chat-gold);
   text-decoration: underline;
   font-weight: 600;
 }
 
 .message a:hover {
-  color: var(--accent-secondary);
+  color: var(--chat-gold-bright);
+}
+
+/* Assistant “Learn more” / inline links — saturated gold */
+.message.assistant a {
+  color: var(--chat-gold);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+}
+
+.message.assistant a:hover {
+  color: var(--chat-gold-bright);
 }
 
 .assistant {
@@ -207,8 +221,8 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--accent-primary);
-  opacity: 0.4;
+  background: var(--chat-gold);
+  opacity: 0.55;
   animation: typingBounce 1.4s ease-in-out infinite;
 }
 
@@ -238,19 +252,19 @@
 .input {
   flex: 1;
   padding: 11px 16px;
-  border: 1px solid var(--border-light);
+  border: 1px solid rgba(255, 199, 0, 0.35);
   border-radius: 12px;
   font-family: var(--font-main);
   font-size: 0.88rem;
   outline: none;
   background: var(--bg-secondary);
   color: var(--text-primary);
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .input:focus {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(10, 61, 98, 0.08);
+  border-color: var(--chat-gold);
+  box-shadow: 0 0 0 3px var(--chat-gold-ring);
 }
 
 .input::placeholder {
@@ -291,7 +305,7 @@
 .welcomeTitle {
   font-family: var(--font-heading);
   font-size: 1rem;
-  color: var(--accent-primary);
+  color: var(--chat-gold);
   margin-bottom: 6px;
 }
 
@@ -313,10 +327,10 @@
 .quickAction {
   padding: 6px 14px;
   border-radius: 20px;
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(255, 199, 0, 0.4);
   background: var(--bg-primary);
   font-size: 0.78rem;
-  color: var(--accent-primary);
+  color: var(--chat-gold);
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: var(--font-main);
@@ -324,9 +338,9 @@
 }
 
 .quickAction:hover {
-  background: var(--accent-primary);
-  color: white;
-  border-color: var(--accent-primary);
+  background: var(--chat-gold);
+  color: #0c1017;
+  border-color: var(--chat-gold);
 }
 
 /* Error message */
@@ -356,12 +370,12 @@
   gap: 12px;
   margin-bottom: 8px;
   font-size: 0.85rem;
-  color: var(--accent-primary);
+  color: var(--chat-gold);
   font-weight: 600;
 }
 
 .intentButton {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 6px 14px;
@@ -373,6 +387,8 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .intentButton:hover {

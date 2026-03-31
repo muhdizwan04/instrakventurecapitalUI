@@ -1,0 +1,1 @@
+INSERT INTO "public"."admin_users" ("id", "email", "role", "created_at") VALUES ('1dae339d-28ed-4f2c-96ac-7de9a11061a3', 'admin@admin.com', 'admin', '2026-02-17 00:49:10.700868+00');

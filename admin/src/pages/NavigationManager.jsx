@@ -66,8 +66,28 @@ const NavigationManager = () => {
     };
 
     const { content, loading, saving, saveContent } = useContent('navigation', defaultData);
+    // Used to provide a friendly section anchor picker for About page dropdown items
+    const { content: aboutContent } = useContent('about', { sections: [] });
     const [formData, setFormData] = useState(defaultData);
     const [expandedItem, setExpandedItem] = useState(null);
+
+    const aboutAnchorOptions = (() => {
+        const sections = Array.isArray(aboutContent?.sections) ? aboutContent.sections : [];
+        const opts = sections
+            .filter(s => s && typeof s.id === 'string' && s.id.trim() !== '' && s.id !== 'hero')
+            .map(s => ({
+                id: s.id,
+                label: (s.title && String(s.title).trim() !== '') ? String(s.title) : s.id,
+                href: `/about#${s.id}`
+            }));
+        // Dedupe by href in case sections repeat
+        const seen = new Set();
+        return opts.filter(o => {
+            if (seen.has(o.href)) return false;
+            seen.add(o.href);
+            return true;
+        });
+    })();
 
     useEffect(() => {
         if (content && !loading) {
@@ -502,13 +522,43 @@ const NavigationManager = () => {
                                                                                         className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm"
                                                                                         placeholder="Sub-item label"
                                                                                     />
-                                                                                    <input
-                                                                                        type="text"
-                                                                                        value={sub.link}
-                                                                                        onChange={(e) => handleUpdateSubItem(item.id, sub.id, 'link', e.target.value)}
-                                                                                        className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm"
-                                                                                        placeholder="/path"
-                                                                                    />
+                                                                                    {String(item.link || '').startsWith('/about') ? (
+                                                                                        <div className="flex-1 flex items-center gap-2 min-w-[280px]">
+                                                                                            <select
+                                                                                                value={aboutAnchorOptions.find(o => o.href === sub.link)?.href || '__custom__'}
+                                                                                                onChange={(e) => {
+                                                                                                    const v = e.target.value;
+                                                                                                    if (v === '__custom__') {
+                                                                                                        handleUpdateSubItem(item.id, sub.id, 'link', sub.link || '/about#');
+                                                                                                    } else {
+                                                                                                        handleUpdateSubItem(item.id, sub.id, 'link', v);
+                                                                                                    }
+                                                                                                }}
+                                                                                                className="px-3 py-2 rounded border border-[var(--border-light)] text-sm bg-white w-56"
+                                                                                                title="Pick an About Us section (auto-scroll)"
+                                                                                            >
+                                                                                                <option value="__custom__">Custom URL…</option>
+                                                                                                {aboutAnchorOptions.map(o => (
+                                                                                                    <option key={o.href} value={o.href}>{o.label}</option>
+                                                                                                ))}
+                                                                                            </select>
+                                                                                            <input
+                                                                                                type="text"
+                                                                                                value={sub.link}
+                                                                                                onChange={(e) => handleUpdateSubItem(item.id, sub.id, 'link', e.target.value)}
+                                                                                                className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm font-mono"
+                                                                                                placeholder="/about#section-id"
+                                                                                            />
+                                                                                        </div>
+                                                                                    ) : (
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            value={sub.link}
+                                                                                            onChange={(e) => handleUpdateSubItem(item.id, sub.id, 'link', e.target.value)}
+                                                                                            className="flex-1 px-3 py-2 rounded border border-[var(--border-light)] text-sm"
+                                                                                            placeholder="/path"
+                                                                                        />
+                                                                                    )}
                                                                                     <button
                                                                                         onClick={() => handleDeleteSubItem(item.id, sub.id)}
                                                                                         className="p-1.5 text-gray-400 hover:text-red-500"

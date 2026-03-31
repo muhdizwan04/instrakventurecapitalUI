@@ -25,3 +25,6 @@ dist-ssr
 *.sw?
 .env
 .vercel
+
+# Supabase (migrations, functions, local CLI state — keep out of remote)
+supabase/

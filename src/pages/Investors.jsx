@@ -169,8 +169,9 @@ const Investors = () => {
                     </div>
 
                     <div className="glass-card" style={{ padding: '3rem', background: 'rgba(15, 23, 42, 0.42)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', border: '1px solid rgba(148, 163, 184, 0.2)', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)' }}>
-                        <h3 style={{ marginBottom: '2rem', color: '#F1F5F9' }}>{formSettings.title}</h3>
-                        <ProtectedFormSection serviceName="Investor Relations">
+                        <ProtectedFormSection>
+                            <>
+                            <h3 style={{ marginBottom: '2rem', color: '#F1F5F9' }}>{formSettings.title}</h3>
                             <form className="investors-form-glass" onSubmit={handleSubmit}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
                                 <div>
@@ -218,6 +219,7 @@ const Investors = () => {
                                 {loading ? 'Submitting...' : formSettings.submitButtonText}
                             </button>
                             </form>
+                            </>
                         </ProtectedFormSection>
                     </div>
                 </div>

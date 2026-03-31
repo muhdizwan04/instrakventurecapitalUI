@@ -48,7 +48,7 @@ const StyledFormSection = ({ serviceId, serviceName, title, subtitle, fallbackFo
                         )}
                     </>
                 )}
-                <ProtectedFormSection serviceName={serviceName || title}>
+                <ProtectedFormSection>
                     <DynamicServiceForm
                         serviceId={serviceId}
                         title=""

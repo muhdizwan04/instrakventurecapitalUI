@@ -120,25 +120,28 @@ export const AuthProvider = ({ children }) => {
             }
         });
         if (error) throw error;
-        
-        // Create profile in client_profiles table
-        if (data.user) {
-            const { error: profileError } = await supabase.from('client_profiles').insert({
-                id: data.user.id,
-                email: email,
-                full_name: metadata.full_name || '',
-                company_name: metadata.company_name || '',
-                phone: metadata.phone || ''
-            });
-            
+
+        // Only upsert profile when Supabase returns a session (e.g. "Confirm email" is off).
+        // If email confirmation is required, session is null — RLS would block anon inserts;
+        // profile is created by handle_verified_user() after the user verifies.
+        if (data.user && data.session) {
+            const { error: profileError } = await supabase.from('client_profiles').upsert(
+                {
+                    id: data.user.id,
+                    email,
+                    full_name: metadata.full_name || '',
+                    company_name: metadata.company_name || '',
+                    phone: metadata.phone || ''
+                },
+                { onConflict: 'id' }
+            );
             if (profileError) {
-                console.error('[AuthContext] Error creating client profile:', profileError);
+                console.error('[AuthContext] client_profiles upsert:', profileError);
             } else {
-                // Set the client profile after creation
                 await checkClientProfile(data.user.id);
             }
         }
-        
+
         return data;
     };
 

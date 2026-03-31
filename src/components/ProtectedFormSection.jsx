@@ -4,11 +4,15 @@ import { useAuth } from '../context/AuthContext';
 import { Lock, UserPlus, LogIn, ArrowRight } from 'lucide-react';
 import styles from './ProtectedFormSection.module.css';
 
+/** Shown on the “Login Required” card for every gated form (Investors + service inquiry forms). */
+const LOGIN_GATE_DESCRIPTION =
+    'Create an account or sign in to access our investor relations platform. Registration enables direct engagement with our team, application tracking, and access to selected investment opportunities.';
+
 /**
  * Wraps form sections in service pages
  * Shows CTA when not logged in as CLIENT, shows children (form) when logged in as client
  */
-const ProtectedFormSection = ({ children, serviceName = 'this service' }) => {
+const ProtectedFormSection = ({ children }) => {
     const { isClient, loading, user, logout } = useAuth();
     const location = useLocation();
 
@@ -109,10 +113,7 @@ const ProtectedFormSection = ({ children, serviceName = 'this service' }) => {
                 
                 <h3 className={styles.title}>Login Required</h3>
                 
-                <p className={styles.description}>
-                    Create an account or sign in to apply for {serviceName}. 
-                    Registration is quick and gives you access to all our investment services.
-                </p>
+                <p className={styles.description}>{LOGIN_GATE_DESCRIPTION}</p>
 
                 <div className={styles.benefits}>
                     <div className={styles.benefit}>

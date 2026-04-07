@@ -3,13 +3,16 @@ import { Link } from 'react-router-dom';
 import styles from './Navbar.module.css';
 import { usePageContent } from '../hooks/usePageContent';
 import { useAuth } from '../context/AuthContext';
-import { User, LogOut } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { isLightHexColor } from '../theme/clientThemeDefaults';
+import { User, LogOut, Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
     const { user, logout } = useAuth();
+    const { theme, toggleTheme } = useTheme();
 
     // Default navigation structure
     const defaultNav = {
@@ -67,14 +70,21 @@ const Navbar = () => {
     // Navigation styles from admin. Gradient (custom or default) vs solid: when solid, use backgroundColor; when gradient, use custom gradient from admin or fall back to CSS default.
     const navStylesConfig = navData?.navStyles || {};
     const navStyleVars = {};
-    if (navStylesConfig.textColor) {
-        navStyleVars['--nav-link-color'] = navStylesConfig.textColor;
-    }
-    if (navStylesConfig.backgroundType === 'solid' && navStylesConfig.backgroundColor) {
-        navStyleVars.background = navStylesConfig.backgroundColor;
-    } else if (navStylesConfig.backgroundType !== 'solid' && navStylesConfig.gradientStart != null && navStylesConfig.gradientEnd != null) {
-        const dir = navStylesConfig.gradientDirection || '90deg';
-        navStyleVars.background = `linear-gradient(${dir}, ${navStylesConfig.gradientStart}, ${navStylesConfig.gradientEnd})`;
+    // Light mode: keep CSS module light navbar (no inline background). Only apply link color if it reads on white.
+    if (theme === 'light') {
+        if (navStylesConfig.textColor && !isLightHexColor(navStylesConfig.textColor)) {
+            navStyleVars['--nav-link-color'] = navStylesConfig.textColor;
+        }
+    } else {
+        if (navStylesConfig.textColor) {
+            navStyleVars['--nav-link-color'] = navStylesConfig.textColor;
+        }
+        if (navStylesConfig.backgroundType === 'solid' && navStylesConfig.backgroundColor) {
+            navStyleVars.background = navStylesConfig.backgroundColor;
+        } else if (navStylesConfig.backgroundType !== 'solid' && navStylesConfig.gradientStart != null && navStylesConfig.gradientEnd != null) {
+            const dir = navStylesConfig.gradientDirection || '90deg';
+            navStyleVars.background = `linear-gradient(${dir}, ${navStylesConfig.gradientStart}, ${navStylesConfig.gradientEnd})`;
+        }
     }
 
     // Keep admin-provided labels; only normalize About Us links if needed.
@@ -163,6 +173,18 @@ const Navbar = () => {
                             )}
                         </li>
                     ))}
+
+                    {/* Theme Toggle */}
+                    <li className={styles.themeToggle}>
+                        <button
+                            onClick={toggleTheme}
+                            className={styles.themeBtn}
+                            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                            title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+                        >
+                            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                        </button>
+                    </li>
 
                     {/* Profile Menu - Only visible when logged in */}
                     {user && (

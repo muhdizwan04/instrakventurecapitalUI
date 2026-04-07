@@ -1,11 +1,15 @@
 import React from 'react';
 import { usePageContent } from '../hooks/usePageContent';
+import { useTheme } from '../context/ThemeContext';
+import { lightBandAt } from '../theme/lightBands';
 import { Layout, Building2, MapPin, Calendar, ArrowRight, TrendingUp, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import projectPlaceholder from '../assets/project-placeholder.png';
 import ScrollReveal from '../components/ScrollReveal';
 
 const ProjectListing = () => {
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
     const defaultContent = {
         title: 'STRATEGIC PROJECT LISTINGS',
         subtitle: '',
@@ -42,10 +46,10 @@ const ProjectListing = () => {
     return (
         <div className="page-wrapper">
             {/* Hero Section */}
-            <div style={{ 
-                background: 'linear-gradient(135deg, #0F2942 0%, #1A365D 100%)', 
+            <div className={isLight ? 'lm-hero-edge' : undefined} style={{ 
+                background: isLight ? 'linear-gradient(135deg, #f1f5f9 0%, #e8eef5 100%)' : 'linear-gradient(135deg, #0F2942 0%, #1A365D 100%)', 
                 padding: '120px 20px 80px', 
-                color: '#FFFFFF', 
+                color: isLight ? '#0f172a' : '#FFFFFF', 
                 textAlign: 'center' 
             }}>
                 <div className="container">
@@ -54,7 +58,7 @@ const ProjectListing = () => {
                         fontSize: '3.5rem', 
                         fontWeight: '700', 
                         marginBottom: '1.5rem',
-                        color: '#FFFFFF'
+                        color: isLight ? '#0f172a' : '#FFFFFF'
                     }}>
                         {title}
                     </h1>
@@ -62,7 +66,7 @@ const ProjectListing = () => {
             </div>
 
             {/* Introduction */}
-            <section style={{ padding: '80px 20px 40px', background: '#FFFFFF' }}>
+            <section className={isLight ? `lm-band-${lightBandAt(1)}` : undefined} style={{ padding: '80px 20px 40px', background: isLight ? 'transparent' : '#FFFFFF' }}>
                 <div className="container">
                     <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
                         <p style={{ fontSize: '1.15rem', color: '#4A5568', lineHeight: '1.9' }}>
@@ -73,7 +77,7 @@ const ProjectListing = () => {
             </section>
 
             {/* Project List */}
-            <section style={{ padding: '40px 20px 80px', background: '#F8FAFC' }}>
+            <section className={isLight ? `lm-band-${lightBandAt(2)}` : undefined} style={{ padding: '40px 20px 80px', background: isLight ? 'transparent' : '#F8FAFC' }}>
                 <div className="container">
                     <div style={{ display: 'grid', gap: '3rem' }}>
                         {projects.map((project, i) => (

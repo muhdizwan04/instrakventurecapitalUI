@@ -20,10 +20,13 @@ import {
     FileText,
     Newspaper,
     Building2,
-    ExternalLink
+    ExternalLink,
+    Sun,
+    Moon
 } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
+import { useAdminTheme } from '../context/ThemeContext';
 import { useContent } from '../hooks/useContent';
 
 // Simple sidebar item
@@ -36,10 +39,10 @@ const SidebarItem = ({ icon: Icon, label, path }) => {
             to={path}
             className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group w-full box-border whitespace-nowrap overflow-hidden ${active
                 ? 'bg-gradient-to-r from-[#0A3D62] to-[#1A365D] text-white shadow-md'
-                : 'hover:bg-[#F8F9FC] text-gray-600 hover:text-[#1A365D]'
+                : 'hover:bg-[#F8F9FC] dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 hover:text-[#1A365D] dark:hover:text-gray-100'
                 }`}
         >
-            <Icon size={18} className={active ? 'text-white' : 'text-gray-500 group-hover:text-[#1A365D]'} />
+            <Icon size={18} className={active ? 'text-white' : 'text-gray-500 dark:text-gray-400 group-hover:text-[#1A365D] dark:group-hover:text-gray-100'} />
             <span className="font-medium text-sm">
                 {label}
             </span>
@@ -50,7 +53,7 @@ const SidebarItem = ({ icon: Icon, label, path }) => {
 // Section divider
 const SectionDivider = ({ label }) => (
     <div className="pt-4 pb-2 px-4">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{label}</span>
+        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">{label}</span>
     </div>
 );
 
@@ -58,6 +61,7 @@ const Layout = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { logout } = useAuth();
+    const { theme, toggleTheme } = useAdminTheme();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
     // Fetch navigation settings to match order
@@ -131,19 +135,19 @@ const Layout = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8F9FC] flex relative">
+        <div className="min-h-screen bg-[#F8F9FC] dark:bg-[#0F172A] flex relative">
             <Toaster position="top-right" />
 
             {/* Sidebar - theme: navy/gold strip, same as login */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-100 w-60 shrink-0 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                className={`fixed inset-y-0 left-0 z-50 bg-white dark:bg-[#1E293B] border-r border-gray-100 dark:border-gray-700 w-60 shrink-0 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
                     } lg:relative lg:translate-x-0 overflow-y-auto shadow-sm`}
             >
                 {/* Theme accent strip (match login card) */}
                 <div className="h-1 w-full bg-gradient-to-r from-[#0A3D62] via-[#1A365D] to-[#C9A227]" />
                 {/* Logo */}
-                <div className="p-4 border-b border-gray-100">
-                    <h1 className="text-lg font-bold text-[#1A365D] font-heading">Instrak Admin</h1>
+                <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+                    <h1 className="text-lg font-bold text-[#1A365D] dark:text-gray-100 font-heading">Instrak Admin</h1>
                 </div>
 
                 {/* Navigation */}
@@ -175,10 +179,10 @@ const Layout = () => {
                     )}
 
                     {/* Logout */}
-                    <div className="pt-6 mt-4 border-t border-gray-100">
+                    <div className="pt-6 mt-4 border-t border-gray-100 dark:border-gray-700">
                         <button
                             onClick={handleLogout}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium text-sm"
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors font-medium text-sm"
                         >
                             <LogOut size={18} />
                             <span>Logout</span>
@@ -190,23 +194,31 @@ const Layout = () => {
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-h-screen min-w-0 overflow-hidden">
                 {/* Header - theme accent */}
-                <header className="bg-white border-b border-gray-100 h-14 px-6 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+                <header className="bg-white dark:bg-[#1E293B] border-b border-gray-100 dark:border-gray-700 h-14 px-6 flex items-center justify-between sticky top-0 z-40 shadow-sm">
                     <div className="h-full flex items-center gap-2">
                         <div className="hidden lg:block w-1 h-8 rounded-full bg-gradient-to-b from-[#0A3D62] to-[#C9A227]" />
                         <button
                             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                            className="lg:hidden p-2 hover:bg-[#F8F9FC] rounded-xl text-gray-600"
+                            className="lg:hidden p-2 hover:bg-[#F8F9FC] dark:hover:bg-gray-700 rounded-xl text-gray-600 dark:text-gray-300"
                         >
                             {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
                         </button>
                     </div>
 
                     <div className="flex items-center gap-4 ml-auto">
+                        <button
+                            onClick={toggleTheme}
+                            className="flex items-center justify-center w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-600 hover:bg-[#F8F9FC] dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300"
+                            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+                            title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+                        >
+                            {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+                        </button>
                         <a
                             href="/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-sm font-medium text-[#1A365D] hover:text-[#0A3D62] px-3 py-2 rounded-xl hover:bg-[#F8F9FC] transition-colors"
+                            className="flex items-center gap-2 text-sm font-medium text-[#1A365D] dark:text-gray-200 hover:text-[#0A3D62] dark:hover:text-white px-3 py-2 rounded-xl hover:bg-[#F8F9FC] dark:hover:bg-gray-700 transition-colors"
                         >
                             <ExternalLink size={16} /> View Site
                         </a>
@@ -214,7 +226,7 @@ const Layout = () => {
                 </header>
 
                 {/* Page Content */}
-                <main className="p-6 flex-1 overflow-hidden min-w-0 bg-[#F8F9FC]">
+                <main className="p-6 flex-1 overflow-hidden min-w-0 bg-[#F8F9FC] dark:bg-[#0F172A]">
                     <div className="overflow-hidden">
                         <Outlet />
                     </div>

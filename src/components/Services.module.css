@@ -5,8 +5,17 @@
     position: relative;
 }
 
-.services .section-title {
+/* h2 uses global className="section-title" (index.css) — must :global() or rules never match */
+.services :global(.section-title) {
     color: inherit;
+}
+
+:global([data-theme="light"]) .services :global(.section-title) {
+    color: #0f172a !important;
+}
+
+:global([data-theme="light"]) .services .subtitle {
+    color: #475569;
 }
 
 /* Subtle background pattern */
@@ -189,4 +198,62 @@
         width: 40px;
         height: 40px;
     }
+}
+
+/* ============================================================
+   SERVICES LIGHT MODE OVERRIDES
+   ============================================================ */
+
+:global([data-theme="light"]) .services {
+    background: var(--services-bg, #F8FAFC);
+    color: var(--services-text, #1E293B);
+}
+
+:global([data-theme="light"]) .categoryHeading {
+    color: rgba(30, 41, 59, 0.78);
+}
+
+:global([data-theme="light"]) .services .subtitle {
+    color: #475569;
+    opacity: 1;
+}
+
+:global([data-theme="light"]) .serviceInfo h4 {
+    color: #0f172a !important;
+}
+
+:global([data-theme="light"]) .serviceInfo p {
+    color: #1e293b !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #1e293b;
+}
+
+:global([data-theme="light"]) .serviceItem {
+    color: #0f172a;
+    background: var(--services-box-bg, #FFFFFF);
+    border-color: rgba(15, 23, 42, 0.08);
+}
+
+:global([data-theme="light"]) .serviceItem:hover {
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+}
+
+:global([data-theme="light"]) .services.cardStyleGlass .serviceItem {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(15, 23, 42, 0.08);
+    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+}
+
+:global([data-theme="light"]) .services.cardStyleGlass .serviceItem:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(184, 134, 11, 0.3);
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+}
+
+:global([data-theme="light"]) .serviceIcon {
+    background: linear-gradient(135deg, rgba(10, 61, 98, 0.06), rgba(184, 134, 11, 0.08));
+}
+
+:global([data-theme="light"]) .arrow {
+    color: #94A3B8;
 }

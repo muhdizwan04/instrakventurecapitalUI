@@ -40,7 +40,7 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-[#F5F6F8] px-4 py-12">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#F5F6F8] dark:bg-[#0F172A] px-4 py-12">
             {/* Subtle background depth */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-[#1A365D]/[0.03]" />

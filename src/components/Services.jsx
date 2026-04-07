@@ -3,10 +3,14 @@ import { Link } from 'react-router-dom';
 import styles from './Services.module.css';
 import { TrendingUp, Wallet, ShieldCheck, PieChart, Briefcase, Building2, Landmark, Globe, Shield, Coins, Gem, Users, BarChart3, ArrowRight } from 'lucide-react';
 import { usePageContent } from '../hooks/usePageContent';
+import { useTheme } from '../context/ThemeContext';
+import { lightBandAt } from '../theme/lightBands';
 
 const ICON_MAP = { TrendingUp, Wallet, ShieldCheck, PieChart, Briefcase, Building2, Landmark, Globe, Shield, Coins, Gem, Users, BarChart3 };
 
-const Services = () => {
+const Services = ({ lightBandIndex }) => {
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
     const defaultServices = [
         {
             id: 1,
@@ -135,8 +139,16 @@ const Services = () => {
     const title = homeContent.servicesTitle || 'Our Portfolio';
     const subtitle = homeContent.servicesSubtitle || 'Comprehensive financial solutions tailored for your growth';
     const sectionStyles = homeContent.servicesSectionStyles || {};
+    const useLightBand = isLight && typeof lightBandIndex === 'number' && Number.isFinite(lightBandIndex);
+    const lightBandClass = useLightBand ? `lm-band-${lightBandAt(lightBandIndex)}` : '';
+
     const sectionStyle = {};
-    if (sectionStyles.backgroundColor) {
+    if (isLight) {
+        sectionStyle['--services-bg'] = useLightBand ? 'transparent' : '#eef2f7';
+        sectionStyle['--services-text'] = '#0f172a';
+        sectionStyle['--services-box-bg'] = '#ffffff';
+        sectionStyle.color = '#0f172a';
+    } else if (sectionStyles.backgroundColor) {
         const v = sectionStyles.backgroundColor.trim();
         if (v.startsWith('linear-gradient') || v.startsWith('radial-gradient')) {
             sectionStyle.background = v;
@@ -147,18 +159,23 @@ const Services = () => {
     } else {
         sectionStyle['--services-bg'] = '#0b1120';
     }
-    if (sectionStyles.textColor) {
+    if (!isLight && sectionStyles.textColor) {
         sectionStyle.color = sectionStyles.textColor;
         sectionStyle['--services-text'] = sectionStyles.textColor;
     }
-    if (sectionStyles.boxColor && sectionStyles.cardStyle === 'solid') sectionStyle['--services-box-bg'] = sectionStyles.boxColor;
+    if (!isLight && sectionStyles.boxColor && sectionStyles.cardStyle === 'solid') sectionStyle['--services-box-bg'] = sectionStyles.boxColor;
     const cardStyleGlass = sectionStyles.cardStyle !== 'solid';
 
+    const lightHeadingStyle = isLight ? { color: '#0f172a' } : undefined;
+    const lightSubtitleStyle = isLight ? { color: '#475569', opacity: 1 } : undefined;
+    const lightCardTitleStyle = isLight ? { color: '#0f172a' } : undefined;
+    const lightCardBodyStyle = isLight ? { color: '#1e293b', opacity: 1 } : undefined;
+
     return (
-        <section id="services" className={`${styles.services} ${cardStyleGlass ? styles.cardStyleGlass : ''}`} style={sectionStyle}>
+        <section id="services" className={`${styles.services} ${cardStyleGlass ? styles.cardStyleGlass : ''} ${lightBandClass}`.trim()} style={sectionStyle}>
             <div className="container">
-                <h2 className="section-title">{title}</h2>
-                {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+                <h2 className="section-title" style={lightHeadingStyle}>{title}</h2>
+                {subtitle && <p className={styles.subtitle} style={lightSubtitleStyle}>{subtitle}</p>}
 
                 <div className={styles.groupedServices}>
                     {orderedCategories.map((category) => (
@@ -173,8 +190,8 @@ const Services = () => {
                                                 <IconComponent size={24} />
                                             </div>
                                             <div className={styles.serviceInfo}>
-                                                <h4>{service.title}</h4>
-                                                <p>{service.summary}</p>
+                                                <h4 style={lightCardTitleStyle}>{service.title}</h4>
+                                                <p style={lightCardBodyStyle}>{service.summary}</p>
                                             </div>
                                             <ArrowRight size={18} className={styles.arrow} />
                                         </Link>

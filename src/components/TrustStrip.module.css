@@ -146,3 +146,58 @@
     }
 }
 
+/* ============================================================
+   TRUSTSTRIP LIGHT MODE OVERRIDES
+   ============================================================ */
+
+:global([data-theme="light"]) .trustStrip {
+    background: #F1F5F9;
+    color: #1E293B;
+    border-top-color: rgba(15, 23, 42, 0.06);
+    border-bottom-color: rgba(15, 23, 42, 0.06);
+}
+
+:global([data-theme="light"]) .trustStrip::before {
+    opacity: 0.05;
+}
+
+:global([data-theme="light"]) .subtitle {
+    color: #475569;
+}
+
+:global([data-theme="light"]) .signalPill {
+    background: #FFFFFF;
+    border-color: rgba(15, 23, 42, 0.1);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    color: #1E293B;
+}
+
+:global([data-theme="light"]) .signalIcon {
+    color: #B8860B;
+}
+
+:global([data-theme="light"]) .metricCard {
+    background: #FFFFFF;
+    border-color: rgba(15, 23, 42, 0.08);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+:global([data-theme="light"]) .metricIconWrap {
+    background: radial-gradient(circle at 30% 0%, rgba(184, 134, 11, 0.15), rgba(241, 245, 249, 0.5));
+}
+
+:global([data-theme="light"]) .metricIcon {
+    color: #B8860B;
+}
+
+:global([data-theme="light"]) .metricLabel {
+    color: #1E293B;
+}
+
+:global([data-theme="light"]) .metricDescription {
+    color: #334155;
+}
+
+:global([data-theme="light"]) .signalPill span {
+    color: #0f172a;
+}

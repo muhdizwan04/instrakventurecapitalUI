@@ -5,8 +5,11 @@ import { usePageContent } from '../hooks/usePageContent';
 import { Toaster } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 import ProtectedFormSection from '../components/ProtectedFormSection';
+import { useTheme } from '../context/ThemeContext';
 
 const Investors = () => {
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
     // Default content
     const defaultContent = {
         pageHero: {
@@ -115,8 +118,12 @@ const Investors = () => {
         }
     };
 
-    const inputStyle = { width: '100%', padding: '0.9rem', background: 'rgba(255, 255, 255, 0.12)', border: '1px solid rgba(255, 255, 255, 0.2)', color: '#F1F5F9', borderRadius: '8px', fontSize: '0.95rem' };
-    const labelStyle = { display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500', color: 'rgba(241, 245, 249, 0.95)' };
+    const inputStyle = isLight
+        ? { width: '100%', padding: '0.9rem', background: '#ffffff', border: '1px solid rgba(15, 23, 42, 0.15)', color: '#0f172a', borderRadius: '8px', fontSize: '0.95rem' }
+        : { width: '100%', padding: '0.9rem', background: 'rgba(255, 255, 255, 0.12)', border: '1px solid rgba(255, 255, 255, 0.2)', color: '#F1F5F9', borderRadius: '8px', fontSize: '0.95rem' };
+    const labelStyle = isLight
+        ? { display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500', color: '#334155' }
+        : { display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '500', color: 'rgba(241, 245, 249, 0.95)' };
 
     // Use loaded content or defaults
     const pageHero = content?.pageHero || defaultContent.pageHero;
@@ -124,6 +131,26 @@ const Investors = () => {
     const onboarding = content?.onboarding || defaultContent.onboarding;
     const portfolioSection = content?.portfolioSection || defaultContent.portfolioSection;
     const formSettings = content?.formSettings || defaultContent.formSettings;
+
+    const phStyles = pageHero.styles || {};
+    const heroSectionStyles = isLight
+        ? {
+            titleColor: '#1A365D',
+            subtitleColor: '#475569',
+            textAlign: phStyles.textAlign || 'center',
+            titleAlign: phStyles.textAlign || 'center',
+        }
+        : {
+            titleColor: phStyles.titleColor,
+            titleAlign: phStyles.textAlign,
+            textAlign: phStyles.textAlign,
+            subtitleColor: phStyles.titleColor,
+        };
+    const heroStyle = isLight ? { backgroundColor: '#f8fafc' } : { backgroundColor: phStyles.bgColor };
+    const inquiryCardStyle = isLight
+        ? { padding: '3rem', background: '#ffffff', border: '1px solid rgba(15, 23, 42, 0.1)', boxShadow: '0 8px 32px rgba(15, 23, 42, 0.06)', borderRadius: '12px' }
+        : { padding: '3rem', background: 'rgba(15, 23, 42, 0.42)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', border: '1px solid rgba(148, 163, 184, 0.2)', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)' };
+    const inquiryTitleColor = isLight ? '#0f172a' : '#F1F5F9';
 
     if (contentLoading) {
         return (
@@ -139,16 +166,12 @@ const Investors = () => {
             <PageHero
                 title={pageHero.title}
                 subtitle={pageHero.subtitle || ''}
-                style={{ backgroundColor: pageHero.styles?.bgColor }}
-                sectionStyles={{
-                    titleColor: pageHero.styles?.titleColor,
-                    titleAlign: pageHero.styles?.textAlign,
-                    textAlign: pageHero.styles?.textAlign,
-                    subtitleColor: pageHero.styles?.titleColor
-                }}
-                textColor={pageHero.styles?.titleColor}
+                lightBandIndex={0}
+                style={heroStyle}
+                sectionStyles={heroSectionStyles}
+                textColor={isLight ? '#1A365D' : pageHero.styles?.titleColor}
             />
-            <div className="container" style={{ padding: '80px 20px' }}>
+            <div className={`container${isLight ? ' lm-band-b' : ''}`} style={{ padding: '80px 20px', background: isLight ? 'transparent' : undefined }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '4rem', alignItems: 'start' }}>
                     <div>
                         <h2 style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>{mainContent.headline}</h2>
@@ -168,8 +191,8 @@ const Investors = () => {
                         </div>
                     </div>
 
-                    <div className="glass-card" style={{ padding: '3rem', background: 'rgba(15, 23, 42, 0.42)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', border: '1px solid rgba(148, 163, 184, 0.2)', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)' }}>
-                        <h3 style={{ marginBottom: '2rem', color: '#F1F5F9' }}>{formSettings.title}</h3>
+                    <div className="glass-card" style={inquiryCardStyle}>
+                        <h3 style={{ marginBottom: '2rem', color: inquiryTitleColor }}>{formSettings.title}</h3>
                         <ProtectedFormSection serviceName="Investor Relations">
                             <form className="investors-form-glass" onSubmit={handleSubmit}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
@@ -242,37 +265,60 @@ const Investors = () => {
                                 <div
                                     key={step.id || idx}
                                     className="glass-card"
-                                    style={{
-                                        padding: '1.5rem',
-                                        borderRadius: '1rem',
-                                        border: '1px solid rgba(148,163,184,0.35)',
-                                        background: 'linear-gradient(135deg, rgba(15,23,42,0.96), rgba(15,23,42,0.88))',
-                                        boxShadow: '0 10px 30px rgba(15,23,42,0.55)'
-                                    }}
+                                    style={
+                                        isLight
+                                            ? {
+                                                  padding: '1.5rem',
+                                                  borderRadius: '1rem',
+                                                  border: '1px solid rgba(15,23,42,0.1)',
+                                                  background: '#ffffff',
+                                                  boxShadow: '0 4px 20px rgba(15,23,42,0.06)',
+                                              }
+                                            : {
+                                                  padding: '1.5rem',
+                                                  borderRadius: '1rem',
+                                                  border: '1px solid rgba(148,163,184,0.35)',
+                                                  background: 'linear-gradient(135deg, rgba(15,23,42,0.96), rgba(15,23,42,0.88))',
+                                                  boxShadow: '0 10px 30px rgba(15,23,42,0.55)',
+                                              }
+                                    }
                                 >
                                     <div
                                         style={{
                                             width: '32px',
                                             height: '32px',
                                             borderRadius: '999px',
-                                            background: 'rgba(248, 250, 252, 0.06)',
-                                            border: '1px solid rgba(250, 204, 21, 0.7)',
+                                            background: isLight ? 'rgba(184, 134, 11, 0.12)' : 'rgba(248, 250, 252, 0.06)',
+                                            border: isLight ? '1px solid rgba(184, 134, 11, 0.45)' : '1px solid rgba(250, 204, 21, 0.7)',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
-                                            color: '#facc15',
+                                            color: isLight ? '#B8860B' : '#facc15',
                                             fontSize: '0.8rem',
                                             fontWeight: 700,
-                                            marginBottom: '0.75rem'
+                                            marginBottom: '0.75rem',
                                         }}
                                     >
                                         {idx + 1}
                                     </div>
-                                    <h4 style={{ fontSize: '1rem', fontWeight: 600, color: '#e5e7eb', marginBottom: '0.5rem' }}>
+                                    <h4
+                                        style={{
+                                            fontSize: '1rem',
+                                            fontWeight: 600,
+                                            color: isLight ? '#0f172a' : '#e5e7eb',
+                                            marginBottom: '0.5rem',
+                                        }}
+                                    >
                                         {step.title}
                                     </h4>
                                     {step.description && (
-                                        <p style={{ fontSize: '0.9rem', color: '#9ca3af', lineHeight: '1.6' }}>
+                                        <p
+                                            style={{
+                                                fontSize: '0.9rem',
+                                                color: isLight ? '#64748b' : '#9ca3af',
+                                                lineHeight: '1.6',
+                                            }}
+                                        >
                                             {step.description}
                                         </p>
                                     )}

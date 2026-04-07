@@ -2,8 +2,12 @@ import React from 'react';
 import PageHero from '../components/PageHero';
 import { Shield, Handshake, Building2, Globe, Award } from 'lucide-react';
 import { usePageContent } from '../hooks/usePageContent';
+import { useTheme } from '../context/ThemeContext';
+import { lightBandAt } from '../theme/lightBands';
 
 const StrategicPartners = () => {
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
     // Default data (fallback)
     const defaultData = {
         pageHeader: {
@@ -68,10 +72,11 @@ const StrategicPartners = () => {
             <PageHero
                 title={pageHeader.title}
                 subtitle={pageHeader.subtitle}
+                lightBandIndex={0}
             />
 
             {/* Highlights */}
-            <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>
+            <section className={isLight ? `lm-band-${lightBandAt(1)}` : undefined} style={{ padding: '80px 20px', background: isLight ? 'transparent' : '#FFFFFF' }}>
                 <div className="container">
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem' }}>
                         {highlights.map((item, i) => (
@@ -86,12 +91,12 @@ const StrategicPartners = () => {
             </section>
 
             {/* Investment Signed */}
-            <section style={{ padding: '80px 20px', background: '#1A365D' }}>
+            <section className={isLight ? `lm-band-${lightBandAt(2)}` : undefined} style={{ padding: '80px 20px', background: isLight ? 'transparent' : '#1A365D' }}>
                 <div className="container">
-                    <div style={{ textAlign: 'center', color: 'white' }}>
+                    <div style={{ textAlign: 'center', color: isLight ? '#0f172a' : 'white' }}>
                         <Award size={48} style={{ color: '#B8860B', marginBottom: '1.5rem' }} />
                         <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>USD 1 Billion Investment Signed</h2>
-                        <p style={{ fontSize: '1.2rem', opacity: 0.9, maxWidth: '700px', margin: '0 auto' }}>
+                        <p style={{ fontSize: '1.2rem', opacity: isLight ? 1 : 0.9, maxWidth: '700px', margin: '0 auto', color: isLight ? '#475569' : undefined }}>
                             INSTRAK Venture Capital Berhad has secured strategic investment commitments to support project financing and equity investments across the ASEAN region.
                         </p>
                     </div>
@@ -99,7 +104,7 @@ const StrategicPartners = () => {
             </section>
 
             {/* Insurance Partner */}
-            <section style={{ padding: '80px 20px', background: '#FFFFFF' }}>
+            <section className={isLight ? `lm-band-${lightBandAt(3)}` : undefined} style={{ padding: '80px 20px', background: isLight ? 'transparent' : '#FFFFFF' }}>
                 <div className="container">
                     <h2 className="section-title">Insurance Partner</h2>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
@@ -148,7 +153,7 @@ const StrategicPartners = () => {
             </section>
 
             {/* Banking Partners */}
-            <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
+            <section className={isLight ? `lm-band-${lightBandAt(4)}` : undefined} style={{ padding: '80px 20px', background: isLight ? 'transparent' : '#F5F7FA' }}>
                 <div className="container">
                     <h2 className="section-title">Banking Partners</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', maxWidth: '900px', margin: '0 auto' }}>
@@ -212,7 +217,7 @@ const StrategicPartners = () => {
 
             {/* Custom Sections */}
             {customSections.length > 0 && (
-                <section style={{ padding: '80px 20px', background: '#F5F7FA' }}>
+                <section className={isLight ? `lm-band-${lightBandAt(5)}` : undefined} style={{ padding: '80px 20px', background: isLight ? 'transparent' : '#F5F7FA' }}>
                     <div className="container">
                         {customSections.map((sec) => (
                             <div key={sec.id} style={{ maxWidth: '800px', margin: '0 auto 4rem', textAlign: 'center' }}>

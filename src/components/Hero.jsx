@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import styles from './Hero.module.css';
 import { usePageContent } from '../hooks/usePageContent';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { isLikelyLightTextColor } from '../theme/clientThemeDefaults';
 
 // Hero background – external placeholder image for investment skyline.
 // You can replace this URL with any image or a local import later.
 const nightSkyline =
     'https://images.pexels.com/photos/313782/pexels-photo-313782.jpeg?auto=compress&cs=tinysrgb&w=1600';
 
-const Hero = () => {
+const Hero = ({ showLightSectionEdge }) => {
     const ref = useRef(null);
     const { scrollYProgress } = useScroll({
         target: ref,
@@ -127,14 +128,16 @@ const Hero = () => {
         switch (block.type) {
             case 'title': {
                 const parts = (block.content || '').split('\n');
+                const titleColor = block.color || '#f9fafb';
+                const highlightColor = block.highlightColor || '#B8860B';
                 return (
-                    <h1 className={styles.title} style={{ color: block.color || '#f9fafb' }}>
+                    <h1 className={styles.title} style={{ color: titleColor }}>
                         <motion.span className="block" variants={itemVariant}>
                             {parts[0]}
                         </motion.span>
                         {parts[1] && (
                             <motion.span className="block" variants={itemVariant}>
-                                <span className={styles.highlight} style={{ color: block.highlightColor || '#B8860B' }}>{parts[1]}</span>
+                                <span className={styles.highlight} style={{ color: highlightColor }}>{parts[1]}</span>
                             </motion.span>
                         )}
                     </h1>
@@ -143,11 +146,12 @@ const Hero = () => {
 
             case 'subtitle': {
                 const subtitleParts = (block.content || '').split('•').map(s => s.trim());
+                const subColor = block.color || '#fde68a';
                 return (
-                    <motion.p className={styles.subtitle} style={{ color: block.color || '#fde68a' }} variants={itemVariant}>
+                    <motion.p className={styles.subtitle} style={{ color: subColor }} variants={itemVariant}>
                         {subtitleParts.map((part, i) => (
                             <React.Fragment key={i}>
-                                <strong style={{ color: block.color || '#fde68a' }}>{part}</strong>
+                                <strong style={{ color: subColor }}>{part}</strong>
                                 {i < subtitleParts.length - 1 && ' • '}
                             </React.Fragment>
                         ))}
@@ -156,11 +160,16 @@ const Hero = () => {
             }
 
             case 'text':
+                {
+                    const rawDesc = block.color || '#9ca3af';
+                    /* Pure white / very light CMS colours wash out on bright areas of the photo */
+                    const textColor = isLikelyLightTextColor(rawDesc) ? '#E2E8F0' : rawDesc;
                 return (
-                    <motion.p className={styles.description} style={{ color: block.color || '#9ca3af' }} variants={itemVariant}>
+                    <motion.p className={styles.description} style={{ color: textColor }} variants={itemVariant}>
                         {block.content}
                     </motion.p>
                 );
+                }
 
             case 'buttons': {
                 const btns = block.buttons || [];
@@ -187,7 +196,11 @@ const Hero = () => {
                                             borderColor: solidBgFrom,
                                             color: solidTextColor
                                         }
-                                        : { borderColor: outlineColor, color: outlineTextColor }
+                                        : {
+                                            background: 'rgba(15, 23, 42, 0.85)',
+                                            borderColor: outlineColor,
+                                            color: outlineTextColor
+                                        }
                                     }
                                 >
                                     {btn.text}
@@ -207,7 +220,11 @@ const Hero = () => {
     };
 
     return (
-        <section id="home" className={styles.hero} ref={ref}>
+        <section
+            id="home"
+            className={[styles.hero, showLightSectionEdge ? 'lm-hero-edge' : ''].filter(Boolean).join(' ')}
+            ref={ref}
+        >
 
             {/* Content Layer */}
             <motion.div
@@ -249,10 +266,10 @@ const Hero = () => {
                     className={styles.overlay}
                     style={{
                         background: `linear-gradient(135deg,
-                          rgba(2,6,23,${overlayOpacity}) 0%,
-                          rgba(2,6,23,${overlayOpacity * 0.9}) 40%,
-                          rgba(15,23,42,${overlayOpacity * 0.7}) 70%,
-                          rgba(15,23,42,${overlayOpacity * 0.3}) 100%)`
+                                rgba(2,6,23,${Math.min(1, overlayOpacity + 0.04)}) 0%,
+                                rgba(2,6,23,${overlayOpacity * 0.92}) 38%,
+                                rgba(15,23,42,${Math.max(overlayOpacity * 0.72, 0.58)}) 68%,
+                                rgba(15,23,42,${Math.max(overlayOpacity * 0.38, 0.5)}) 100%)`
                     }}
                 />
                 <div className={styles.gradientOverlay}></div>

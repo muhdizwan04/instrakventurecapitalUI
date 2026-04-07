@@ -4,8 +4,12 @@ import { Mail, MapPin, Phone, Loader2 } from 'lucide-react';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { usePageContent } from '../hooks/usePageContent';
 import { Toaster } from 'react-hot-toast';
+import { useTheme } from '../context/ThemeContext';
+import { isDarkHexColor } from '../theme/clientThemeDefaults';
 
 const Contact = () => {
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
     // Default content
     const defaultContent = {
         pageHero: {
@@ -82,7 +86,10 @@ const Contact = () => {
     const styles = content?.styles || {};
 
     const sectionTitle = styles.sectionTitle ?? 'Get in Touch';
-    const sectionBgColor = styles.sectionBgColor || 'transparent';
+    const sectionBgColorRaw = styles.sectionBgColor || 'transparent';
+    const sectionBgColor = isLight && sectionBgColorRaw !== 'transparent' && isDarkHexColor(sectionBgColorRaw)
+        ? 'transparent'
+        : sectionBgColorRaw;
     const sectionTitleColor = styles.sectionTitleColor || '#1A365D';
     const sectionTextColor = styles.sectionTextColor || '#64748B';
     const sectionAlign = styles.sectionAlign || 'left';
@@ -92,16 +99,20 @@ const Contact = () => {
     const isContactGlass = contactBlockStyle === 'glass';
     const contactHex = (contactBlockBgColor !== 'transparent' ? contactBlockBgColor : '#FFFFFF').replace(/^#/, '');
     const hexToRgba = (hex, a) => { if (hex.length === 6) { const r = parseInt(hex.slice(0, 2), 16), g = parseInt(hex.slice(2, 4), 16), b = parseInt(hex.slice(4, 6), 16); return `rgba(${r},${g},${b},${a})`; } return `rgba(255,255,255,${a})`; };
-    const contactBlockBg = isContactGlass ? hexToRgba(contactHex.length === 6 ? contactHex : 'ffffff', 0.42) : (contactBlockBgColor !== 'transparent' ? contactBlockBgColor : 'transparent');
-    const contactGlassStyle = isContactGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {};
+    const contactBlockBg = isLight
+        ? (isContactGlass ? '#ffffff' : (contactBlockBgColor !== 'transparent' ? contactBlockBgColor : 'transparent'))
+        : (isContactGlass ? hexToRgba(contactHex.length === 6 ? contactHex : 'ffffff', 0.42) : (contactBlockBgColor !== 'transparent' ? contactBlockBgColor : 'transparent'));
+    const contactGlassStyle = isLight ? {} : (isContactGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {});
     const contactIconColor = styles.contactIconColor || 'var(--accent-secondary)';
 
     const formCardStyle = styles.formCardStyle || 'solid';
     const formCardBgColor = styles.formCardBgColor || '#FFFFFF';
     const isFormGlass = formCardStyle === 'glass';
     const formHex = (formCardBgColor || '#FFFFFF').replace(/^#/, '');
-    const formCardBg = isFormGlass ? hexToRgba(formHex.length === 6 ? formHex : 'ffffff', 0.42) : (formCardBgColor || '#FFFFFF');
-    const formGlassStyle = isFormGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {};
+    const formCardBg = isLight
+        ? (isFormGlass ? '#ffffff' : (formCardBgColor || '#FFFFFF'))
+        : (isFormGlass ? hexToRgba(formHex.length === 6 ? formHex : 'ffffff', 0.42) : (formCardBgColor || '#FFFFFF'));
+    const formGlassStyle = isLight ? {} : (isFormGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {});
 
     const inputStyle = {
         width: '100%',
@@ -142,6 +153,7 @@ const Contact = () => {
             <PageHero
                 title={pageHero.title}
                 subtitle={pageHero.subtitle}
+                lightBandIndex={0}
                 style={{ backgroundColor: pageHero.styles?.bgColor }}
                 sectionStyles={{
                     titleColor: pageHero.styles?.titleColor,
@@ -152,10 +164,10 @@ const Contact = () => {
                 textColor={pageHero.styles?.titleColor}
             />
             <div
-                className="container"
+                className={`container${isLight ? ' lm-band-b' : ''}`}
                 style={{
                     padding: `${styles.sectionPaddingTop ?? '80px'} ${styles.sectionPaddingHorizontal ?? '20px'} ${styles.sectionPaddingBottom ?? '80px'}`,
-                    backgroundColor: sectionBgColor !== 'transparent' ? sectionBgColor : undefined
+                    backgroundColor: isLight ? 'transparent' : (sectionBgColor !== 'transparent' ? sectionBgColor : undefined)
                 }}
             >
                 <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '5rem' }}>

@@ -2,6 +2,8 @@ import React from 'react';
 import styles from './Industries.module.css';
 import { Fuel, GraduationCap, Car, HardHat, Building, Truck, Factory, Cpu } from 'lucide-react';
 import { usePageContent } from '../hooks/usePageContent';
+import { useTheme } from '../context/ThemeContext';
+import { lightBandAt } from '../theme/lightBands';
 import { motion } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
 
@@ -9,7 +11,9 @@ const ICON_MAP = {
     Fuel, GraduationCap, Car, HardHat, Building, Truck, Factory, Cpu
 };
 
-const Industries = () => {
+const Industries = ({ lightBandIndex }) => {
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
     const defaultIndustries = [
         { id: 'ind-1', name: 'Oil and Gas', icon: 'Fuel' },
         { id: 'ind-2', name: 'Education', icon: 'GraduationCap' },
@@ -24,8 +28,16 @@ const Industries = () => {
     const { content } = usePageContent('home', { industries: defaultIndustries, industriesSectionStyles: {} });
     const industries = content.industries || defaultIndustries;
     const sectionStyles = content.industriesSectionStyles || {};
+    const useLightBand = isLight && typeof lightBandIndex === 'number' && Number.isFinite(lightBandIndex);
+    const lightBandClass = useLightBand ? `lm-band-${lightBandAt(lightBandIndex)}` : '';
+
     const sectionStyle = {};
-    if (sectionStyles.backgroundColor) {
+    if (isLight) {
+        sectionStyle['--industries-bg'] = useLightBand ? 'transparent' : '#f8fafc';
+        sectionStyle['--industries-text'] = '#0f172a';
+        sectionStyle['--industries-box-bg'] = '#ffffff';
+        sectionStyle.color = '#0f172a';
+    } else if (sectionStyles.backgroundColor) {
         const v = sectionStyles.backgroundColor.trim();
         if (v.startsWith('linear-gradient') || v.startsWith('radial-gradient')) {
             sectionStyle.background = v;
@@ -36,14 +48,14 @@ const Industries = () => {
     } else {
         sectionStyle['--industries-bg'] = '#0b1120';
     }
-    if (sectionStyles.textColor) {
+    if (!isLight && sectionStyles.textColor) {
         sectionStyle.color = sectionStyles.textColor;
         sectionStyle['--industries-text'] = sectionStyles.textColor;
     }
-    if (sectionStyles.boxColor) sectionStyle['--industries-box-bg'] = sectionStyles.boxColor;
+    if (!isLight && sectionStyles.boxColor) sectionStyle['--industries-box-bg'] = sectionStyles.boxColor;
 
     return (
-        <section id="industries" className={styles.industries} style={sectionStyle}>
+        <section id="industries" className={`${styles.industries} ${lightBandClass}`.trim()} style={sectionStyle}>
             <div className="container">
                 <ScrollReveal>
                     <h2 className="section-title">Focus Industries</h2>

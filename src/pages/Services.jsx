@@ -3,10 +3,21 @@ import { Link } from 'react-router-dom';
 import { TrendingUp, Wallet, ShieldCheck, PieChart, ArrowRight, Briefcase, FileText, Building2, Landmark, Globe, Shield, Coins, Gem, Users, BarChart3 } from 'lucide-react';
 import { usePageContent } from '../hooks/usePageContent';
 import UniversalSection from '../components/UniversalSection';
+import { useTheme } from '../context/ThemeContext';
+import { lightBandAt } from '../theme/lightBands';
+import { isLikelyLightTextColor } from '../theme/clientThemeDefaults';
 
 const ICON_MAP = { TrendingUp, Wallet, ShieldCheck, PieChart, Briefcase, FileText, Building2, Landmark, Globe, Shield, Coins, Gem, Users, BarChart3 };
 
 const ServicesPage = () => {
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
+    const lightBodyText = (raw, darkFallback, lightFallback) => {
+        const v = raw || darkFallback;
+        if (!isLight) return v;
+        return isLikelyLightTextColor(v) ? lightFallback : v;
+    };
+
     const defaultServices = [
         {
             id: 1,
@@ -178,6 +189,12 @@ const ServicesPage = () => {
     const { content: pageContent } = usePageContent('services_page', defaultPageContent);
     const p = { ...defaultPageContent, ...pageContent };
     const isGlass = (p.solutionsCardStyle || 'glass') !== 'solid';
+    /* Light: keep hero clearly brighter than first content band (lm-band-b / lm-band-c) */
+    const heroBackgroundResolved = isLight
+        ? 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)'
+        : (p.heroBackground || 'linear-gradient(135deg, #1A365D 0%, #0F2942 100%)');
+    const heroTextResolved = isLight ? '#0f172a' : (p.heroTextColor || '#FFFFFF');
+    const heroSubtitleResolved = isLight ? '#475569' : (p.heroTextColor ? `${p.heroTextColor}dd` : 'rgba(255,255,255,0.85)');
     const PAGE_SECTION_IDS = ['solutions', 'leadMagnet'];
     const customIds = (p.customSections || []).map(s => s.id);
     const orderedIds = Array.isArray(p.pageContentOrder) && p.pageContentOrder.length
@@ -187,9 +204,9 @@ const ServicesPage = () => {
     return (
         <div className="page-wrapper">
             {/* Enhanced Hero with CTA (from services_page content) */}
-            <div style={{
-                background: p.heroBackground || 'linear-gradient(135deg, #1A365D 0%, #0F2942 100%)',
-                color: p.heroTextColor || '#FFFFFF',
+            <div className={isLight ? 'lm-hero-edge' : undefined} style={{
+                background: heroBackgroundResolved,
+                color: heroTextResolved,
                 padding: '120px 20px 80px',
                 textAlign: p.heroTextAlign || 'center',
                 position: 'relative',
@@ -202,7 +219,7 @@ const ServicesPage = () => {
                         marginBottom: '1.5rem', 
                         fontFamily: p.heroFontFamily || 'var(--font-heading)',
                         letterSpacing: '-1px',
-                        color: p.heroTextColor || '#FFFFFF',
+                        color: heroTextResolved,
                         textAlign: p.heroTextAlign || 'center'
                     }}>
                         {p.heroTitle}
@@ -213,7 +230,7 @@ const ServicesPage = () => {
                         maxWidth: '100%',
                         boxSizing: 'border-box',
                         margin: (p.heroSubtitleAlign || p.heroTextAlign || 'center') === 'center' ? '0 0 2.5rem 0' : ((p.heroSubtitleAlign || p.heroTextAlign) === 'right' ? '0 0 2.5rem 0' : '0 0 2.5rem 0'), 
-                        color: p.heroTextColor ? `${p.heroTextColor}dd` : 'rgba(255,255,255,0.85)', 
+                        color: heroSubtitleResolved, 
                         lineHeight: '1.6',
                         fontFamily: p.heroFontFamily || 'var(--font-heading)',
                         textAlign: p.heroSubtitleAlign || p.heroTextAlign || 'center',
@@ -245,8 +262,8 @@ const ServicesPage = () => {
                         )}
                         {p.heroShowSecondaryCta !== false && (
                             <a href={p.ctaSecondaryLink || '#services-list'} className="btn-outline" style={{ 
-                                borderColor: p.ctaSecondaryBorderColor || 'rgba(255,255,255,0.3)', 
-                                color: p.ctaSecondaryTextColor || p.heroTextColor || '#FFFFFF', 
+                                borderColor: isLight ? (p.ctaSecondaryBorderColor || 'rgba(184, 134, 11, 0.55)') : (p.ctaSecondaryBorderColor || 'rgba(255,255,255,0.3)'), 
+                                color: isLight ? (p.ctaSecondaryTextColor || '#B8860B') : (p.ctaSecondaryTextColor || p.heroTextColor || '#FFFFFF'), 
                                 padding: '1rem 2rem', 
                                 fontSize: '1.1rem' 
                             }}>
@@ -257,14 +274,26 @@ const ServicesPage = () => {
                 </div>
             </div>
 
-            <div id="services-list" className="container" style={{ padding: '80px 20px' }}>
-                {orderedIds.map((sectionId) => {
+            {orderedIds.map((sectionId, blockIdx) => {
+                    /* Hero reads as band “0”; stack stripes from here so first block is not another white slab */
+                    const stripeIdx = blockIdx + 1;
                     if (sectionId === 'solutions') {
+                        const bandCls = isLight ? `lm-band-${lightBandAt(stripeIdx)}` : '';
                         return (
-                            <React.Fragment key="solutions">
-                                <h2 style={{ fontSize: p.sectionTitleFontSize || '2.5rem', marginBottom: '1rem', textAlign: p.sectionTitleAlign || 'center', fontFamily: p.sectionTitleFontFamily || 'var(--font-heading)', color: p.sectionTitleColor || '#1A365D', fontWeight: p.sectionTitleFontWeight || '700' }}>{p.sectionSolutionsTitle}</h2>
+                            <section
+                                key="solutions"
+                                id="services-list"
+                                className={bandCls}
+                                style={{
+                                    width: '100%',
+                                    boxSizing: 'border-box',
+                                    padding: isLight ? '72px 0 48px' : '80px 0 40px'
+                                }}
+                            >
+                                <div className="container" style={{ paddingLeft: '20px', paddingRight: '20px' }}>
+                                <h2 style={{ fontSize: p.sectionTitleFontSize || '2.5rem', marginBottom: '1rem', textAlign: p.sectionTitleAlign || 'center', fontFamily: p.sectionTitleFontFamily || 'var(--font-heading)', color: lightBodyText(p.sectionTitleColor, '#1A365D', '#0f172a'), fontWeight: p.sectionTitleFontWeight || '700' }}>{p.sectionSolutionsTitle}</h2>
                                 {p.sectionSolutionsSubtitle && (
-                                    <p style={{ maxWidth: '720px', margin: '0 auto 2.5rem', textAlign: p.sectionTitleAlign || 'center', color: '#4A5568', fontSize: '1rem', lineHeight: 1.7 }}>
+                                    <p style={{ maxWidth: '720px', margin: '0 auto 2.5rem', textAlign: p.sectionTitleAlign || 'center', color: lightBodyText(p.sectionSolutionsSubtitleColor, '#4A5568', '#475569'), fontSize: '1rem', lineHeight: 1.7 }}>
                                         {p.sectionSolutionsSubtitle}
                                     </p>
                                 )}
@@ -287,21 +316,25 @@ const ServicesPage = () => {
                         const link = s.link || p.tileButtonLink || `/services/${s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
                         const buttonText = s.linkText || p.tileButtonText || 'Learn More';
                         const showTileButton = p.tileButtonShow !== false;
+                        const cardBorderIdle = isLight ? '1px solid rgba(15, 23, 42, 0.1)' : '1px solid rgba(26, 54, 93, 0.1)';
+                        const cardBackground = isLight
+                            ? '#ffffff'
+                            : (isGlass ? (() => { const c = (p.tileCardBg || '#FFFFFF').replace(/^#/, ''); if (c.length === 6) { const r = parseInt(c.slice(0, 2), 16), g = parseInt(c.slice(2, 4), 16), b = parseInt(c.slice(4, 6), 16); return `rgba(${r},${g},${b},0.6)`; } return 'rgba(255,255,255,0.6)'; })() : (p.tileCardBg || 'linear-gradient(145deg, #FFFFFF, #F8FAFC)'));
+                        const cardBlur = !isLight && isGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {};
                         return (
                             <Link 
                                 to={link}
                                 key={i}
                                 className={isGlass ? 'glass-card service-card-hover' : 'service-card-hover'}
                                 style={{ 
-                                    border: '1px solid rgba(26, 54, 93, 0.1)',
+                                    border: cardBorderIdle,
                                     borderRadius: '16px',
                                     padding: '2.5rem',
                                     display: 'flex', 
                                     flexDirection: 'column',
-                                    background: isGlass ? (() => { const c = (p.tileCardBg || '#FFFFFF').replace(/^#/, ''); if (c.length === 6) { const r = parseInt(c.slice(0, 2), 16), g = parseInt(c.slice(2, 4), 16), b = parseInt(c.slice(4, 6), 16); return `rgba(${r},${g},${b},0.6)`; } return 'rgba(255,255,255,0.6)'; })() : (p.tileCardBg || 'linear-gradient(145deg, #FFFFFF, #F8FAFC)'),
-                                    backdropFilter: isGlass ? 'blur(12px)' : undefined,
-                                    WebkitBackdropFilter: isGlass ? 'blur(12px)' : undefined,
-                                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
+                                    background: cardBackground,
+                                    ...cardBlur,
+                                    boxShadow: isLight ? '0 4px 20px rgba(15, 23, 42, 0.06)' : '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
                                     transition: 'all 0.3s ease',
                                     position: 'relative',
                                     overflow: 'hidden',
@@ -309,26 +342,26 @@ const ServicesPage = () => {
                                 }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.transform = 'translateY(-5px)';
-                                    e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1)';
+                                    e.currentTarget.style.boxShadow = isLight ? '0 16px 32px rgba(15, 23, 42, 0.1)' : '0 20px 25px -5px rgba(0, 0, 0, 0.1)';
                                     e.currentTarget.style.borderColor = p.tileButtonColor || '#B8860B';
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.05)';
-                                    e.currentTarget.style.borderColor = 'rgba(26, 54, 93, 0.1)';
+                                    e.currentTarget.style.boxShadow = isLight ? '0 4px 20px rgba(15, 23, 42, 0.06)' : '0 4px 6px -1px rgba(0, 0, 0, 0.05)';
+                                    e.currentTarget.style.borderColor = isLight ? 'rgba(15, 23, 42, 0.1)' : 'rgba(26, 54, 93, 0.1)';
                                 }}
                             >
                                 <div style={{ 
                                     width: '60px', 
                                     height: '60px', 
-                                    background: 'rgba(26, 54, 93, 0.05)', 
+                                    background: isLight ? 'rgba(15, 23, 42, 0.06)' : 'rgba(26, 54, 93, 0.05)', 
                                     borderRadius: '12px', 
                                     display: 'flex', 
                                     alignItems: 'center', 
                                     justifyContent: 'center', 
                                     marginBottom: '1.5rem' 
                                 }}>
-                                    <IconComponent size={32} style={{ color: p.tileIconColor || '#1A365D' }} />
+                                    <IconComponent size={32} style={{ color: lightBodyText(p.tileIconColor, '#1A365D', '#0A3D62') }} />
                                 </div>
                                 
                                 {s.category && (
@@ -336,11 +369,11 @@ const ServicesPage = () => {
                                         {s.category}
                                     </div>
                                 )}
-                                <h3 style={{ marginBottom: '1rem', color: p.tileTitleColor || '#1A365D', fontSize: p.tileTitleFontSize || '1.4rem', fontFamily: p.tileTitleFontFamily || 'var(--font-heading)' }}>{s.title}</h3>
-                                <p style={{ color: p.tileDescColor || '#4A5568', lineHeight: '1.7', flex: 1, marginBottom: '1.5rem', fontSize: p.tileDescFontSize || '0.95rem' }}>{s.summary}</p>
+                                <h3 style={{ marginBottom: '1rem', color: lightBodyText(p.tileTitleColor, '#1A365D', '#0f172a'), fontSize: p.tileTitleFontSize || '1.4rem', fontFamily: p.tileTitleFontFamily || 'var(--font-heading)' }}>{s.title}</h3>
+                                <p style={{ color: lightBodyText(p.tileDescColor, '#4A5568', '#1e293b'), lineHeight: '1.7', flex: 1, marginBottom: '1.5rem', fontSize: p.tileDescFontSize || '0.95rem' }}>{s.summary}</p>
                                 
                                 {showTileButton && (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: p.tileButtonColor || '#B8860B', fontWeight: '600', fontSize: p.tileButtonFontSize || '0.95rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: lightBodyText(p.tileButtonColor, '#B8860B', '#B8860B'), fontWeight: '600', fontSize: p.tileButtonFontSize || '0.95rem' }}>
                                         {buttonText} <ArrowRight size={16} />
                                     </div>
                                 )}
@@ -351,23 +384,34 @@ const ServicesPage = () => {
                             </div>
                         ))}
                                 </div>
-                            </React.Fragment>
+                                </div>
+                            </section>
                         );
                     }
                     if (sectionId === 'leadMagnet') {
+                        const lmBand = isLight ? `lm-band-${lightBandAt(stripeIdx)}` : '';
                         return (
-                            <React.Fragment key="leadMagnet">
+                            <section
+                                key="leadMagnet"
+                                className={lmBand}
+                                style={{
+                                    width: '100%',
+                                    boxSizing: 'border-box',
+                                    padding: isLight ? '48px 0 96px' : '40px 0 100px'
+                                }}
+                            >
+                                <div className="container" style={{ paddingLeft: '20px', paddingRight: '20px' }}>
                                 <div style={{ 
-                    background: 'linear-gradient(135deg, #F8FAFC, #EDF2F7)', 
+                    background: isLight ? 'linear-gradient(135deg, #ffffff, #f1f5f9)' : 'linear-gradient(135deg, #F8FAFC, #EDF2F7)', 
                     borderRadius: '20px', 
                     padding: '4rem 2rem', 
                     textAlign: p.leadMagnetTextAlign || 'center',
-                    marginBottom: '100px',
+                    marginBottom: 0,
                     border: '1px solid rgba(26, 54, 93, 0.05)'
                 }}>
                     <h3 style={{ 
                         fontSize: p.leadMagnetTitleFontSize || '2rem', 
-                        color: p.leadMagnetTitleColor || '#1A365D', 
+                        color: lightBodyText(p.leadMagnetTitleColor, '#1A365D', '#0f172a'), 
                         marginBottom: '1rem',
                         fontFamily: p.leadMagnetFontFamily || 'var(--font-heading)',
                         textAlign: p.leadMagnetTextAlign || 'center'
@@ -375,7 +419,7 @@ const ServicesPage = () => {
                     <p style={{ 
                         maxWidth: '600px', 
                         margin: p.leadMagnetTextAlign === 'center' ? '0 auto 2rem' : (p.leadMagnetTextAlign === 'right' ? '0 0 2rem auto' : '0 auto 2rem 0'), 
-                        color: p.leadMagnetDescColor || '#4A5568', 
+                        color: lightBodyText(p.leadMagnetDescColor, '#4A5568', '#475569'), 
                         fontSize: p.leadMagnetDescFontSize || '1.1rem',
                         fontFamily: p.leadMagnetFontFamily || 'var(--font-heading)',
                         textAlign: p.leadMagnetTextAlign || 'center'
@@ -386,20 +430,20 @@ const ServicesPage = () => {
                         {p.leadMagnetButtonText}
                     </Link>
                 </div>
-                            </React.Fragment>
+                                </div>
+                            </section>
                         );
                     }
                     const customSection = (p.customSections || []).find(s => s.id === sectionId);
                     if (customSection) {
                         return (
-                            <div key={sectionId} className="container" style={{ paddingBottom: '3rem' }}>
-                                <UniversalSection section={customSection} containerClass="container" />
+                            <div key={sectionId} style={{ paddingBottom: '3rem' }}>
+                                <UniversalSection section={customSection} containerClass="container" lightBandIndex={stripeIdx} />
                             </div>
                         );
                     }
                     return null;
                 })}
-            </div>
         </div>
     );
 };

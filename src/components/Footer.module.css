@@ -120,3 +120,56 @@
         gap: 3rem;
     }
 }
+
+/* ============================================================
+   FOOTER LIGHT MODE OVERRIDES
+   ============================================================ */
+
+:global([data-theme="light"]) .footer {
+    background: #F8FAFC;
+}
+
+:global([data-theme="light"]) .footer::before {
+    background-image: 
+        linear-gradient(rgba(15, 23, 42, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.02) 1px, transparent 1px);
+}
+
+:global([data-theme="light"]) .brandTitle {
+    color: #1E293B;
+}
+
+:global([data-theme="light"]) .tagline {
+    color: #B8860B;
+}
+
+:global([data-theme="light"]) .description {
+    color: #475569;
+}
+
+:global([data-theme="light"]) .links h4,
+:global([data-theme="light"]) .contact h4 {
+    color: #1E293B;
+}
+
+:global([data-theme="light"]) .links ul li a {
+    color: #475569;
+}
+
+:global([data-theme="light"]) .links ul li a:hover {
+    color: #B8860B;
+}
+
+:global([data-theme="light"]) .contact p {
+    color: #475569;
+}
+
+:global([data-theme="light"]) .email {
+    color: #0A3D62;
+}
+
+:global([data-theme="light"]) .bottom {
+    border-top-color: rgba(15, 23, 42, 0.06);
+    color: #475569;
+    background: rgba(241, 245, 249, 0.5);
+}

@@ -84,3 +84,27 @@
         max-width: 18ch;
     }
 }
+
+/* ============================================================
+   INDUSTRIES LIGHT MODE OVERRIDES
+   ============================================================ */
+
+:global([data-theme="light"]) .industries {
+    background: var(--industries-bg, #F8FAFC);
+    color: var(--industries-text, #1E293B);
+}
+
+:global([data-theme="light"]) .item {
+    background: var(--industries-box-bg, #FFFFFF);
+    border-color: rgba(15, 23, 42, 0.08);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+:global([data-theme="light"]) .item:hover {
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+}
+
+:global([data-theme="light"]) .item span {
+    color: #0f172a;
+    font-weight: 600;
+}

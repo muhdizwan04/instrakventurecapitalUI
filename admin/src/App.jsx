@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { AdminThemeProvider } from './context/ThemeContext';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -82,11 +83,12 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <AppRoutes />
+        <AdminThemeProvider>
+          <AppRoutes />
+        </AdminThemeProvider>
       </AuthProvider>
     </Router>
   );
 }
 
 export default App;
-

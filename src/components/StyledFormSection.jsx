@@ -2,17 +2,26 @@ import React from 'react';
 import { usePageContent } from '../hooks/usePageContent';
 import ProtectedFormSection from './ProtectedFormSection';
 import DynamicServiceForm from './DynamicServiceForm';
+import { useTheme } from '../context/ThemeContext';
+import { isDarkHexColor, isLikelyLightTextColor } from '../theme/clientThemeDefaults';
 
 const StyledFormSection = ({ serviceId, serviceName, title, subtitle, fallbackForm, customHeader, noWrapper, maxWidth = '800px', sectionId }) => {
     const { content } = usePageContent('service_pages', { pages: [] });
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
     const service = content?.pages?.find(p => p.id === serviceId);
     const fs = service?.formStyles || {};
 
-    const sectionBg = fs.sectionBg || '#F5F7FA';
+    const rawSectionBg = fs.sectionBg || '#F5F7FA';
+    const sectionBg = isLight && isDarkHexColor(rawSectionBg) ? '#F1F5F9' : rawSectionBg;
     const sectionTitle = fs.sectionTitle || title || 'Submit Your Inquiry';
     const sectionSubtitle = fs.sectionSubtitle || subtitle || '';
-    const titleColor = fs.sectionTitleColor || '#1A365D';
-    const subtitleColor = fs.sectionSubtitleColor || '#4A5568';
+    const rawTitleColor = fs.sectionTitleColor || '#1A365D';
+    const rawSubtitleColor = fs.sectionSubtitleColor || '#4A5568';
+    const titleColor =
+        isLight && isLikelyLightTextColor(rawTitleColor) ? '#0F172A' : rawTitleColor;
+    const subtitleColor =
+        isLight && isLikelyLightTextColor(rawSubtitleColor) ? '#475569' : rawSubtitleColor;
 
     const contentWrapper = (
         <div className="container">
@@ -64,7 +73,11 @@ const StyledFormSection = ({ serviceId, serviceName, title, subtitle, fallbackFo
     }
 
     return (
-        <section id={sectionId} style={{ padding: '80px 20px', background: sectionBg }}>
+        <section
+            id={sectionId}
+            className={isLight ? 'lm-band-form' : undefined}
+            style={{ padding: '80px 20px', background: isLight ? 'transparent' : sectionBg }}
+        >
             {contentWrapper}
         </section>
     );

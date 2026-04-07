@@ -346,3 +346,312 @@ ul {
     width: 100px;
   }
 }
+
+/* ============================================================
+   ADMIN DARK MODE OVERRIDES
+   ============================================================ */
+
+[data-theme="dark"] {
+  --bg-primary: #0F172A;
+  --bg-secondary: #1E293B;
+  --bg-tertiary: #334155;
+  --bg-dark: #020617;
+
+  --text-primary: #F1F5F9;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+
+  --accent-primary: #3B82F6;
+  --accent-secondary: #D4A017;
+  --accent-tertiary: #60A5FA;
+
+  --border-color: rgba(148, 163, 184, 0.15);
+  --border-light: rgba(148, 163, 184, 0.1);
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.5);
+  --shadow-gold: 0 4px 20px rgba(201, 162, 39, 0.2);
+
+  --gradient-gold: linear-gradient(135deg, #C9A227, #D4A017);
+  --gradient-navy: linear-gradient(135deg, #1E293B, #334155);
+  --gradient-premium: linear-gradient(135deg, #0F172A, #1E293B);
+}
+
+/* Body */
+html[data-theme="dark"] body {
+  background: #0F172A;
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] body::before {
+  background-image:
+    radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 0% 100%, rgba(201, 162, 39, 0.02) 0%, transparent 40%);
+}
+
+/* Headings: do NOT force a single color — it overrides Tailwind text-gray-* on admin
+   panels (e.g. white cards) and makes titles invisible. Use utilities or var(--text-primary). */
+
+/* Links */
+[data-theme="dark"] a:hover {
+  color: #60A5FA;
+}
+
+/* Glass card */
+[data-theme="dark"] .glass-card {
+  background: #1E293B;
+  border-color: rgba(148, 163, 184, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .glass-card::before {
+  background: linear-gradient(90deg, #3B82F6 0%, #1E40AF 50%, #C9A227 100%);
+}
+
+[data-theme="dark"] .glass-card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  border-color: rgba(148, 163, 184, 0.15);
+}
+
+/* Glass */
+[data-theme="dark"] .glass {
+  background: #1E293B;
+  border-color: rgba(148, 163, 184, 0.1);
+}
+
+/* Buttons */
+[data-theme="dark"] .btn-primary {
+  color: #60A5FA;
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #93C5FD;
+}
+
+[data-theme="dark"] .btn-solid {
+  background: linear-gradient(135deg, #3B82F6, #1E40AF);
+}
+
+[data-theme="dark"] .btn-gold {
+  background: linear-gradient(135deg, #C9A227, #D4A017);
+  color: #0F172A;
+}
+
+/* Section title */
+[data-theme="dark"] .section-title {
+  color: #F1F5F9;
+}
+
+[data-theme="dark"] .section-title::after {
+  background: linear-gradient(90deg, rgba(148, 163, 184, 0.1), rgba(201, 162, 39, 0.5), rgba(148, 163, 184, 0.05));
+}
+
+/* Color input in dark mode */
+[data-theme="dark"] input[type="color"] {
+  border-color: rgba(148, 163, 184, 0.2);
+  background: #334155;
+}
+
+/* Form inputs in dark mode */
+[data-theme="dark"] .input-field {
+  background: #334155;
+  border-color: rgba(148, 163, 184, 0.15);
+  color: #F1F5F9;
+}
+
+[data-theme="dark"] .input-field::placeholder {
+  color: #94A3B8;
+}
+
+[data-theme="dark"] .input-field:focus {
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+/* Generic inputs / textareas in dark */
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="email"],
+[data-theme="dark"] input[type="url"],
+[data-theme="dark"] input[type="number"],
+[data-theme="dark"] input[type="password"],
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background: #334155;
+  border-color: rgba(148, 163, 184, 0.15);
+  color: #F1F5F9;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #94A3B8;
+}
+
+[data-theme="dark"] select option {
+  background: #1E293B;
+  color: #F1F5F9;
+}
+
+/* Label */
+[data-theme="dark"] .label {
+  color: #94A3B8;
+}
+
+/* btn-save dark */
+[data-theme="dark"] .btn-save {
+  background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+}
+
+/* btn-add dark */
+[data-theme="dark"] .btn-add {
+  background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+}
+
+/* ============================================================
+   ADMIN: Tailwind light utilities → cohesive dark surfaces
+   (Many managers use bg-white / gray-* without dark: variants.)
+   ============================================================ */
+
+[data-theme="dark"] .bg-white {
+  background-color: #1e293b !important;
+}
+
+[data-theme="dark"] .bg-gray-50 {
+  background-color: #1e293b !important;
+}
+
+[data-theme="dark"] .bg-gray-50\/50 {
+  background-color: rgba(30, 41, 59, 0.55) !important;
+}
+
+[data-theme="dark"] .bg-gray-50\/80 {
+  background-color: rgba(51, 65, 85, 0.85) !important;
+}
+
+[data-theme="dark"] .bg-gray-100 {
+  background-color: #334155 !important;
+}
+
+[data-theme="dark"] .bg-gray-200 {
+  background-color: #475569 !important;
+}
+
+[data-theme="dark"] .border-gray-100,
+[data-theme="dark"] .border-gray-200,
+[data-theme="dark"] .border-gray-200\/80 {
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+[data-theme="dark"] .border-b-white {
+  border-bottom-color: #1e293b !important;
+}
+
+/* Text on remapped dark panels */
+[data-theme="dark"] .text-gray-900,
+[data-theme="dark"] .text-gray-800,
+[data-theme="dark"] .text-gray-700 {
+  color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .text-gray-600 {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .text-gray-400 {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .text-gray-300 {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .text-blue-600 {
+  color: #60a5fa !important;
+}
+
+[data-theme="dark"] .text-blue-700 {
+  color: #93c5fd !important;
+}
+
+[data-theme="dark"] .hover\:text-blue-700:hover {
+  color: #93c5fd !important;
+}
+
+[data-theme="dark"] .hover\:text-gray-600:hover {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .hover\:text-gray-700:hover {
+  color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .bg-blue-50 {
+  background-color: rgba(59, 130, 246, 0.12) !important;
+}
+
+[data-theme="dark"] .hover\:bg-blue-50:hover {
+  background-color: rgba(59, 130, 246, 0.16) !important;
+}
+
+[data-theme="dark"] .hover\:bg-blue-100:hover {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+[data-theme="dark"] .border-blue-100,
+[data-theme="dark"] .border-blue-200 {
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+[data-theme="dark"] .hover\:bg-gray-50:hover {
+  background-color: #334155 !important;
+}
+
+[data-theme="dark"] .hover\:bg-gray-100:hover {
+  background-color: #334155 !important;
+}
+
+[data-theme="dark"] .hover\:bg-gray-200:hover {
+  background-color: #475569 !important;
+}
+
+/* Inputs that force bg-white beat .input-field — normalize in dark mode */
+[data-theme="dark"] .input-field.bg-white,
+[data-theme="dark"] textarea.input-field.bg-white {
+  background-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+/* Small toggle strips (alignment, font weight) */
+[data-theme="dark"] .flex.bg-white.p-1.rounded-lg {
+  background-color: #334155 !important;
+  border-color: rgba(148, 163, 184, 0.2) !important;
+}
+
+/* Login / inputs: avoid flash of pure white on focus */
+[data-theme="dark"] .focus\:bg-white:focus {
+  background-color: #334155 !important;
+}
+
+[data-theme="dark"] .focus\:ring-offset-2:focus {
+  --tw-ring-offset-color: #0f172a !important;
+}
+
+/* Alerts — soften bright red panels in dark mode */
+[data-theme="dark"] .bg-red-50 {
+  background-color: rgba(127, 29, 29, 0.28) !important;
+}
+
+[data-theme="dark"] .border-red-100 {
+  border-color: rgba(248, 113, 113, 0.35) !important;
+}
+
+[data-theme="dark"] .text-red-700 {
+  color: #fecaca !important;
+}

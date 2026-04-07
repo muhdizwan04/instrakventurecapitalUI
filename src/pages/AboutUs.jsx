@@ -4,11 +4,23 @@ import { ShieldCheck, Eye, Scale, User, Shield, Handshake, Building2, Award, Che
 import { usePageContent } from '../hooks/usePageContent';
 import { motion } from 'framer-motion';
 import UniversalSection from '../components/UniversalSection';
+import { useTheme } from '../context/ThemeContext';
+import { isDarkHexColor, isLikelyLightTextColor } from '../theme/clientThemeDefaults';
+import { lightBandAt } from '../theme/lightBands';
 
 // --- Icon Map for Dynamic Content ---
 const ICON_MAP = { ShieldCheck, Eye, Scale };
 
 const AboutUs = () => {
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
+
+    const aboutLightBandClass = (idx, section) => {
+        if (!isLight) return '';
+        if (section?.styles?.backgroundImage) return '';
+        return `lm-band-${lightBandAt(idx)}`;
+    };
+
     // --- Data Fetching ---
 
     // 1. About Page Content (Master of Layout)
@@ -229,11 +241,18 @@ const AboutUs = () => {
 
     // --- Renderers ---
 
-    const renderHero = (section) => {
+    const renderHero = (section, idx) => {
         const styles = section.styles || {};
+        const bandCls = aboutLightBandClass(idx, section);
+        const heroBg = isLight && styles.bgColor && isDarkHexColor(styles.bgColor)
+            ? 'transparent'
+            : (styles.bgColor || 'transparent');
+        const heroText = isLight
+            ? (styles.textColor && !isLikelyLightTextColor(styles.textColor) ? styles.textColor : undefined)
+            : styles.textColor;
         return (
-            <div key={section.id} style={{
-                backgroundColor: styles.bgColor || 'transparent',
+            <div key={section.id} className={bandCls} style={{
+                backgroundColor: bandCls ? 'transparent' : heroBg,
                 backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
                 backgroundSize: styles.backgroundSize || 'cover',
                 backgroundPosition: 'center',
@@ -249,7 +268,7 @@ const AboutUs = () => {
                 <PageHero
                     title={section.title}
                     subtitle={section.subtitle}
-                    textColor={styles.textColor}
+                    textColor={heroText}
                     sectionStyles={styles}
                     style={{ background: 'transparent', position: 'relative', zIndex: 1 }}
                 />
@@ -257,17 +276,28 @@ const AboutUs = () => {
         );
     };
 
-    const renderMission = (section) => {
+    const renderMission = (section, idx) => {
         const styles = section.styles || {};
-        const titleColor = styles.titleColor || styles.textColor || 'var(--accent-primary)';
-        const textColor = styles.textColor || '#475569';
+        const bandCls = aboutLightBandClass(idx, section);
+        let titleColor = styles.titleColor || styles.textColor || 'var(--accent-primary)';
+        let textColor = styles.textColor || '#475569';
+        if (isLight) {
+            if (isLikelyLightTextColor(titleColor)) titleColor = '#1A365D';
+            if (isLikelyLightTextColor(textColor)) textColor = '#475569';
+        }
         const titleSizePx = styles.titleFontSize != null ? styles.titleFontSize : 32;
         const bodySizePx = styles.contentFontSize != null ? styles.contentFontSize : 18;
         const titleWeight = styles.titleFontWeight === 'bold' ? 700 : 900;
+        const missionSurfaceBg = bandCls
+            ? 'transparent'
+            : (isLight && styles.bgColor && isDarkHexColor(styles.bgColor)
+                ? '#f8fafc'
+                : (styles.bgColor || 'transparent'));
         return (
             <motion.section
                 key={section.id}
                 id="mission"
+                className={bandCls}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px", amount: 0.1 }}
@@ -275,7 +305,7 @@ const AboutUs = () => {
                 style={{
                     padding: '100px 0',
                     scrollMarginTop: '60px',
-                    backgroundColor: styles.bgColor || 'transparent',
+                    backgroundColor: missionSurfaceBg,
                     backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
                     backgroundSize: styles.backgroundSize || 'cover',
                     backgroundPosition: 'center',
@@ -300,19 +330,22 @@ const AboutUs = () => {
                         const cardStyle = styles.cardStyle || 'glass';
                         const isGlass = cardStyle !== 'solid';
                         const hex = (styles.cardColor || '#FFFFFF').replace(/^#/, '');
-                        const cardBg = isGlass && hex.length === 6
-                            ? `rgba(${parseInt(hex.slice(0,2),16)},${parseInt(hex.slice(2,4),16)},${parseInt(hex.slice(4,6),16)},0.42)`
-                            : (styles.cardColor || '#FFFFFF');
-                        const glassStyle = isGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {};
+                        const cardBg = isLight
+                            ? '#ffffff'
+                            : (isGlass && hex.length === 6
+                                ? `rgba(${parseInt(hex.slice(0,2),16)},${parseInt(hex.slice(2,4),16)},${parseInt(hex.slice(4,6),16)},0.42)`
+                                : (styles.cardColor || '#FFFFFF'));
+                        const glassStyle = isLight ? {} : (isGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {});
                         return (
                     <div className="luxury-border-gold overflow-hidden" style={{
                         borderRadius: '24px',
                         padding: '4rem',
                         color: textColor,
                         position: 'relative',
-                        boxShadow: 'var(--shadow-lg)',
+                        boxShadow: isLight ? '0 4px 24px rgba(15, 23, 42, 0.07)' : 'var(--shadow-lg)',
                         marginBottom: '4rem',
                         background: cardBg,
+                        border: isLight ? '1px solid rgba(15, 23, 42, 0.08)' : undefined,
                         ...glassStyle
                     }}>
                         <div style={{ position: 'relative', zIndex: 10, maxWidth: '800px' }}>
@@ -343,19 +376,22 @@ const AboutUs = () => {
         );
     };
 
-    const renderBoard = (section) => {
+    const renderBoard = (section, idx) => {
         const styles = section.styles || {};
+        const bandCls = aboutLightBandClass(idx, section);
+        const boardBg = bandCls ? 'transparent' : (styles.bgColor || '#F8FAFC');
         return (
             <motion.section
                 key={section.id}
                 id="board"
+                className={bandCls}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px", amount: 0.1 }}
                 variants={sectionVariants}
                 style={{
                     padding: '100px 0',
-                    background: styles.bgColor || '#F8FAFC',
+                    background: boardBg,
                     scrollMarginTop: '60px',
                     backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
                     backgroundSize: styles.backgroundSize || 'cover',
@@ -471,8 +507,9 @@ const AboutUs = () => {
         );
     };
 
-    const renderPartners = (section) => {
+    const renderPartners = (section, idx) => {
         const styles = section.styles || {};
+        const bandCls = aboutLightBandClass(idx, section);
         const bgColor = styles.bgColor || 'transparent';
         const isBlack = typeof bgColor === 'string' && (bgColor.toLowerCase() === 'black' || bgColor === '#000' || bgColor === '#000000');
         const titleColor = styles.titleColor || '#1A365D';
@@ -486,6 +523,7 @@ const AboutUs = () => {
             <motion.div
                 key={section.id}
                 id="partners"
+                className={bandCls}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px", amount: 0.1 }}
@@ -493,7 +531,7 @@ const AboutUs = () => {
                 style={{
                     paddingBottom: '100px',
                     scrollMarginTop: '80px',
-                    backgroundColor: isBlack ? 'transparent' : bgColor,
+                    backgroundColor: bandCls ? 'transparent' : (isBlack ? 'transparent' : bgColor),
                     backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
                     backgroundSize: styles.backgroundSize || 'cover',
                     backgroundPosition: 'center',
@@ -587,12 +625,14 @@ const AboutUs = () => {
         );
     };
 
-    const renderMilestone = (section) => {
+    const renderMilestone = (section, idx) => {
         const styles = section.styles || {};
-        const bgBase = styles.bgColor || '#0A2540';
-        const textBase = styles.textColor || '#FFFFFF';
-        const titleBase = styles.titleColor || textBase;
+        const bandCls = aboutLightBandClass(idx, section);
+        const bgBase = bandCls ? 'transparent' : (isLight ? '#F1F5F9' : (styles.bgColor || '#0A2540'));
+        const textBase = isLight ? '#334155' : (styles.textColor || '#FFFFFF');
+        const titleBase = isLight ? '#0F172A' : (styles.titleColor || textBase);
         const iconColor = styles.iconColor || '#D4AF37';
+        const badgeBg = bandCls && isLight ? '#f1f5f9' : bgBase;
         return (
             <motion.div
                 key={section.id}
@@ -605,7 +645,7 @@ const AboutUs = () => {
                 }}
             >
                 {/* 3b. Investment Feature (Deal Tombstone Style) */}
-                <section style={{
+                <section className={bandCls} style={{
                     padding: '80px 0',
                     backgroundColor: bgBase,
                     color: textBase,
@@ -625,7 +665,7 @@ const AboutUs = () => {
                         <div style={{
                             maxWidth: '900px',
                             margin: '0 auto',
-                            border: '2px solid rgba(212, 175, 55, 0.3)',
+                            border: isLight ? '2px solid rgba(15, 23, 42, 0.12)' : '2px solid rgba(212, 175, 55, 0.3)',
                             padding: '4rem',
                             textAlign: 'center',
                             position: 'relative',
@@ -633,7 +673,7 @@ const AboutUs = () => {
                         }}>
                             <div style={{
                                 position: 'absolute', top: '-1px', left: '50%', transform: 'translate(-50%, -50%)',
-                                background: bgBase, padding: '0 1rem', textTransform: 'uppercase', letterSpacing: '2px', color: iconColor, fontSize: '0.9rem', fontWeight: 'bold'
+                                background: badgeBg, padding: '0 1rem', textTransform: 'uppercase', letterSpacing: '2px', color: iconColor, fontSize: '0.9rem', fontWeight: 'bold'
                             }}>
                                 {section.title || 'Investment Milestone'}
                             </div>
@@ -641,8 +681,8 @@ const AboutUs = () => {
                             <Award size={64} style={{ color: iconColor, margin: '0 auto 2rem' }} />
                             <h2 style={{ fontSize: '3.5rem', fontFamily: 'var(--font-heading)', color: titleBase, marginBottom: '1rem' }}>{milestone.headline}</h2>
                             <p style={{ fontSize: '1.5rem', color: iconColor, marginBottom: '2rem' }}>{milestone.subtitle}</p>
-                            <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', width: '100px', margin: '0 auto 2rem' }}></div>
-                            <p style={{ fontSize: '1.1rem', lineHeight: '1.8', opacity: 0.8, maxWidth: '700px', margin: '0 auto' }}>
+                            <div style={{ height: '1px', background: isLight ? 'rgba(15,23,42,0.12)' : 'rgba(255,255,255,0.1)', width: '100px', margin: '0 auto 2rem' }}></div>
+                            <p style={{ fontSize: '1.1rem', lineHeight: '1.8', opacity: isLight ? 1 : 0.8, maxWidth: '700px', margin: '0 auto', color: isLight ? textBase : undefined }}>
                                 {milestone.description}
                             </p>
                         </div>
@@ -662,16 +702,16 @@ const AboutUs = () => {
         'board': renderBoard,
         'partners': renderPartners,
         'milestone': renderMilestone,
-        'custom': (section) => <UniversalSection key={section.id} section={section} />
+        'custom': (section, idx) => <UniversalSection key={section.id} section={section} lightBandIndex={idx} />
     };
 
-    const renderCustom = (section) => <UniversalSection key={section.id} section={section} />;
+    const renderCustom = (section, idx) => <UniversalSection key={section.id} section={section} lightBandIndex={idx} />;
 
     return (
         <div className="page-wrapper">
-            {sections.map(section => {
+            {sections.map((section, idx) => {
                 const RenderFn = renderers[section.type] || renderCustom;
-                return RenderFn(section);
+                return RenderFn(section, idx);
             })}
         </div>
     );

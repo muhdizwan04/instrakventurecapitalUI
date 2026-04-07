@@ -5,6 +5,7 @@ import { useFormSubmit } from '../hooks/useFormSubmit';
 import { useAuth } from '../context/AuthContext';
 import PageHero from '../components/PageHero';
 import UniversalSection from '../components/UniversalSection';
+import { useTheme } from '../context/ThemeContext';
 import { Loader2, CheckCircle2, AlertTriangle, Lock, LogIn, UserPlus } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 
@@ -226,6 +227,8 @@ const AICapitalAssessment = () => {
   const { user, loading: authLoading } = useAuth();
   const { submitForm } = useFormSubmit('ai-capital-assessment');
   const saveStartedRef = useRef(false);
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
 
   const [stepIndex, setStepIndex] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -269,6 +272,35 @@ const AICapitalAssessment = () => {
   const sectionsBefore = sections.filter((s) => !s.position || s.position === 'before');
   const sectionsAfter = sections.filter((s) => s.position === 'after');
 
+  const phSt = pageHero.styles || {};
+  const ws = wizardStyles;
+  const aiHeroStyle = isLight
+    ? phSt.bgGradient
+      ? { background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)' }
+      : { background: '#f8fafc' }
+    : phSt.bgGradient
+      ? { background: `linear-gradient(135deg, ${phSt.bgColor || '#0A2540'}, ${phSt.bgGradient})` }
+      : { background: phSt.bgColor };
+  const aiHeroSectionStyles = isLight
+    ? { ...phSt, titleColor: '#1A365D', subtitleColor: '#475569', textColor: '#475569' }
+    : phSt;
+  const aiWizardShellStyle = isLight
+    ? { background: '#eef2f7' }
+    : ws.bgGradient
+      ? { background: `linear-gradient(135deg, ${ws.bgColor || '#020617'}, ${ws.bgGradient})` }
+      : { background: ws.bgColor || 'transparent' };
+  const aiWizardCardStyle = isLight
+    ? {
+        backgroundColor: '#ffffff',
+        borderColor: 'rgba(15, 23, 42, 0.12)',
+        color: '#0f172a',
+      }
+    : {
+        backgroundColor: ws.cardBgColor,
+        borderColor: ws.cardBorderColor,
+        color: ws.textColor,
+      };
+
   if ((loading && !steps.length) || layoutLoading || authLoading) {
     return (
       <div className="page-wrapper flex items-center justify-center min-h-screen">
@@ -285,23 +317,16 @@ const AICapitalAssessment = () => {
         <PageHero
           title={pageHero.title}
           subtitle={pageHero.subtitle}
-          sectionStyles={pageHero.styles}
-          style={{
-            background: pageHero.styles?.bgGradient
-              ? `linear-gradient(135deg, ${pageHero.styles.bgColor || '#0A2540'}, ${pageHero.styles.bgGradient})`
-              : pageHero.styles?.bgColor || undefined,
-          }}
+          lightBandIndex={0}
+          sectionStyles={aiHeroSectionStyles}
+          style={aiHeroStyle}
         />
-        {sectionsBefore.map((section) => (
-          <UniversalSection key={section.id || section.title} section={section} />
+        {sectionsBefore.map((section, idx) => (
+          <UniversalSection key={section.id || section.title} section={section} lightBandIndex={idx + 1} />
         ))}
         <div
           className="ai-assessment-wizard"
-          style={{
-            background: wizardStyles.bgGradient
-              ? `linear-gradient(135deg, ${wizardStyles.bgColor || '#020617'}, ${wizardStyles.bgGradient})`
-              : wizardStyles.bgColor || 'transparent',
-          }}
+          style={aiWizardShellStyle}
         >
           <div className="container mx-auto px-4 sm:px-6 max-w-3xl py-10 md:py-12 pb-16 md:pb-20">
             <header className="wizard-intro">
@@ -315,9 +340,7 @@ const AICapitalAssessment = () => {
             <div
               className="glass-card wizard-card"
               style={{
-                backgroundColor: wizardStyles.cardBgColor,
-                borderColor: wizardStyles.cardBorderColor,
-                color: wizardStyles.textColor,
+                ...aiWizardCardStyle,
                 textAlign: 'center',
                 padding: '2.5rem 1.5rem',
               }}
@@ -327,7 +350,7 @@ const AICapitalAssessment = () => {
                   width: 56,
                   height: 56,
                   borderRadius: 14,
-                  background: 'rgba(201, 162, 39, 0.2)',
+                  background: isLight ? 'rgba(184, 134, 11, 0.15)' : 'rgba(201, 162, 39, 0.2)',
                   color: '#c9a227',
                   display: 'flex',
                   alignItems: 'center',
@@ -336,10 +359,10 @@ const AICapitalAssessment = () => {
                   <Lock size={28} />
                 </div>
               </div>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#f8fafc', marginBottom: '0.5rem' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: isLight ? '#0f172a' : '#f8fafc', marginBottom: '0.5rem' }}>
                 Login required
               </h2>
-              <p style={{ color: 'rgba(226, 232, 240, 0.9)', fontSize: '0.9375rem', marginBottom: '1.5rem', maxWidth: 420, margin: '0 auto 1.5rem' }}>
+              <p style={{ color: isLight ? 'rgba(51, 65, 85, 0.95)' : 'rgba(226, 232, 240, 0.9)', fontSize: '0.9375rem', marginBottom: '1.5rem', maxWidth: 420, margin: '0 auto 1.5rem' }}>
                 Sign in or create an account to take the Capital Readiness Assessment and receive your score and recommendations.
               </p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'center' }}>
@@ -370,8 +393,8 @@ const AICapitalAssessment = () => {
                     gap: '0.5rem',
                     padding: '0.6rem 1.25rem',
                     background: 'transparent',
-                    color: '#e2e8f0',
-                    border: '1px solid rgba(148, 163, 184, 0.5)',
+                    color: isLight ? '#334155' : '#e2e8f0',
+                    border: isLight ? '1px solid rgba(15, 23, 42, 0.2)' : '1px solid rgba(148, 163, 184, 0.5)',
                     fontWeight: 500,
                     borderRadius: 10,
                     fontSize: '0.9375rem',
@@ -384,8 +407,8 @@ const AICapitalAssessment = () => {
             </div>
           </div>
         </div>
-        {sectionsAfter.map((section) => (
-          <UniversalSection key={section.id || section.title} section={section} />
+        {sectionsAfter.map((section, idx) => (
+          <UniversalSection key={section.id || section.title} section={section} lightBandIndex={sectionsBefore.length + 1 + idx} />
         ))}
       </div>
     );
@@ -534,28 +557,15 @@ const AICapitalAssessment = () => {
         <PageHero
           title={pageHero.title}
           subtitle={pageHero.subtitle}
-          sectionStyles={pageHero.styles}
-          style={{
-            background: pageHero.styles?.bgGradient
-              ? `linear-gradient(135deg, ${pageHero.styles.bgColor || '#0A2540'}, ${
-                  pageHero.styles.bgGradient
-                })`
-              : pageHero.styles?.bgColor || undefined,
-          }}
+          lightBandIndex={0}
+          sectionStyles={aiHeroSectionStyles}
+          style={aiHeroStyle}
         />
-        {sectionsBefore.map((section) => (
-          <UniversalSection key={section.id || section.title} section={section} />
+        {sectionsBefore.map((section, idx) => (
+          <UniversalSection key={section.id || section.title} section={section} lightBandIndex={idx + 1} />
         ))}
 
-        <div
-          style={{
-            background: wizardStyles.bgGradient
-              ? `linear-gradient(135deg, ${wizardStyles.bgColor || '#020617'}, ${
-                  wizardStyles.bgGradient
-                })`
-              : wizardStyles.bgColor || 'transparent',
-          }}
-        >
+        <div style={aiWizardShellStyle}>
           <div className="container mx-auto px-4 py-16 max-w-4xl">
             <h1 className="text-3xl md:text-4xl font-heading text-[var(--accent-primary)] mb-4">
               {resultsConfig.title}
@@ -565,11 +575,7 @@ const AICapitalAssessment = () => {
             <div className="grid md:grid-cols-3 gap-6 mb-10">
               <div
                 className="glass-card p-6 md:col-span-1 flex flex-col items-center justify-center"
-                style={{
-                  backgroundColor: wizardStyles.cardBgColor,
-                  borderColor: wizardStyles.cardBorderColor,
-                  color: wizardStyles.textColor,
-                }}
+                style={aiWizardCardStyle}
               >
                 <div className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
                   {resultsConfig.scoreLabel}
@@ -584,11 +590,7 @@ const AICapitalAssessment = () => {
 
               <div
                 className="glass-card p-6 md:col-span-2"
-                style={{
-                  backgroundColor: wizardStyles.cardBgColor,
-                  borderColor: wizardStyles.cardBorderColor,
-                  color: wizardStyles.textColor,
-                }}
+                style={aiWizardCardStyle}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle2 className="text-green-500" size={18} />
@@ -605,11 +607,7 @@ const AICapitalAssessment = () => {
             <div className="grid md:grid-cols-2 gap-6 mb-10">
               <div
                 className="glass-card p-6"
-                style={{
-                  backgroundColor: wizardStyles.cardBgColor,
-                  borderColor: wizardStyles.cardBorderColor,
-                  color: wizardStyles.textColor,
-                }}
+                style={aiWizardCardStyle}
               >
                 <div className="flex items-center gap-2 mb-3">
                   <CheckCircle2 className="text-[var(--accent-primary)]" size={18} />
@@ -642,11 +640,7 @@ const AICapitalAssessment = () => {
 
               <div
                 className="glass-card p-6"
-                style={{
-                  backgroundColor: wizardStyles.cardBgColor,
-                  borderColor: wizardStyles.cardBorderColor,
-                  color: wizardStyles.textColor,
-                }}
+                style={aiWizardCardStyle}
               >
                 <div className="flex items-center gap-2 mb-3">
                   <AlertTriangle className="text-amber-500" size={18} />
@@ -670,11 +664,7 @@ const AICapitalAssessment = () => {
 
             <div
               className="glass-card p-6 flex flex-col md:flex-row items-center justify-between gap-4"
-              style={{
-                backgroundColor: wizardStyles.cardBgColor,
-                borderColor: wizardStyles.cardBorderColor,
-                color: wizardStyles.textColor,
-              }}
+              style={aiWizardCardStyle}
             >
               <div>
                 <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
@@ -705,8 +695,8 @@ const AICapitalAssessment = () => {
           </div>
         </div>
 
-        {sectionsAfter.map((section) => (
-          <UniversalSection key={section.id || section.title} section={section} />
+        {sectionsAfter.map((section, idx) => (
+          <UniversalSection key={section.id || section.title} section={section} lightBandIndex={sectionsBefore.length + 1 + idx} />
         ))}
       </div>
     );
@@ -718,28 +708,17 @@ const AICapitalAssessment = () => {
       <PageHero
         title={pageHero.title}
         subtitle={pageHero.subtitle}
-        sectionStyles={pageHero.styles}
-        style={{
-          background: pageHero.styles?.bgGradient
-            ? `linear-gradient(135deg, ${pageHero.styles.bgColor || '#0A2540'}, ${
-                pageHero.styles.bgGradient
-              })`
-            : pageHero.styles?.bgColor || undefined,
-        }}
+        lightBandIndex={0}
+        sectionStyles={aiHeroSectionStyles}
+        style={aiHeroStyle}
       />
-      {sectionsBefore.map((section) => (
-        <UniversalSection key={section.id || section.title} section={section} />
+      {sectionsBefore.map((section, idx) => (
+        <UniversalSection key={section.id || section.title} section={section} lightBandIndex={idx + 1} />
       ))}
 
       <div
         className="ai-assessment-wizard"
-        style={{
-          background: wizardStyles.bgGradient
-            ? `linear-gradient(135deg, ${wizardStyles.bgColor || '#020617'}, ${
-                wizardStyles.bgGradient
-              })`
-            : wizardStyles.bgColor || 'transparent',
-        }}
+        style={aiWizardShellStyle}
       >
         <div className="container mx-auto px-4 sm:px-6 max-w-3xl py-10 md:py-12 pb-16 md:pb-20">
           <header className="wizard-intro">
@@ -754,39 +733,47 @@ const AICapitalAssessment = () => {
           {authLoading ? (
             <div
               className="glass-card wizard-card flex items-center justify-center"
-              style={{
-                backgroundColor: wizardStyles.cardBgColor,
-                borderColor: wizardStyles.cardBorderColor,
-                color: wizardStyles.textColor,
-              }}
+              style={aiWizardCardStyle}
             >
               <Loader2 className="animate-spin text-[var(--accent-primary)]" size={32} />
             </div>
           ) : !user ? (
             <div
               className="glass-card wizard-card"
-              style={{
-                backgroundColor: wizardStyles.cardBgColor,
-                borderColor: wizardStyles.cardBorderColor,
-                color: wizardStyles.textColor,
-              }}
+              style={aiWizardCardStyle}
             >
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center">
+                    <div
+                      className={`w-9 h-9 rounded-full flex items-center justify-center ${
+                        isLight ? 'bg-amber-100' : 'bg-slate-800'
+                      }`}
+                    >
                       <Lock className="text-amber-400" size={18} />
                     </div>
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                      <p
+                        className={`text-xs font-bold uppercase tracking-wider ${
+                          isLight ? 'text-slate-600' : 'text-slate-300'
+                        }`}
+                      >
                         Sign in required
                       </p>
-                      <p className="text-sm text-slate-200 font-semibold">
+                      <p
+                        className={`text-sm font-semibold ${
+                          isLight ? 'text-slate-800' : 'text-slate-200'
+                        }`}
+                      >
                         Log in to start your AI Capital Assessment
                       </p>
                     </div>
                   </div>
-                  <p className="text-sm text-slate-300 leading-relaxed max-w-md">
+                  <p
+                    className={`text-sm leading-relaxed max-w-md ${
+                      isLight ? 'text-slate-600' : 'text-slate-300'
+                    }`}
+                  >
                     You can review how the assessment works on this page, but you need an account
                     to answer the questions and save your Capital Readiness Score.
                   </p>
@@ -803,7 +790,11 @@ const AICapitalAssessment = () => {
                   <Link
                     to="/login"
                     state={{ from: { pathname: '/ai-capital-assessment' } }}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold border border-slate-500 text-slate-100 hover:bg-slate-800 transition-colors"
+                    className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold border transition-colors ${
+                      isLight
+                        ? 'border-slate-300 text-slate-700 hover:bg-slate-100'
+                        : 'border-slate-500 text-slate-100 hover:bg-slate-800'
+                    }`}
                   >
                     <LogIn size={14} />
                     Sign in
@@ -814,11 +805,7 @@ const AICapitalAssessment = () => {
           ) : (
             <div
               className="glass-card wizard-card"
-              style={{
-                backgroundColor: wizardStyles.cardBgColor,
-                borderColor: wizardStyles.cardBorderColor,
-                color: wizardStyles.textColor,
-              }}
+              style={aiWizardCardStyle}
             >
               <div className="wizard-step-header">
                 <div className="wizard-step-meta text-xs font-bold uppercase tracking-wider mb-2">
@@ -905,8 +892,8 @@ const AICapitalAssessment = () => {
         </div>
       </div>
 
-      {sectionsAfter.map((section) => (
-        <UniversalSection key={section.id || section.title} section={section} />
+      {sectionsAfter.map((section, idx) => (
+        <UniversalSection key={section.id || section.title} section={section} lightBandIndex={sectionsBefore.length + 1 + idx} />
       ))}
     </div>
   );

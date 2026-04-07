@@ -2,8 +2,41 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { CheckCircle2, ChevronDown, ChevronUp, Image as ImageIcon, Building2, ArrowRight } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { isLikelyLightTextColor } from '../theme/clientThemeDefaults';
+import { lightBandAt } from '../theme/lightBands';
 
-const UniversalSection = ({ section, containerClass = "" }) => {
+const DARK_BG_HEX = new Set(
+    ['#0A2540', '#0A1628', '#1A365D', '#0B1120', '#020617', '#0F172A', '#111827', '#000000', '#1E293B'].map((h) =>
+        h.toUpperCase()
+    )
+);
+
+function normalizeBgHex(color) {
+    if (!color || typeof color !== 'string') return '';
+    const s = color.trim();
+    if (s.startsWith('linear-gradient') || s.startsWith('radial-gradient')) return '';
+    if (!s.startsWith('#')) return s.toUpperCase();
+    let h = s.slice(1);
+    if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+    if (h.length === 6) return `#${h.toUpperCase()}`;
+    return s.toUpperCase();
+}
+
+function isDarkSectionBackground(bgColor) {
+    const hex = normalizeBgHex(bgColor);
+    if (!hex || hex[0] !== '#') return false;
+    if (DARK_BG_HEX.has(hex)) return true;
+    if (hex.length !== 7) return false;
+    const h = hex.slice(1);
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return lum < 0.22;
+}
+
+const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
     const { title, subtitle, content, items = [], styles = {}, sectionLabel } = section;
     const layoutType = styles.layoutType || 'standard';
 
@@ -50,12 +83,51 @@ const UniversalSection = ({ section, containerClass = "" }) => {
         .filter(line => line.trim().startsWith('-'))
         .map(line => ({ title: line.trim().substring(1).trim() })) : []);
 
-    // Determine section colors
-    const isDarkBg = styles.bgColor === '#0A2540' || styles.bgColor === '#0A1628' || styles.bgColor === '#1A365D';
-    const titleColor = styles.titleColor || (isDarkBg ? '#FFFFFF' : '#0A3D62');
-    const subtitleColor = styles.subtitleColor ?? styles.textColor ?? (isDarkBg ? 'rgba(255,255,255,0.7)' : '#64748B');
-    const itemTextColor = styles.itemTitleColor || (isDarkBg ? '#FFFFFF' : '#1A365D');
-    const itemDescColor = styles.textColor || (isDarkBg ? 'rgba(255,255,255,0.65)' : '#64748B');
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
+    const rawDarkBg = isDarkSectionBackground(styles.bgColor);
+    const lightModeSurface = isLight && rawDarkBg;
+    const sectionBgColor = lightModeSurface ? '#F8FAFC' : (styles.bgColor || 'transparent');
+    const useLightBand =
+        isLight &&
+        typeof lightBandIndex === 'number' &&
+        Number.isFinite(lightBandIndex) &&
+        !styles.backgroundImage;
+    const lightBandKey = useLightBand ? lightBandAt(lightBandIndex) : null;
+    const lightBandClass = lightBandKey ? `lm-band-${lightBandKey}` : '';
+    const resolvedSectionBg = useLightBand ? 'transparent' : sectionBgColor;
+    const isDarkBg = rawDarkBg && !lightModeSurface;
+
+    /* lightModeSurface: reject light CMS colours using hex + rgb (old helper was hex-only) */
+    let titleColor = lightModeSurface
+        ? (styles.titleColor && !isLikelyLightTextColor(styles.titleColor) ? styles.titleColor : '#0F172A')
+        : (styles.titleColor || (isDarkBg ? '#FFFFFF' : '#0A3D62'));
+    let subtitleColor = lightModeSurface
+        ? (styles.subtitleColor && !isLikelyLightTextColor(styles.subtitleColor)
+            ? styles.subtitleColor
+            : styles.textColor && !isLikelyLightTextColor(styles.textColor)
+              ? styles.textColor
+              : '#64748B')
+        : (styles.subtitleColor ?? styles.textColor ?? (isDarkBg ? 'rgba(255,255,255,0.7)' : '#64748B'));
+    let itemTextColor = lightModeSurface
+        ? (styles.itemTitleColor && !isLikelyLightTextColor(styles.itemTitleColor) ? styles.itemTitleColor : '#0F172A')
+        : (styles.itemTitleColor || (isDarkBg ? '#FFFFFF' : '#1A365D'));
+    let itemDescColor = lightModeSurface
+        ? (styles.textColor && !isLikelyLightTextColor(styles.textColor) ? styles.textColor : '#64748B')
+        : (styles.textColor || (isDarkBg ? 'rgba(255,255,255,0.65)' : '#64748B'));
+
+    if (isLight) {
+        if (isLikelyLightTextColor(titleColor)) titleColor = '#0F172A';
+        if (isLikelyLightTextColor(subtitleColor)) subtitleColor = '#475569';
+        if (isLikelyLightTextColor(itemTextColor)) itemTextColor = '#0F172A';
+        if (isLikelyLightTextColor(itemDescColor)) itemDescColor = '#475569';
+    }
+
+    const proseColorLight = (explicit, fallbackDarkTheme = '#4A5568') => {
+        if (!isLight) return explicit || (isDarkBg ? 'rgba(255,255,255,0.88)' : fallbackDarkTheme);
+        if (explicit && !isLikelyLightTextColor(explicit)) return explicit;
+        return '#334155';
+    };
     const accentColor = '#C9A227';
     const iconColor = styles.iconColor || accentColor;
 
@@ -71,9 +143,17 @@ const UniversalSection = ({ section, containerClass = "" }) => {
         }
         return isDarkBg ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.85)';
     };
-    const cardBg = isCardGlass ? hexToRgba(cardColorHex, 0.42) : cardColorHex;
-    const cardBorder = isDarkBg ? 'rgba(255,255,255,0.12)' : 'rgba(10, 61, 98, 0.08)';
-    const cardGlassStyle = isCardGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {};
+    const cardBg = isLight && isCardGlass
+        ? '#ffffff'
+        : (isCardGlass ? hexToRgba(cardColorHex, 0.42) : cardColorHex);
+    const cardBorder = isLight
+        ? 'rgba(15, 23, 42, 0.1)'
+        : (isDarkBg ? 'rgba(255,255,255,0.12)' : 'rgba(10, 61, 98, 0.08)');
+    const cardGlassStyle = isCardGlass
+        ? (isLight
+            ? { boxShadow: '0 2px 16px rgba(15, 23, 42, 0.06)' }
+            : { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' })
+        : {};
 
     const renderHeader = () => (
         <div style={{
@@ -173,6 +253,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                     <motion.section
                         ref={sectionRef}
                         id={section.id}
+                        className={[lightBandClass, isLight ? 'lm-universal-hero-light' : ''].filter(Boolean).join(' ')}
                         initial={{ opacity: 0, y: 20 }}
                         animate={isInitiallyVisible ? { opacity: 1, y: 0 } : undefined}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -183,7 +264,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                             textAlign: styles.textAlign || 'center',
                             position: 'relative',
                             overflow: 'hidden',
-                            backgroundColor: styles.bgColor || 'transparent',
+                            ...(useLightBand ? {} : { backgroundColor: resolvedSectionBg }),
                             backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : 'none',
                             backgroundSize: styles.backgroundSize || 'cover',
                             backgroundPosition: 'center'
@@ -952,14 +1033,17 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                                     ...cardGlassStyle,
                                     border: `1px solid ${cardBorder}`,
                                     borderRadius: '20px',
-                                    boxShadow: isDarkBg ? 'none' : '0 2px 15px rgba(0,0,0,0.04)'
+                                    boxShadow: isLight
+                                        ? '0 2px 16px rgba(15, 23, 42, 0.06)'
+                                        : (isDarkBg ? 'none' : '0 2px 15px rgba(0,0,0,0.04)')
                                 }}
                             >
                                 <div
+                                    className={isLight ? 'universal-prose-light' : undefined}
                                     style={{
                                         fontSize: `${styles.contentFontSize || 16}px`,
                                         lineHeight: 1.9,
-                                        color: styles.textColor || (isDarkBg ? 'rgba(255,255,255,0.85)' : '#4A5568'),
+                                        color: proseColorLight(styles.textColor, '#4A5568'),
                                         whiteSpace: 'pre-line'
                                     }}
                                     dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
@@ -1292,7 +1376,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
         <motion.section
             ref={sectionRef}
             id={section.id}
-            className={containerClass}
+            className={[containerClass, lightBandClass].filter(Boolean).join(' ')}
             initial={{ opacity: 0 }}
             animate={isInitiallyVisible ? { opacity: 1 } : undefined}
             whileInView={{ opacity: 1 }}
@@ -1302,7 +1386,7 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                 padding: 'clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem)',
                 position: 'relative',
                 overflow: 'hidden',
-                backgroundColor: styles.bgColor || 'transparent',
+                ...(useLightBand ? {} : { backgroundColor: resolvedSectionBg }),
                 backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : 'none',
                 backgroundSize: styles.backgroundSize || 'cover',
                 backgroundPosition: 'center'
@@ -1344,10 +1428,11 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                         }}
                     >
                         <div
+                            className={isLight ? 'universal-prose-light' : undefined}
                             style={{
                                 fontSize: `${styles.contentFontSize || 16}px`,
                                 lineHeight: 1.8,
-                                color: styles.textColor || (isDarkBg ? 'rgba(255,255,255,0.7)' : '#64748B'),
+                                color: proseColorLight(styles.textColor, '#64748B'),
                                 whiteSpace: 'pre-line'
                             }}
                             dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
@@ -1372,10 +1457,11 @@ const UniversalSection = ({ section, containerClass = "" }) => {
                         }}
                     >
                         <div
+                            className={isLight ? 'universal-prose-light' : undefined}
                             style={{
                                 fontSize: `${styles.contentFontSize || 16}px`,
                                 lineHeight: 1.8,
-                                color: styles.textColor || (isDarkBg ? 'rgba(255,255,255,0.7)' : '#64748B'),
+                                color: proseColorLight(styles.textColor, '#64748B'),
                                 fontStyle: 'italic',
                                 whiteSpace: 'pre-line'
                             }}

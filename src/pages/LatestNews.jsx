@@ -2,8 +2,12 @@ import React from 'react';
 import PageHero from '../components/PageHero';
 import { usePageContent } from '../hooks/usePageContent';
 import MagazineBlock from '../components/MagazineBlock';
+import { useTheme } from '../context/ThemeContext';
+import { lightBandAt } from '../theme/lightBands';
 
 const LatestNews = () => {
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
     // Default content if none exists in admin
     const defaultContent = {
         hero: {
@@ -38,6 +42,7 @@ const LatestNews = () => {
             <PageHero
                 title={hero?.title || defaultContent.hero.title}
                 subtitle={hero?.subtitle || defaultContent.hero.subtitle}
+                lightBandIndex={0}
                 sectionStyles={hero?.styles || {}}
                 style={{ backgroundColor: hero?.styles?.bgColor }}
                 buttonLabel={hero?.buttonLabel || ''}
@@ -46,12 +51,14 @@ const LatestNews = () => {
 
             {/* New magazine blocks */}
             {blocks && blocks.length > 0 ? (
-                blocks.map((block) => (
-                    <MagazineBlock key={block.id} block={block} />
+                blocks.map((block, i) => (
+                    <div key={block.id} className={isLight ? `lm-band-${lightBandAt(i + 1)}` : undefined} style={isLight ? { background: 'transparent' } : undefined}>
+                        <MagazineBlock block={block} />
+                    </div>
                 ))
             ) : (
                 // Legacy fallback (old schema: markdown sections)
-                <div className="container section-padding">
+                <div className={`container section-padding${isLight ? ' lm-band-b' : ''}`} style={isLight ? { background: 'transparent' } : undefined}>
                     <div className="glass-card p-8">
                         {legacySections?.map((section, index) => (
                             <div key={index} className="mb-8 last:mb-0">

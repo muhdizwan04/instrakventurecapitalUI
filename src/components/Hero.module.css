@@ -51,6 +51,7 @@
     color: #f9fafb;
     font-weight: 700;
     letter-spacing: -1px;
+    text-shadow: 0 2px 24px rgba(2, 6, 23, 0.85);
 }
 
 .highlight {
@@ -66,6 +67,11 @@
     line-height: 1.6;
     letter-spacing: 2px;
     font-weight: 500;
+    /* Readable over bright skyline / bloom in the photo */
+    text-shadow:
+        0 0 1px rgba(2, 6, 23, 1),
+        0 1px 3px rgba(0, 0, 0, 0.95),
+        0 0 22px rgba(2, 6, 23, 0.9);
 }
 
 .subtitle strong {
@@ -79,6 +85,10 @@
     max-width: 550px;
     margin: 0 0 2.5rem 0;
     line-height: 1.8;
+    text-shadow:
+        0 0 1px rgba(2, 6, 23, 1),
+        0 1px 4px rgba(0, 0, 0, 0.95),
+        0 0 28px rgba(2, 6, 23, 0.92);
 }
 
 .cta {
@@ -132,9 +142,10 @@
     width: 55%;
     height: 100%;
     background: radial-gradient(circle at left center,
-            rgba(15, 23, 42, 0.9) 0%,
-            rgba(15, 23, 42, 0.7) 35%,
-            transparent 80%);
+            rgba(15, 23, 42, 0.96) 0%,
+            rgba(15, 23, 42, 0.82) 32%,
+            rgba(15, 23, 42, 0.45) 55%,
+            transparent 78%);
     z-index: 3;
 }
 

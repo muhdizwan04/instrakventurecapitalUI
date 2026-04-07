@@ -2,8 +2,12 @@ import React from 'react';
 import styles from './TrustStrip.module.css';
 import { ShieldCheck, Globe, Scale, ArrowRightLeft } from 'lucide-react';
 import { usePageContent } from '../hooks/usePageContent';
+import { useTheme } from '../context/ThemeContext';
+import { lightBandAt } from '../theme/lightBands';
 
-const TrustStrip = () => {
+const TrustStrip = ({ lightBandIndex }) => {
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
     const defaultSignals = [
         { id: 'sig-1', label: 'Cross-border capital structuring' },
         { id: 'sig-2', label: 'Institutional governance framework' },
@@ -55,8 +59,14 @@ const TrustStrip = () => {
     const metrics = Array.isArray(content.trustMetrics) && content.trustMetrics.length > 0 ? content.trustMetrics : defaultMetrics;
     const sectionStyles = content.trustSectionStyles || defaultStyles;
 
+    const useLightBand = isLight && typeof lightBandIndex === 'number' && Number.isFinite(lightBandIndex);
+    const lightBandClass = useLightBand ? `lm-band-${lightBandAt(lightBandIndex)}` : '';
+
     const sectionStyle = {};
-    if (sectionStyles.backgroundColor) {
+    if (isLight) {
+        if (!useLightBand) sectionStyle.background = '#f1f5f9';
+        sectionStyle.color = '#0f172a';
+    } else if (sectionStyles.backgroundColor) {
         const v = (sectionStyles.backgroundColor || '').trim();
         if (v.startsWith('linear-gradient') || v.startsWith('radial-gradient')) {
             sectionStyle.background = v;
@@ -64,10 +74,12 @@ const TrustStrip = () => {
             sectionStyle.backgroundColor = v || '#020617';
         }
     }
-    if (sectionStyles.textColor) {
+    if (!isLight && sectionStyles.textColor) {
         sectionStyle.color = sectionStyles.textColor;
     }
-    const boxBg = sectionStyles.boxColor || 'rgba(15, 23, 42, 0.9)';
+    const boxBg = isLight
+        ? 'rgba(255, 255, 255, 0.95)'
+        : (sectionStyles.boxColor || 'rgba(15, 23, 42, 0.9)');
     const titleFontSizePx = sectionStyles.titleFontSize ?? 32;
     const subtitleFontSizePx = sectionStyles.subtitleFontSize ?? 16;
     const signalFontSizePx = sectionStyles.signalFontSize ?? 13;
@@ -88,7 +100,7 @@ const TrustStrip = () => {
     };
 
     return (
-        <section className={styles.trustStrip} style={sectionStyle}>
+        <section className={`${styles.trustStrip} ${lightBandClass}`.trim()} style={sectionStyle}>
             <div className="container">
                 <div className={styles.inner}>
                     <div className={styles.headerRow}>

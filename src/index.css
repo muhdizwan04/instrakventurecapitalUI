@@ -743,3 +743,455 @@ ul {
     width: 100px;
   }
 }
+
+/* ============================================================
+   LIGHT MODE OVERRIDES
+   ============================================================ */
+
+[data-theme="light"] {
+  /* Colors - Light Wealth Theme */
+  /* Softer, warmer light palette (less harsh white) */
+  --bg-primary: #fbfbfa;
+  --bg-secondary: #f6f7f9;
+  --bg-tertiary: #eef2f7;
+  --bg-dark: #e2e8f0;
+
+  --text-primary: #1E293B;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+
+  /* Light mode accents: navy-forward for better readability */
+  --accent-primary: #0A3D62;
+  --accent-secondary: #B8860B;
+  --accent-tertiary: #2563EB;
+
+  --border-color: rgba(15, 23, 42, 0.12);
+  --border-light: rgba(15, 23, 42, 0.06);
+
+  /* Premium gradients - light */
+  --gradient-gold: linear-gradient(135deg, #B8860B, #D4A017);
+  --gradient-navy: linear-gradient(135deg, #F8FAFC, #E2E8F0);
+  --gradient-premium: linear-gradient(135deg, #FFFFFF, #F1F5F9);
+
+  /* Shadows - Light & Refined */
+  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 20px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 10px 40px rgba(15, 23, 42, 0.12);
+  --shadow-gold: 0 4px 20px rgba(184, 134, 11, 0.15);
+
+  /* Light mode: stacked section “bands” (distinct from flat white) */
+  --lm-page-canvas: #e2e8f0;
+  --lm-band-a: #ffffff;
+  --lm-band-b: #f1f5f9;
+  --lm-band-c: #e8eef5;
+  --lm-band-form: #f8fafc;
+  --lm-edge: rgba(15, 23, 42, 0.09);
+}
+
+/* Background - Light */
+html[data-theme="light"] {
+  background: var(--lm-page-canvas);
+}
+
+html[data-theme="light"] body {
+  background: var(--lm-page-canvas);
+  color: var(--text-primary);
+}
+
+/* Remove dark pattern overlays */
+html[data-theme="light"] body::before {
+  background-image:
+    radial-gradient(circle at 100% 0%, rgba(184, 134, 11, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 0% 100%, rgba(10, 61, 98, 0.02) 0%, transparent 40%);
+}
+
+html[data-theme="light"] body::after {
+  opacity: 0.05;
+}
+
+/* Headings */
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] h5,
+[data-theme="light"] h6 {
+  color: #1E293B;
+}
+
+/* Links */
+[data-theme="light"] a:hover {
+  color: var(--accent-secondary);
+}
+
+/* Page wrapper — let section bands carry tone; canvas shows in gaps */
+[data-theme="light"] .page-wrapper {
+  background: transparent;
+}
+
+/* Alternating full-width bands (mirrors dark-mode slab rhythm) */
+[data-theme="light"] .lm-band-a,
+[data-theme="light"] .lm-band-b,
+[data-theme="light"] .lm-band-c,
+[data-theme="light"] .lm-band-form {
+  width: 100%;
+  box-sizing: border-box;
+  border-top: 1px solid var(--lm-edge);
+}
+
+[data-theme="light"] .lm-band-a {
+  background-color: var(--lm-band-a) !important;
+}
+
+[data-theme="light"] .lm-band-b {
+  background-color: var(--lm-band-b) !important;
+}
+
+[data-theme="light"] .lm-band-c {
+  background-color: var(--lm-band-c) !important;
+}
+
+[data-theme="light"] .lm-band-form {
+  background-color: var(--lm-band-form) !important;
+}
+
+[data-theme="light"] .page-wrapper > .lm-band-a:first-child,
+[data-theme="light"] .page-wrapper > .lm-band-b:first-child,
+[data-theme="light"] .page-wrapper > .lm-band-c:first-child,
+[data-theme="light"] .page-wrapper > .lm-band-form:first-child {
+  border-top: none;
+}
+
+/* Home hero: keep imagery; only separate from next block */
+[data-theme="light"] .lm-hero-edge {
+  border-bottom: 1px solid var(--lm-edge);
+}
+
+[data-theme="light"] footer#contact {
+  border-top: 1px solid var(--lm-edge);
+}
+
+/* Service / CMS pages: first “hero” block — match PageHero (pattern + seam into next band) */
+[data-theme="light"] .lm-universal-hero-light {
+  position: relative;
+  border-bottom: 1px solid var(--lm-edge);
+}
+
+[data-theme="light"] .lm-universal-hero-light::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image:
+    linear-gradient(rgba(26, 54, 93, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26, 54, 93, 0.04) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+[data-theme="light"] .layout {
+  background: transparent;
+}
+
+[data-theme="light"] main {
+  background: transparent;
+  color: var(--text-primary);
+}
+
+/* UniversalSection markdown (About, CMS sections) — readable on light cards */
+[data-theme="light"] .universal-prose-light .universal-h2,
+[data-theme="light"] .universal-prose-light .universal-h3 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .universal-prose-light strong {
+  color: #0f172a;
+}
+
+/* Glass cards */
+[data-theme="light"] .glass {
+  background: #FFFFFF;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="light"] .glass-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="light"] .glass-card::before {
+  background: linear-gradient(135deg, #B8860B, #D4A017);
+}
+
+[data-theme="light"] .glass-card:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(184, 134, 11, 0.25);
+}
+
+/* Buttons */
+[data-theme="light"] .btn-primary {
+  color: #0A3D62;
+  border: 1px solid rgba(10, 61, 98, 0.3);
+}
+
+[data-theme="light"] .btn-primary:hover {
+  background: rgba(10, 61, 98, 0.06);
+  color: #0A3D62;
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="light"] .btn-solid {
+  background: linear-gradient(135deg, #B8860B, #D4A017);
+  color: #FFFFFF;
+}
+
+[data-theme="light"] .btn-gold {
+  background: linear-gradient(135deg, #B8860B, #D4A017);
+  color: #FFFFFF;
+}
+
+[data-theme="light"] .btn-outline-gold {
+  background: rgba(184, 134, 11, 0.06);
+  color: #B8860B;
+  border: 1px solid rgba(184, 134, 11, 0.4);
+}
+
+[data-theme="light"] .btn-outline-gold:hover {
+  background: linear-gradient(135deg, #B8860B, #D4A017);
+  color: #FFFFFF;
+}
+
+/* Section title line */
+[data-theme="light"] .section-title {
+  color: #1E293B;
+}
+
+/* Home services block: h2 uses global .section-title inside CSS-module section */
+[data-theme="light"] #services > .container > h2.section-title {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] #services .container a[href] p {
+  color: #1e293b !important;
+  opacity: 1 !important;
+}
+
+[data-theme="light"] .section-title::after {
+  background: linear-gradient(90deg, rgba(15, 23, 42, 0.1), rgba(184, 134, 11, 0.6), rgba(15, 23, 42, 0.05));
+}
+
+/* Luxury prose */
+[data-theme="light"] .luxury-prose {
+  color: #475569;
+}
+
+[data-theme="light"] .luxury-prose h2 {
+  color: #0A3D62;
+  border-left-color: #B8860B;
+}
+
+[data-theme="light"] .luxury-prose h3 {
+  color: #0A3D62;
+}
+
+[data-theme="light"] .luxury-prose strong {
+  color: #B8860B;
+}
+
+[data-theme="light"] .luxury-prose li::before {
+  color: #B8860B;
+}
+
+/* Luxury glass - Light */
+[data-theme="light"] .luxury-glass {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+}
+
+/* Investors form */
+[data-theme="light"] .investors-form-glass input::placeholder,
+[data-theme="light"] .investors-form-glass textarea::placeholder {
+  color: rgba(71, 85, 105, 0.6);
+}
+
+[data-theme="light"] .investors-form-glass select option {
+  background: #FFFFFF;
+  color: #1E293B;
+}
+
+/* AI Assessment Wizard */
+[data-theme="light"] .ai-assessment-wizard .wizard-card {
+  border-color: rgba(15, 23, 42, 0.1);
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+}
+
+[data-theme="light"] .ai-assessment-wizard .wizard-step-meta {
+  color: rgba(71, 85, 105, 0.8);
+}
+
+[data-theme="light"] .ai-assessment-wizard .wizard-step-title {
+  color: #1E293B !important;
+}
+
+[data-theme="light"] .ai-assessment-wizard .wizard-step-desc {
+  color: rgba(71, 85, 105, 0.9);
+}
+
+[data-theme="light"] .ai-assessment-wizard .wizard-field label {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .ai-assessment-wizard input[type="text"],
+[data-theme="light"] .ai-assessment-wizard input[type="email"],
+[data-theme="light"] .ai-assessment-wizard select {
+  background: rgba(241, 245, 249, 0.8);
+  border-color: rgba(15, 23, 42, 0.12);
+  color: #1E293B;
+}
+
+[data-theme="light"] .ai-assessment-wizard input::placeholder {
+  color: rgba(71, 85, 105, 0.5);
+}
+
+[data-theme="light"] .ai-assessment-wizard input:focus,
+[data-theme="light"] .ai-assessment-wizard select:focus {
+  border-color: rgba(184, 134, 11, 0.5);
+  box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.1);
+}
+
+[data-theme="light"] .ai-assessment-wizard select option {
+  background: #FFFFFF;
+  color: #1E293B;
+}
+
+[data-theme="light"] .ai-assessment-wizard .wizard-step-header {
+  border-bottom-color: rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="light"] .ai-assessment-wizard .wizard-actions {
+  border-top-color: rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="light"] .ai-assessment-wizard .wizard-btn-back {
+  color: #475569;
+  border-color: rgba(15, 23, 42, 0.2);
+}
+
+[data-theme="light"] .ai-assessment-wizard .wizard-btn-back:hover:not(:disabled) {
+  background: rgba(241, 245, 249, 0.8);
+  border-color: rgba(15, 23, 42, 0.3);
+  color: #1E293B;
+}
+
+[data-theme="light"] .ai-assessment-wizard .wizard-chip {
+  background: rgba(241, 245, 249, 0.8);
+  color: #475569;
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+[data-theme="light"] .ai-assessment-wizard .wizard-chip:hover {
+  background: rgba(226, 232, 240, 0.8);
+  border-color: rgba(15, 23, 42, 0.2);
+}
+
+[data-theme="light"] .ai-assessment-wizard .wizard-chip.selected {
+  background: linear-gradient(135deg, #B8860B, #D4A017);
+  color: #FFFFFF;
+  border-color: rgba(184, 134, 11, 0.6);
+}
+
+[data-theme="light"] .ai-assessment-wizard .wizard-intro-title {
+  color: #1E293B;
+}
+
+[data-theme="light"] .ai-assessment-wizard .wizard-intro-subtitle {
+  color: rgba(71, 85, 105, 0.9);
+}
+
+/* Animate shimmer - lighter */
+[data-theme="light"] .animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(184, 134, 11, 0.08), transparent);
+  background-size: 200% 100%;
+}
+
+/* Mind Map nodes */
+[data-theme="light"] .luxury-node-hub {
+  background: linear-gradient(135deg, #0A3D62, #1A365D);
+  box-shadow: 0 0 20px rgba(10, 61, 98, 0.2), 0 0 0 4px rgba(184, 134, 11, 0.2);
+}
+
+[data-theme="light"] .luxury-node-detail {
+  background: #FFFFFF;
+  border-color: #B8860B;
+  color: #B8860B;
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="light"] .luxury-node-detail:hover {
+  background: #F8FAFC;
+}
+
+/* Command box */
+[data-theme="light"] .command-box {
+  background: #FFFFFF;
+  border-color: #B8860B;
+}
+
+[data-theme="light"] .command-item:hover {
+  background: #F8FAFC;
+}
+
+/* Career apply button */
+[data-theme="light"] .career-apply-btn:hover {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+}
+
+/* ============================================================
+   NIGHT MODE (DEEPER DARK VARIANT)
+   Note: Client supports Dark + Night only. Light is kept for legacy but no longer selected.
+   ============================================================ */
+
+[data-theme="night"] {
+  /* Night = deeper blacks than default Dark */
+  --bg-primary: #000000;
+  --bg-secondary: #02040a;
+  --bg-tertiary: #040711;
+  --bg-dark: #000000;
+
+  --text-primary: #e5e7eb;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+
+  /* Slightly richer accents at night for contrast */
+  --accent-primary: #facc15;
+  --accent-secondary: #fde68a;
+  --accent-tertiary: #0ea5e9;
+
+  --border-color: rgba(148, 163, 184, 0.35);
+  --border-light: rgba(15, 23, 42, 0.9);
+
+  --gradient-gold: linear-gradient(135deg, #facc15, #fb7185);
+  --gradient-navy: linear-gradient(135deg, #000000, #040711);
+  --gradient-premium: linear-gradient(135deg, #000000, #020617);
+
+  --shadow-sm: 0 8px 20px rgba(15, 23, 42, 0.6);
+  --shadow-md: 0 16px 40px rgba(15, 23, 42, 0.75);
+  --shadow-lg: 0 28px 80px rgba(15, 23, 42, 0.9);
+  --shadow-gold: 0 16px 40px rgba(250, 204, 21, 0.35);
+}
+
+html[data-theme="night"] {
+  background: #020617;
+}
+
+html[data-theme="night"] body,
+[data-theme="night"] .page-wrapper {
+  background: radial-gradient(circle at top left, #0b1120 0, #020617 35%, #000000 85%);
+}
+
+html[data-theme="night"] body::after {
+  opacity: 0.22;
+}

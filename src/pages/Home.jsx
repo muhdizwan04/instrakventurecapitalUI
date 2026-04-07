@@ -5,6 +5,7 @@ import Services from '../components/Services';
 import Industries from '../components/Industries';
 import TrustStrip from '../components/TrustStrip';
 import { usePageContent } from '../hooks/usePageContent';
+import { useTheme } from '../context/ThemeContext';
 
 // Map section IDs to components
 const SECTION_COMPONENTS = {
@@ -37,6 +38,8 @@ function getSectionOrder(tabOrder) {
 }
 
 const Home = () => {
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
     // Fetch home content including section order
     const { content } = usePageContent('home', {
         tabOrder: DEFAULT_SECTION_ORDER
@@ -192,8 +195,10 @@ const Home = () => {
 
                 const SectionComponent = SECTION_COMPONENTS[sectionId];
                 if (!SectionComponent) return null;
-                // Hero component handles its own top padding via CSS
-                return <SectionComponent key={sectionId} />;
+                if (sectionId === 'hero') {
+                    return <Hero key={sectionId} showLightSectionEdge={isLight} />;
+                }
+                return <SectionComponent key={sectionId} lightBandIndex={isLight ? index : undefined} />;
             })}
         </>
     );

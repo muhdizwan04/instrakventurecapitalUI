@@ -17,7 +17,7 @@ const AssetInsurance = () => {
         <div className="page-wrapper">
             {/* All Sections (including hero) */}
             {(pageContent.sections || []).map((section, idx) => (
-                <UniversalSection key={section.id || idx} section={section} />
+                <UniversalSection key={section.id || idx} section={section} lightBandIndex={idx} />
             ))}
 
             {/* Form Section */}

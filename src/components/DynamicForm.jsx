@@ -401,7 +401,7 @@ const DynamicForm = ({ fields = [], title, onSubmit, loading, formStyles = {} })
                 <button type="submit" disabled={loading}
                     style={{ ...getButtonStyle(), opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
                     onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)}>
-                    {loading ? 'Submitting...' : (fs.btnLabel || 'Submit Inquiry')}
+                    {loading ? 'Submitting...' : (fs.btnLabel || 'Submit profile')}
                 </button>
             </form>
         </div>

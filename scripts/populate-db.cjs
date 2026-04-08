@@ -796,8 +796,8 @@ const investors = {
         ]
     },
     formSettings: {
-        title: 'Investment Inquiry',
-        submitButtonText: 'Submit Inquiry',
+        title: 'Investment Profile',
+        submitButtonText: 'Submit profile',
         interestOptions: ['Investment', 'Loan', 'Partnership', 'Others']
     }
 };

@@ -360,7 +360,7 @@ const AICapitalAssessment = () => {
                 </div>
               </div>
               <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: isLight ? '#0f172a' : '#f8fafc', marginBottom: '0.5rem' }}>
-                Login required
+                Register Now
               </h2>
               <p style={{ color: isLight ? 'rgba(51, 65, 85, 0.95)' : 'rgba(226, 232, 240, 0.9)', fontSize: '0.9375rem', marginBottom: '1.5rem', maxWidth: 420, margin: '0 auto 1.5rem' }}>
                 Sign in or create an account to take the Capital Readiness Assessment and receive your score and recommendations.

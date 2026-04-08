@@ -7,7 +7,7 @@ import {
     CANONICAL_GLOBAL_THEME_COLORS,
     CLIENT_BRAND_ACCENTS_BY_MODE,
     DEFAULT_CLIENT_THEME_MODE,
-} from '../../../src/theme/clientThemeDefaults';
+} from '../theme/clientThemeDefaults';
 
 const GlobalSettingsManager = () => {
     const defaultData = {

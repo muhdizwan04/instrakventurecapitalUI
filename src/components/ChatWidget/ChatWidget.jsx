@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { MessageCircle, X, Send, Bot, ExternalLink } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, ExternalLink, User, Mail } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import styles from './ChatWidget.module.css';
 import { supabase } from '../../lib/supabase';
@@ -127,6 +127,27 @@ const ChatWidget = () => {
   const autoScrollRef = useRef(true);
   const programmaticScrollRef = useRef(false);
 
+  // Pre-chat visitor info
+  const [visitorName, setVisitorName] = useState(() => localStorage.getItem('chat_visitor_name') || '');
+  const [visitorEmail, setVisitorEmail] = useState(() => localStorage.getItem('chat_visitor_email') || '');
+  const [preChatDone, setPreChatDone] = useState(() => {
+    const n = (localStorage.getItem('chat_visitor_name') || '').trim();
+    const e = (localStorage.getItem('chat_visitor_email') || '').trim();
+    return !!n && !!e;
+  });
+
+  const handlePreChatSubmit = (e) => {
+    e.preventDefault();
+    const name = visitorName.trim();
+    const email = visitorEmail.trim();
+    if (!name || !email) return;
+    localStorage.setItem('chat_visitor_name', name);
+    localStorage.setItem('chat_visitor_email', email);
+    setVisitorName(name);
+    setVisitorEmail(email);
+    setPreChatDone(true);
+  };
+
   // Scroll to bottom helper — sets programmatic flag so onScroll ignores it
   const scrollToBottom = useCallback(() => {
     const el = messagesAreaRef.current;
@@ -157,13 +178,27 @@ const ChatWidget = () => {
     if (!sessionId) return;
     supabase
       .from('chat_conversations')
-      .select('messages, intent, service_mentioned')
+      .select('messages, intent, service_mentioned, visitor_name, visitor_email')
       .eq('session_id', sessionId)
       .order('updated_at', { ascending: false })
       .limit(1)
       .single()
       .then(({ data, error }) => {
         if (error || !data || !Array.isArray(data.messages) || data.messages.length === 0) return;
+
+        // Hydrate visitor identity if present (so admin doesn't see Anonymous for this session)
+        if (data.visitor_name && data.visitor_email) {
+          const n = String(data.visitor_name).trim();
+          const e = String(data.visitor_email).trim();
+          if (n && e) {
+            localStorage.setItem('chat_visitor_name', n);
+            localStorage.setItem('chat_visitor_email', e);
+            setVisitorName(n);
+            setVisitorEmail(e);
+            setPreChatDone(true);
+          }
+        }
+
         const msgs = data.messages.filter(m => m.role !== 'system');
         if (msgs.length > 0) {
           setMessages(msgs);
@@ -229,7 +264,13 @@ const ChatWidget = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${supabaseAnonKey}`,
         },
-        body: JSON.stringify({ messages: apiMessages, sessionId, userId }),
+        body: JSON.stringify({
+          messages: apiMessages,
+          sessionId,
+          userId,
+          visitorName: localStorage.getItem('chat_visitor_name') || null,
+          visitorEmail: localStorage.getItem('chat_visitor_email') || null,
+        }),
       });
 
       if (!response.ok) throw new Error(`Server error: ${response.status}`);
@@ -339,6 +380,44 @@ const ChatWidget = () => {
             </div>
           </div>
 
+          {!preChatDone ? (
+            <form className={styles.preChatForm} onSubmit={handlePreChatSubmit}>
+              <div className={styles.preChatWelcome}>
+                <div className={styles.preChatIconWrap}>
+                  <Bot size={28} />
+                </div>
+                <p className={styles.preChatTitle}>Welcome to IVC!</p>
+                <p className={styles.preChatSubtitle}>Please share your details so we can assist you better.</p>
+              </div>
+              <div className={styles.preChatField}>
+                <User size={16} className={styles.preChatFieldIcon} />
+                <input
+                  className={styles.preChatInput}
+                  type="text"
+                  placeholder="Your Name"
+                  value={visitorName}
+                  onChange={(e) => setVisitorName(e.target.value)}
+                  required
+                  autoFocus
+                />
+              </div>
+              <div className={styles.preChatField}>
+                <Mail size={16} className={styles.preChatFieldIcon} />
+                <input
+                  className={styles.preChatInput}
+                  type="email"
+                  placeholder="Your Email"
+                  value={visitorEmail}
+                  onChange={(e) => setVisitorEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <button className={styles.preChatButton} type="submit">
+                Start Chatting
+              </button>
+            </form>
+          ) : (
+          <>
           <div
             className={styles.messagesArea}
             ref={messagesAreaRef}
@@ -462,6 +541,8 @@ const ChatWidget = () => {
               <Send size={18} />
             </button>
           </div>
+          </>
+          )}
         </div>
       )}
 

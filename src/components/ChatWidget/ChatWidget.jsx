@@ -262,7 +262,11 @@ const ChatWidget = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          // Supabase Edge Functions expect both headers for auth:
+          // - Authorization: Bearer <anon/publishable key>
+          // - apikey: <same key>
           'Authorization': `Bearer ${supabaseAnonKey}`,
+          'apikey': supabaseAnonKey,
         },
         body: JSON.stringify({
           messages: apiMessages,

@@ -1,5 +1,5 @@
-import React from 'react';
-import { X, Bot, User, AlertTriangle, Clock, Mail, Tag, ExternalLink } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { X, Bot, User, AlertTriangle, Clock, Mail, Trash2 } from 'lucide-react';
 
 const INTENT_CONFIG = {
     SERVICE_INQUIRY: { label: 'Service Inquiry', color: 'bg-blue-50 text-blue-700 border-blue-200' },
@@ -27,13 +27,20 @@ function getTimeAgo(dateStr) {
     return `${Math.floor(seconds / 86400)}d ago`;
 }
 
-const ChatReplayViewer = ({ conversation, onClose }) => {
+const ChatReplayViewer = ({ conversation, onClose, onDelete }) => {
     if (!conversation) return null;
 
     const messages = Array.isArray(conversation.messages) ? conversation.messages : [];
     const intentCfg = INTENT_CONFIG[conversation.intent] || INTENT_CONFIG.GENERAL_INFO;
     const visitorName = conversation.visitor_name || 'Anonymous';
     const visitorEmail = conversation.visitor_email || null;
+    const messagesCount = useMemo(() => messages.filter(m => m.role !== 'system').length, [messages]);
+
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [confirmChecked, setConfirmChecked] = useState(false);
+    const [confirmText, setConfirmText] = useState('');
+    const canDelete = !!onDelete;
+    const canConfirmDelete = confirmChecked && confirmText.trim().toUpperCase() === 'DELETE';
 
     return (
         <div className="fixed inset-0 z-50 flex items-stretch justify-end bg-black/40 backdrop-blur-sm" onClick={onClose}>
@@ -58,12 +65,26 @@ const ChatReplayViewer = ({ conversation, onClose }) => {
                                 )}
                             </div>
                         </div>
-                        <button
-                            onClick={onClose}
-                            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-                        >
-                            <X size={18} />
-                        </button>
+                        <div className="flex items-center gap-1">
+                            {canDelete && (
+                                <button
+                                    type="button"
+                                    onClick={() => setConfirmOpen(true)}
+                                    className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+                                    title="Delete conversation"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            )}
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+                                title="Close"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
                         <span className={`text-[10px] px-2 py-0.5 rounded border font-semibold ${intentCfg.color}`}>
@@ -131,12 +152,81 @@ const ChatReplayViewer = ({ conversation, onClose }) => {
                 {/* Footer */}
                 <div className="px-5 py-3 border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-[#1E293B] flex items-center justify-between">
                     <div className="text-[10px] text-gray-400 dark:text-gray-500">
-                        {messages.filter(m => m.role !== 'system').length} messages · Session: <span className="font-mono">{conversation.session_id?.slice(0, 16)}…</span>
+                        {messagesCount} messages · Session: <span className="font-mono">{conversation.session_id?.slice(0, 16)}…</span>
                     </div>
                     <div className="text-[10px] text-gray-400 dark:text-gray-500">
                         {conversation.created_at ? new Date(conversation.created_at).toLocaleString() : ''}
                     </div>
                 </div>
+
+                {/* Delete confirmation modal (double confirm) */}
+                {confirmOpen && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center p-4" onClick={() => setConfirmOpen(false)}>
+                        <div
+                            className="w-full max-w-md bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+                                <p className="text-sm font-bold text-gray-900 dark:text-gray-100">Delete conversation?</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    This will permanently remove the conversation (and analytics, if present). This action cannot be undone.
+                                </p>
+                            </div>
+                            <div className="px-5 py-4 space-y-3">
+                                <div className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
+                                    <div className="flex items-center justify-between gap-3">
+                                        <span className="font-semibold truncate">{visitorName}{visitorEmail ? ` · ${visitorEmail}` : ''}</span>
+                                        <span className="font-mono text-[10px] text-gray-400 dark:text-gray-500 shrink-0">{conversation.session_id?.slice(0, 16)}…</span>
+                                    </div>
+                                </div>
+
+                                <label className="flex items-start gap-2 text-xs text-gray-700 dark:text-gray-200">
+                                    <input
+                                        type="checkbox"
+                                        checked={confirmChecked}
+                                        onChange={(e) => setConfirmChecked(e.target.checked)}
+                                        className="mt-0.5"
+                                    />
+                                    <span>I understand this will permanently delete the conversation.</span>
+                                </label>
+
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">
+                                        Type <span className="font-mono">DELETE</span> to confirm
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={confirmText}
+                                        onChange={(e) => setConfirmText(e.target.value)}
+                                        placeholder="DELETE"
+                                        className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#0F172A] text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                                    />
+                                </div>
+                            </div>
+                            <div className="px-5 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-end gap-2 bg-gray-50/60 dark:bg-[#0F172A]/50">
+                                <button
+                                    type="button"
+                                    onClick={() => setConfirmOpen(false)}
+                                    className="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-white dark:hover:bg-gray-800 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    disabled={!canConfirmDelete}
+                                    onClick={() => {
+                                        if (!canConfirmDelete) return;
+                                        setConfirmOpen(false);
+                                        onDelete?.(conversation);
+                                    }}
+                                    className="px-3 py-2 rounded-xl text-xs font-semibold bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Delete permanently
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <style>{`

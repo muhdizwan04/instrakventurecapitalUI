@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import {
     Bot, Search, RefreshCw, MessageSquare, Clock, Inbox,
     TrendingUp, Calendar, Filter, ChevronLeft, ChevronRight,
-    Loader2, Users, Hash, Zap
+    Loader2, Users, Hash, Zap, Download
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { supabase } from '../lib/supabase';
@@ -29,6 +29,59 @@ function getTimeAgo(dateStr) {
     return `${Math.floor(seconds / 86400)}d ago`;
 }
 
+function downloadBlob({ blob, filename }) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+}
+
+function toCsvValue(v) {
+    if (v == null) return '';
+    const s = String(v);
+    if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+    return s;
+}
+
+function conversationsToCsv(convs) {
+    const headers = [
+        'id',
+        'session_id',
+        'visitor_name',
+        'visitor_email',
+        'intent',
+        'service_mentioned',
+        'messages_count',
+        'created_at',
+        'updated_at',
+        'last_user_message',
+        'last_assistant_message',
+    ];
+    const rows = (convs || []).map((c) => {
+        const msgs = Array.isArray(c.messages) ? c.messages.filter(m => m.role !== 'system') : [];
+        const lastUser = [...msgs].reverse().find(m => m.role === 'user')?.content || '';
+        const lastAsst = [...msgs].reverse().find(m => m.role === 'assistant')?.content || '';
+        return [
+            c.id,
+            c.session_id,
+            c.visitor_name,
+            c.visitor_email,
+            c.intent,
+            c.service_mentioned,
+            msgs.length,
+            c.created_at,
+            c.updated_at,
+            lastUser,
+            lastAsst,
+        ].map(toCsvValue).join(',');
+    });
+    return [headers.join(','), ...rows].join('\n');
+}
+
 const AIConversationsManager = () => {
     const [conversations, setConversations] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -40,6 +93,7 @@ const AIConversationsManager = () => {
     const [totalCount, setTotalCount] = useState(0);
     const [services, setServices] = useState([]);
     const [stats, setStats] = useState({ total: 0, today: 0, topIntent: '—', avgMessages: 0 });
+    const [exporting, setExporting] = useState(false);
     const pollingRef = useRef(null);
 
     const fetchConversations = useCallback(async (silent = false) => {
@@ -74,6 +128,80 @@ const AIConversationsManager = () => {
             if (!silent) setLoading(false);
         }
     }, [filterIntent, filterService, searchQuery, page]);
+
+    const buildBaseQuery = useCallback(() => {
+        let query = supabase
+            .from('chat_conversations')
+            .select('*', { count: 'exact' })
+            .order('updated_at', { ascending: false });
+
+        if (filterIntent !== 'all') query = query.eq('intent', filterIntent);
+        if (filterService !== 'all') query = query.eq('service_mentioned', filterService);
+        if (searchQuery.trim()) {
+            const s = searchQuery.trim();
+            query = query.or(`visitor_name.ilike.%${s}%,visitor_email.ilike.%${s}%,session_id.ilike.%${s}%`);
+        }
+        return query;
+    }, [filterIntent, filterService, searchQuery]);
+
+    const exportFiltered = useCallback(async (format) => {
+        if (exporting) return;
+        setExporting(true);
+        const toastId = toast.loading('Preparing export...');
+        try {
+            const PAGE = 1000;
+            const all = [];
+            let from = 0;
+            while (true) {
+                const to = from + PAGE - 1;
+                const { data, error } = await buildBaseQuery().range(from, to);
+                if (error) throw error;
+                if (data && data.length) {
+                    all.push(...data);
+                }
+                if (!data || data.length < PAGE) break;
+                from += PAGE;
+            }
+
+            const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+            if (format === 'json') {
+                const blob = new Blob([JSON.stringify(all, null, 2)], { type: 'application/json' });
+                downloadBlob({ blob, filename: `ai-conversations-${ts}.json` });
+            } else {
+                const csv = conversationsToCsv(all);
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+                downloadBlob({ blob, filename: `ai-conversations-${ts}.csv` });
+            }
+            toast.success(`Exported ${all.length} conversations`, { id: toastId });
+        } catch (err) {
+            console.error('Export error:', err);
+            toast.error('Export failed', { id: toastId });
+        } finally {
+            setExporting(false);
+        }
+    }, [buildBaseQuery, exporting]);
+
+    const handleDeleteConversation = useCallback(async (conv) => {
+        if (!conv?.id) return;
+        const toastId = toast.loading('Deleting conversation...');
+        try {
+            // Best-effort: delete analytics first (if FK exists)
+            try {
+                await supabase.from('chat_analytics').delete().eq('conversation_id', conv.id);
+            } catch {
+                // ignore
+            }
+            const { error } = await supabase.from('chat_conversations').delete().eq('id', conv.id);
+            if (error) throw error;
+            toast.success('Conversation deleted', { id: toastId });
+            setSelectedConversation(null);
+            fetchConversations(true);
+            fetchStats();
+        } catch (err) {
+            console.error('Delete error:', err);
+            toast.error('Failed to delete conversation', { id: toastId });
+        }
+    }, [fetchConversations, fetchStats]);
 
     const fetchStats = useCallback(async () => {
         try {
@@ -168,6 +296,24 @@ const AIConversationsManager = () => {
                         <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
                         Auto-refresh 30s
                     </span>
+                    <div className="flex items-center gap-1.5">
+                        <button
+                            onClick={() => exportFiltered('csv')}
+                            disabled={exporting}
+                            className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-[#1E293B] border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                            title="Export filtered conversations as CSV"
+                        >
+                            <Download size={14} /> CSV
+                        </button>
+                        <button
+                            onClick={() => exportFiltered('json')}
+                            disabled={exporting}
+                            className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-[#1E293B] border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                            title="Export filtered conversations as JSON"
+                        >
+                            <Download size={14} /> JSON
+                        </button>
+                    </div>
                     <button
                         onClick={() => { fetchConversations(); fetchStats(); }}
                         className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-[#1E293B] border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -368,6 +514,7 @@ const AIConversationsManager = () => {
                 <ChatReplayViewer
                     conversation={selectedConversation}
                     onClose={() => setSelectedConversation(null)}
+                    onDelete={handleDeleteConversation}
                 />
             )}
         </div>

@@ -182,7 +182,7 @@ const ChatWidget = () => {
       .eq('session_id', sessionId)
       .order('updated_at', { ascending: false })
       .limit(1)
-      .single()
+      .maybeSingle()
       .then(({ data, error }) => {
         if (error || !data || !Array.isArray(data.messages) || data.messages.length === 0) return;
 
@@ -268,8 +268,8 @@ const ChatWidget = () => {
           messages: apiMessages,
           sessionId,
           userId,
-          visitorName: localStorage.getItem('chat_visitor_name') || null,
-          visitorEmail: localStorage.getItem('chat_visitor_email') || null,
+          visitorName: (visitorName || localStorage.getItem('chat_visitor_name') || '').trim() || null,
+          visitorEmail: (visitorEmail || localStorage.getItem('chat_visitor_email') || '').trim() || null,
         }),
       });
 

@@ -58,6 +58,7 @@ const MainLayout = () => {
             <Route path="/services" element={<PageTransition><ServicesPage /></PageTransition>} />
             <Route path="/ai-capital-assessment" element={<PageTransition><AICapitalAssessment /></PageTransition>} />
             <Route path="/investors" element={<PageTransition><Investors /></PageTransition>} />
+            <Route path="/profile" element={<PageTransition><Investors /></PageTransition>} />
             <Route path="/join-us" element={<PageTransition><JoinUs /></PageTransition>} />
             <Route path="/latest-news-2" element={<PageTransition><LatestNews /></PageTransition>} />
             <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />

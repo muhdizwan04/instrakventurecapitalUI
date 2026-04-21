@@ -16,8 +16,7 @@ const Login = () => {
     const { login } = useAuth();
     const { showLoading, hideLoading } = useLoading();
 
-    // Get the page user was trying to access
-    const from = location.state?.from?.pathname || '/';
+    const redirectAfterLogin = '/profile';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -28,7 +27,7 @@ const Login = () => {
         try {
             await login(email, password);
             hideLoading();
-            navigate(from, { replace: true });
+            navigate(redirectAfterLogin, { replace: true });
         } catch (err) {
             hideLoading();
             console.error('Login error:', err);

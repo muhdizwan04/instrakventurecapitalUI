@@ -28,7 +28,7 @@ BEGIN
         form_styles := jsonb_build_object(
             -- Section Wrapper (matches page background)
             'sectionBg', '#1A365D',  -- Dark blue background matching service pages
-            'sectionTitle', COALESCE((page_item->'formStyles'->>'sectionTitle'), 'Submit Your Inquiry'),
+            'sectionTitle', COALESCE((page_item->'formStyles'->>'sectionTitle'), 'Submit profile'),
             'sectionSubtitle', COALESCE((page_item->'formStyles'->>'sectionSubtitle'), 'Fill out the form below and our team will get back to you shortly.'),
             'sectionTitleColor', '#FFFFFF',  -- White text on dark background
             'sectionSubtitleColor', 'rgba(255,255,255,0.85)',  -- Light gray/white text for subtitle on dark background

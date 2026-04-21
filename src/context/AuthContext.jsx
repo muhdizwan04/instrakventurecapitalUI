@@ -157,8 +157,9 @@ export const AuthProvider = ({ children }) => {
         } finally {
             // Always clear local state
             setClientProfile(null);
-            setUser(null); 
-            // We manually clear user here just in case onAuthStateChange doesn't fire on error
+            setUser(null);
+            // Full navigation so UI matches signed-out state; land on Register (not home)
+            window.location.href = '/register';
         }
     };
 

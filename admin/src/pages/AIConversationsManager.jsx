@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import {
     Bot, Search, RefreshCw, MessageSquare, Clock, Inbox,
     TrendingUp, Calendar, Filter, ChevronLeft, ChevronRight,
-    Loader2, Users, Hash, Zap, Download
+    Loader2, Users, Hash, Zap, Download, Trash2, X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { supabase } from '../lib/supabase';
@@ -94,6 +94,8 @@ const AIConversationsManager = () => {
     const [services, setServices] = useState([]);
     const [stats, setStats] = useState({ total: 0, today: 0, topIntent: '—', avgMessages: 0 });
     const [exporting, setExporting] = useState(false);
+    const [selectedIds, setSelectedIds] = useState(() => new Set());
+    const [bulkDeleting, setBulkDeleting] = useState(false);
     const pollingRef = useRef(null);
 
     const fetchConversations = useCallback(async (silent = false) => {
@@ -181,28 +183,6 @@ const AIConversationsManager = () => {
         }
     }, [buildBaseQuery, exporting]);
 
-    const handleDeleteConversation = useCallback(async (conv) => {
-        if (!conv?.id) return;
-        const toastId = toast.loading('Deleting conversation...');
-        try {
-            // Best-effort: delete analytics first (if FK exists)
-            try {
-                await supabase.from('chat_analytics').delete().eq('conversation_id', conv.id);
-            } catch {
-                // ignore
-            }
-            const { error } = await supabase.from('chat_conversations').delete().eq('id', conv.id);
-            if (error) throw error;
-            toast.success('Conversation deleted', { id: toastId });
-            setSelectedConversation(null);
-            fetchConversations(true);
-            fetchStats();
-        } catch (err) {
-            console.error('Delete error:', err);
-            toast.error('Failed to delete conversation', { id: toastId });
-        }
-    }, [fetchConversations, fetchStats]);
-
     const fetchStats = useCallback(async () => {
         try {
             const { data, error } = await supabase
@@ -255,6 +235,118 @@ const AIConversationsManager = () => {
         }
     }, []);
 
+    const handleDeleteConversation = useCallback(async (conv) => {
+        if (!conv?.id) return;
+        const toastId = toast.loading('Deleting conversation...');
+        try {
+            try {
+                await supabase.from('chat_analytics').delete().eq('conversation_id', conv.id);
+            } catch {
+                // ignore
+            }
+            const { data: deleted, error } = await supabase
+                .from('chat_conversations')
+                .delete()
+                .eq('id', conv.id)
+                .select('id');
+            if (error) throw error;
+            if (!deleted || deleted.length === 0) {
+                toast.error('Delete blocked by permissions (RLS). Ask an admin to run the DELETE policy SQL.', { id: toastId });
+                return;
+            }
+            toast.success('Conversation deleted', { id: toastId });
+            setSelectedConversation(null);
+            setSelectedIds((prev) => {
+                if (!prev.has(conv.id)) return prev;
+                const next = new Set(prev);
+                next.delete(conv.id);
+                return next;
+            });
+            fetchConversations(true);
+            fetchStats();
+        } catch (err) {
+            console.error('Delete error:', err);
+            toast.error(err?.message || 'Failed to delete conversation', { id: toastId });
+        }
+    }, [fetchConversations, fetchStats]);
+
+    const toggleSelectOne = useCallback((id) => {
+        setSelectedIds((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    }, []);
+
+    const toggleSelectPage = useCallback(() => {
+        setSelectedIds((prev) => {
+            const pageIds = conversations.map((c) => c.id);
+            const allSelected = pageIds.length > 0 && pageIds.every((id) => prev.has(id));
+            const next = new Set(prev);
+            if (allSelected) {
+                pageIds.forEach((id) => next.delete(id));
+            } else {
+                pageIds.forEach((id) => next.add(id));
+            }
+            return next;
+        });
+    }, [conversations]);
+
+    const clearSelection = useCallback(() => setSelectedIds(new Set()), []);
+
+    const handleBulkDelete = useCallback(async () => {
+        const ids = Array.from(selectedIds);
+        if (ids.length === 0 || bulkDeleting) return;
+        const confirmMsg = `Delete ${ids.length} conversation${ids.length === 1 ? '' : 's'}? This cannot be undone.`;
+        if (!window.confirm(confirmMsg)) return;
+
+        setBulkDeleting(true);
+        const toastId = toast.loading(`Deleting ${ids.length} conversation${ids.length === 1 ? '' : 's'}...`);
+        try {
+            try {
+                await supabase.from('chat_analytics').delete().in('conversation_id', ids);
+            } catch {
+                // ignore — table may not have FK or rows
+            }
+            const { data: deleted, error } = await supabase
+                .from('chat_conversations')
+                .delete()
+                .in('id', ids)
+                .select('id');
+            if (error) throw error;
+            const deletedCount = deleted?.length || 0;
+            if (deletedCount === 0) {
+                toast.error('Delete blocked by permissions (RLS). Ask an admin to run the DELETE policy SQL.', { id: toastId });
+                return;
+            }
+            if (deletedCount < ids.length) {
+                toast.success(`Deleted ${deletedCount} of ${ids.length} (others blocked by permissions)`, { id: toastId });
+            } else {
+                toast.success(`Deleted ${deletedCount} conversation${deletedCount === 1 ? '' : 's'}`, { id: toastId });
+            }
+            const deletedIdSet = new Set((deleted || []).map((r) => r.id));
+            setSelectedConversation((prev) => (prev && deletedIdSet.has(prev.id) ? null : prev));
+            setSelectedIds((prev) => {
+                const next = new Set(prev);
+                deletedIdSet.forEach((id) => next.delete(id));
+                return next;
+            });
+            fetchConversations(true);
+            fetchStats();
+        } catch (err) {
+            console.error('Bulk delete error:', err);
+            toast.error(err?.message || 'Failed to delete conversations', { id: toastId });
+        } finally {
+            setBulkDeleting(false);
+        }
+    }, [selectedIds, bulkDeleting, fetchConversations, fetchStats]);
+
+    const pageIds = useMemo(() => conversations.map((c) => c.id), [conversations]);
+    const allOnPageSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.has(id));
+    const someOnPageSelected = pageIds.some((id) => selectedIds.has(id)) && !allOnPageSelected;
+    const selectedCount = selectedIds.size;
+
     // Initial load
     useEffect(() => {
         fetchStats();
@@ -274,9 +366,10 @@ const AIConversationsManager = () => {
         return () => clearInterval(pollingRef.current);
     }, [fetchConversations, fetchStats]);
 
-    // Reset page when filters change
+    // Reset page and selection when filters change
     useEffect(() => {
         setPage(0);
+        setSelectedIds(new Set());
     }, [searchQuery, filterIntent, filterService]);
 
     const totalPages = Math.ceil(totalCount / PAGE_SIZE);
@@ -399,6 +492,31 @@ const AIConversationsManager = () => {
                 </select>
             </div>
 
+            {/* Bulk action bar */}
+            {selectedCount > 0 && (
+                <div className="flex items-center justify-between gap-3 px-4 py-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl shrink-0">
+                    <div className="flex items-center gap-3 text-sm text-red-700 dark:text-red-300">
+                        <span className="font-semibold">{selectedCount} selected</span>
+                        <button
+                            type="button"
+                            onClick={clearSelection}
+                            className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1"
+                        >
+                            <X size={12} /> Clear
+                        </button>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleBulkDelete}
+                        disabled={bulkDeleting}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                        {bulkDeleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                        Delete selected
+                    </button>
+                </div>
+            )}
+
             {/* Table */}
             <div className="flex-1 bg-white dark:bg-[#1E293B] rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col min-h-0">
                 {loading ? (
@@ -416,6 +534,16 @@ const AIConversationsManager = () => {
                             <table className="w-full text-left">
                                 <thead className="sticky top-0 bg-gray-50 dark:bg-[#0F172A] border-b border-gray-100 dark:border-gray-700 z-10">
                                     <tr>
+                                        <th className="pl-4 pr-2 py-3 w-10">
+                                            <input
+                                                type="checkbox"
+                                                aria-label="Select all on this page"
+                                                checked={allOnPageSelected}
+                                                ref={(el) => { if (el) el.indeterminate = someOnPageSelected; }}
+                                                onChange={toggleSelectPage}
+                                                className="h-4 w-4 rounded border-gray-300 text-[var(--accent-primary)] focus:ring-[var(--accent-primary)] cursor-pointer"
+                                            />
+                                        </th>
                                         <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Visitor</th>
                                         <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Intent</th>
                                         <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Service</th>
@@ -430,12 +558,26 @@ const AIConversationsManager = () => {
                                         const name = conv.visitor_name || 'Anonymous';
                                         const email = conv.visitor_email || null;
 
+                                        const isSelected = selectedIds.has(conv.id);
                                         return (
                                             <tr
                                                 key={conv.id}
                                                 onClick={() => setSelectedConversation(conv)}
-                                                className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                                                className={`cursor-pointer transition-colors ${isSelected ? 'bg-red-50/60 dark:bg-red-900/10' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
                                             >
+                                                <td
+                                                    className="pl-4 pr-2 py-3 w-10"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        aria-label={`Select conversation ${name}`}
+                                                        checked={isSelected}
+                                                        onChange={() => toggleSelectOne(conv.id)}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        className="h-4 w-4 rounded border-gray-300 text-[var(--accent-primary)] focus:ring-[var(--accent-primary)] cursor-pointer"
+                                                    />
+                                                </td>
                                                 <td className="px-4 py-3">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-8 h-8 rounded-full bg-[var(--accent-primary)] text-white flex items-center justify-center text-xs font-bold shrink-0">

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import styles from './Navbar.module.css';
 import { usePageContent } from '../hooks/usePageContent';
 import { useAuth } from '../context/AuthContext';
@@ -13,6 +13,9 @@ const Navbar = () => {
     const [openDropdown, setOpenDropdown] = useState(null);
     const { user, logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
+    const navRef = useRef(null);
+    const leaveTimerRef = useRef(null);
+    const location = useLocation();
 
     // Default navigation structure
     const defaultNav = {
@@ -62,7 +65,61 @@ const Navbar = () => {
     const closeAll = () => {
         setMenuOpen(false);
         setOpenDropdown(null);
+        if (leaveTimerRef.current) {
+            clearTimeout(leaveTimerRef.current);
+            leaveTimerRef.current = null;
+        }
     };
+
+    const handleDropdownEnter = (id) => {
+        if (leaveTimerRef.current) {
+            clearTimeout(leaveTimerRef.current);
+            leaveTimerRef.current = null;
+        }
+        setOpenDropdown(id);
+    };
+
+    const handleDropdownLeave = () => {
+        if (leaveTimerRef.current) clearTimeout(leaveTimerRef.current);
+        leaveTimerRef.current = setTimeout(() => setOpenDropdown(null), 120);
+    };
+
+    const handleDropdownToggle = (id) => {
+        setOpenDropdown((prev) => (prev === id ? null : id));
+    };
+
+    // Close dropdown/menu on route change
+    useEffect(() => {
+        setOpenDropdown(null);
+        setMenuOpen(false);
+    }, [location.pathname, location.hash]);
+
+    // Close on click outside, Esc key, or scroll
+    useEffect(() => {
+        const onPointerDown = (e) => {
+            if (navRef.current && !navRef.current.contains(e.target)) {
+                setOpenDropdown(null);
+            }
+        };
+        const onKey = (e) => {
+            if (e.key === 'Escape') {
+                setOpenDropdown(null);
+                setMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', onPointerDown);
+        document.addEventListener('touchstart', onPointerDown);
+        document.addEventListener('keydown', onKey);
+        return () => {
+            document.removeEventListener('mousedown', onPointerDown);
+            document.removeEventListener('touchstart', onPointerDown);
+            document.removeEventListener('keydown', onKey);
+        };
+    }, []);
+
+    useEffect(() => () => {
+        if (leaveTimerRef.current) clearTimeout(leaveTimerRef.current);
+    }, []);
 
     // Use loaded data or defaults
     const rawItems = navData?.items || defaultNav.items;
@@ -107,7 +164,7 @@ const Navbar = () => {
     });
 
     return (
-        <nav className={styles.nav} style={navStyleVars}>
+        <nav ref={navRef} className={styles.nav} style={navStyleVars}>
             <div className={styles.container}>
                 <Link to="/" className={styles.logo} onClick={closeAll}>
                     {settings?.siteIdentity?.logoUrl ? (
@@ -142,13 +199,33 @@ const Navbar = () => {
 
                 <ul className={`${styles.links} ${menuOpen ? styles.active : ''}`}>
                     {items.map(item => (
-                        <li key={item.id} className={item.isDropdown ? styles.hasDropdown : ''}>
+                        <li
+                            key={item.id}
+                            className={item.isDropdown
+                                ? `${styles.hasDropdown}${openDropdown === item.id ? ` ${styles.open}` : ''}`
+                                : ''}
+                            onMouseEnter={item.isDropdown ? () => handleDropdownEnter(item.id) : undefined}
+                            onMouseLeave={item.isDropdown ? handleDropdownLeave : undefined}
+                        >
                             {item.isDropdown ? (
                                 <>
                                     <Link
                                         to={item.link}
                                         className={styles.parentLink}
-                                        onClick={closeAll}
+                                        aria-haspopup="true"
+                                        aria-expanded={openDropdown === item.id}
+                                        onClick={(e) => {
+                                            // On touch devices, first tap toggles the menu instead of navigating.
+                                            const hasRealHover = typeof window !== 'undefined'
+                                                && window.matchMedia
+                                                && window.matchMedia('(hover: hover)').matches;
+                                            if (!hasRealHover && openDropdown !== item.id) {
+                                                e.preventDefault();
+                                                handleDropdownToggle(item.id);
+                                                return;
+                                            }
+                                            closeAll();
+                                        }}
                                     >
                                         {item.label}
                                     </Link>
@@ -188,8 +265,26 @@ const Navbar = () => {
 
                     {/* Profile Menu - Only visible when logged in */}
                     {user && (
-                        <li className={styles.hasDropdown}>
-                            <div className={styles.parentLink} style={{ cursor: 'pointer', gap: '0.5rem' }}>
+                        <li
+                            className={`${styles.hasDropdown}${openDropdown === 'account' ? ` ${styles.open}` : ''}`}
+                            onMouseEnter={() => handleDropdownEnter('account')}
+                            onMouseLeave={handleDropdownLeave}
+                        >
+                            <div
+                                className={styles.parentLink}
+                                style={{ cursor: 'pointer', gap: '0.5rem' }}
+                                role="button"
+                                tabIndex={0}
+                                aria-haspopup="true"
+                                aria-expanded={openDropdown === 'account'}
+                                onClick={() => handleDropdownToggle('account')}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        handleDropdownToggle('account');
+                                    }
+                                }}
+                            >
                                 <div className={styles.avatar}>
                                     <User size={18} />
                                 </div>

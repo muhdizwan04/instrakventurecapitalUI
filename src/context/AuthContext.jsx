@@ -96,6 +96,31 @@ export const AuthProvider = ({ children }) => {
         return () => subscription.unsubscribe();
     }, []);
 
+    const stampClientSignIn = async (userId) => {
+        if (!userId) return;
+        try {
+            const nowIso = new Date().toISOString();
+            const { data: current, error: readError } = await supabase
+                .from('client_profiles')
+                .select('sign_in_count')
+                .eq('id', userId)
+                .maybeSingle();
+            if (readError && readError.code !== 'PGRST116') {
+                console.log('[AuthContext] read sign_in_count failed:', readError.message);
+            }
+            const nextCount = (current?.sign_in_count || 0) + 1;
+            const { error: updateError } = await supabase
+                .from('client_profiles')
+                .update({ last_sign_in_at: nowIso, sign_in_count: nextCount })
+                .eq('id', userId);
+            if (updateError) {
+                console.log('[AuthContext] stamp last_sign_in_at failed:', updateError.message);
+            }
+        } catch (err) {
+            console.log('[AuthContext] stampClientSignIn error:', err);
+        }
+    };
+
     const login = async (email, password) => {
         const { data, error } = await supabase.auth.signInWithPassword({
             email,
@@ -103,9 +128,9 @@ export const AuthProvider = ({ children }) => {
         });
         if (error) throw error;
         
-        // Check client profile after login
         if (data.user) {
             await checkClientProfile(data.user.id);
+            stampClientSignIn(data.user.id);
         }
         
         return data;

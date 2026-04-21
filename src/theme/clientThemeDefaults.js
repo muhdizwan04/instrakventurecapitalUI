@@ -126,5 +126,6 @@ export function normalizeLegacyFormSectionTitle(title) {
     if (title == null || typeof title !== 'string') return title;
     const key = title.trim().replace(/\s+/g, ' ').toLowerCase();
     if (key === 'submit your inquiry') return 'Submit profile';
+    if (key === 'investment inquiry') return 'Investment Profile';
     return title;
 }

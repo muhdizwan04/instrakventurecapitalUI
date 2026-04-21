@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
-import { Users, Search, Mail, Phone, Building2, Calendar, RefreshCcw, Loader2, Filter, Download, X, ChevronDown, FileText, Table } from 'lucide-react';
+import { Users, Search, Mail, Phone, Building2, Calendar, RefreshCcw, Loader2, Filter, Download, X, ChevronDown, FileText, Table, Clock } from 'lucide-react';
 
 const UsersManager = () => {
     const [users, setUsers] = useState([]);
@@ -114,10 +114,12 @@ const UsersManager = () => {
     };
 
     const downloadCSV = () => {
-        const headers = ['Name', 'Email', 'Company', 'Phone', 'Registered'];
+        const headers = ['Name', 'Email', 'Company', 'Phone', 'Registered', 'Last Sign-in', 'Sign-in Count'];
         const rows = filteredUsers.map(u => [
             u.full_name || '', u.email || '', u.company_name || '', u.phone || '',
-            u.created_at ? new Date(u.created_at).toLocaleString('en-MY') : ''
+            u.created_at ? new Date(u.created_at).toLocaleString('en-MY') : '',
+            u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString('en-MY') : '',
+            String(u.sign_in_count ?? 0)
         ]);
         const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${(c || '').replace(/"/g, '""')}"`).join(','))].join('\n');
         const blob = new Blob([csv], { type: 'text/csv' });
@@ -139,6 +141,8 @@ const UsersManager = () => {
                 <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;">${u.company_name || '-'}</td>
                 <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;">${u.phone || '-'}</td>
                 <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;">${u.created_at ? new Date(u.created_at).toLocaleString('en-MY') : '-'}</td>
+                <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;">${u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString('en-MY') : '-'}</td>
+                <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;">${u.sign_in_count ?? 0}</td>
             </tr>
         `).join('');
         win.document.write(`
@@ -152,7 +156,7 @@ const UsersManager = () => {
             <p class="sub">Filter: ${getFilterLabel()} &nbsp;|&nbsp; Total: ${filteredUsers.length} clients &nbsp;|&nbsp; Generated: ${new Date().toLocaleString('en-MY')}</p>
             <table>
                 <thead><tr>
-                    <th>Name</th><th>Email</th><th>Company</th><th>Phone</th><th>Registered</th>
+                    <th>Name</th><th>Email</th><th>Company</th><th>Phone</th><th>Registered</th><th>Last Sign-in</th><th>Sign-ins</th>
                 </tr></thead>
                 <tbody>${rows}</tbody>
             </table>
@@ -359,12 +363,13 @@ const UsersManager = () => {
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Company</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Phone</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Registered</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Last Sign-in</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {filteredUsers.length === 0 ? (
                                     <tr>
-                                        <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
+                                        <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
                                             {searchTerm || hasActiveFilter ? 'No users match your filters.' : 'No registered clients yet.'}
                                         </td>
                                     </tr>
@@ -401,6 +406,17 @@ const UsersManager = () => {
                                                 <div className="flex items-center gap-2 text-gray-600">
                                                     <Calendar size={16} />
                                                     {formatDate(user.created_at)}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-2 text-gray-600">
+                                                    <Clock size={16} />
+                                                    <div>
+                                                        <p>{user.last_sign_in_at ? formatDate(user.last_sign_in_at) : 'Never'}</p>
+                                                        {user.sign_in_count > 0 && (
+                                                            <p className="text-[11px] text-gray-400">{user.sign_in_count} sign-in{user.sign_in_count !== 1 ? 's' : ''}</p>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </td>
                                         </tr>

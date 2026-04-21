@@ -6,6 +6,7 @@ import { Toaster } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 import ProtectedFormSection from '../components/ProtectedFormSection';
 import { useTheme } from '../context/ThemeContext';
+import { normalizeLegacyFormSectionTitle } from '../theme/clientThemeDefaults';
 
 const Investors = () => {
     const { theme } = useTheme();
@@ -131,6 +132,7 @@ const Investors = () => {
     const onboarding = content?.onboarding || defaultContent.onboarding;
     const portfolioSection = content?.portfolioSection || defaultContent.portfolioSection;
     const formSettings = content?.formSettings || defaultContent.formSettings;
+    const normalizedFormTitle = normalizeLegacyFormSectionTitle(formSettings.title);
 
     const phStyles = pageHero.styles || {};
     const heroSectionStyles = isLight
@@ -192,7 +194,7 @@ const Investors = () => {
                     </div>
 
                     <div className="glass-card" style={inquiryCardStyle}>
-                        <h3 style={{ marginBottom: '2rem', color: inquiryTitleColor }}>{formSettings.title}</h3>
+                        <h3 style={{ marginBottom: '2rem', color: inquiryTitleColor }}>{normalizedFormTitle}</h3>
                         <ProtectedFormSection serviceName="Investor Relations">
                             <form className="investors-form-glass" onSubmit={handleSubmit}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>

@@ -7,7 +7,7 @@ export const FORM_DEFAULTS = {
     cardBg: '#FFFFFF', cardBorderColor: 'rgba(26,54,93,0.1)', cardRadius: 'md', cardShadow: 'subtle',
     labelColor: '#1A365D', inputBg: '#FFFFFF', inputBorderColor: 'rgba(26,54,93,0.2)', inputFocusColor: '#B8860B', inputRadius: 'sm',
     placeholderColor: '#9CA3AF', headingColor: '#1A365D', headingSeparator: true,
-    btnBg: '#1A365D', btnText: '#FFFFFF', btnLabel: 'Submit Inquiry', btnRadius: 'sm', btnStyle: 'solid',
+    btnBg: '#1A365D', btnText: '#FFFFFF', btnLabel: 'Submit profile', btnRadius: 'sm', btnStyle: 'solid',
     btnHoverBg: '#152c4a',
 };
 
@@ -122,7 +122,7 @@ const FormAppearanceEditor = ({ formStyles = {}, onChange }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Button Label</label>
-                        <input value={fs.btnLabel || ''} onChange={e => upd('btnLabel', e.target.value)} className="input-field text-sm font-bold" placeholder="Submit Inquiry" />
+                        <input value={fs.btnLabel || ''} onChange={e => upd('btnLabel', e.target.value)} className="input-field text-sm font-bold" placeholder="Submit profile" />
                     </div>
                     <div>
                         <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Button Radius</label>
@@ -146,7 +146,7 @@ const FormAppearanceEditor = ({ formStyles = {}, onChange }) => {
                                 : fs.btnStyle === 'gradient' ? { background: `linear-gradient(135deg, ${fs.btnBg || '#1A365D'}, ${fs.btnHoverBg || '#152c4a'})`, color: fs.btnText || '#FFFFFF', border: 'none' }
                                 : { background: fs.btnBg || '#1A365D', color: fs.btnText || '#FFFFFF', border: 'none' })
                         }}>
-                            {fs.btnLabel || 'Submit Inquiry'}
+                            {fs.btnLabel || 'Submit profile'}
                         </button>
                     </div>
                 </div>

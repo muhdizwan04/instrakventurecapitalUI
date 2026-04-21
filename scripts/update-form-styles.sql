@@ -55,7 +55,7 @@ BEGIN
             'btnBg', '#C9A227',  -- Gold button (brand accent)
             'btnText', '#FFFFFF',  -- White text
             'btnHoverBg', '#B8860B',  -- Darker gold on hover
-            'btnLabel', COALESCE((page_item->'formStyles'->>'btnLabel'), 'Submit Inquiry'),
+            'btnLabel', COALESCE((page_item->'formStyles'->>'btnLabel'), 'Submit profile'),
             'btnRadius', 'md',  -- Medium rounded button (12px)
             'btnStyle', 'solid'  -- Solid button style
         );

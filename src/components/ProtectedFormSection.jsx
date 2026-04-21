@@ -111,7 +111,7 @@ const ProtectedFormSection = ({ children }) => {
                     <Lock size={32} />
                 </div>
                 
-                <h3 className={styles.title}>Login Required</h3>
+                <h3 className={styles.title}>Register Now</h3>
                 
                 <p className={styles.description}>{LOGIN_GATE_DESCRIPTION}</p>
 

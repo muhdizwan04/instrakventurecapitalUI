@@ -66,8 +66,8 @@ const Investors = () => {
             ]
         },
         formSettings: {
-            title: 'Investment Inquiry',
-            submitButtonText: 'Submit Inquiry',
+            title: 'Investment Profile',
+            submitButtonText: 'Submit profile',
             interestOptions: ['Investment', 'Loan', 'Partnership', 'Others']
         }
     };
@@ -102,7 +102,7 @@ const Investors = () => {
             email: formData.email,
             phone: formData.phone,
             companyName: formData.companyName,
-            subject: `Investment Inquiry - ${formData.interestType}`,
+            subject: `Investment Profile - ${formData.interestType}`,
             message: formData.message
         }, {
             firstName: formData.firstName,

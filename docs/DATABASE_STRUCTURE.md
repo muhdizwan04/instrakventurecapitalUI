@@ -124,7 +124,7 @@ For service detail pages, the data is stored under `id = 'service_pages'` with t
         "btnBg": "#C9A227",                         // Button background
         "btnText": "#FFFFFF",                       // Button text color
         "btnHoverBg": "#B8860B",                    // Button hover background
-        "btnLabel": "Submit Inquiry",               // Button label text
+        "btnLabel": "Submit profile",               // Button label text
         "btnRadius": "md",                          // Button border radius
         "btnStyle": "solid"                         // Button style: solid, outline, gradient
       },

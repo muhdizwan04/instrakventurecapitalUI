@@ -208,7 +208,6 @@ const Navbar = () => {
                                                 closeAll();
                                                 await logout();
                                                 console.log('Logout successful');
-                                                window.location.href = '/'; // Force redirect to landing page to refresh state
                                             } catch (error) {
                                                 console.error('Logout failed:', error);
                                             }

@@ -120,3 +120,11 @@ export function isDarkInlineBackground(style) {
     }
     return isDarkHexColor(bg);
 }
+
+/** Legacy CMS form headings (any casing) → current copy */
+export function normalizeLegacyFormSectionTitle(title) {
+    if (title == null || typeof title !== 'string') return title;
+    const key = title.trim().replace(/\s+/g, ' ').toLowerCase();
+    if (key === 'submit your inquiry') return 'Submit profile';
+    return title;
+}

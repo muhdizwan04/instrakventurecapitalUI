@@ -3,7 +3,7 @@ import { usePageContent } from '../hooks/usePageContent';
 import ProtectedFormSection from './ProtectedFormSection';
 import DynamicServiceForm from './DynamicServiceForm';
 import { useTheme } from '../context/ThemeContext';
-import { isDarkHexColor, isLikelyLightTextColor } from '../theme/clientThemeDefaults';
+import { isDarkHexColor, isLikelyLightTextColor, normalizeLegacyFormSectionTitle } from '../theme/clientThemeDefaults';
 
 const StyledFormSection = ({ serviceId, serviceName, title, subtitle, fallbackForm, customHeader, noWrapper, maxWidth = '800px', sectionId }) => {
     const { content } = usePageContent('service_pages', { pages: [] });
@@ -14,7 +14,7 @@ const StyledFormSection = ({ serviceId, serviceName, title, subtitle, fallbackFo
 
     const rawSectionBg = fs.sectionBg || '#F5F7FA';
     const sectionBg = isLight && isDarkHexColor(rawSectionBg) ? '#F1F5F9' : rawSectionBg;
-    const sectionTitle = fs.sectionTitle || title || 'Submit Your Inquiry';
+    const sectionTitle = normalizeLegacyFormSectionTitle(fs.sectionTitle || title || 'Submit profile');
     const sectionSubtitle = fs.sectionSubtitle || subtitle || '';
     const rawTitleColor = fs.sectionTitleColor || '#1A365D';
     const rawSubtitleColor = fs.sectionSubtitleColor || '#4A5568';

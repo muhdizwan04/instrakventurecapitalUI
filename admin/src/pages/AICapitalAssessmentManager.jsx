@@ -104,7 +104,7 @@ const AICapitalAssessmentManager = () => {
         <div className="max-w-5xl mx-auto p-6 space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-heading text-[var(--accent-primary)] mb-2">AI Capital Assessment</h1>
+                    <h1 className="text-3xl font-heading text-[var(--text-primary)] mb-2">AI Capital Assessment</h1>
                     <p className="text-[var(--text-secondary)] max-w-2xl">
                         Manage the steps and questions for the AI Capital Assessment wizard used on the public site.
                         Text and options are editable here; scoring logic stays consistent in code.
@@ -123,7 +123,7 @@ const AICapitalAssessmentManager = () => {
             {localContent.steps.map(step => (
                 <div key={step.id} className="glass-card p-6 border-l-4 border-l-[var(--accent-primary)] space-y-4">
                     <div>
-                        <h2 className="text-xl font-semibold text-[var(--accent-primary)] mb-1">{step.title}</h2>
+                        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-1">{step.title}</h2>
                         <p className="text-sm text-[var(--text-secondary)]">{step.description}</p>
                     </div>
 

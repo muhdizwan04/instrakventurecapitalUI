@@ -98,7 +98,7 @@ const ProjectListingManager = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-heading text-[var(--accent-primary)] mb-2">Project Listing Manager</h1>
+                    <h1 className="text-3xl font-heading text-[var(--text-primary)] mb-2">Project Listing Manager</h1>
                     <p className="text-[var(--text-secondary)]">Manage high-potential project listings and details.</p>
                 </div>
                 {view === 'list' && (
@@ -119,7 +119,7 @@ const ProjectListingManager = () => {
                 <div className="space-y-6">
                     {/* Page Settings */}
                     <div className="glass-card p-6 border-l-4 border-l-[var(--accent-secondary)]">
-                        <h3 className="font-bold text-[var(--accent-primary)] mb-4">Page Header Content</h3>
+                        <h3 className="font-bold text-[var(--text-primary)] mb-4">Page Header Content</h3>
                         <div className="grid grid-cols-1 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Page Title</label>
@@ -145,7 +145,7 @@ const ProjectListingManager = () => {
                     {/* Projects List */}
                     <div className="glass-card p-0 overflow-hidden">
                         <div className="p-4 border-b border-[var(--border-light)] bg-[var(--bg-tertiary)] bg-opacity-30">
-                            <h3 className="font-bold text-[var(--accent-primary)]">Project List</h3>
+                            <h3 className="font-bold text-[var(--text-primary)]">Project List</h3>
                         </div>
 
                         <div className="divide-y divide-[var(--border-light)]">

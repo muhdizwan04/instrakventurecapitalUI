@@ -130,9 +130,7 @@
 }
 
 :global([data-theme="light"]) .footer::before {
-    background-image: 
-        linear-gradient(rgba(15, 23, 42, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(15, 23, 42, 0.02) 1px, transparent 1px);
+    background-image: none;
 }
 
 :global([data-theme="light"]) .brandTitle {

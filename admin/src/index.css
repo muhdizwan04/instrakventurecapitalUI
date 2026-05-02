@@ -357,7 +357,8 @@ ul {
   --bg-tertiary: #334155;
   --bg-dark: #020617;
 
-  --text-primary: #F1F5F9;
+  /* Primary copy: white for strong contrast on dark panels */
+  --text-primary: #ffffff;
   --text-secondary: #CBD5E1;
   --text-muted: #94A3B8;
 
@@ -654,4 +655,14 @@ html[data-theme="dark"] body::before {
 
 [data-theme="dark"] .text-red-700 {
   color: #fecaca !important;
+}
+
+/* Dividers / hairlines on dark panels (dashboard lists, cards) */
+[data-theme="dark"] .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+[data-theme="dark"] .divide-y.divide-gray-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(148, 163, 184, 0.14) !important;
+}
+
+[data-theme="dark"] .border-gray-50 {
+  border-color: rgba(148, 163, 184, 0.12) !important;
 }

@@ -215,7 +215,7 @@ const ServicesManager = ({ embedded = false } = {}) => {
                         <Settings size={20} />
                     </div>
                     <div>
-                        <h1 className="text-xl font-heading text-[var(--accent-primary)] font-bold">Services Manager</h1>
+                        <h1 className="text-xl font-heading text-[var(--text-primary)] font-bold">Services Manager</h1>
                         <p className="text-xs text-gray-400">{services.length} services</p>
                     </div>
                 </div>

@@ -47,6 +47,10 @@ a.heroButton {
     cursor: pointer;
 }
 
+:global([data-theme="light"]) .overlay {
+    background-image: none;
+}
+
 /* Professional grid pattern */
 .overlay {
     position: absolute;

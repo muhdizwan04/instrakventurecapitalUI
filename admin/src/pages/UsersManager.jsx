@@ -432,7 +432,7 @@ const UsersManager = () => {
             {!loading && !error && (
                 <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-600">
-                        <span className="font-semibold text-[var(--accent-primary)]">{filteredUsers.length}</span>
+                        <span className="font-semibold text-[var(--text-primary)]">{filteredUsers.length}</span>
                         {' '}registered client{filteredUsers.length !== 1 && 's'}
                         {searchTerm && ` matching "${searchTerm}"`}
                         {hasActiveFilter && ` (filtered)`}

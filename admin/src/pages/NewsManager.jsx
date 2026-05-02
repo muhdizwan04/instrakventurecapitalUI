@@ -209,7 +209,7 @@ const NewsManager = () => {
         <div className="space-y-6 pb-10">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-heading text-[var(--accent-primary)] mb-2">News & Events</h1>
+                    <h1 className="text-3xl font-heading text-[var(--text-primary)] mb-2">News & Events</h1>
                     <p className="text-[var(--text-secondary)]">Create magazine-style blocks and manage articles with images + button links.</p>
                 </div>
                 <button onClick={handleSave} disabled={saving} className="btn-save">

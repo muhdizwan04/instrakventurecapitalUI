@@ -122,6 +122,19 @@ export function isDarkInlineBackground(style) {
 }
 
 /** Legacy CMS form headings (any casing) → current copy */
+/**
+ * Board of Directors block on About — light mode only.
+ * Not driven by CMS/admin so light backgrounds always get readable contrast.
+ * Dark mode continues to use `board.styleColors` from admin.
+ */
+export const BOARD_SECTION_LIGHT_TYPOGRAPHY = {
+    title: '#0A2540',
+    subtitle: '#475569',
+    name: '#0A2540',
+    role: '#8B6914',
+    bio: '#64748b',
+};
+
 export function normalizeLegacyFormSectionTitle(title) {
     if (title == null || typeof title !== 'string') return title;
     const key = title.trim().replace(/\s+/g, ' ').toLowerCase();

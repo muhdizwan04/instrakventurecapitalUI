@@ -158,7 +158,8 @@
 }
 
 :global([data-theme="light"]) .trustStrip::before {
-    opacity: 0.05;
+    background-image: none;
+    opacity: 0;
 }
 
 :global([data-theme="light"]) .subtitle {

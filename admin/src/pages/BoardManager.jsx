@@ -82,7 +82,7 @@ const BoardManager = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h1 className="text-3xl font-heading text-[var(--accent-primary)] mb-2">Board of Directors</h1>
+                    <h1 className="text-3xl font-heading text-[var(--text-primary)] mb-2">Board of Directors</h1>
                     <p className="text-[var(--text-secondary)]">Manage leadership profiles. Drag and drop to reorder.</p>
                 </div>
                 <div className="flex gap-3">
@@ -99,8 +99,8 @@ const BoardManager = () => {
 
             {/* Custom font colours */}
             <div className="glass-card p-6 mb-8">
-                <h3 className="font-bold text-[var(--accent-primary)] mb-3">Custom font colours</h3>
-                <p className="text-sm text-[var(--text-secondary)] mb-4">Set colours for name, role, and bio on the public Board of Directors section. Leave empty to use the site default.</p>
+                <h3 className="font-bold text-[var(--text-primary)] mb-3">Custom font colours (dark mode only)</h3>
+                <p className="text-sm text-[var(--text-secondary)] mb-4">When visitors use dark mode, these colours apply to director name, role, and bio. Light mode always uses fixed high-contrast colours on the public site and cannot be overridden here.</p>
                 <AppearanceEditor
                     styles={styleColors}
                     onChange={(st) => setStyleColors(st)}

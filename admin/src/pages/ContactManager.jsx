@@ -205,7 +205,7 @@ const ContactManager = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-heading text-[var(--accent-primary)] mb-2">Contact Page Manager</h1>
+                    <h1 className="text-3xl font-heading text-[var(--text-primary)] mb-2">Contact Page Manager</h1>
                     <p className="text-[var(--text-secondary)]">Manage contact details, address, and form labels.</p>
                 </div>
                 <button
@@ -223,7 +223,7 @@ const ContactManager = () => {
                 <div className="glass-card p-6 border-l-4 border-l-blue-600">
                     <div className="flex items-center gap-2 mb-4">
                         <Layout className="text-[var(--accent-primary)]" />
-                        <h3 className="font-bold text-[var(--accent-primary)]">Page Header</h3>
+                        <h3 className="font-bold text-[var(--text-primary)]">Page Header</h3>
                     </div>
                     <div className="space-y-4">
                         <div>
@@ -261,7 +261,7 @@ const ContactManager = () => {
                 <div className="glass-card p-6 border-l-4 border-l-green-600">
                     <div className="flex items-center gap-2 mb-4">
                         <Mail className="text-[var(--accent-primary)]" />
-                        <h3 className="font-bold text-[var(--accent-primary)]">Form Config</h3>
+                        <h3 className="font-bold text-[var(--text-primary)]">Form Config</h3>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -436,7 +436,7 @@ const ContactManager = () => {
                 <div className="glass-card p-6 lg:col-span-2 border-l-4 border-l-[#B8860B]">
                     <div className="flex items-center gap-2 mb-6">
                         <MapPin className="text-[var(--accent-primary)]" />
-                        <h3 className="font-bold text-[var(--accent-primary)]">Contact Information</h3>
+                        <h3 className="font-bold text-[var(--text-primary)]">Contact Information</h3>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -538,7 +538,7 @@ const ContactManager = () => {
 
                 {/* Section & Form Appearance */}
                 <div className="glass-card p-6 lg:col-span-2 border-l-4 border-l-purple-500">
-                    <h3 className="font-bold text-[var(--accent-primary)] mb-4">Section & Form Appearance</h3>
+                    <h3 className="font-bold text-[var(--text-primary)] mb-4">Section & Form Appearance</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-3">
                             <h4 className="text-sm font-bold text-gray-600">Content section</h4>

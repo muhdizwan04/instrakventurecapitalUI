@@ -79,3 +79,7 @@
     color: #4A5568;
     line-height: 1.7;
 }
+
+:global([data-theme="light"]) .about::before {
+    background-image: none;
+}

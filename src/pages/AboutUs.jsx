@@ -5,7 +5,7 @@ import { usePageContent } from '../hooks/usePageContent';
 import { motion } from 'framer-motion';
 import UniversalSection from '../components/UniversalSection';
 import { useTheme } from '../context/ThemeContext';
-import { isDarkHexColor, isLikelyLightTextColor } from '../theme/clientThemeDefaults';
+import { isDarkHexColor, isLikelyLightTextColor, BOARD_SECTION_LIGHT_TYPOGRAPHY } from '../theme/clientThemeDefaults';
 import { lightBandAt } from '../theme/lightBands';
 
 // --- Icon Map for Dynamic Content ---
@@ -380,6 +380,22 @@ const AboutUs = () => {
         const styles = section.styles || {};
         const bandCls = aboutLightBandClass(idx, section);
         const boardBg = bandCls ? 'transparent' : (styles.bgColor || '#F8FAFC');
+        const L = BOARD_SECTION_LIGHT_TYPOGRAPHY;
+        const boardTitleColor = isLight
+            ? L.title
+            : (styles.textColor || 'var(--text-primary)');
+        const boardSubtitleColor = isLight
+            ? L.subtitle
+            : (styles.textColor ? styles.textColor : '#94a3b8');
+        const nameColorResolved = isLight
+            ? L.name
+            : (boardStyleColors.nameColor || 'var(--accent-primary)');
+        const roleColorResolved = isLight
+            ? L.role
+            : (boardStyleColors.roleColor || 'var(--accent-secondary)');
+        const bioColorResolved = isLight
+            ? L.bio
+            : (boardStyleColors.bioColor || '#94a3b8');
         return (
             <motion.section
                 key={section.id}
@@ -415,7 +431,7 @@ const AboutUs = () => {
                         )}
                         <h2 className="section-title" style={{
                             marginTop: '0.5rem',
-                            color: styles.textColor || '#1A365D',
+                            color: boardTitleColor,
                             fontWeight: styles.titleFontWeight || 800,
                             fontStyle: styles.titleFontStyle || 'normal',
                             textDecoration: styles.titleTextDecoration || 'none',
@@ -431,8 +447,8 @@ const AboutUs = () => {
                                     : styles.subtitleAlign === 'right'
                                         ? 'right'
                                         : 'justify',
-                                color: styles.textColor ? styles.textColor : '#64748B',
-                                opacity: styles.textColor ? 0.8 : 1,
+                                color: boardSubtitleColor,
+                                opacity: isLight ? 1 : (styles.textColor ? 0.85 : 1),
                                 fontSize: styles.subtitleFontSize ? `${styles.subtitleFontSize}px` : undefined,
                                 whiteSpace: 'pre-line',
                                 lineHeight: 1.7
@@ -491,10 +507,10 @@ const AboutUs = () => {
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
                                 <div style={{ padding: '2rem', position: 'relative' }}>
-                                    <h3 style={{ fontSize: '1.35rem', marginBottom: '0.5rem', color: boardStyleColors.nameColor || 'var(--accent-primary)', fontWeight: '800', letterSpacing: '-0.01em' }}>{d.name}</h3>
-                                    <p style={{ color: boardStyleColors.roleColor || 'var(--accent-secondary)', fontWeight: '700', fontSize: '0.85rem', letterSpacing: '1px', textTransform: 'uppercase' }}>{d.role}</p>
+                                    <h3 style={{ fontSize: '1.35rem', marginBottom: '0.5rem', color: nameColorResolved, fontWeight: '800', letterSpacing: '-0.01em' }}>{d.name}</h3>
+                                    <p style={{ color: roleColorResolved, fontWeight: '700', fontSize: '0.85rem', letterSpacing: '1px', textTransform: 'uppercase' }}>{d.role}</p>
                                     {d.bio && (
-                                        <p style={{ marginTop: '1rem', fontSize: '0.9rem', lineHeight: 1.6, color: boardStyleColors.bioColor || '#64748b' }}>{d.bio}</p>
+                                        <p style={{ marginTop: '1rem', fontSize: '0.9rem', lineHeight: 1.6, color: bioColorResolved }}>{d.bio}</p>
                                     )}
                                     <div style={{ marginTop: '1.5rem', width: '40px', height: '2px', background: 'var(--gradient-gold)', transition: 'width 0.4s ease' }} className="group-hover:width-[100px]"></div>
                                 </div>
@@ -515,6 +531,10 @@ const AboutUs = () => {
         const titleColor = styles.titleColor || '#1A365D';
         const textColor = styles.textColor || '#475569';
         const itemTitleColor = styles.itemTitleColor || '#1A365D';
+        const L = BOARD_SECTION_LIGHT_TYPOGRAPHY;
+        /* Inline colours beat global .section-title; CMS may set light text for dark preview — force readable light-mode headings. */
+        const partnersHeadingTitleColor = isLight ? L.title : titleColor;
+        const partnersHeadingSubtitleColor = isLight ? L.subtitle : textColor;
         const contentSizePx = styles.contentFontSize || 16;
         const titleSizePx = styles.titleFontSize || 32;
         const subtitleSizePx = styles.subtitleFontSize || 17;
@@ -552,8 +572,8 @@ const AboutUs = () => {
                     <section style={{ padding: '100px 0', background: 'transparent' }}>
                         <div className="container">
                             <div style={{ textAlign: styles.textAlign || 'center', marginBottom: '4rem' }}>
-                                <h2 className="section-title" style={{ color: titleColor, fontSize: titleSizePx ? `${titleSizePx}px` : undefined }}>{section.title || 'Strategic Banking & Insurance'}</h2>
-                                {section.subtitle && <p className="mt-2" style={{ color: textColor, opacity: 0.9, fontSize: subtitleSizePx ? `${subtitleSizePx}px` : undefined }}>{section.subtitle}</p>}
+                                <h2 className="section-title" style={{ color: partnersHeadingTitleColor, fontSize: titleSizePx ? `${titleSizePx}px` : undefined }}>{section.title || 'Strategic Banking & Insurance'}</h2>
+                                {section.subtitle && <p className="mt-2" style={{ color: partnersHeadingSubtitleColor, opacity: isLight ? 1 : 0.9, fontSize: subtitleSizePx ? `${subtitleSizePx}px` : undefined }}>{section.subtitle}</p>}
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>

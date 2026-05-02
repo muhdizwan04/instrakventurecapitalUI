@@ -25,42 +25,6 @@ const defaultPortfolioSection = {
         { id: 'port-3', text: 'Logistics & Distribution' }
     ]
 };
-const defaultOnboarding = {
-    title: 'Investor Onboarding Workflow',
-    subtitle: 'A clear, institutional journey from registration to reporting.',
-    steps: [
-        {
-            id: 'step-1',
-            title: 'Step 1 — Investor Registration',
-            description: 'Submit basic investor and organisation information to initiate the relationship.'
-        },
-        {
-            id: 'step-2',
-            title: 'Step 2 — AI Investor Profiling',
-            description: 'We collect investment ticket size, risk tolerance, sector preferences, and geographic focus.'
-        },
-        {
-            id: 'step-3',
-            title: 'Step 3 — Compliance Verification',
-            description: 'Institutional KYC and AML checks to verify identity, source of funds, and regulatory eligibility.'
-        },
-        {
-            id: 'step-4',
-            title: 'Step 4 — Secure Investor Portal',
-            description: 'Approved investors receive access to a secure deal room, curated opportunities, and key reports.'
-        },
-        {
-            id: 'step-5',
-            title: 'Step 5 — Capital Allocation',
-            description: 'Investor selects funds, projects, and investment programmes aligned to their mandate.'
-        },
-        {
-            id: 'step-6',
-            title: 'Step 6 — Portfolio Dashboard',
-            description: 'View capital deployed, performance reports, and institutional updates in one dashboard.'
-        }
-    ]
-};
 const defaultFormSettings = {
     title: 'Investment Profile',
     submitButtonText: 'Submit profile',
@@ -82,7 +46,6 @@ const defaultData = {
     pageHero: defaultPageHero,
     mainContent: defaultMainContent,
     portfolioSection: defaultPortfolioSection,
-    onboarding: defaultOnboarding,
     formSettings: defaultFormSettings,
     fields: defaultFields,
     formStyles: { ...FORM_DEFAULTS, sectionTitle: defaultFormSettings.title, btnLabel: defaultFormSettings.submitButtonText }
@@ -91,8 +54,7 @@ const defaultData = {
 const CONTENT_SECTIONS = [
     { id: 'hero', label: 'Page Hero', icon: LayoutTemplate },
     { id: 'main', label: 'Main Content', icon: FileText },
-    { id: 'portfolio', label: 'Portfolio Section', icon: Briefcase },
-    { id: 'onboarding', label: 'Onboarding Workflow', icon: FileText }
+    { id: 'portfolio', label: 'Portfolio Section', icon: Briefcase }
 ];
 
 const InvestorsManager = () => {
@@ -109,17 +71,11 @@ const InvestorsManager = () => {
                 pageHero: { ...defaultPageHero, ...content.pageHero },
                 mainContent: { ...defaultMainContent, ...content.mainContent },
                 portfolioSection: { ...defaultPortfolioSection, ...content.portfolioSection },
-                onboarding: {
-                    ...defaultOnboarding,
-                    ...(content.onboarding || {}),
-                    steps: Array.isArray(content.onboarding?.steps) && content.onboarding.steps.length
-                        ? content.onboarding.steps
-                        : defaultOnboarding.steps
-                },
                 formSettings: { ...defaultFormSettings, ...content.formSettings },
                 fields: Array.isArray(content.fields) && content.fields.length ? content.fields : defaultFields,
                 formStyles: { ...FORM_DEFAULTS, ...content.formStyles }
             };
+            delete merged.onboarding;
             setFormData(merged);
         }
     }, [content, loading]);
@@ -127,6 +83,7 @@ const InvestorsManager = () => {
     // Sync formSettings from formStyles + fields (for frontend backward compatibility)
     const buildPayload = () => {
         const payload = { ...formData };
+        delete payload.onboarding;
         if (payload.formStyles) {
             payload.formSettings = {
                 ...payload.formSettings,
@@ -366,99 +323,6 @@ const InvestorsManager = () => {
                                 </div>
                             </div>
                         )}
-                        {activeSection === 'onboarding' && (
-                            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm max-w-5xl">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="p-2 bg-white border rounded-lg text-blue-700"><FileText size={20} /></div>
-                                    <div>
-                                        <h2 className="text-lg font-bold text-gray-800">Investor Onboarding Workflow</h2>
-                                        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Step-by-step journey</span>
-                                    </div>
-                                </div>
-                                <div className="space-y-5">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="label">Section Title</label>
-                                            <input
-                                                value={formData.onboarding?.title || ''}
-                                                onChange={e => setFormData(prev => ({
-                                                    ...prev,
-                                                    onboarding: { ...(prev.onboarding || {}), title: e.target.value }
-                                                }))}
-                                                className="input-field font-bold"
-                                                placeholder="Investor Onboarding Workflow"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="label">Section Subtitle</label>
-                                            <textarea
-                                                rows={2}
-                                                value={formData.onboarding?.subtitle || ''}
-                                                onChange={e => setFormData(prev => ({
-                                                    ...prev,
-                                                    onboarding: { ...(prev.onboarding || {}), subtitle: e.target.value }
-                                                }))}
-                                                className="input-field"
-                                                placeholder="Short description of the journey for investors."
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-4 text-xs text-gray-600">
-                                        Use this section to show institutional investors exactly what happens from registration to ongoing reporting.
-                                        The six default steps are based on your workflow, but you can edit titles and descriptions.
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                                        {(formData.onboarding?.steps || defaultOnboarding.steps).map((step, idx) => (
-                                            <div
-                                                key={step.id}
-                                                className="border border-gray-200 rounded-lg p-3 bg-white shadow-sm flex flex-col gap-2"
-                                            >
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
-                                                        Step {idx + 1}
-                                                    </span>
-                                                </div>
-                                                <input
-                                                    value={step.title}
-                                                    onChange={e => {
-                                                        const value = e.target.value;
-                                                        setFormData(prev => ({
-                                                            ...prev,
-                                                            onboarding: {
-                                                                ...(prev.onboarding || {}),
-                                                                steps: (prev.onboarding?.steps || defaultOnboarding.steps).map(s =>
-                                                                    s.id === step.id ? { ...s, title: value } : s
-                                                                )
-                                                            }
-                                                        }));
-                                                    }}
-                                                    className="input-field text-sm font-semibold"
-                                                />
-                                                <textarea
-                                                    rows={3}
-                                                    value={step.description || ''}
-                                                    onChange={e => {
-                                                        const value = e.target.value;
-                                                        setFormData(prev => ({
-                                                            ...prev,
-                                                            onboarding: {
-                                                                ...(prev.onboarding || {}),
-                                                                steps: (prev.onboarding?.steps || defaultOnboarding.steps).map(s =>
-                                                                    s.id === step.id ? { ...s, description: value } : s
-                                                                )
-                                                            }
-                                                        }));
-                                                    }}
-                                                    className="input-field text-xs"
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </>
             )}
@@ -467,7 +331,7 @@ const InvestorsManager = () => {
             {activeTab === 'form' && (
                 <div className="flex-1 min-h-0 overflow-y-auto bg-gray-50/50 px-4 py-5 space-y-6">
                     <div className="glass-card p-6 max-w-4xl">
-                        <h3 className="text-lg font-bold text-[var(--accent-primary)] mb-2">Inquiry Form Fields</h3>
+                        <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">Inquiry Form Fields</h3>
                         <p className="text-sm text-[var(--text-secondary)] mb-4">Configure the fields shown on the Investors inquiry form. Use the &quot;Nature of Interest&quot; select options for the dropdown (synced to the live page).</p>
                         <FormBuilder fields={formData.fields || []} onChange={newFields => setFormData(prev => ({ ...prev, fields: newFields }))} />
                     </div>

@@ -22,42 +22,6 @@ const Investors = () => {
             headline: 'The Institutional Advantage',
             description: 'Instrak Venture Capital Berhad offers qualified investors access to a curated portfolio of high-growth industrial assets in the ASEAN region. Our approach is defined by rigorous due diligence and institutional-grade governance.'
         },
-        onboarding: {
-            title: 'Investor Onboarding Workflow',
-            subtitle: 'A clear, institutional journey from registration to reporting.',
-            steps: [
-                {
-                    id: 'step-1',
-                    title: 'Step 1 — Investor Registration',
-                    description: 'Submit basic investor and organisation information to initiate the relationship.'
-                },
-                {
-                    id: 'step-2',
-                    title: 'Step 2 — AI Investor Profiling',
-                    description: 'We collect investment ticket size, risk tolerance, sector preferences, and geographic focus.'
-                },
-                {
-                    id: 'step-3',
-                    title: 'Step 3 — Compliance Verification',
-                    description: 'Institutional KYC and AML checks to verify identity, source of funds, and regulatory eligibility.'
-                },
-                {
-                    id: 'step-4',
-                    title: 'Step 4 — Secure Investor Portal',
-                    description: 'Approved investors receive access to a secure deal room, curated opportunities, and key reports.'
-                },
-                {
-                    id: 'step-5',
-                    title: 'Step 5 — Capital Allocation',
-                    description: 'Investor selects funds, projects, and investment programmes aligned to their mandate.'
-                },
-                {
-                    id: 'step-6',
-                    title: 'Step 6 — Portfolio Dashboard',
-                    description: 'View capital deployed, performance reports, and institutional updates in one dashboard.'
-                }
-            ]
-        },
         portfolioSection: {
             title: 'Institutional Portfolio',
             items: [
@@ -129,7 +93,6 @@ const Investors = () => {
     // Use loaded content or defaults
     const pageHero = content?.pageHero || defaultContent.pageHero;
     const mainContent = content?.mainContent || defaultContent.mainContent;
-    const onboarding = content?.onboarding || defaultContent.onboarding;
     const portfolioSection = content?.portfolioSection || defaultContent.portfolioSection;
     const formSettings = content?.formSettings || defaultContent.formSettings;
     const normalizedFormTitle = normalizeLegacyFormSectionTitle(formSettings.title);
@@ -246,89 +209,6 @@ const Investors = () => {
                         </ProtectedFormSection>
                     </div>
                 </div>
-
-                {onboarding && Array.isArray(onboarding.steps) && onboarding.steps.length > 0 && (
-                    <div style={{ marginTop: '4rem' }}>
-                        <h3 style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>{onboarding.title}</h3>
-                        {onboarding.subtitle && (
-                            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.7', maxWidth: '720px' }}>
-                                {onboarding.subtitle}
-                            </p>
-                        )}
-                        <div
-                            style={{
-                                marginTop: '2rem',
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                                gap: '1.5rem'
-                            }}
-                        >
-                            {onboarding.steps.map((step, idx) => (
-                                <div
-                                    key={step.id || idx}
-                                    className="glass-card"
-                                    style={
-                                        isLight
-                                            ? {
-                                                  padding: '1.5rem',
-                                                  borderRadius: '1rem',
-                                                  border: '1px solid rgba(15,23,42,0.1)',
-                                                  background: '#ffffff',
-                                                  boxShadow: '0 4px 20px rgba(15,23,42,0.06)',
-                                              }
-                                            : {
-                                                  padding: '1.5rem',
-                                                  borderRadius: '1rem',
-                                                  border: '1px solid rgba(148,163,184,0.35)',
-                                                  background: 'linear-gradient(135deg, rgba(15,23,42,0.96), rgba(15,23,42,0.88))',
-                                                  boxShadow: '0 10px 30px rgba(15,23,42,0.55)',
-                                              }
-                                    }
-                                >
-                                    <div
-                                        style={{
-                                            width: '32px',
-                                            height: '32px',
-                                            borderRadius: '999px',
-                                            background: isLight ? 'rgba(184, 134, 11, 0.12)' : 'rgba(248, 250, 252, 0.06)',
-                                            border: isLight ? '1px solid rgba(184, 134, 11, 0.45)' : '1px solid rgba(250, 204, 21, 0.7)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            color: isLight ? '#B8860B' : '#facc15',
-                                            fontSize: '0.8rem',
-                                            fontWeight: 700,
-                                            marginBottom: '0.75rem',
-                                        }}
-                                    >
-                                        {idx + 1}
-                                    </div>
-                                    <h4
-                                        style={{
-                                            fontSize: '1rem',
-                                            fontWeight: 600,
-                                            color: isLight ? '#0f172a' : '#e5e7eb',
-                                            marginBottom: '0.5rem',
-                                        }}
-                                    >
-                                        {step.title}
-                                    </h4>
-                                    {step.description && (
-                                        <p
-                                            style={{
-                                                fontSize: '0.9rem',
-                                                color: isLight ? '#64748b' : '#9ca3af',
-                                                lineHeight: '1.6',
-                                            }}
-                                        >
-                                            {step.description}
-                                        </p>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
             </div>
         </div>
     );

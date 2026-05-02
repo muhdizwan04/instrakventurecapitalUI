@@ -571,7 +571,7 @@ const ServiceContentManager = ({ embedded = false } = {}) => {
             <div className={embedded ? 'p-6' : 'max-w-6xl mx-auto p-6'}>
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-3xl font-heading text-[var(--accent-primary)] mb-2">Service Pages Manager</h1>
+                        <h1 className="text-3xl font-heading text-[var(--text-primary)] mb-2">Service Pages Manager</h1>
                         <p className="text-[var(--text-secondary)]">Manage content and inquiry forms for each service detail page.</p>
                     </div>
                 </div>
@@ -616,7 +616,7 @@ const ServiceContentManager = ({ embedded = false } = {}) => {
                 <div className="flex items-center gap-4">
                     <button onClick={() => setActiveService(null)} className="p-2 text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-gray-100 rounded-lg transition-all"><ArrowLeft size={20} /></button>
                     <div>
-                        <h1 className="text-2xl font-bold text-[var(--accent-primary)]">{service.title}</h1>
+                        <h1 className="text-2xl font-bold text-[var(--text-primary)]">{service.title}</h1>
                         <p className="text-sm text-[var(--text-secondary)]">Manage page content sections and inquiry form</p>
                     </div>
                 </div>

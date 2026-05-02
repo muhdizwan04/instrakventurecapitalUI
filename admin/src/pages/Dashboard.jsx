@@ -100,7 +100,7 @@ const Dashboard = () => {
     if (loading) {
         return (
             <div className="flex items-center justify-center h-96">
-                <Loader2 className="animate-spin text-[#0A3D62]" size={40} />
+                <Loader2 className="animate-spin text-[var(--accent-primary)]" size={40} />
             </div>
         );
     }
@@ -110,7 +110,7 @@ const Dashboard = () => {
             {/* Header */}
             <div className="flex justify-between items-center shrink-0">
                 <div>
-                    <h1 className="text-xl font-bold text-[#1A365D] font-heading">Dashboard</h1>
+                    <h1 className="text-xl font-bold text-[var(--text-primary)] font-heading">Dashboard</h1>
                     <p className="text-xs text-[var(--text-secondary)]">Welcome back! Here's your overview.</p>
                 </div>
                 <div className="flex gap-2">
@@ -191,7 +191,7 @@ const Dashboard = () => {
                 {/* Recent Inquiries */}
                 <div className="col-span-2 glass-card flex flex-col overflow-hidden p-0">
                     <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100 shrink-0">
-                        <h3 className="font-semibold text-[#1A365D] text-sm font-heading">Recent Inquiries</h3>
+                        <h3 className="font-semibold text-[var(--text-primary)] text-sm font-heading">Recent Inquiries</h3>
                         <Link to="/inquiries" className="text-xs text-[var(--accent-primary)] hover:underline flex items-center gap-1">
                             View all <ArrowRight size={12} />
                         </Link>
@@ -231,7 +231,7 @@ const Dashboard = () => {
                 <div className="space-y-4 flex flex-col overflow-hidden">
                     {/* Inquiry Types Breakdown */}
                     <div className="glass-card p-4 shrink-0">
-                        <h3 className="font-semibold text-[#1A365D] mb-3 text-sm font-heading">Inquiries by Type</h3>
+                        <h3 className="font-semibold text-[var(--text-primary)] mb-3 text-sm font-heading">Inquiries by Type</h3>
                         <div className="space-y-2">
                             {inquiryTypes.length === 0 ? (
                                 <p className="text-xs text-gray-400 text-center py-2">No data yet</p>
@@ -256,7 +256,7 @@ const Dashboard = () => {
 
                     {/* Quick Links */}
                     <div className="glass-card p-4 flex-1">
-                        <h3 className="font-semibold text-[#1A365D] mb-3 text-sm font-heading">Quick Links</h3>
+                        <h3 className="font-semibold text-[var(--text-primary)] mb-3 text-sm font-heading">Quick Links</h3>
                         <div className="grid grid-cols-2 gap-2">
                             {quickLinks.map(link => (
                                 <Link

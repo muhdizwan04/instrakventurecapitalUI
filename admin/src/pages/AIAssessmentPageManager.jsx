@@ -418,7 +418,7 @@ const AIAssessmentPageManager = () => {
         <div className="space-y-6">
             <div className="flex items-center justify-between gap-4 mb-2">
                 <div>
-                    <h1 className="text-2xl font-heading text-[var(--accent-primary)] flex items-center gap-2">
+                    <h1 className="text-2xl font-heading text-[var(--text-primary)] flex items-center gap-2">
                         <LayoutTemplate size={22} /> AI Capital Assessment
                     </h1>
                     <p className="text-sm text-gray-500">
@@ -1088,7 +1088,7 @@ const AIAssessmentPageManager = () => {
                                                         ) : (
                                                             <ChevronRight size={18} className="text-gray-500 shrink-0" />
                                                         )}
-                                                        <span className="font-semibold text-[var(--accent-primary)] flex-1">
+                                                        <span className="font-semibold text-[var(--text-primary)] flex-1">
                                                             Step {stepIndex + 1}: {step.title || 'Untitled step'}
                                                         </span>
                                                         <span className="text-[11px] text-gray-400">

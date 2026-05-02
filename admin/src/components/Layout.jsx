@@ -40,10 +40,10 @@ const SidebarItem = ({ icon: Icon, label, path }) => {
             to={path}
             className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group w-full box-border whitespace-nowrap overflow-hidden ${active
                 ? 'bg-gradient-to-r from-[#0A3D62] to-[#1A365D] text-white shadow-md'
-                : 'hover:bg-[#F8F9FC] dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 hover:text-[#1A365D] dark:hover:text-gray-100'
+                : 'hover:bg-[#F8F9FC] dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 hover:text-[var(--accent-primary)] dark:hover:text-white'
                 }`}
         >
-            <Icon size={18} className={active ? 'text-white' : 'text-gray-500 dark:text-gray-400 group-hover:text-[#1A365D] dark:group-hover:text-gray-100'} />
+            <Icon size={18} className={active ? 'text-white' : 'text-gray-500 dark:text-gray-400 group-hover:text-[var(--accent-primary)] dark:group-hover:text-white'} />
             <span className="font-medium text-sm">
                 {label}
             </span>
@@ -149,7 +149,7 @@ const Layout = () => {
                 <div className="h-1 w-full bg-gradient-to-r from-[#0A3D62] via-[#1A365D] to-[#C9A227]" />
                 {/* Logo */}
                 <div className="p-4 border-b border-gray-100 dark:border-gray-700">
-                    <h1 className="text-lg font-bold text-[#1A365D] dark:text-gray-100 font-heading">Instrak Admin</h1>
+                    <h1 className="text-lg font-bold text-[var(--text-primary)] font-heading">Instrak Admin</h1>
                 </div>
 
                 {/* Navigation */}
@@ -220,7 +220,7 @@ const Layout = () => {
                             href="/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-sm font-medium text-[#1A365D] dark:text-gray-200 hover:text-[#0A3D62] dark:hover:text-white px-3 py-2 rounded-xl hover:bg-[#F8F9FC] dark:hover:bg-gray-700 transition-colors"
+                            className="flex items-center gap-2 text-sm font-medium text-[var(--text-primary)] hover:text-[var(--accent-primary)] dark:hover:text-white px-3 py-2 rounded-xl hover:bg-[#F8F9FC] dark:hover:bg-gray-700 transition-colors"
                         >
                             <ExternalLink size={16} /> View Site
                         </a>

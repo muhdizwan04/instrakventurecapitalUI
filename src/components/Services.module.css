@@ -209,6 +209,10 @@
     color: var(--services-text, #1E293B);
 }
 
+:global([data-theme="light"]) .services::before {
+    background-image: none;
+}
+
 :global([data-theme="light"]) .categoryHeading {
     color: rgba(30, 41, 59, 0.78);
 }

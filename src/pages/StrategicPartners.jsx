@@ -4,6 +4,7 @@ import { Shield, Handshake, Building2, Globe, Award } from 'lucide-react';
 import { usePageContent } from '../hooks/usePageContent';
 import { useTheme } from '../context/ThemeContext';
 import { lightBandAt } from '../theme/lightBands';
+import { BOARD_SECTION_LIGHT_TYPOGRAPHY } from '../theme/clientThemeDefaults';
 
 const StrategicPartners = () => {
     const { theme } = useTheme();
@@ -60,6 +61,8 @@ const StrategicPartners = () => {
     const trustContent = content.trustContent || defaultData.trustContent;
     const customSections = content.customSections || [];
 
+    const sectionHeadingColor = isLight ? BOARD_SECTION_LIGHT_TYPOGRAPHY.title : '#1A365D';
+
     const highlights = [
         { icon: <Shield />, title: 'USD 1 Billion', desc: 'Investment commitment signed with strategic partners' },
         { icon: <Handshake />, title: 'Insurance Coverage', desc: 'Chubb International for fund protection' },
@@ -106,7 +109,7 @@ const StrategicPartners = () => {
             {/* Insurance Partner */}
             <section className={isLight ? `lm-band-${lightBandAt(3)}` : undefined} style={{ padding: '80px 20px', background: isLight ? 'transparent' : '#FFFFFF' }}>
                 <div className="container">
-                    <h2 className="section-title">Insurance Partner</h2>
+                    <h2 className="section-title" style={{ color: sectionHeadingColor }}>Insurance Partner</h2>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                         {partners.map((partner, i) => (
                             <div key={partner.id || i} className="glass-card" style={{ padding: '3rem', textAlign: 'center' }}>
@@ -155,7 +158,7 @@ const StrategicPartners = () => {
             {/* Banking Partners */}
             <section className={isLight ? `lm-band-${lightBandAt(4)}` : undefined} style={{ padding: '80px 20px', background: isLight ? 'transparent' : '#F5F7FA' }}>
                 <div className="container">
-                    <h2 className="section-title">Banking Partners</h2>
+                    <h2 className="section-title" style={{ color: sectionHeadingColor }}>Banking Partners</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', maxWidth: '900px', margin: '0 auto' }}>
                         {banks.map((bank, i) => (
                             <div key={bank.id || i} className="glass-card" style={{ padding: '2rem' }}>

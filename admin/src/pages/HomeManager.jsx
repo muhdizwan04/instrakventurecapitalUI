@@ -371,7 +371,7 @@ const HomeManager = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h1 className="text-3xl font-heading text-[var(--accent-primary)] mb-2">Home Page Manager</h1>
+                    <h1 className="text-3xl font-heading text-[var(--text-primary)] mb-2">Home Page Manager</h1>
                     <p className="text-[var(--text-secondary)]">Manage content for the main landing page. Drag tabs to reorder sections.</p>
                 </div>
                 <div className="flex gap-3">
@@ -770,7 +770,7 @@ const HomeManager = () => {
                                 {/* Institutional Signals */}
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between">
-                                        <h4 className="font-semibold text-[var(--accent-primary)] flex items-center gap-2">
+                                        <h4 className="font-semibold text-[var(--text-primary)] flex items-center gap-2">
                                             <ShieldCheck size={16} />
                                             <span>Institutional Signals</span>
                                         </h4>
@@ -828,7 +828,7 @@ const HomeManager = () => {
                                 {/* Metrics */}
                                 <div className="space-y-3 border-t border-[var(--border-light)] pt-5 mt-4">
                                     <div className="flex items-center justify-between">
-                                        <h4 className="font-semibold text-[var(--accent-primary)] flex items-center gap-2">
+                                        <h4 className="font-semibold text-[var(--text-primary)] flex items-center gap-2">
                                             <Scale size={16} />
                                             <span>Institutional Metrics</span>
                                         </h4>
@@ -902,7 +902,7 @@ const HomeManager = () => {
 
                                 {/* Trust Section Colours & Fonts */}
                                 <div className="border-t border-[var(--border-light)] pt-6 mt-6">
-                                    <h4 className="font-bold text-[var(--accent-primary)] mb-3">Section Colours</h4>
+                                    <h4 className="font-bold text-[var(--text-primary)] mb-3">Section Colours</h4>
                                     <p className="text-sm text-[var(--text-secondary)] mb-4">Solid or gradient. Same pattern as Industries.</p>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         <div className="space-y-2">
@@ -961,7 +961,7 @@ const HomeManager = () => {
                                         </div>
                                     </div>
 
-                                    <h4 className="font-bold text-[var(--accent-primary)] mt-6 mb-3">Font sizes (px)</h4>
+                                    <h4 className="font-bold text-[var(--text-primary)] mt-6 mb-3">Font sizes (px)</h4>
                                     <p className="text-sm text-[var(--text-secondary)] mb-4">Customise title, subtitle, signal pills and metric text.</p>
                                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                                         <div>
@@ -1021,7 +1021,7 @@ const HomeManager = () => {
                                 </div>
 
                                 <div className="border-t border-[var(--border-light)] pt-6 mt-6">
-                                    <h4 className="font-bold text-[var(--accent-primary)] mb-3">Section Colours</h4>
+                                    <h4 className="font-bold text-[var(--text-primary)] mb-3">Section Colours</h4>
                                     <p className="text-sm text-[var(--text-secondary)] mb-4">Solid colour or gradient. Use picker or enter hex/gradient in the field.</p>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         {/* Background */}
@@ -1182,7 +1182,7 @@ const HomeManager = () => {
                                 </Droppable>
 
                                 <div className="border-t border-[var(--border-light)] pt-6 mt-6">
-                                    <h4 className="font-bold text-[var(--accent-primary)] mb-3">Section Colours</h4>
+                                    <h4 className="font-bold text-[var(--text-primary)] mb-3">Section Colours</h4>
                                     <p className="text-sm text-[var(--text-secondary)] mb-4">Solid or gradient. Pick colours or enter hex/gradient.</p>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         {/* Background */}
@@ -1568,7 +1568,7 @@ const HomeManager = () => {
                                                                     <div className="text-center p-2 bg-gray-100 rounded">
                                                                         <button className={`px-4 py-2 text-sm uppercase tracking-wider font-bold transition-all ${block.variant === 'solid'
                                                                             ? 'bg-[#1A365D] text-white'
-                                                                            : 'border border-[#1A365D] text-[#1A365D] bg-transparent'
+                                                                            : 'border border-[var(--accent-primary)] text-[var(--accent-primary)] dark:text-white dark:border-white/40 bg-transparent'
                                                                             }`}>
                                                                             {block.content || 'Button'}
                                                                         </button>

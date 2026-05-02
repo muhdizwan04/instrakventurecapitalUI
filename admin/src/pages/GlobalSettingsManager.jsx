@@ -134,7 +134,7 @@ const GlobalSettingsManager = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-heading text-[var(--accent-primary)] mb-2">Global Settings</h1>
+                    <h1 className="text-3xl font-heading text-[var(--text-primary)] mb-2">Global Settings</h1>
                     <p className="text-[var(--text-secondary)]">Manage site-wide identity, theme, and SEO settings.</p>
                 </div>
                 <button
@@ -167,7 +167,7 @@ const GlobalSettingsManager = () => {
             {/* Site Identity Tab */}
             {activeTab === 'identity' && (
                 <div className="glass-card p-8 animate-in fade-in duration-300">
-                    <h3 className="font-bold text-[var(--accent-primary)] mb-6 text-lg">Site Identity</h3>
+                    <h3 className="font-bold text-[var(--text-primary)] mb-6 text-lg">Site Identity</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                         <div className="space-y-2">
@@ -200,7 +200,7 @@ const GlobalSettingsManager = () => {
                 <div className="glass-card p-8 animate-in fade-in duration-300">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
                         <div>
-                            <h3 className="font-bold text-[var(--accent-primary)] mb-1 text-lg">Theme Colours</h3>
+                            <h3 className="font-bold text-[var(--text-primary)] mb-1 text-lg">Theme Colours</h3>
                             <p className="text-sm text-[var(--text-muted)]">Applies to the public site. Missing values fall back to built-in Day/Night palettes (see code: <code className="text-xs">src/theme/clientThemeDefaults.js</code>).</p>
                         </div>
                         <button
@@ -251,7 +251,7 @@ const GlobalSettingsManager = () => {
             {/* SEO Tab */}
             {activeTab === 'seo' && (
                 <div className="glass-card p-8 animate-in fade-in duration-300">
-                    <h3 className="font-bold text-[var(--accent-primary)] mb-6 text-lg">SEO Defaults</h3>
+                    <h3 className="font-bold text-[var(--text-primary)] mb-6 text-lg">SEO Defaults</h3>
                     <div className="space-y-6">
                         <div>
                             <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Meta Title Template</label>
@@ -300,7 +300,7 @@ const GlobalSettingsManager = () => {
             {/* Client Theme Mode Tab */}
             {activeTab === 'clientTheme' && (
                 <div className="glass-card p-8 animate-in fade-in duration-300">
-                    <h3 className="font-bold text-[var(--accent-primary)] mb-2 text-lg">Client Dark / Light mode</h3>
+                    <h3 className="font-bold text-[var(--text-primary)] mb-2 text-lg">Client Dark / Light mode</h3>
                     <p className="text-sm text-[var(--text-muted)] mb-8">Visitors can switch between <strong>Dark</strong> (default) and <strong>Light</strong>. Choose the default for first-time visitors. Built-in colour fallbacks are re-published to settings whenever you save a mode here.</p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

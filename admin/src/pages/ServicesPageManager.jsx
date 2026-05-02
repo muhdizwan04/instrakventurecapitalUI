@@ -258,7 +258,7 @@ const ServicesPageManager = () => {
         <div className="space-y-4">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-heading text-[var(--accent-primary)] mb-2">Services Page</h1>
+                    <h1 className="text-3xl font-heading text-[var(--text-primary)] mb-2">Services Page</h1>
                     <p className="text-[var(--text-secondary)]">Full custom: hero, sections order, and each block. Same style as service detail pages. Service cards are in <strong>Services Manager</strong>.</p>
                 </div>
                 <button onClick={handleSave} disabled={saving} className="btn-save">
@@ -271,7 +271,7 @@ const ServicesPageManager = () => {
                 {/* Left: Section list (like service detail) */}
                 <div className="lg:w-72 shrink-0 space-y-2">
                     <div className="glass-card p-4">
-                        <h3 className="text-sm font-bold text-[var(--accent-primary)] uppercase tracking-wider mb-3">Sections</h3>
+                        <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider mb-3">Sections</h3>
                         <button
                             type="button"
                             onClick={() => setSelectedSection('hero')}
@@ -340,7 +340,7 @@ const ServicesPageManager = () => {
                 <div className="flex-1 min-w-0 space-y-6">
                 {selectedSection === 'hero' && (
                 <div className="glass-card p-6">
-                    <h3 className="text-xl font-bold text-[var(--accent-primary)] mb-4 flex items-center gap-2">
+                    <h3 className="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                         <Layout size={20} /> Hero
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -506,7 +506,7 @@ const ServicesPageManager = () => {
                 {selectedSection === 'solutions' && (
                 <>
                 <div className="glass-card p-6">
-                    <h3 className="text-xl font-bold text-[var(--accent-primary)] mb-4 flex items-center gap-2"><Layers size={20} /> Solutions section</h3>
+                    <h3 className="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2"><Layers size={20} /> Solutions section</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="label">Solutions section title</label>
@@ -569,7 +569,7 @@ const ServicesPageManager = () => {
                     </div>
                 </div>
                 <div className="glass-card p-6">
-                    <h3 className="text-xl font-bold text-[var(--accent-primary)] mb-4">Section tiles (solution cards)</h3>
+                    <h3 className="text-xl font-bold text-[var(--text-primary)] mb-4">Section tiles (solution cards)</h3>
                     <p className="text-sm text-[var(--text-secondary)] mb-4">Style the title, description, button and icon on each solution card.</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
@@ -665,7 +665,7 @@ const ServicesPageManager = () => {
 
                 {selectedSection === 'leadMagnet' && (
                 <div className="glass-card p-6">
-                    <h3 className="text-xl font-bold text-[var(--accent-primary)] mb-4">Lead magnet block</h3>
+                    <h3 className="text-xl font-bold text-[var(--text-primary)] mb-4">Lead magnet block</h3>
                     <div className="space-y-4">
                         <div>
                             <label className="label">Title</label>
@@ -730,7 +730,7 @@ const ServicesPageManager = () => {
 
                 {activeCustomSection && (
                 <div className="glass-card p-6">
-                    <h3 className="text-xl font-bold text-[var(--accent-primary)] mb-4 flex items-center gap-2"><FileText size={20} /> Custom section</h3>
+                    <h3 className="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2"><FileText size={20} /> Custom section</h3>
                     <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>

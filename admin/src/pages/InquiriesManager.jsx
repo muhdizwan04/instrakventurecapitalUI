@@ -360,7 +360,7 @@ const InquiriesManager = () => {
                     <div className="absolute right-0 top-0 w-16 h-16 bg-[var(--accent-primary)] opacity-5 rounded-bl-full"></div>
                     <div className="relative z-10">
                         <p className="text-xs font-medium text-[var(--accent-primary)] mb-1">New</p>
-                        <p className="text-2xl font-bold text-[var(--accent-primary)]">{stats.new}</p>
+                        <p className="text-2xl font-bold text-[var(--text-primary)]">{stats.new}</p>
                     </div>
                     <div className="relative z-10 w-10 h-10 bg-[var(--bg-tertiary)] rounded-lg flex items-center justify-center text-[var(--accent-primary)]">
                         <AlertCircle size={20} />
@@ -531,7 +531,7 @@ const InquiriesManager = () => {
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="bg-white rounded-lg p-3 border border-amber-100">
                                                 <p className="text-[10px] text-gray-500 uppercase">Score</p>
-                                                <p className="text-xl font-bold text-[var(--accent-primary)]">
+                                                <p className="text-xl font-bold text-[var(--text-primary)]">
                                                     {selectedInquiry.metadata.assessmentScore ?? '—'} / 100
                                                 </p>
                                             </div>

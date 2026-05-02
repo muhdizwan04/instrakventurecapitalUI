@@ -199,7 +199,7 @@ const NavigationManager = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-heading text-[var(--accent-primary)] mb-2">Navigation Manager</h1>
+                    <h1 className="text-3xl font-heading text-[var(--text-primary)] mb-2">Navigation Manager</h1>
                     <p className="text-[var(--text-secondary)]">Customize the site's main navigation menu and dropdowns.</p>
                 </div>
                 <div className="flex gap-3">
@@ -260,7 +260,7 @@ const NavigationManager = () => {
 
             {/* Navigation Styles */}
             <div className="glass-card p-6">
-                <h3 className="font-bold text-[var(--accent-primary)] mb-4">Navigation Styles</h3>
+                <h3 className="font-bold text-[var(--text-primary)] mb-4">Navigation Styles</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
@@ -390,7 +390,7 @@ const NavigationManager = () => {
 
             {/* Logo Settings */}
             <div className="glass-card p-6 border-l-4 border-l-[var(--accent-secondary)]">
-                <h3 className="font-bold text-[var(--accent-primary)] mb-4">Logo Settings</h3>
+                <h3 className="font-bold text-[var(--text-primary)] mb-4">Logo Settings</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Logo Image URL</label>
@@ -416,7 +416,7 @@ const NavigationManager = () => {
 
             {/* Navigation Items */}
             <div className="glass-card p-6">
-                <h3 className="font-bold text-[var(--accent-primary)] mb-4">Navigation Items</h3>
+                <h3 className="font-bold text-[var(--text-primary)] mb-4">Navigation Items</h3>
                 <DragDropContext onDragEnd={handleDragEnd}>
                     <Droppable droppableId="nav-items" type="NAV_ITEMS">
                         {(provided) => (

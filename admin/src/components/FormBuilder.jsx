@@ -47,7 +47,7 @@ const FormBuilder = ({ fields = [], onChange }) => {
     return (
         <div className="space-y-4">
             <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-[var(--accent-primary)]">Form Configuration</h3>
+                <h3 className="text-lg font-semibold text-[var(--text-primary)]">Form Configuration</h3>
                 <button 
                     type="button" 
                     onClick={addField}

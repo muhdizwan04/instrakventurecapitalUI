@@ -521,7 +521,7 @@ const AIConversationsManager = () => {
             <div className="flex-1 bg-white dark:bg-[#1E293B] rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col min-h-0">
                 {loading ? (
                     <div className="flex-1 flex items-center justify-center">
-                        <Loader2 className="animate-spin text-[#0A3D62]" size={32} />
+                        <Loader2 className="animate-spin text-[var(--accent-primary)]" size={32} />
                     </div>
                 ) : conversations.length === 0 ? (
                     <div className="flex-1 flex flex-col items-center justify-center text-gray-400">

@@ -121,7 +121,7 @@ const PartnersManager = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h1 className="text-3xl font-heading text-[var(--accent-primary)] mb-2">Strategic Partners & Trust</h1>
+                    <h1 className="text-3xl font-heading text-[var(--text-primary)] mb-2">Strategic Partners & Trust</h1>
                     <p className="text-[var(--text-secondary)]">Manage partners, banking relationships, and regulatory content.</p>
                 </div>
                 {loading ? (
@@ -144,11 +144,11 @@ const PartnersManager = () => {
 
                     {/* 0. Page Header Settings */}
                     <div className="glass-card p-6 border-l-4 border-l-purple-600">
-                        <h2 className="text-xl font-bold text-[var(--accent-primary)] flex items-center gap-2 mb-4"><Type size={20} /> Page Header</h2>
+                        <h2 className="text-xl font-bold text-[var(--text-primary)] flex items-center gap-2 mb-4"><Type size={20} /> Page Header</h2>
                         <div className="space-y-4">
                             <div>
                                 <label className="text-xs font-bold text-gray-500 uppercase">Page Title</label>
-                                <input value={pageHeader.title} onChange={e => setPageHeader({ ...pageHeader, title: e.target.value })} className="w-full p-2 border border-purple-100 rounded focus:ring-2 focus:ring-purple-100 outline-none font-bold text-[var(--accent-primary)]" />
+                                <input value={pageHeader.title} onChange={e => setPageHeader({ ...pageHeader, title: e.target.value })} className="w-full p-2 border border-purple-100 rounded focus:ring-2 focus:ring-purple-100 outline-none font-bold text-[var(--text-primary)]" />
                             </div>
                             <div>
                                 <label className="text-xs font-bold text-gray-500 uppercase">Subtitle</label>
@@ -162,7 +162,7 @@ const PartnersManager = () => {
                         {/* 1. Partners Section */}
                         <div className="glass-card p-6 border-l-4 border-l-blue-600">
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold text-[var(--accent-primary)] flex items-center gap-2"><Handshake size={20} /> Strategic Partners</h2>
+                                <h2 className="text-xl font-bold text-[var(--text-primary)] flex items-center gap-2"><Handshake size={20} /> Strategic Partners</h2>
                                 <button onClick={handleAddPartner} className="btn-add px-3 py-1.5 text-xs">
                                     <Plus size={14} /> Add
                                 </button>
@@ -183,7 +183,7 @@ const PartnersManager = () => {
                                                                     </div>
                                                                     <input value={p.logo} onChange={e => handleUpdatePartner(p.id, 'logo', e.target.value)} className="flex-1 text-xs border rounded px-2" placeholder="Logo Image URL" />
                                                                 </div>
-                                                                <input value={p.name} onChange={e => handleUpdatePartner(p.id, 'name', e.target.value)} className="w-full font-bold text-[#1A365D] border-b border-transparent focus:border-blue-300 outline-none pb-1" placeholder="Partner Name" />
+                                                                <input value={p.name} onChange={e => handleUpdatePartner(p.id, 'name', e.target.value)} className="w-full font-bold text-[var(--text-primary)] border-b border-transparent focus:border-blue-300 outline-none pb-1" placeholder="Partner Name" />
                                                                 <input value={p.category} onChange={e => handleUpdatePartner(p.id, 'category', e.target.value)} className="w-full text-xs font-bold text-[#B8860B] uppercase border-b border-transparent focus:border-blue-300 outline-none" placeholder="Category" />
                                                                 <textarea value={p.description} onChange={e => handleUpdatePartner(p.id, 'description', e.target.value)} className="w-full text-sm text-gray-600 border rounded p-2 focus:border-blue-300 outline-none" rows={2} placeholder="Description" />
                                                                 <input value={p.partnership} onChange={e => handleUpdatePartner(p.id, 'partnership', e.target.value)} className="w-full text-xs text-gray-500 italic bg-gray-50 p-2 rounded" placeholder="Partnership Details" />
@@ -203,7 +203,7 @@ const PartnersManager = () => {
                         {/* 2. Banking Section */}
                         <div className="glass-card p-6 border-l-4 border-l-green-600">
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold text-[var(--accent-primary)] flex items-center gap-2"><Building2 size={20} /> Banking Partners</h2>
+                                <h2 className="text-xl font-bold text-[var(--text-primary)] flex items-center gap-2"><Building2 size={20} /> Banking Partners</h2>
                                 <button onClick={handleAddBank} className="btn-add px-3 py-1.5 text-xs">
                                     <Plus size={14} /> Add
                                 </button>
@@ -224,7 +224,7 @@ const PartnersManager = () => {
                                                                     </div>
                                                                     <input value={b.logo} onChange={e => handleUpdateBank(b.id, 'logo', e.target.value)} className="flex-1 text-xs border rounded px-2" placeholder="Logo Image URL" />
                                                                 </div>
-                                                                <input value={b.name} onChange={e => handleUpdateBank(b.id, 'name', e.target.value)} className="w-full font-bold text-[#1A365D] border-b border-transparent focus:border-green-300 outline-none pb-1" placeholder="Bank Name" />
+                                                                <input value={b.name} onChange={e => handleUpdateBank(b.id, 'name', e.target.value)} className="w-full font-bold text-[var(--text-primary)] border-b border-transparent focus:border-green-300 outline-none pb-1" placeholder="Bank Name" />
                                                                 <input value={b.role} onChange={e => handleUpdateBank(b.id, 'role', e.target.value)} className="w-full text-xs font-bold text-gray-500 uppercase" placeholder="Role" />
                                                                 <div className="flex gap-2 text-xs">
                                                                     <input value={b.branch || b.location || ''} onChange={e => handleUpdateBank(b.id, 'branch', e.target.value)} className="flex-1 border rounded px-2 py-1" placeholder="Branch / Location" />
@@ -245,11 +245,11 @@ const PartnersManager = () => {
 
                         {/* 3. Governance Section */}
                         <div className="glass-card p-6 border-l-4 border-l-amber-500">
-                            <h2 className="text-xl font-bold text-[var(--accent-primary)] flex items-center gap-2 mb-4"><Shield size={20} /> Governance Content</h2>
+                            <h2 className="text-xl font-bold text-[var(--text-primary)] flex items-center gap-2 mb-4"><Shield size={20} /> Governance Content</h2>
                             <div className="space-y-4">
                                 <div>
                                     <label className="text-xs font-bold text-gray-500 uppercase">Title</label>
-                                    <input value={trustContent.title} onChange={e => handleUpdateTrust('title', e.target.value)} className="w-full p-2 border border-blue-100 rounded focus:ring-2 focus:ring-blue-100 outline-none font-bold text-[#1A365D]" />
+                                    <input value={trustContent.title} onChange={e => handleUpdateTrust('title', e.target.value)} className="w-full p-2 border border-blue-100 rounded focus:ring-2 focus:ring-blue-100 outline-none font-bold text-[var(--text-primary)]" />
                                 </div>
                                 <div>
                                     <label className="text-xs font-bold text-gray-500 uppercase">Description</label>
@@ -258,7 +258,7 @@ const PartnersManager = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-4">
                                     {trustContent.regulators.map(reg => (
                                         <div key={reg.id} className="p-3 bg-amber-50 rounded border border-amber-100">
-                                            <input value={reg.title} onChange={e => handleUpdateRegulator(reg.id, 'title', e.target.value)} className="w-full bg-transparent text-sm font-bold text-[#1A365D] mb-1" />
+                                            <input value={reg.title} onChange={e => handleUpdateRegulator(reg.id, 'title', e.target.value)} className="w-full bg-transparent text-sm font-bold text-[var(--text-primary)] mb-1" />
                                             <input value={reg.subtitle} onChange={e => handleUpdateRegulator(reg.id, 'subtitle', e.target.value)} className="w-full bg-transparent text-xs text-gray-600" />
                                         </div>
                                     ))}
@@ -269,7 +269,7 @@ const PartnersManager = () => {
                         {/* 4. Custom Sections (Dynamic) */}
                         <div className="glass-card p-6 border-l-4 border-l-gray-600">
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold text-[var(--accent-primary)] flex items-center gap-2"><LayoutTemplate size={20} /> Custom Sections (Bottom)</h2>
+                                <h2 className="text-xl font-bold text-[var(--text-primary)] flex items-center gap-2"><LayoutTemplate size={20} /> Custom Sections (Bottom)</h2>
                                 <button onClick={handleAddCustomSection} className="btn-add px-3 py-1.5 text-xs">
                                     <Plus size={14} /> Add Title Section
                                 </button>
@@ -315,13 +315,13 @@ const PartnersManager = () => {
 
                             {/* Hero Mock */}
                             <div className="bg-[#F5F7FA] py-12 px-6 text-center mb-8 border-b-4 border-[#B8860B]">
-                                <h1 className="text-3xl font-bold mb-2 text-[#1A365D]">{pageHeader.title}</h1>
+                                <h1 className="text-3xl font-bold mb-2 text-[var(--text-primary)]">{pageHeader.title}</h1>
                                 <p className="text-gray-600 text-sm">{pageHeader.subtitle}</p>
                             </div>
 
                             {/* Partners Preview */}
                             <div className="px-8 pb-12">
-                                <h2 className="text-xl font-bold text-[#1A365D] text-center mb-8 border-b pb-4">Insurance Partner</h2>
+                                <h2 className="text-xl font-bold text-[var(--text-primary)] text-center mb-8 border-b pb-4">Insurance Partner</h2>
                                 <div className="space-y-8">
                                     {partners.map(p => (
                                         <div key={p.id} className="text-center max-w-lg mx-auto">
@@ -330,7 +330,7 @@ const PartnersManager = () => {
                                             ) : (
                                                 <div className="w-20 h-20 bg-gradient-to-br from-[#1A365D] to-[#2D5A8B] rounded-full mx-auto mb-4 flex items-center justify-center text-white font-bold text-xs p-2 shadow-lg">LOGO</div>
                                             )}
-                                            <h3 className="text-2xl font-bold text-[#1A365D] mb-2">{p.name}</h3>
+                                            <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-2">{p.name}</h3>
                                             <p className="text-[#B8860B] font-bold text-xs uppercase tracking-widest mb-4">{p.category}</p>
                                             <p className="text-gray-600 text-sm leading-relaxed mb-4">{p.description}</p>
                                             <div className="bg-gray-50 border-l-4 border-[#B8860B] p-3 text-xs text-gray-500 italic">
@@ -343,7 +343,7 @@ const PartnersManager = () => {
 
                             {/* Banking Preview */}
                             <div className="bg-[#F5F7FA] py-12 px-8">
-                                <h2 className="text-xl font-bold text-[#1A365D] text-center mb-8">Banking Partners</h2>
+                                <h2 className="text-xl font-bold text-[var(--text-primary)] text-center mb-8">Banking Partners</h2>
                                 <div className="grid grid-cols-1 gap-4 max-w-lg mx-auto">
                                     {banks.map((b, i) => (
                                         <div key={b.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 relative overflow-hidden">
@@ -351,7 +351,7 @@ const PartnersManager = () => {
                                             <div className="flex items-start gap-4">
                                                 {b.logo && <img src={b.logo} alt={b.name} className="w-12 h-12 object-contain" />}
                                                 <div>
-                                                    <h3 className="text-lg font-bold text-[#1A365D]">{b.name}</h3>
+                                                    <h3 className="text-lg font-bold text-[var(--text-primary)]">{b.name}</h3>
                                                     <p className="text-[#B8860B] font-bold text-xs mb-2">{b.role}</p>
                                                     <div className="text-xs text-gray-500 space-y-1">
                                                         {b.branch && <p>Branch: {b.branch}</p>}
@@ -367,12 +367,12 @@ const PartnersManager = () => {
 
                             {/* Governance Preview */}
                             <div className="py-12 px-8 text-center bg-white">
-                                <h2 className="text-2xl font-bold text-[#1A365D] mb-4">{trustContent.title}</h2>
+                                <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-4">{trustContent.title}</h2>
                                 <p className="text-gray-600 text-sm max-w-lg mx-auto mb-8">{trustContent.description}</p>
                                 <div className="grid grid-cols-3 gap-2 text-xs">
                                     {trustContent.regulators.map(r => (
                                         <div key={r.id} className="bg-gray-50 p-3 rounded">
-                                            <div className="font-bold text-[#1A365D] mb-1">{r.title}</div>
+                                            <div className="font-bold text-[var(--text-primary)] mb-1">{r.title}</div>
                                             <div className="text-gray-500 text-[10px]">{r.subtitle}</div>
                                         </div>
                                     ))}
@@ -384,7 +384,7 @@ const PartnersManager = () => {
                                 <div className="py-12 px-8 bg-gray-50 border-t border-gray-200">
                                     {customSections.map(sec => (
                                         <div key={sec.id} className="max-w-2xl mx-auto mb-12 last:mb-0 text-center">
-                                            <h2 className="text-2xl font-bold text-[#1A365D] mb-4">{sec.title}</h2>
+                                            <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-4">{sec.title}</h2>
                                             <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">{sec.content}</p>
                                         </div>
                                     ))}

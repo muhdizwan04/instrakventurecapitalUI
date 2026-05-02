@@ -64,6 +64,8 @@ export const useContent = (contentId, defaultContent = {}, options = {}) => {
     const [content, setContent] = useState(hasFreshCache ? cached.data : defaultContent);
     const [loading, setLoading] = useState(!forceDefaults && !hasFreshCache);
     const [saving, setSaving] = useState(false);
+    const [revisions, setRevisions] = useState([]);
+    const [revisionsLoading, setRevisionsLoading] = useState(false);
     const fetchedRef = useRef(false);
     const isMountedRef = useRef(true);
     const timeoutIdRef = useRef(null);
@@ -130,7 +132,7 @@ export const useContent = (contentId, defaultContent = {}, options = {}) => {
     };
 
     const saveContent = async (newContent = content, options = {}) => {
-        const { silent = false } = options;
+        const { silent = false, successToast = null } = options;
         
         if (saving) {
             return false;
@@ -193,7 +195,7 @@ export const useContent = (contentId, defaultContent = {}, options = {}) => {
             if (isMountedRef.current) {
                 setContent(newContent);
                 contentCache.set(contentId, { data: newContent, timestamp: Date.now() });
-                if (!silent) toast.success('Changes saved successfully!');
+                if (!silent) toast.success(successToast ?? 'Changes saved successfully!');
             }
             return true;
         } catch (err) {
@@ -230,6 +232,67 @@ export const useContent = (contentId, defaultContent = {}, options = {}) => {
         setContent(prev => ({ ...prev, [key]: value }));
     };
 
+    const loadRevisions = async (limit = 30) => {
+        if (forceDefaults) return;
+        setRevisionsLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('site_content_revisions')
+                .select('id, created_at, previous_updated_at')
+                .eq('content_id', contentId)
+                .order('created_at', { ascending: false })
+                .limit(limit);
+
+            if (error) throw error;
+            if (isMountedRef.current) {
+                setRevisions(Array.isArray(data) ? data : []);
+            }
+        } catch (err) {
+            console.error('Error loading content revisions:', err);
+            if (isMountedRef.current) {
+                setRevisions([]);
+            }
+            const msg = (err.message || '').toLowerCase();
+            const missingTable =
+                (msg.includes('relation') && msg.includes('does not exist')) ||
+                (msg.includes('site_content_revisions') &&
+                    (msg.includes('schema cache') || msg.includes('could not find')));
+            if (missingTable) {
+                toast.error('Revision history is not set up yet. Run scripts/site-content-revisions.sql in Supabase.');
+            } else if (!isNetworkError(err)) {
+                toast.error('Could not load version history.');
+            }
+        } finally {
+            if (isMountedRef.current) {
+                setRevisionsLoading(false);
+            }
+        }
+    };
+
+    const restoreRevision = async (revisionId) => {
+        if (!revisionId || saving) return false;
+        try {
+            const { data: rev, error } = await supabase
+                .from('site_content_revisions')
+                .select('content_id, content')
+                .eq('id', revisionId)
+                .single();
+
+            if (error) throw error;
+            if (!rev || rev.content_id !== contentId) {
+                toast.error('That version does not belong to this page.');
+                return false;
+            }
+            return saveContent(rev.content, {
+                successToast: 'Previous version restored and published.',
+            });
+        } catch (err) {
+            console.error('Error restoring revision:', err);
+            toast.error('Could not restore that version.');
+            return false;
+        }
+    };
+
     return {
         content,
         setContent,
@@ -238,7 +301,11 @@ export const useContent = (contentId, defaultContent = {}, options = {}) => {
         loading,
         saving,
         saveContent,
-        refetch: fetchContent
+        refetch: fetchContent,
+        revisions,
+        revisionsLoading,
+        loadRevisions,
+        restoreRevision,
     };
 };
 

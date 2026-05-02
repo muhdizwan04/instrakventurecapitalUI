@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Save, Eye, RefreshCw, Info, Plus, Trash2, Layout, Target, Zap, Building2, TrendingUp, Wallet, ShieldCheck, Scale, GripVertical, HelpCircle, Loader2, FileText, RotateCcw, ChevronDown, ChevronUp, Type, AlignLeft, MousePointer, Minus } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import toast from 'react-hot-toast';
@@ -6,6 +6,7 @@ import IconPicker from '../components/IconPicker';
 import ImageUpload from '../components/ImageUpload';
 import * as LucideIcons from 'lucide-react';
 import { useContent } from '../hooks/useContent';
+import { useRegisterContentUndo } from '../hooks/useRegisterContentUndo';
 
 const AVAILABLE_ROUTES = [
     { label: 'Strategic Services', path: '/services' },
@@ -174,11 +175,21 @@ const HomeManager = () => {
     };
 
     // Use Supabase content hook
-    const { content, loading, saving, saveContent } = useContent('home', defaultFormData);
+    const {
+        content,
+        loading,
+        saving,
+        saveContent,
+        revisions,
+        revisionsLoading,
+        loadRevisions,
+        restoreRevision,
+    } = useContent('home', defaultFormData);
     const [formData, setFormData] = useState(defaultFormData);
 
     // Load content from Supabase when available
     const [isInitialized, setIsInitialized] = useState(false);
+    const revisionsPrimed = useRef(false);
 
     // Load content from Supabase when available
     useEffect(() => {
@@ -187,6 +198,27 @@ const HomeManager = () => {
             setIsInitialized(true);
         }
     }, [content, loading, isInitialized]);
+
+    useEffect(() => {
+        if (!loading && !revisionsPrimed.current) {
+            revisionsPrimed.current = true;
+            loadRevisions();
+        }
+    }, [loading]);
+
+    useRegisterContentUndo({
+        shouldOffer: revisions.length > 0,
+        busy: saving || revisionsLoading,
+        executeUndo: async () => {
+            const latest = revisions[0];
+            if (!latest) return;
+            const ok = await restoreRevision(latest.id);
+            if (ok) {
+                await loadRevisions();
+                setIsInitialized(false);
+            }
+        },
+    });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -330,7 +362,8 @@ const HomeManager = () => {
 
     const handleSave = async (e) => {
         e.preventDefault();
-        await saveContent(formData);
+        const ok = await saveContent(formData);
+        if (ok) await loadRevisions();
     };
 
     // Tab configuration

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Save, Palette, Globe, Image as ImageIcon, Settings, Loader2, Monitor, Sun, Moon, RotateCcw, Sparkles } from 'lucide-react';
-import toast from 'react-hot-toast';
 import { useContent } from '../hooks/useContent';
+import { useRegisterContentUndo } from '../hooks/useRegisterContentUndo';
 import ImageUpload from '../components/ImageUpload';
 import {
     CANONICAL_GLOBAL_THEME_COLORS,
@@ -27,8 +27,26 @@ const GlobalSettingsManager = () => {
         },
     };
 
-    const { content, loading, saving, saveContent } = useContent('global_settings', defaultData);
-    const { content: themeContent, loading: themeLoading, saving: themeSaving, saveContent: saveThemeContent } = useContent('theme_settings', {
+    const {
+        content,
+        loading,
+        saving,
+        saveContent,
+        revisions,
+        revisionsLoading,
+        loadRevisions,
+        restoreRevision,
+    } = useContent('global_settings', defaultData);
+    const {
+        content: themeContent,
+        loading: themeLoading,
+        saving: themeSaving,
+        saveContent: saveThemeContent,
+        revisions: themeRevisions,
+        revisionsLoading: themeRevisionsLoading,
+        loadRevisions: loadThemeRevisions,
+        restoreRevision: restoreThemeRevision,
+    } = useContent('theme_settings', {
         defaultTheme: DEFAULT_CLIENT_THEME_MODE,
         accentFallbacksByMode: CLIENT_BRAND_ACCENTS_BY_MODE,
         canonicalThemeColors: CANONICAL_GLOBAL_THEME_COLORS,
@@ -36,6 +54,8 @@ const GlobalSettingsManager = () => {
     const [formData, setFormData] = useState(defaultData);
     const [clientTheme, setClientTheme] = useState(DEFAULT_CLIENT_THEME_MODE);
     const [activeTab, setActiveTab] = useState('identity');
+    const globalRevisionsPrimed = useRef(false);
+    const themeRevisionsPrimed = useRef(false);
 
     useEffect(() => {
         if (content && !loading) {
@@ -50,6 +70,53 @@ const GlobalSettingsManager = () => {
         }
     }, [themeContent, themeLoading]);
 
+    useEffect(() => {
+        if (!loading && !globalRevisionsPrimed.current) {
+            globalRevisionsPrimed.current = true;
+            loadRevisions();
+        }
+    }, [loading]);
+
+    useEffect(() => {
+        if (!themeLoading && !themeRevisionsPrimed.current) {
+            themeRevisionsPrimed.current = true;
+            loadThemeRevisions();
+        }
+    }, [themeLoading]);
+
+    const undoPick = useMemo(() => {
+        const gRev = revisions[0];
+        const tRev = themeRevisions[0];
+        if (!gRev && !tRev) return null;
+        if (!gRev) {
+            return { rev: tRev, restore: restoreThemeRevision };
+        }
+        if (!tRev) {
+            return { rev: gRev, restore: restoreRevision };
+        }
+        const gTime = new Date(gRev.created_at).getTime();
+        const tTime = new Date(tRev.created_at).getTime();
+        return gTime >= tTime
+            ? { rev: gRev, restore: restoreRevision }
+            : { rev: tRev, restore: restoreThemeRevision };
+    }, [revisions, themeRevisions, restoreRevision, restoreThemeRevision]);
+
+    const undoPickRef = useRef(undoPick);
+    undoPickRef.current = undoPick;
+
+    useRegisterContentUndo({
+        shouldOffer: Boolean(undoPick),
+        busy: saving || themeSaving || revisionsLoading || themeRevisionsLoading,
+        executeUndo: async () => {
+            const pick = undoPickRef.current;
+            if (!pick) return;
+            const ok = await pick.restore(pick.rev.id);
+            if (ok) {
+                await Promise.all([loadRevisions(), loadThemeRevisions()]);
+            }
+        },
+    });
+
     const handleChange = (section, field, value) => {
         setFormData(prev => ({
             ...prev,
@@ -58,29 +125,34 @@ const GlobalSettingsManager = () => {
     };
 
     const handleSave = async () => {
-        await saveContent(formData);
+        const ok = await saveContent(formData);
+        if (ok) await loadRevisions();
     };
 
     const handleSaveTheme = async (themeValue) => {
         const nextTheme = themeValue === 'light' ? 'light' : DEFAULT_CLIENT_THEME_MODE;
         setClientTheme(nextTheme);
-        await saveThemeContent({
+        const ok = await saveThemeContent({
             ...(themeContent && typeof themeContent === 'object' ? themeContent : {}),
             defaultTheme: nextTheme,
             accentFallbacksByMode: CLIENT_BRAND_ACCENTS_BY_MODE,
             canonicalThemeColors: CANONICAL_GLOBAL_THEME_COLORS,
         });
+        if (ok) await loadThemeRevisions();
     };
 
     const handleResetTheme = async () => {
         setClientTheme(DEFAULT_CLIENT_THEME_MODE);
-        await saveThemeContent({
-            ...(themeContent && typeof themeContent === 'object' ? themeContent : {}),
-            defaultTheme: DEFAULT_CLIENT_THEME_MODE,
-            accentFallbacksByMode: CLIENT_BRAND_ACCENTS_BY_MODE,
-            canonicalThemeColors: CANONICAL_GLOBAL_THEME_COLORS,
-        });
-        toast.success('Client default set to Dark mode (default)');
+        const ok = await saveThemeContent(
+            {
+                ...(themeContent && typeof themeContent === 'object' ? themeContent : {}),
+                defaultTheme: DEFAULT_CLIENT_THEME_MODE,
+                accentFallbacksByMode: CLIENT_BRAND_ACCENTS_BY_MODE,
+                canonicalThemeColors: CANONICAL_GLOBAL_THEME_COLORS,
+            },
+            { successToast: 'Client default set to Dark mode (default).' },
+        );
+        if (ok) await loadThemeRevisions();
     };
 
     const handleRestoreBrandColors = async () => {
@@ -88,11 +160,14 @@ const GlobalSettingsManager = () => {
             ...prev,
             themeColors: { ...CANONICAL_GLOBAL_THEME_COLORS },
         }));
-        await saveContent({
-            ...formData,
-            themeColors: { ...CANONICAL_GLOBAL_THEME_COLORS },
-        });
-        toast.success('Brand colours restored to built-in defaults (also saved)');
+        const ok = await saveContent(
+            {
+                ...formData,
+                themeColors: { ...CANONICAL_GLOBAL_THEME_COLORS },
+            },
+            { successToast: 'Brand colours restored to built-in defaults (also saved).' },
+        );
+        if (ok) await loadRevisions();
     };
 
     const tabs = [

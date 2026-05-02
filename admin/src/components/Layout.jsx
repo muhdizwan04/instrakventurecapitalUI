@@ -23,11 +23,13 @@ import {
     ExternalLink,
     Sun,
     Moon,
-    Bot
+    Bot,
+    Undo2
 } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { useAdminTheme } from '../context/ThemeContext';
+import { useContentUndo } from '../context/ContentUndoContext';
 import { useContent } from '../hooks/useContent';
 
 // Simple sidebar item
@@ -63,6 +65,7 @@ const Layout = () => {
     const navigate = useNavigate();
     const { logout } = useAuth();
     const { theme, toggleTheme } = useAdminTheme();
+    const { undo } = useContentUndo();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
     // Fetch navigation settings to match order
@@ -207,7 +210,19 @@ const Layout = () => {
                         </button>
                     </div>
 
-                    <div className="flex items-center gap-4 ml-auto">
+                    <div className="flex items-center gap-2 sm:gap-4 ml-auto">
+                        {undo ? (
+                            <button
+                                type="button"
+                                onClick={() => undo.run()}
+                                disabled={undo.busy}
+                                title="Undo last save — restore the previous published version for this page"
+                                className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 rounded-xl border border-gray-200 dark:border-gray-600 text-xs font-medium text-gray-700 dark:text-gray-200 hover:bg-[#F8F9FC] dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <Undo2 size={15} className={undo.busy ? 'animate-pulse' : ''} />
+                                <span className="hidden sm:inline">Undo</span>
+                            </button>
+                        ) : null}
                         <button
                             onClick={toggleTheme}
                             className="flex items-center justify-center w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-600 hover:bg-[#F8F9FC] dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300"

@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AdminThemeProvider } from './context/ThemeContext';
+import { ContentUndoProvider } from './context/ContentUndoContext';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -51,7 +52,9 @@ function AppRoutes() {
         path="/"
         element={
           <ProtectedRoute>
-            <Layout />
+            <ContentUndoProvider>
+              <Layout />
+            </ContentUndoProvider>
           </ProtectedRoute>
         }
       >

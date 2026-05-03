@@ -68,22 +68,22 @@ const WELCOME_MESSAGE = {
 };
 
 const QUICK_ACTIONS = [
-  'What services do you offer?',
-  'I need funding',
-  'Tell me about Virtual CFO',
-  'How to contact you?'
+  'What services fit my business or portfolio?',
+  'I need funding—equity, property, or M&A?',
+  'How does Virtual CFO work?',
+  'Book a call or share contact details'
 ];
 
 const INTENT_ACTIONS = {
   SERVICE_INQUIRY: [
-    'Tell me more about this service',
-    'What are the requirements?',
-    'How do I apply?'
+    'Scope, deliverables, and timeline',
+    'Requirements and eligibility',
+    'How do I start an application?'
   ],
   FUNDING_REQUEST: [
-    'What funding options do you have?',
-    'What is the minimum investment?',
-    'Schedule a consultation'
+    'Compare equity vs real estate vs M&A routes',
+    'Ticket size, structure, and timeline',
+    'Book a funding strategy call'
   ],
   CONTACT_REQUEST: [
     'Send me contact details',
@@ -96,9 +96,9 @@ const INTENT_ACTIONS = {
     'Get started'
   ],
   GENERAL_INFO: [
-    'Tell me about your company',
-    'What is your mission?',
-    'View our services'
+    'Virtual CFO vs business finance consulting?',
+    'Equity, REITs, tokenization, or property financing?',
+    'Browse every service category'
   ]
 };
 

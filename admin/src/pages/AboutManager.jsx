@@ -736,7 +736,7 @@ const AboutManager = () => {
             <div>
                 <div className="flex justify-between items-center mb-3">
                     <span className="text-xs font-bold text-green-700 uppercase tracking-wider">Banking Partners</span>
-                    <button onClick={addBank} className="text-xs text-green-600 bg-green-50 px-3 py-1.5 rounded-lg hover:bg-green-100 font-bold border border-green-100"><Plus size={14} className="inline mr-1" />Add Bank</button>
+                    <button onClick={addBank} className="btn-add px-3 py-1.5 text-xs"><Plus size={14} />Add Bank</button>
                 </div>
                 <Droppable droppableId="banks-list">
                     {(provided) => (
@@ -868,8 +868,8 @@ const AboutManager = () => {
                 <div className="shrink-0 flex items-center justify-between bg-white px-4 py-2 border-b border-gray-100">
                     <h1 className="text-sm font-bold text-gray-700 tracking-wide uppercase">About Page Sections</h1>
                     <div className="flex items-center gap-2">
-                        <button onClick={openAddModal} className="flex items-center gap-1.5 px-3 py-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg border border-blue-200 text-xs font-bold transition-all" title="Add Section"><Plus size={14} /> Add Section</button>
-                        <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-1.5 bg-[#22c55e] text-white rounded-lg hover:bg-[#16a34a] text-xs font-bold disabled:opacity-50 shadow-md transition-all">
+                        <button onClick={openAddModal} className="btn-add px-3 py-1.5 text-xs" title="Add Section"><Plus size={14} /> Add Section</button>
+                        <button onClick={handleSave} disabled={saving} className="btn-save px-4 py-1.5 text-xs">
                             {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                             {saving ? 'Saving...' : 'Save All'}
                         </button>
@@ -1061,7 +1061,7 @@ const AboutManager = () => {
                         {/* Modal Footer */}
                         <div className="flex items-center justify-end gap-3 p-5 border-t border-gray-100">
                             <button onClick={() => setShowAddModal(false)} className="px-5 py-2 text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all">Cancel</button>
-                            <button onClick={confirmAddSection} className="px-6 py-2 bg-[#22c55e] text-white rounded-lg hover:bg-[#16a34a] text-sm font-bold shadow-md transition-all flex items-center gap-2">
+                            <button onClick={confirmAddSection} className="btn-save px-6 py-2 text-sm">
                                 <Plus size={16} /> Add Section
                             </button>
                         </div>

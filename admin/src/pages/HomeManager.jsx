@@ -107,6 +107,7 @@ const HomeManager = () => {
         ],
         // Hero background settings
         heroBackgroundImage: '',
+        heroUseCustomBackground: false,
         heroBgOpacity: 0.25,
         heroOverlayOpacity: 0.92,
         servicesSubtitle: "Comprehensive financial solutions tailored for your growth",
@@ -690,6 +691,7 @@ const HomeManager = () => {
                                             onClick={() => setFormData(prev => ({
                                                 ...prev,
                                                 heroBackgroundImage: '',
+                                                heroUseCustomBackground: false,
                                                 heroBgOpacity: 0.25,
                                                 heroOverlayOpacity: 0.92,
                                                 heroBlocks: defaultFormData.heroBlocks
@@ -702,11 +704,15 @@ const HomeManager = () => {
 
                                     <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
                                         <label className="label font-bold">Background Image</label>
-                                        <p className="text-xs text-gray-400 -mt-2">Upload a custom hero background. Leave empty to use the default KL Skyline.</p>
+                                        <p className="text-xs text-gray-400 -mt-2">Upload a custom hero background. Leave empty to use the default Dubai blue-hour skyline.</p>
                                         <div className="max-w-xs">
                                             <ImageUpload
                                                 value={formData.heroBackgroundImage || ''}
-                                                onChange={(val) => setFormData(prev => ({ ...prev, heroBackgroundImage: val }))}
+                                                onChange={(val) => setFormData(prev => ({
+                                                    ...prev,
+                                                    heroBackgroundImage: val,
+                                                    heroUseCustomBackground: Boolean(val)
+                                                }))}
                                                 aspectRatio="16/9"
                                                 maxSizeMB={2}
                                                 maxWidth={1600}

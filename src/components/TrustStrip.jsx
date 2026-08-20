@@ -4,6 +4,7 @@ import { ShieldCheck, Globe, Scale, ArrowRightLeft } from 'lucide-react';
 import { usePageContent } from '../hooks/usePageContent';
 import { useTheme } from '../context/ThemeContext';
 import { lightBandAt } from '../theme/lightBands';
+import ScrollReveal from './ScrollReveal';
 
 const TrustStrip = ({ lightBandIndex }) => {
     const { theme } = useTheme();
@@ -103,8 +104,10 @@ const TrustStrip = ({ lightBandIndex }) => {
         <section className={`${styles.trustStrip} ${lightBandClass}`.trim()} style={sectionStyle}>
             <div className="container">
                 <div className={styles.inner}>
+                    <ScrollReveal>
                     <div className={styles.headerRow}>
                         <div className={styles.heading} style={{ textAlign }}>
+                            <span className={styles.sectionIndex} aria-hidden="true">02 / Institutional Standard</span>
                             <h2
                                 className="section-title"
                                 style={{ fontSize: `${titleFontSizePx}px`, marginBottom: '0.4rem' }}
@@ -133,6 +136,7 @@ const TrustStrip = ({ lightBandIndex }) => {
                             ))}
                         </div>
                     </div>
+                    </ScrollReveal>
 
                     {metrics.length > 0 && (
                         <div className={styles.metricsRow}>
@@ -140,6 +144,7 @@ const TrustStrip = ({ lightBandIndex }) => {
                                 const Icon = getMetricIcon(index);
                                 return (
                                     <div key={metric.id || metric.label} className={styles.metricCard} style={{ background: boxBg }}>
+                                        <span className={styles.metricNumber}>{String(index + 1).padStart(2, '0')}</span>
                                         <div className={styles.metricIconWrap}>
                                             <Icon size={20} className={styles.metricIcon} />
                                         </div>
@@ -161,4 +166,3 @@ const TrustStrip = ({ lightBandIndex }) => {
 };
 
 export default TrustStrip;
-

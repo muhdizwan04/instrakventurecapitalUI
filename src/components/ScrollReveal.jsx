@@ -1,25 +1,26 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion, useReducedMotion } from 'framer-motion';
 
 const ScrollReveal = ({ children, width = "100%", delay = 0, staggerIndex = 0 }) => {
+    const reduceMotion = useReducedMotion();
     return (
-        <motion.div
+        <Motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
             transition={{
-                duration: 0.8,
-                ease: [0.25, 0.1, 0.25, 1.0], // "Calm/Expensive" easing (similar to easeOutSine but smoother)
+                duration: reduceMotion ? 0.15 : 0.9,
+                ease: [0.22, 1, 0.36, 1],
                 delay: delay + (staggerIndex * 0.1)
             }}
             variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0 }
+                hidden: { opacity: 0, y: reduceMotion ? 0 : 38, filter: reduceMotion ? 'none' : 'blur(7px)', scale: reduceMotion ? 1 : 0.985 },
+                visible: { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }
             }}
             style={{ width }}
         >
             {children}
-        </motion.div>
+        </Motion.div>
     );
 };
 

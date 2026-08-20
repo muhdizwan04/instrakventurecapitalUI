@@ -1,114 +1,218 @@
 .industries {
-    padding: var(--section-padding);
-    background: var(--industries-bg, #0b1120);
-    color: var(--industries-text, #e5e7eb);
     position: relative;
+    overflow: hidden;
+    padding: clamp(6rem, 9vw, 9rem) 20px;
+    color: var(--industries-text, #e5e7eb);
+    background: var(--industries-bg, #07101e);
 }
 
-.industries .section-title {
-    color: inherit;
-}
-
-/* Professional grid pattern */
 .industries::before {
     content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-        linear-gradient(rgba(26, 54, 93, 0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(26, 54, 93, 0.025) 1px, transparent 1px);
-    background-size: 50px 50px;
+    inset: 0;
     pointer-events: none;
+    background:
+        radial-gradient(circle at 16% 70%, rgba(184, 134, 11, 0.1), transparent 29%),
+        radial-gradient(circle at 88% 18%, rgba(14, 78, 129, 0.2), transparent 31%),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.02) 1px, transparent 1px);
+    background-size: auto, auto, 8.5vw 100%;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.5rem;
+.industries > :global(.container) {
     position: relative;
     z-index: 1;
 }
 
+.sectionHeader {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: clamp(4rem, 7vw, 7rem);
+    padding: 2rem 0 2.4rem;
+    border-top: 1px solid rgba(148, 197, 238, 0.24);
+    border-bottom: 1px solid rgba(148, 197, 238, 0.12);
+}
+
+.sectionIndex {
+    flex-shrink: 0;
+    color: #facc15;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.industries :global(.section-title) {
+    display: block;
+    margin: 0;
+    color: inherit;
+    font-family: var(--font-main);
+    font-size: clamp(3rem, 5.3vw, 5.6rem);
+    font-weight: 300;
+    line-height: 0.98;
+    letter-spacing: -0.06em;
+    text-align: right;
+}
+
+.industries :global(.section-title)::after {
+    display: none;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    overflow: hidden;
+    background: rgba(148, 197, 238, 0.16);
+    border: 1px solid rgba(148, 197, 238, 0.16);
+}
+
 .item {
+    position: relative;
+    min-height: 240px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2.25rem 2rem;
-    background: var(--industries-box-bg, rgba(30, 41, 59, 0.6));
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    border-radius: 8px;
-    transition: all 0.3s ease;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 1.8rem;
+    overflow: hidden;
     cursor: default;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    /* Keep all boxes consistent height */
-    min-height: 160px;
+    background: var(--industries-box-bg, rgba(9, 22, 42, 0.96));
+    transition: background 350ms ease, box-shadow 350ms ease;
+}
+
+.item::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(145deg, transparent 38%, rgba(56, 189, 248, 0.1));
+    transform: translateX(-105%);
+    transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.item::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 2px;
+    background: linear-gradient(90deg, #facc15, #38bdf8, transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 430ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .item:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(26, 54, 93, 0.08);
-    border-color: #B8860B;
+    z-index: 2;
+    background: rgba(17, 41, 72, 0.98);
+    box-shadow: 0 26px 54px rgba(0, 0, 0, 0.34);
+}
+
+.item:hover::before,
+.item:hover::after {
+    transform: translateX(0) scaleX(1);
+}
+
+.sectorNumber {
+    position: absolute;
+    top: 1.4rem;
+    right: 1.4rem;
+    color: rgba(148, 197, 238, 0.34);
+    font-size: 0.67rem;
+    letter-spacing: 0.14em;
 }
 
 .iconBox {
-    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.35rem;
+    color: #d4a017;
+    background: linear-gradient(135deg, rgba(250, 204, 21, 0.13), rgba(56, 189, 248, 0.07));
+    border: 1px solid rgba(250, 204, 21, 0.2);
+    transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1), border-color 350ms ease;
+}
+
+.item:hover .iconBox {
+    transform: translateY(-5px);
+    border-color: rgba(250, 204, 21, 0.5);
 }
 
 .icon {
-    width: 36px;
-    height: 36px;
-    color: #B8860B;
+    width: 26px;
+    height: 26px;
+    color: #d4a017;
 }
 
-.item span {
-    font-weight: 500;
+.item > span:last-child {
+    position: relative;
+    z-index: 1;
+    max-width: 15ch;
     color: inherit;
-    text-align: center;
-    /* Keep long labels from changing card size */
-    max-width: 14ch;
-    line-height: 1.2;
-    text-wrap: balance;
-    font-size: clamp(0.85rem, 1.2vw, 1rem);
+    font-family: var(--font-main);
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.025em;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 960px) {
+    .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .industries {
+        padding: 5rem 1.25rem;
+    }
+
+    .sectionHeader {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .industries :global(.section-title) {
+        text-align: left;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
     .item {
-        min-height: 140px;
-        padding: 2rem 1.5rem;
-    }
-    .item span {
-        max-width: 18ch;
+        min-height: 190px;
     }
 }
-
-/* ============================================================
-   INDUSTRIES LIGHT MODE OVERRIDES
-   ============================================================ */
 
 :global([data-theme="light"]) .industries {
-    background: var(--industries-bg, #F8FAFC);
-    color: var(--industries-text, #1E293B);
+    color: var(--industries-text, #0f172a);
+    background: var(--industries-bg, #f6f8fb);
 }
 
 :global([data-theme="light"]) .industries::before {
-    background-image: none;
+    background: radial-gradient(circle at 88% 18%, rgba(26, 54, 93, 0.08), transparent 31%);
+}
+
+:global([data-theme="light"]) .sectionHeader {
+    border-color: rgba(15, 23, 42, 0.1);
+}
+
+:global([data-theme="light"]) .grid {
+    background: rgba(15, 23, 42, 0.1);
+    border-color: rgba(15, 23, 42, 0.1);
 }
 
 :global([data-theme="light"]) .item {
-    background: var(--industries-box-bg, #FFFFFF);
-    border-color: rgba(15, 23, 42, 0.08);
-    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    color: #0f172a;
+    background: #ffffff;
 }
 
 :global([data-theme="light"]) .item:hover {
-    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
-}
-
-:global([data-theme="light"]) .item span {
-    color: #0f172a;
-    font-weight: 600;
+    background: #f8fafc;
+    box-shadow: 0 22px 46px rgba(15, 23, 42, 0.1);
 }

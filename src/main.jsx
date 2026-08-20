@@ -10,6 +10,7 @@ import { AuthProvider } from './context/AuthContext';
 import { LoadingProvider } from './context/LoadingContext';
 import { ThemeProvider } from './context/ThemeContext';
 import './index.css'
+import './styles/EditorialPages.css'
 import App from './App.jsx'
 
 // Create a client

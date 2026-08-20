@@ -90,7 +90,7 @@ body::after {
   height: 100%;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 320 320'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23fff' stop-opacity='0.14'/%3E%3Cstop offset='100%25' stop-opacity='0'/%3E%3C/linearGradient%3E%3ClinearGradient id='b' x1='100%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23000' stop-opacity='0.1'/%3E%3Cstop offset='100%25' stop-opacity='0'/%3E%3C/linearGradient%3E%3ClinearGradient id='c' x1='0%25' y1='100%25' x2='100%25' y2='0%25'%3E%3Cstop offset='0%25' stop-color='%23888' stop-opacity='0.12'/%3E%3Cstop offset='100%25' stop-opacity='0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0 0 L320 0 L320 320 Z' fill='url(%23a)'/%3E%3Cpath d='M0 0 L0 320 L320 320 Z' fill='url(%23b)'/%3E%3Cpath d='M0 0 L320 0 L0 320 Z' fill='url(%23c)'/%3E%3Cline x1='0' y1='80' x2='320' y2='240' stroke='%23fff' stroke-opacity='0.08' stroke-width='1'/%3E%3Cline x1='0' y1='240' x2='320' y2='80' stroke='%23fff' stroke-opacity='0.08' stroke-width='1'/%3E%3Cline x1='160' y1='0' x2='160' y2='320' stroke='%23000' stroke-opacity='0.05'/%3E%3C/svg%3E");
   background-size: 320px 320px;
-  opacity: 0.35;
+  opacity: 0.14;
   pointer-events: none;
   z-index: 1;
 }
@@ -142,7 +142,7 @@ ul {
 .glass-card {
   background: radial-gradient(circle at top left, #020617 0, #020617 35%, #020617 60%, #020617 100%);
   border: 1px solid rgba(148, 163, 184, 0.35);
-  border-radius: 16px;
+  border-radius: 2px;
   padding: 2rem;
   transition: var(--transition-slow);
   position: relative;
@@ -156,9 +156,135 @@ ul {
   right: 0;
   height: 3px;
   background: var(--gradient-gold);
-  border-radius: 16px 16px 0 0;
+  border-radius: 2px 2px 0 0;
   opacity: 0;
   transition: opacity 0.3s ease;
+}
+
+/* Shared editorial system for CMS-driven inner-page sections */
+.universal-section-shell {
+  isolation: isolate;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.universal-section-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), rgba(148, 163, 184, 0.07) 25%, transparent calc(25% + 1px)),
+    linear-gradient(90deg, transparent 0, transparent calc(75% - 1px), rgba(148, 163, 184, 0.07) 75%, transparent calc(75% + 1px)),
+    radial-gradient(circle at 88% 8%, rgba(56, 189, 248, 0.07), transparent 28%),
+    radial-gradient(circle at 12% 92%, rgba(251, 191, 36, 0.055), transparent 25%);
+}
+
+.universal-section-inner {
+  width: 100%;
+}
+
+.universal-section-header {
+  max-width: none !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+  padding: clamp(1.5rem, 3vw, 2.5rem) 0;
+  text-align: left !important;
+  border-top: 1px solid rgba(251, 191, 36, 0.72);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+  position: relative;
+}
+
+.universal-section-header::before {
+  content: "INSTRAK / DUBAI";
+  display: block;
+  margin-bottom: 1rem;
+  color: var(--accent-primary);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+}
+
+.universal-section-title {
+  max-width: 980px;
+  margin-bottom: 0.9rem !important;
+  font-family: var(--font-main) !important;
+  font-size: clamp(2.6rem, 5.4vw, 5.5rem) !important;
+  font-weight: 300 !important;
+  letter-spacing: -0.06em !important;
+  line-height: 0.98 !important;
+  text-wrap: balance;
+}
+
+.universal-section-subtitle {
+  max-width: 720px !important;
+  margin: 0 !important;
+  text-align: left !important;
+  font-size: clamp(0.95rem, 1.3vw, 1.1rem) !important;
+}
+
+.universal-section-accent {
+  width: clamp(100px, 18vw, 220px) !important;
+  height: 1px !important;
+  margin: 1.5rem 0 0 !important;
+  transform-origin: left !important;
+}
+
+.universal-section-shell button,
+.universal-section-shell a {
+  border-radius: 2px !important;
+}
+
+[data-theme="light"] .universal-section-shell {
+  border-top-color: rgba(15, 23, 42, 0.1);
+}
+
+[data-theme="light"] .universal-section-shell::before {
+  background-image:
+    linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), rgba(15, 23, 42, 0.045) 25%, transparent calc(25% + 1px)),
+    linear-gradient(90deg, transparent 0, transparent calc(75% - 1px), rgba(15, 23, 42, 0.045) 75%, transparent calc(75% + 1px)),
+    radial-gradient(circle at 88% 8%, rgba(10, 61, 98, 0.07), transparent 28%),
+    radial-gradient(circle at 12% 92%, rgba(184, 134, 11, 0.06), transparent 25%);
+}
+
+[data-theme="light"] .universal-section-header {
+  border-bottom-color: rgba(15, 23, 42, 0.12);
+}
+
+@media (min-width: 860px) {
+  .universal-section-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
+    column-gap: clamp(2rem, 7vw, 7rem);
+    align-items: end;
+  }
+
+  .universal-section-header::before,
+  .universal-section-header .universal-section-title,
+  .universal-section-header h6 {
+    grid-column: 1;
+  }
+
+  .universal-section-header .universal-section-subtitle {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    align-self: end;
+    padding-bottom: 0.35rem;
+  }
+
+  .universal-section-header .universal-section-accent {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .universal-section-title {
+    font-size: clamp(2.35rem, 12vw, 3.6rem) !important;
+  }
+
+  .universal-section-header::before {
+    margin-bottom: 0.75rem;
+  }
 }
 
 /* Career / Join Us – Apply button box + hover (outline & background set inline) */
@@ -391,17 +517,17 @@ ul {
   background: transparent;
   color: var(--accent-secondary);
   border: 1px solid rgba(148, 163, 184, 0.7);
-  border-radius: 6px;
+  border-radius: 2px;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--transition-fast);
-  letter-spacing: 0.5px;
+  transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1), background 350ms ease, color 350ms ease, box-shadow 350ms ease;
+  letter-spacing: 0.075em;
 }
 
 .btn-primary:hover {
   background: rgba(15, 23, 42, 0.9);
   color: var(--accent-secondary);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
   box-shadow: var(--shadow-md);
 }
 
@@ -410,10 +536,10 @@ ul {
   padding: 0.9rem 2rem;
   background: var(--gradient-gold);
   color: #020617;
-  border-radius: 6px;
+  border-radius: 2px;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--transition-fast);
+  transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 350ms ease, filter 350ms ease;
   border: none;
   letter-spacing: 0.5px;
   position: relative;
@@ -433,8 +559,9 @@ ul {
 }
 
 .btn-solid:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(10, 61, 98, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 34px rgba(2, 6, 23, 0.32);
+  filter: brightness(1.06);
 }
 
 .btn-solid:hover::before {
@@ -447,7 +574,7 @@ ul {
   padding: 0.9rem 2rem;
   background: var(--gradient-gold);
   color: #020617;
-  border-radius: 6px;
+  border-radius: 2px;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition-fast);
@@ -469,11 +596,11 @@ ul {
   background: rgba(15, 23, 42, 0.85);
   color: var(--accent-secondary);
   border: 1px solid rgba(250, 204, 21, 0.6);
-  border-radius: 6px;
+  border-radius: 2px;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--transition-fast);
-  letter-spacing: 0.5px;
+  transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1), background 350ms ease, color 350ms ease, box-shadow 350ms ease;
+  letter-spacing: 0.075em;
   position: relative;
   overflow: hidden;
 }
@@ -492,8 +619,8 @@ ul {
 .btn-outline-gold:hover {
   background: var(--gradient-gold);
   color: #020617;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(184, 134, 11, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 34px rgba(184, 134, 11, 0.25);
 }
 
 .btn-outline-gold:hover::before {

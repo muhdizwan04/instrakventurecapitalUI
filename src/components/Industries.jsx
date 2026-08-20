@@ -4,7 +4,7 @@ import { Fuel, GraduationCap, Car, HardHat, Building, Truck, Factory, Cpu } from
 import { usePageContent } from '../hooks/usePageContent';
 import { useTheme } from '../context/ThemeContext';
 import { lightBandAt } from '../theme/lightBands';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
 
 const ICON_MAP = {
@@ -58,22 +58,26 @@ const Industries = ({ lightBandIndex }) => {
         <section id="industries" className={`${styles.industries} ${lightBandClass}`.trim()} style={sectionStyle}>
             <div className="container">
                 <ScrollReveal>
-                    <h2 className="section-title">Focus Industries</h2>
+                    <div className={styles.sectionHeader}>
+                        <span className={styles.sectionIndex} aria-hidden="true">03 / Sector Focus</span>
+                        <h2 className="section-title">Focus Industries</h2>
+                    </div>
                 </ScrollReveal>
                 <div className={styles.grid}>
                     {industries.map((sector, index) => {
                         const IconComponent = ICON_MAP[sector.icon] || Fuel;
                         return (
                             <ScrollReveal key={index} staggerIndex={index} width="100%">
-                                <motion.div 
+                                <Motion.div
                                     className={styles.item}
-                                    whileHover={{ scale: 1.05, transition: { duration: 0.3 } }}
+                                    whileHover={{ y: -6, transition: { duration: 0.3 } }}
                                 >
+                                    <span className={styles.sectorNumber}>{String(index + 1).padStart(2, '0')}</span>
                                     <div className={styles.iconBox}>
                                         <IconComponent className={styles.icon} />
                                     </div>
                                     <span>{sector.name}</span>
-                                </motion.div>
+                                </Motion.div>
                             </ScrollReveal>
                         );
                     })}
@@ -84,5 +88,3 @@ const Industries = ({ lightBandIndex }) => {
 };
 
 export default Industries;
-
-

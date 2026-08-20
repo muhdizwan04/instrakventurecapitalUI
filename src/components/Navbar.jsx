@@ -6,11 +6,12 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { isLightHexColor } from '../theme/clientThemeDefaults';
 import { User, LogOut, Sun, Moon } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
+    const [isScrolled, setIsScrolled] = useState(false);
     const { user, logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const navRef = useRef(null);
@@ -88,12 +89,6 @@ const Navbar = () => {
         setOpenDropdown((prev) => (prev === id ? null : id));
     };
 
-    // Close dropdown/menu on route change
-    useEffect(() => {
-        setOpenDropdown(null);
-        setMenuOpen(false);
-    }, [location.pathname, location.hash]);
-
     // Close on click outside, Esc key, or scroll
     useEffect(() => {
         const onPointerDown = (e) => {
@@ -121,6 +116,13 @@ const Navbar = () => {
         if (leaveTimerRef.current) clearTimeout(leaveTimerRef.current);
     }, []);
 
+    useEffect(() => {
+        const updateScrolledState = () => setIsScrolled(window.scrollY > 28);
+        updateScrolledState();
+        window.addEventListener('scroll', updateScrolledState, { passive: true });
+        return () => window.removeEventListener('scroll', updateScrolledState);
+    }, []);
+
     // Use loaded data or defaults
     const rawItems = navData?.items || defaultNav.items;
 
@@ -136,9 +138,9 @@ const Navbar = () => {
         if (navStylesConfig.textColor) {
             navStyleVars['--nav-link-color'] = navStylesConfig.textColor;
         }
-        if (navStylesConfig.backgroundType === 'solid' && navStylesConfig.backgroundColor) {
+        if ((isScrolled || location.pathname !== '/') && navStylesConfig.backgroundType === 'solid' && navStylesConfig.backgroundColor) {
             navStyleVars.background = navStylesConfig.backgroundColor;
-        } else if (navStylesConfig.backgroundType !== 'solid' && navStylesConfig.gradientStart != null && navStylesConfig.gradientEnd != null) {
+        } else if ((isScrolled || location.pathname !== '/') && navStylesConfig.backgroundType !== 'solid' && navStylesConfig.gradientStart != null && navStylesConfig.gradientEnd != null) {
             const dir = navStylesConfig.gradientDirection || '90deg';
             navStyleVars.background = `linear-gradient(${dir}, ${navStylesConfig.gradientStart}, ${navStylesConfig.gradientEnd})`;
         }
@@ -164,7 +166,11 @@ const Navbar = () => {
     });
 
     return (
-        <nav ref={navRef} className={styles.nav} style={navStyleVars}>
+        <nav
+            ref={navRef}
+            className={`${styles.nav} ${isScrolled || location.pathname !== '/' ? styles.scrolled : styles.atTop}`}
+            style={navStyleVars}
+        >
             <div className={styles.container}>
                 <Link to="/" className={styles.logo} onClick={closeAll}>
                     {settings?.siteIdentity?.logoUrl ? (
@@ -175,23 +181,23 @@ const Navbar = () => {
                         />
                     ) : (
                         <div className={styles.logoText}>
-                            <motion.span
+                            <Motion.span
                                 className={styles.brand}
                                 initial={{ opacity: 0, letterSpacing: '-0.02em', y: 5 }}
                                 animate={{ opacity: 1, letterSpacing: '0.02em', y: 0 }}
                                 transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1.0] }}
                             >
                                 {settings?.siteIdentity?.siteName || 'Instrak Venture Capital'}
-                            </motion.span>
+                            </Motion.span>
                             {settings?.siteIdentity?.tagline && (
-                                <motion.span
+                                <Motion.span
                                     className={styles.tagline}
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.8, delay: 0.4 }}
                                 >
                                     {settings.siteIdentity.tagline}
-                                </motion.span>
+                                </Motion.span>
                             )}
                         </div>
                     )}
@@ -318,9 +324,15 @@ const Navbar = () => {
                     )}
                 </ul>
 
-                <div className={styles.mobileMenu} onClick={toggleMenu}>
+                <button
+                    type="button"
+                    className={styles.mobileMenu}
+                    onClick={toggleMenu}
+                    aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                    aria-expanded={menuOpen}
+                >
                     <div className={`${styles.hamburger} ${menuOpen ? styles.open : ''}`}></div>
-                </div>
+                </button>
             </div>
         </nav>
     );

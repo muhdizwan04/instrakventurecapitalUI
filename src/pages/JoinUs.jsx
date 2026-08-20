@@ -5,6 +5,7 @@ import { MapPin, Clock, Briefcase, ArrowRight, Mail } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { isDarkHexColor, isLikelyLightTextColor } from '../theme/clientThemeDefaults';
 import { lightBandAt } from '../theme/lightBands';
+import ScrollReveal from '../components/ScrollReveal';
 
 const JoinUs = () => {
     const { theme } = useTheme();
@@ -112,7 +113,7 @@ const JoinUs = () => {
         const buttonOutlineColor = styles.buttonOutlineColor || styles.buttonIconColor || '#B8860B';
         const buttonBgColor = styles.buttonBgColor || 'transparent';
         return (
-            <div key={section.id} className={['container-wrapper', bandCls].filter(Boolean).join(' ')} style={{
+            <div key={section.id} className={['container-wrapper', 'editorial-section', bandCls].filter(Boolean).join(' ')} style={{
                 padding: '80px 20px',
                 backgroundColor: jobsSurfaceBg,
                 backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
@@ -131,12 +132,17 @@ const JoinUs = () => {
                 <div style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto' }}>
                     {jobs.length > 0 ? (
                         <div style={{ marginBottom: '4rem' }}>
-                            <h2 style={{ fontSize: `${titleSizePx}px`, marginBottom: '0.5rem', color: titleColor, textAlign: styles.textAlign || 'center' }}>{section.title || 'Open Positions'}</h2>
-                            <p style={{ color: sublineColor, opacity: isLight ? 1 : 0.8, textAlign: styles.textAlign || 'center', marginBottom: '3rem' }}>Current opportunities at Instrak Venture Capital</p>
+                            <ScrollReveal>
+                                <div className="editorial-section-heading" data-kicker="02 / Current Opportunities">
+                                    <h2 style={{ fontSize: `${titleSizePx}px`, marginBottom: '0.5rem', color: titleColor, textAlign: styles.textAlign || 'center' }}>{section.title || 'Open Positions'}</h2>
+                                    <p style={{ color: sublineColor, opacity: isLight ? 1 : 0.8, textAlign: styles.textAlign || 'center', marginBottom: '3rem' }}>Current opportunities at Instrak Venture Capital</p>
+                                </div>
+                            </ScrollReveal>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem' }}>
+                            <div className="editorial-career-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem' }}>
                                 {jobs.map((job, i) => (
-                                    <div key={i} className="glass-card" style={{ padding: '2rem', borderLeft: `4px solid ${iconColor}`, background: cardBg, border: '1px solid rgba(0,0,0,0.06)', ...glassStyle }}>
+                                    <ScrollReveal key={`${job.title}-${i}`} staggerIndex={i}>
+                                    <div className="glass-card editorial-career-card" style={{ padding: '2rem', borderLeft: `4px solid ${iconColor}`, background: cardBg, border: '1px solid rgba(0,0,0,0.06)', ...glassStyle }}>
                                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
                                             <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: iconColor, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                                                 <Briefcase size={24} color="white" />
@@ -178,12 +184,13 @@ const JoinUs = () => {
                                             </div>
                                         </div>
                                     </div>
+                                    </ScrollReveal>
                                 ))}
                             </div>
                         </div>
                     ) : !loading && (
                         <div style={{ marginBottom: '4rem', textAlign: 'center' }}>
-                            <div className="glass-card" style={{ padding: '3rem', maxWidth: '600px', margin: '0 auto', background: cardBg, border: '1px solid rgba(0,0,0,0.06)', ...glassStyle }}>
+                            <div className="glass-card editorial-career-empty" style={{ padding: '3rem', maxWidth: '600px', margin: '0 auto', background: cardBg, border: '1px solid rgba(0,0,0,0.06)', ...glassStyle }}>
                                 <Briefcase size={48} style={{ color: iconColor, marginBottom: '1rem' }} />
                                 <h3 style={{ color: titleColor, marginBottom: '0.5rem' }}>No Open Positions</h3>
                                 <p style={{ color: cardBodyColor, marginBottom: '1.5rem' }}>
@@ -207,7 +214,7 @@ const JoinUs = () => {
             : (styles.textColor || '#1A365D');
         const introBody = isLight ? '#475569' : (styles.textColor ? styles.textColor : 'var(--text-secondary)');
         return (
-            <div key={section.id} className={bandCls} style={{
+            <div key={section.id} className={['editorial-section', bandCls].filter(Boolean).join(' ')} style={{
                 padding: '80px 20px',
                 backgroundColor: introBg,
                 backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
@@ -224,8 +231,9 @@ const JoinUs = () => {
                     }} />
                 )}
                 <div style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }}>
-                        <div style={{ textAlign: styles.textAlign || 'left' }}>
+                    <ScrollReveal>
+                    <div className="editorial-career-intro" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }}>
+                        <div className="editorial-career-copy" style={{ textAlign: styles.textAlign || 'left' }}>
                             <h2 style={{ fontSize: '2.5rem', marginBottom: '1.5rem', color: introHeading }}>{section.title}</h2>
                             <p style={{ color: introBody, fontSize: '1.1rem', lineHeight: '1.8', marginBottom: '2rem', whiteSpace: 'pre-wrap', opacity: isLight ? 1 : (styles.textColor ? 0.9 : 1) }}>
                                 {section.description}
@@ -262,7 +270,7 @@ const JoinUs = () => {
                             const quoteSurfaceBg = isLight && isGlass ? '#ffffff' : ((styles.rightBoxBgColor != null && styles.rightBoxBgColor !== '') ? boxBg : defaultQuoteBg);
                             return (
                                 <div
-                                    className="glass-card"
+                                    className="glass-card editorial-career-quote"
                                     style={{
                                         minHeight: '300px',
                                         display: 'flex',
@@ -284,6 +292,7 @@ const JoinUs = () => {
                             );
                         })()}
                     </div>
+                    </ScrollReveal>
                 </div>
             </div>
         );
@@ -299,7 +308,7 @@ const JoinUs = () => {
                 : (styles.bgColor || '#FFFFFF'));
         const customInk = resolveSectionInk(styles, '#1e293b');
         return (
-            <section key={section.id} className={bandCls} style={{
+            <section key={section.id} className={['editorial-section', bandCls].filter(Boolean).join(' ')} style={{
                 padding: '80px 20px',
                 backgroundColor: customBg,
                 backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
@@ -343,7 +352,7 @@ const JoinUs = () => {
     };
 
     return (
-        <div className="page-wrapper">
+        <div className="page-wrapper editorial-page editorial-page--career">
             {sections.map((section, idx) => {
                 const RenderFn = renderers[section.type] || renderCustom;
                 return RenderFn(section, idx);

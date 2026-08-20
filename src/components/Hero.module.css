@@ -1,223 +1,396 @@
 .hero {
     position: relative;
-    min-height: 100vh;
+    min-height: min(880px, 88svh);
     display: flex;
     align-items: center;
     overflow: hidden;
+    isolation: isolate;
     padding-top: 80px;
-    background: radial-gradient(circle at top left, #020617 0%, #020617 45%, #000000 100%);
+    background: #02050d;
 }
 
-/* 3D Scene Container - Above background, below content */
-.scene3d {
+.hero::before {
+    content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 5;
+    inset: 0;
+    z-index: 8;
     pointer-events: none;
+    background:
+        linear-gradient(90deg, rgba(56, 189, 248, 0.07) 1px, transparent 1px),
+        linear-gradient(rgba(56, 189, 248, 0.045) 1px, transparent 1px);
+    background-size: 8.5vw 100%, 100% 12vh;
+    mask-image: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0.58) 46%, #000 100%);
+    opacity: 0.18;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 100px;
+    z-index: 18;
+    pointer-events: none;
+    background: linear-gradient(0deg, #07101e 0%, rgba(7, 16, 30, 0.48) 34%, transparent 100%);
 }
 
 .container {
     position: relative;
-    z-index: 20;
-    width: 100%;
+    z-index: 30;
+    width: min(100%, 1600px);
     max-width: none;
-    margin: 0;
-    padding: 2rem 0;
+    margin: 0 auto;
+    padding: 3.5rem 0 4.5rem;
     text-align: left;
+    pointer-events: none;
 }
 
-/* Company name badge */
-.companyBadge {
-    display: inline-block;
-    padding: 0.6rem 1.5rem;
-    background: rgba(15, 23, 42, 0.7);
-    border: 1px solid rgba(148, 163, 184, 0.5);
-    border-radius: 4px;
-    margin-bottom: 2rem;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #e5e7eb;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+.container > div {
+    pointer-events: auto;
 }
 
 .title {
-    font-size: clamp(2.8rem, 7vw, 4.5rem);
-    line-height: 1.1;
-    margin-bottom: 1.5rem;
-    color: #f9fafb;
-    font-weight: 700;
-    letter-spacing: -1px;
-    text-shadow: 0 2px 24px rgba(2, 6, 23, 0.85);
+    width: min(780px, 55vw);
+    font-family: var(--font-main);
+    font-size: clamp(3.2rem, 5.2vw, 6.1rem);
+    line-height: 1.03;
+    margin: 0 0 1.75rem;
+    font-weight: 300;
+    letter-spacing: -0.058em;
+    text-wrap: balance;
+    text-shadow: 0 10px 46px rgba(0, 0, 0, 0.68);
 }
 
-.highlight {
-    color: #facc15;
+.title :global(.block) {
     display: block;
 }
 
-/* Core values tagline */
+.highlight {
+    display: block;
+    color: #facc15;
+    text-shadow: 0 0 34px rgba(250, 204, 21, 0.08), 0 10px 46px rgba(0, 0, 0, 0.72);
+}
+
 .subtitle {
-    font-size: 1.15rem;
-    color: #e5e7eb;
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-    letter-spacing: 2px;
+    width: min(690px, 54vw);
+    margin: 0 0 1.05rem;
+    font-size: clamp(0.86rem, 1.25vw, 1.16rem);
+    line-height: 1.65;
+    letter-spacing: -0.01em;
     font-weight: 500;
-    /* Readable over bright skyline / bloom in the photo */
-    text-shadow:
-        0 0 1px rgba(2, 6, 23, 1),
-        0 1px 3px rgba(0, 0, 0, 0.95),
-        0 0 22px rgba(2, 6, 23, 0.9);
+    text-transform: none;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.95);
 }
 
-.subtitle strong {
-    color: #fde68a;
-}
-
-/* Description paragraph */
 .description {
-    font-size: 1.05rem;
-    color: #9ca3af;
-    max-width: 550px;
-    margin: 0 0 2.5rem 0;
-    line-height: 1.8;
-    text-shadow:
-        0 0 1px rgba(2, 6, 23, 1),
-        0 1px 4px rgba(0, 0, 0, 0.95),
-        0 0 28px rgba(2, 6, 23, 0.92);
+    width: min(620px, 48vw);
+    max-width: 620px;
+    margin: 0 0 1.8rem;
+    font-size: clamp(0.86rem, 1vw, 1rem);
+    line-height: 1.72;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 1);
 }
 
 .cta {
     display: flex;
     justify-content: flex-start;
-    gap: 1.25rem;
+    gap: 0.9rem;
     flex-wrap: wrap;
 }
 
-/* Background layer */
-.background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1;
+.cta a {
+    min-height: 58px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    padding-inline: 1.85rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 350ms ease, filter 350ms ease;
 }
 
-/* KL Skyline background image */
-.bgImage {
+.cta a:hover {
+    transform: translateY(-4px);
+    filter: brightness(1.07);
+    box-shadow: 0 18px 46px rgba(0, 0, 0, 0.4);
+}
+
+.background {
     position: absolute;
+    inset: -5% -2% 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.imageStage {
+    position: absolute;
+    inset: -2%;
+    will-change: transform;
+}
+
+.imageStage::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg, transparent 60.8%, rgba(148, 197, 238, 0.46) 60.88%, rgba(148, 197, 238, 0.46) 60.96%, transparent 61.04%),
+        linear-gradient(90deg, transparent 72.5%, rgba(148, 197, 238, 0.34) 72.58%, rgba(148, 197, 238, 0.34) 72.66%, transparent 72.74%),
+        linear-gradient(90deg, transparent 84.2%, rgba(148, 197, 238, 0.32) 84.28%, rgba(148, 197, 238, 0.32) 84.36%, transparent 84.44%);
+    opacity: 0.8;
+}
+
+.bgImage,
+.imageSlice {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* opacity controlled by inline style from admin settings */
-    filter: contrast(1.05) brightness(0.9) saturate(1.05);
+    object-position: center center;
 }
 
-/* Overlay for better text contrast */
+.bgImage {
+    transform: scale(1.035);
+    filter: contrast(1.03) brightness(0.9) saturate(0.95);
+}
+
+.imageSlice {
+    background-size: cover;
+    background-position: center center;
+    filter: contrast(1.06) brightness(1.02) saturate(1.02);
+    transform: scale(1.035);
+    opacity: 0.96;
+    will-change: transform;
+}
+
+.sliceOne {
+    clip-path: polygon(60.9% 0, 72.55% 0, 72.55% 100%, 60.9% 100%);
+}
+
+.sliceTwo {
+    clip-path: polygon(72.65% 0, 84.25% 0, 84.25% 100%, 72.65% 100%);
+}
+
+.sliceThree {
+    clip-path: polygon(84.35% 0, 100% 0, 100% 100%, 84.35% 100%);
+}
+
 .overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg,
-            rgba(2, 6, 23, 0.96) 0%,
-            rgba(2, 6, 23, 0.9) 40%,
-            rgba(15, 23, 42, 0.7) 70%,
-            rgba(15, 23, 42, 0.35) 100%);
-    z-index: 2;
-}
-
-/* Gradient overlay for depth - makes text readable */
-.gradientOverlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 55%;
-    height: 100%;
-    background: radial-gradient(circle at left center,
-            rgba(15, 23, 42, 0.96) 0%,
-            rgba(15, 23, 42, 0.82) 32%,
-            rgba(15, 23, 42, 0.45) 55%,
-            transparent 78%);
+    inset: 0;
     z-index: 3;
 }
 
-/* Subtle accent line on the left */
-.background::after {
-    content: "";
+.gradientOverlay {
     position: absolute;
-    left: 0;
-    top: 15%;
-    bottom: 15%;
-    width: 4px;
-    background: linear-gradient(180deg, transparent, #facc15 30%, #38bdf8 70%, transparent);
-    z-index: 10;
+    inset: 0;
+    z-index: 4;
+    background:
+        radial-gradient(circle at 72% 44%, transparent 0%, rgba(2, 6, 23, 0.02) 30%, rgba(2, 6, 23, 0.2) 62%),
+        linear-gradient(90deg, #020814 0%, rgba(2, 8, 20, 0.92) 18%, rgba(2, 10, 25, 0.56) 42%, rgba(2, 10, 25, 0.1) 68%, rgba(2, 6, 23, 0.08) 100%);
 }
 
-/* Bottom fade for smooth section transition */
-.gradient2 {
+.locationMark {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 120px;
-    background: linear-gradient(0deg, rgba(15, 23, 42, 1) 0%, transparent 100%);
-    z-index: 15;
+    right: 5.5vw;
+    top: 104px;
+    z-index: 21;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: rgba(248, 250, 252, 0.82);
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: none;
 }
 
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-    .scene3d {
-        opacity: 0.7;
+.locationLine {
+    width: 48px;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(250, 204, 21, 0.75), transparent);
+}
+
+.locationPin {
+    color: #38bdf8;
+}
+
+.chapterRail {
+    position: absolute;
+    right: 2.8vw;
+    top: 36%;
+    z-index: 22;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    color: rgba(226, 232, 240, 0.42);
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+}
+
+.activeChapter {
+    color: #facc15;
+}
+
+.chapterLine {
+    position: relative;
+    width: 1px;
+    height: 112px;
+    background: rgba(226, 232, 240, 0.24);
+}
+
+.chapterLine i {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 38%;
+    background: #facc15;
+}
+
+.scrollCue {
+    position: absolute;
+    left: auto;
+    right: 2.15vw;
+    bottom: 2.2rem;
+    z-index: 25;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.9rem;
+    color: rgba(226, 232, 240, 0.66);
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.scrollTrack {
+    position: relative;
+    width: 1px;
+    height: 38px;
+    overflow: hidden;
+    background: rgba(226, 232, 240, 0.25);
+}
+
+.scrollTrack span {
+    position: absolute;
+    inset: 0 0 auto;
+    width: 100%;
+    height: 36%;
+    background: #facc15;
+    animation: scan 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes scan {
+    0% { transform: translateY(-110%); }
+    55%, 100% { transform: translateY(300%); }
+}
+
+@media (max-width: 1100px) {
+    .title {
+        width: min(720px, 68vw);
+        font-size: clamp(3rem, 7vw, 5.8rem);
+    }
+
+    .subtitle,
+    .description {
+        width: min(590px, 62vw);
     }
 
     .gradientOverlay {
-        width: 70%;
+        background: linear-gradient(90deg, #02050d 0%, rgba(2, 5, 13, 0.92) 37%, rgba(2, 6, 23, 0.36) 75%, rgba(2, 6, 23, 0.52) 100%);
     }
 }
 
 @media (max-width: 768px) {
     .hero {
-        min-height: auto;
-        padding: 140px 0 80px;
+        min-height: 100svh;
+        align-items: flex-end;
+        padding-top: 76px;
     }
 
-    .container {
-        padding: 1.5rem 1rem;
-    }
-
-    .cta {
-        justify-content: center;
-    }
-
-    .description {
-        margin: 0 auto 2rem auto;
-    }
-
-    .scene3d {
-        opacity: 0.5;
-    }
-
-    .background::after {
+    .hero::before,
+    .locationMark,
+    .chapterRail,
+    .scrollCue,
+    .imageStage::after {
         display: none;
     }
 
-    .gradientOverlay {
-        width: 100%;
-        background: linear-gradient(180deg,
-                rgba(15, 23, 42, 0.98) 0%,
-                rgba(15, 23, 42, 0.9) 60%,
-                rgba(15, 23, 42, 0.6) 100%);
+    .container {
+        padding: 10rem 0 6.5rem;
     }
 
-    .bgImage {
-        opacity: 0.4;
+    .container > div {
+        padding-left: 1.25rem !important;
+        padding-right: 1.25rem !important;
+        justify-content: flex-start !important;
+        text-align: left !important;
     }
+
+    .title,
+    .subtitle,
+    .description {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .title {
+        font-size: clamp(2.7rem, 13vw, 4.2rem);
+        line-height: 0.98;
+    }
+
+    .subtitle {
+        font-size: 0.72rem;
+        letter-spacing: 0.1em;
+    }
+
+    .description {
+        font-size: 0.93rem;
+        line-height: 1.7;
+    }
+
+    .cta {
+        width: 100%;
+        gap: 0.65rem;
+    }
+
+    .cta a {
+        width: 100%;
+        min-height: 50px;
+        padding-inline: 1rem;
+    }
+
+    .background {
+        inset: 0;
+    }
+
+    .imageStage {
+        inset: 0;
+    }
+
+    .bgImage,
+    .imageSlice {
+        object-position: 68% center;
+        background-position: 68% center;
+    }
+
+    .gradientOverlay {
+        background: linear-gradient(180deg, rgba(2, 5, 13, 0.1) 0%, rgba(2, 5, 13, 0.34) 30%, rgba(2, 5, 13, 0.94) 62%, #02050d 100%);
+    }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .imageStage,
+    .imageSlice,
+    .scrollTrack span {
+        animation: none !important;
+        transform: none !important;
+    }
+
 }

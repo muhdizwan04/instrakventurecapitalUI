@@ -5,6 +5,7 @@ import { TrendingUp, Wallet, ShieldCheck, PieChart, Briefcase, Building2, Landma
 import { usePageContent } from '../hooks/usePageContent';
 import { useTheme } from '../context/ThemeContext';
 import { lightBandAt } from '../theme/lightBands';
+import ScrollReveal from './ScrollReveal';
 
 const ICON_MAP = { TrendingUp, Wallet, ShieldCheck, PieChart, Briefcase, Building2, Landmark, Globe, Shield, Coins, Gem, Users, BarChart3 };
 
@@ -174,18 +175,30 @@ const Services = ({ lightBandIndex }) => {
     return (
         <section id="services" className={`${styles.services} ${cardStyleGlass ? styles.cardStyleGlass : ''} ${lightBandClass}`.trim()} style={sectionStyle}>
             <div className="container">
-                <h2 className="section-title" style={lightHeadingStyle}>{title}</h2>
-                {subtitle && <p className={styles.subtitle} style={lightSubtitleStyle}>{subtitle}</p>}
+                <ScrollReveal>
+                    <div className={styles.sectionHeader}>
+                        <div className={styles.headingColumn}>
+                            <span className={styles.sectionIndex} aria-hidden="true">01 / Portfolio</span>
+                            <h2 className="section-title" style={lightHeadingStyle}>{title}</h2>
+                        </div>
+                        {subtitle && <p className={styles.subtitle} style={lightSubtitleStyle}>{subtitle}</p>}
+                    </div>
+                </ScrollReveal>
 
                 <div className={styles.groupedServices}>
-                    {orderedCategories.map((category) => (
-                        <div key={category} className={styles.categoryBlock}>
-                            <h3 className={styles.categoryHeading}>{category}</h3>
+                    {orderedCategories.map((category, categoryIndex) => (
+                        <ScrollReveal key={category} staggerIndex={categoryIndex}>
+                        <div className={styles.categoryBlock}>
+                            <div className={styles.categoryLabel}>
+                                <span className={styles.categoryNumber}>{String(categoryIndex + 1).padStart(2, '0')}</span>
+                                <h3 className={styles.categoryHeading}>{category}</h3>
+                            </div>
                             <div className={styles.servicesGrid}>
                                 {grouped[category].map((service, index) => {
                                     const IconComponent = ICON_MAP[service.icon] || Briefcase;
                                     return (
                                         <Link to={service.link} key={service.id || index} className={styles.serviceItem}>
+                                            <span className={styles.serviceNumber}>{String(index + 1).padStart(2, '0')}</span>
                                             <div className={styles.serviceIcon}>
                                                 <IconComponent size={24} />
                                             </div>
@@ -199,6 +212,7 @@ const Services = ({ lightBandIndex }) => {
                                 })}
                             </div>
                         </div>
+                        </ScrollReveal>
                     ))}
                 </div>
 

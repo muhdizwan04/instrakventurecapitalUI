@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,7 +6,7 @@
 
 @layer components {
   .input-field {
-    @apply w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent transition-all duration-200 text-sm;
+    @apply w-full px-4 py-2.5 border border-gray-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent transition-all duration-200 text-sm;
   }
 
   .label {
@@ -14,20 +14,27 @@
   }
 
   .btn-save {
-    @apply flex items-center gap-2 px-6 py-2.5 text-white rounded-xl font-medium disabled:opacity-50 transition-all duration-300;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-white rounded-sm font-semibold disabled:opacity-50 transition-all duration-300 text-sm whitespace-nowrap;
     background: linear-gradient(135deg, #0A3D62 0%, #1E6F9F 100%);
     box-shadow: 0 4px 14px rgba(10, 61, 98, 0.25);
   }
   .btn-save:hover:not(:disabled) {
     box-shadow: 0 8px 24px rgba(10, 61, 98, 0.35);
+    transform: translateY(-2px);
   }
 
   .btn-add {
-    @apply flex items-center gap-2 px-4 py-2.5 text-white rounded-xl transition-all shadow-md font-medium;
-    background: linear-gradient(135deg, #0A3D62 0%, #1E6F9F 100%);
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-sm transition-all font-semibold text-sm whitespace-nowrap;
+    color: #0A3D62;
+    background: #FFFFFF;
+    border: 1px solid rgba(10, 61, 98, 0.28);
   }
   .btn-add:hover {
-    box-shadow: 0 8px 24px rgba(10, 61, 98, 0.3);
+    color: #FFFFFF;
+    background: #0A3D62;
+    border-color: #0A3D62;
+    box-shadow: 0 8px 24px rgba(10, 61, 98, 0.2);
+    transform: translateY(-2px);
   }
 }
 
@@ -57,7 +64,7 @@
 
   /* Typography */
   --font-main: 'Inter', sans-serif;
-  --font-heading: 'Playfair Display', serif;
+  --font-heading: 'Cinzel', serif;
 
   /* Shadows - Subtle & Elegant */
   --shadow-sm: 0 2px 8px rgba(10, 61, 98, 0.06);
@@ -174,7 +181,7 @@ ul {
 .glass-card {
   background: var(--bg-primary);
   border: 1px solid var(--border-light);
-  border-radius: 20px;
+  border-radius: 3px;
   padding: 2rem;
   transition: var(--transition-slow);
   position: relative;
@@ -191,7 +198,7 @@ ul {
   right: 0;
   height: 4px;
   background: linear-gradient(90deg, #0A3D62 0%, #1A365D 50%, #C9A227 100%);
-  border-radius: 20px 20px 0 0;
+  border-radius: 3px 3px 0 0;
   opacity: 1;
 }
 
@@ -665,4 +672,125 @@ html[data-theme="dark"] body::before {
 
 [data-theme="dark"] .border-gray-50 {
   border-color: rgba(148, 163, 184, 0.12) !important;
+}
+
+/* ============================================================
+   ADMIN INTERFACE CONSISTENCY
+   Shared hierarchy for every manager: header actions, editor cards,
+   icon controls and compact responsive behaviour.
+   ============================================================ */
+
+main > div > div > .flex.justify-between.items-center:first-child,
+main > div > div > .mb-8.flex.items-center.justify-between:first-child {
+  min-height: 72px;
+  gap: 1.5rem;
+  padding: 0 0 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+main h1.text-3xl,
+main h1.text-2xl {
+  font-weight: 650;
+  letter-spacing: -0.035em;
+}
+
+.btn-save,
+.btn-add,
+.btn-primary,
+.btn-solid,
+.btn-gold,
+.btn-outline-gold {
+  min-height: 40px;
+  line-height: 1;
+}
+
+main button:has(svg.lucide-edit),
+main button:has(svg.lucide-edit-2) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0.5rem;
+  color: #0A3D62;
+  background: rgba(10, 61, 98, 0.06);
+  border: 1px solid rgba(10, 61, 98, 0.14);
+  border-radius: 2px !important;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+main button:has(svg.lucide-edit):hover,
+main button:has(svg.lucide-edit-2):hover {
+  color: #FFFFFF;
+  background: #0A3D62;
+  border-color: #0A3D62;
+  transform: translateY(-1px);
+}
+
+main button:has(svg.lucide-trash-2) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0.5rem;
+  color: #A33A3A;
+  background: rgba(163, 58, 58, 0.055);
+  border: 1px solid rgba(163, 58, 58, 0.14);
+  border-radius: 2px !important;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+main button:has(svg.lucide-trash-2):hover {
+  color: #FFFFFF !important;
+  background: #A33A3A !important;
+  border-color: #A33A3A !important;
+  transform: translateY(-1px);
+}
+
+main .rounded-xl,
+main .rounded-2xl {
+  border-radius: 4px;
+}
+
+main .rounded-lg {
+  border-radius: 3px;
+}
+
+[data-theme="dark"] .btn-add {
+  color: #93C5FD;
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(96, 165, 250, 0.34);
+}
+
+[data-theme="dark"] .btn-add:hover {
+  color: #FFFFFF;
+  background: #2563EB;
+  border-color: #2563EB;
+}
+
+[data-theme="dark"] main button:has(svg.lucide-edit),
+[data-theme="dark"] main button:has(svg.lucide-edit-2) {
+  color: #93C5FD;
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(96, 165, 250, 0.2);
+}
+
+[data-theme="dark"] main button:has(svg.lucide-trash-2) {
+  color: #FCA5A5;
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(248, 113, 113, 0.18);
+}
+
+@media (max-width: 720px) {
+  main > div > div > .flex.justify-between.items-center:first-child,
+  main > div > div > .mb-8.flex.items-center.justify-between:first-child {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .btn-save,
+  .btn-add {
+    padding-inline: 0.9rem;
+  }
 }

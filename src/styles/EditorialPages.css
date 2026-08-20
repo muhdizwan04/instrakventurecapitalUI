@@ -1,0 +1,513 @@
+.editorial-page {
+  --editorial-gold: #d3a629;
+  --editorial-cyan: #38bdf8;
+  --editorial-ink: #f8fafc;
+  --editorial-muted: #a8b3c7;
+  --editorial-line: rgba(148, 163, 184, 0.22);
+  --editorial-panel: rgba(7, 17, 34, 0.82);
+  position: relative;
+  overflow: clip;
+  background: #07101f;
+}
+
+.editorial-page > section,
+.editorial-section {
+  position: relative;
+  isolation: isolate;
+  border-top: 1px solid var(--editorial-line);
+}
+
+.editorial-section::before,
+.editorial-page--about > section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(90deg, transparent calc(25% - 1px), rgba(148, 163, 184, 0.055) 25%, transparent calc(25% + 1px)),
+    linear-gradient(90deg, transparent calc(75% - 1px), rgba(148, 163, 184, 0.055) 75%, transparent calc(75% + 1px)),
+    radial-gradient(circle at 92% 4%, rgba(56, 189, 248, 0.065), transparent 28%),
+    radial-gradient(circle at 5% 96%, rgba(211, 166, 41, 0.05), transparent 23%);
+}
+
+.editorial-section > *,
+.editorial-page--about > section > * {
+  position: relative;
+  z-index: 1;
+}
+
+.editorial-page-hero {
+  min-height: 610px;
+  display: flex;
+  align-items: center;
+  isolation: isolate;
+  border-bottom: 1px solid rgba(211, 166, 41, 0.42);
+}
+
+.editorial-page-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, #050d1a 0%, rgba(5, 13, 26, 0.95) 34%, rgba(5, 13, 26, 0.5) 72%, rgba(5, 13, 26, 0.72) 100%),
+    url("../assets/dubai-skyline-robert-bock.jpg") center 58% / cover no-repeat;
+  filter: saturate(0.72);
+}
+
+.editorial-page-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(90deg, transparent calc(62% - 1px), rgba(148, 163, 184, 0.28) 62%, transparent calc(62% + 1px)),
+    linear-gradient(90deg, transparent calc(79% - 1px), rgba(148, 163, 184, 0.22) 79%, transparent calc(79% + 1px));
+}
+
+.editorial-page-hero__content {
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.editorial-page-hero__content::before,
+.editorial-section-heading::before {
+  content: attr(data-kicker);
+  display: block;
+  margin-bottom: 1rem;
+  color: var(--editorial-gold);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.editorial-page-hero h1 {
+  max-width: 850px;
+  margin-bottom: 1.4rem !important;
+  color: var(--editorial-ink) !important;
+  font-family: var(--font-main) !important;
+  font-size: clamp(3.2rem, 7vw, 6.8rem) !important;
+  font-weight: 300 !important;
+  letter-spacing: -0.065em !important;
+  line-height: 0.95 !important;
+  text-align: left !important;
+  text-wrap: balance;
+}
+
+.editorial-page-hero p {
+  max-width: 720px !important;
+  margin: 0 0 2.5rem !important;
+  color: #cbd5e1 !important;
+  font-family: var(--font-main) !important;
+  font-size: clamp(1rem, 1.5vw, 1.15rem) !important;
+  text-align: left !important;
+}
+
+.editorial-page-hero__actions {
+  justify-content: flex-start !important;
+}
+
+.editorial-page-hero__actions a {
+  min-width: 205px;
+  justify-content: center;
+  border-radius: 2px !important;
+  letter-spacing: 0.04em;
+}
+
+.editorial-section-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: clamp(2rem, 7vw, 7rem);
+  align-items: end;
+  margin-bottom: clamp(3rem, 6vw, 5rem);
+  padding: 1.6rem 0 2rem;
+  border-top: 1px solid rgba(211, 166, 41, 0.7);
+  border-bottom: 1px solid var(--editorial-line);
+}
+
+.editorial-section-heading::before {
+  grid-column: 1 / -1;
+  margin-bottom: -0.25rem;
+}
+
+.editorial-section-heading h2,
+.editorial-page--about .section-title {
+  margin: 0 !important;
+  color: var(--editorial-ink) !important;
+  font-family: var(--font-main) !important;
+  font-size: clamp(2.7rem, 5.4vw, 5.4rem) !important;
+  font-weight: 300 !important;
+  letter-spacing: -0.06em !important;
+  line-height: 0.98 !important;
+  text-align: left !important;
+}
+
+.editorial-section-heading > p {
+  max-width: 680px !important;
+  margin: 0 !important;
+  color: var(--editorial-muted) !important;
+  text-align: left !important;
+  line-height: 1.75;
+}
+
+.editorial-category {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.35fr) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--editorial-line);
+}
+
+.editorial-category__label {
+  position: sticky;
+  top: 105px;
+  align-self: start;
+  margin: 0 !important;
+  color: var(--editorial-ink) !important;
+  font-family: var(--font-main) !important;
+  font-size: 1.25rem !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.02em !important;
+  text-transform: none !important;
+}
+
+.editorial-category__label::before {
+  content: attr(data-index);
+  display: block;
+  margin-bottom: 1rem;
+  color: var(--editorial-gold);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.editorial-service-grid,
+.editorial-card-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 1px !important;
+  background: var(--editorial-line);
+  border: 1px solid var(--editorial-line);
+}
+
+.editorial-service-card,
+.editorial-career-card,
+.editorial-partner-card,
+.editorial-person-card {
+  min-height: 100%;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: rgba(5, 15, 31, 0.92) !important;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), background 320ms ease, border-color 320ms ease !important;
+}
+
+.editorial-service-card {
+  min-height: 340px;
+}
+
+.editorial-service-card::after,
+.editorial-career-card::after,
+.editorial-partner-card::after,
+.editorial-person-card::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--editorial-gold), var(--editorial-cyan));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.editorial-service-card:hover,
+.editorial-career-card:hover,
+.editorial-partner-card:hover,
+.editorial-person-card:hover {
+  z-index: 2;
+  transform: translateY(-6px) !important;
+  background: #0a1a34 !important;
+}
+
+.editorial-service-card:hover::after,
+.editorial-career-card:hover::after,
+.editorial-partner-card:hover::after,
+.editorial-person-card:hover::after {
+  transform: scaleX(1);
+}
+
+.editorial-service-card > div:first-child,
+.editorial-career-card > div > div:first-child {
+  border: 1px solid rgba(211, 166, 41, 0.35);
+  border-radius: 2px !important;
+  background: linear-gradient(135deg, rgba(211, 166, 41, 0.12), rgba(56, 189, 248, 0.08)) !important;
+}
+
+.editorial-service-card h3,
+.editorial-career-card h3,
+.editorial-partner-card h3,
+.editorial-person-card h3 {
+  color: var(--editorial-ink) !important;
+  font-family: var(--font-main) !important;
+}
+
+.editorial-service-card p,
+.editorial-career-card p,
+.editorial-partner-card p,
+.editorial-person-card p {
+  color: var(--editorial-muted) !important;
+}
+
+.editorial-callout {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(211, 166, 41, 0.42) !important;
+  border-radius: 2px !important;
+  background:
+    linear-gradient(90deg, rgba(5, 15, 31, 0.98), rgba(10, 28, 54, 0.9)),
+    url("../assets/dubai-skyline-robert-bock.jpg") center 60% / cover no-repeat !important;
+  box-shadow: none !important;
+}
+
+.editorial-callout h2,
+.editorial-callout h3 {
+  color: var(--editorial-ink) !important;
+  font-family: var(--font-main) !important;
+  font-size: clamp(2.25rem, 4vw, 4.2rem) !important;
+  font-weight: 300 !important;
+  letter-spacing: -0.05em !important;
+}
+
+.editorial-callout p {
+  color: #cbd5e1 !important;
+}
+
+.editorial-page--career .editorial-section-heading {
+  margin-bottom: 2.5rem;
+}
+
+.editorial-career-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 1px !important;
+  background: var(--editorial-line);
+  border: 1px solid var(--editorial-line);
+}
+
+.editorial-career-card {
+  position: relative;
+}
+
+.editorial-career-empty {
+  position: relative;
+  max-width: none !important;
+  text-align: left;
+  border: 1px solid var(--editorial-line) !important;
+  border-radius: 2px !important;
+  background: rgba(5, 15, 31, 0.88) !important;
+}
+
+.editorial-career-intro {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr) !important;
+  border-top: 1px solid rgba(211, 166, 41, 0.72);
+}
+
+.editorial-career-copy {
+  padding: clamp(2.2rem, 5vw, 5rem) clamp(1rem, 5vw, 5rem) clamp(2.2rem, 5vw, 5rem) 0;
+  text-align: left !important;
+}
+
+.editorial-career-copy h2 {
+  color: var(--editorial-ink) !important;
+  font-family: var(--font-main) !important;
+  font-size: clamp(2.7rem, 5vw, 5rem) !important;
+  font-weight: 300 !important;
+  letter-spacing: -0.055em !important;
+}
+
+.editorial-career-copy p,
+.editorial-career-copy div {
+  color: var(--editorial-muted) !important;
+}
+
+.editorial-career-quote {
+  min-height: 420px !important;
+  border: 0 !important;
+  border-left: 1px solid var(--editorial-line) !important;
+  border-radius: 0 !important;
+  background:
+    linear-gradient(rgba(5, 15, 31, 0.68), rgba(5, 15, 31, 0.92)),
+    url("../assets/dubai-skyline-robert-bock.jpg") center / cover no-repeat !important;
+}
+
+.editorial-career-quote p {
+  color: #f8fafc !important;
+  font-family: var(--font-main);
+  font-size: clamp(1.5rem, 3vw, 2.5rem) !important;
+  font-style: normal !important;
+  font-weight: 300;
+  letter-spacing: -0.035em;
+}
+
+.editorial-page--about .luxury-border-gold,
+.editorial-page--about .editorial-milestone-card {
+  border-radius: 2px !important;
+  box-shadow: none !important;
+}
+
+.editorial-page--about .luxury-border-gold {
+  border: 1px solid var(--editorial-line) !important;
+  background: rgba(5, 15, 31, 0.88) !important;
+}
+
+.editorial-page--about .editorial-section-heading {
+  text-align: left !important;
+}
+
+.editorial-page--about .editorial-section-heading h6 {
+  grid-column: 1 / -1;
+  margin: 0 0 -0.5rem;
+  text-align: left;
+}
+
+.editorial-page--about .editorial-section-heading h2 {
+  grid-column: 1;
+}
+
+.editorial-page--about .editorial-section-heading > p {
+  grid-column: 2;
+  align-self: end;
+}
+
+.editorial-page--about .editorial-person-card,
+.editorial-page--about .editorial-partner-card {
+  position: relative;
+}
+
+.editorial-page--about .editorial-milestone-card {
+  max-width: none !important;
+  background: linear-gradient(120deg, rgba(5, 15, 31, 0.98), rgba(11, 31, 58, 0.9));
+}
+
+[data-theme="light"] .editorial-page {
+  --editorial-ink: #0f172a;
+  --editorial-muted: #475569;
+  --editorial-line: rgba(15, 23, 42, 0.12);
+  --editorial-panel: #ffffff;
+  background: #f8fafc;
+}
+
+[data-theme="light"] .editorial-service-card,
+[data-theme="light"] .editorial-career-card,
+[data-theme="light"] .editorial-partner-card,
+[data-theme="light"] .editorial-person-card,
+[data-theme="light"] .editorial-career-empty,
+[data-theme="light"] .editorial-page--about .luxury-border-gold {
+  background: rgba(255, 255, 255, 0.95) !important;
+}
+
+[data-theme="light"] .editorial-service-card:hover,
+[data-theme="light"] .editorial-career-card:hover,
+[data-theme="light"] .editorial-partner-card:hover,
+[data-theme="light"] .editorial-person-card:hover {
+  background: #ffffff !important;
+}
+
+[data-theme="light"] .editorial-page-hero::before {
+  background:
+    linear-gradient(90deg, rgba(248, 250, 252, 0.99) 0%, rgba(248, 250, 252, 0.93) 48%, rgba(248, 250, 252, 0.62) 100%),
+    url("../assets/dubai-skyline-robert-bock.jpg") center 58% / cover no-repeat;
+  filter: grayscale(0.25);
+}
+
+[data-theme="light"] .editorial-page-hero h1 {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .editorial-page-hero p {
+  color: #475569 !important;
+}
+
+@media (max-width: 900px) {
+  .editorial-page-hero {
+    min-height: 560px;
+  }
+
+  .editorial-section-heading,
+  .editorial-category,
+  .editorial-career-intro {
+    grid-template-columns: 1fr !important;
+  }
+
+  .editorial-category__label {
+    position: static;
+  }
+
+  .editorial-service-grid,
+  .editorial-card-grid,
+  .editorial-career-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .editorial-career-copy {
+    padding-right: 0;
+  }
+
+  .editorial-page--about .editorial-section-heading h2,
+  .editorial-page--about .editorial-section-heading > p {
+    grid-column: 1;
+  }
+
+  .editorial-career-quote {
+    min-height: 300px !important;
+    border-left: 0 !important;
+    border-top: 1px solid var(--editorial-line) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .editorial-page-hero {
+    min-height: 650px;
+  }
+
+  .editorial-page-hero h1 {
+    font-size: clamp(2.8rem, 14vw, 4.5rem) !important;
+  }
+
+  .editorial-page-hero__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .editorial-page-hero__actions a {
+    width: 100%;
+  }
+
+  .editorial-section-heading h2,
+  .editorial-page--about .section-title {
+    font-size: clamp(2.45rem, 12vw, 3.7rem) !important;
+  }
+
+  .editorial-service-card,
+  .editorial-career-card,
+  .editorial-partner-card {
+    padding: 1.5rem !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editorial-service-card,
+  .editorial-career-card,
+  .editorial-partner-card,
+  .editorial-person-card {
+    transition: none !important;
+  }
+}

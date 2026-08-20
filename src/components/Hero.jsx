@@ -2,13 +2,15 @@ import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Hero.module.css';
 import { usePageContent } from '../hooks/usePageContent';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import {
+    motion as Motion,
+    useScroll,
+    useTransform
+} from 'framer-motion';
 import { isLikelyLightTextColor } from '../theme/clientThemeDefaults';
+import dubaiBlueHour from '../assets/dubai-blue-hour-hero-v2.webp';
 
-// Hero background – external placeholder image for investment skyline.
-// You can replace this URL with any image or a local import later.
-const nightSkyline =
-    'https://images.pexels.com/photos/313782/pexels-photo-313782.jpeg?auto=compress&cs=tinysrgb&w=1600';
+const nightSkyline = dubaiBlueHour;
 
 const Hero = ({ showLightSectionEdge }) => {
     const ref = useRef(null);
@@ -59,6 +61,7 @@ const Hero = ({ showLightSectionEdge }) => {
     const defaultContent = {
         heroBlocks: defaultBlocks,
         heroBackgroundImage: '',
+        heroUseCustomBackground: false,
         heroBgOpacity: 0.85,
         heroOverlayOpacity: 0.9
     };
@@ -92,9 +95,10 @@ const Hero = ({ showLightSectionEdge }) => {
     }
 
     // ── Background settings ──
-    const bgImage = content.heroBackgroundImage || nightSkyline;
-    const bgOpacity = content.heroBgOpacity ?? 0.85;
-    const overlayOpacity = content.heroOverlayOpacity ?? 0.92;
+    const usesCustomBackground = Boolean(content.heroUseCustomBackground && content.heroBackgroundImage);
+    const bgImage = usesCustomBackground ? content.heroBackgroundImage : nightSkyline;
+    const bgOpacity = usesCustomBackground ? (content.heroBgOpacity ?? 0.85) : 1;
+    const overlayOpacity = usesCustomBackground ? (content.heroOverlayOpacity ?? 0.92) : 0.66;
 
     const staggerContainer = {
         hidden: { opacity: 0 },
@@ -116,13 +120,6 @@ const Hero = ({ showLightSectionEdge }) => {
         }
     };
 
-    // Map admin align (left / middle / right) to CSS textAlign
-    const resolveAlign = (align) => {
-        if (!align) return 'left';
-        if (align === 'middle') return 'center';
-        return align;
-    };
-
     // ── Block Renderers ──
     const renderBlock = (block) => {
         switch (block.type) {
@@ -132,13 +129,13 @@ const Hero = ({ showLightSectionEdge }) => {
                 const highlightColor = block.highlightColor || '#B8860B';
                 return (
                     <h1 className={styles.title} style={{ color: titleColor }}>
-                        <motion.span className="block" variants={itemVariant}>
+                        <Motion.span className="block" variants={itemVariant}>
                             {parts[0]}
-                        </motion.span>
+                        </Motion.span>
                         {parts[1] && (
-                            <motion.span className="block" variants={itemVariant}>
+                            <Motion.span className="block" variants={itemVariant}>
                                 <span className={styles.highlight} style={{ color: highlightColor }}>{parts[1]}</span>
-                            </motion.span>
+                            </Motion.span>
                         )}
                     </h1>
                 );
@@ -148,14 +145,14 @@ const Hero = ({ showLightSectionEdge }) => {
                 const subtitleParts = (block.content || '').split('•').map(s => s.trim());
                 const subColor = block.color || '#fde68a';
                 return (
-                    <motion.p className={styles.subtitle} style={{ color: subColor }} variants={itemVariant}>
+                    <Motion.p className={styles.subtitle} style={{ color: subColor }} variants={itemVariant}>
                         {subtitleParts.map((part, i) => (
                             <React.Fragment key={i}>
                                 <strong style={{ color: subColor }}>{part}</strong>
                                 {i < subtitleParts.length - 1 && ' • '}
                             </React.Fragment>
                         ))}
-                    </motion.p>
+                    </Motion.p>
                 );
             }
 
@@ -165,16 +162,16 @@ const Hero = ({ showLightSectionEdge }) => {
                     /* Pure white / very light CMS colours wash out on bright areas of the photo */
                     const textColor = isLikelyLightTextColor(rawDesc) ? '#E2E8F0' : rawDesc;
                 return (
-                    <motion.p className={styles.description} style={{ color: textColor }} variants={itemVariant}>
+                    <Motion.p className={styles.description} style={{ color: textColor }} variants={itemVariant}>
                         {block.content}
-                    </motion.p>
+                    </Motion.p>
                 );
                 }
 
             case 'buttons': {
                 const btns = block.buttons || [];
                 return (
-                    <motion.div className={styles.cta} variants={itemVariant}>
+                    <Motion.div className={styles.cta} variants={itemVariant}>
                         {btns.map(btn => {
                             const isSolid = btn.variant === 'solid';
                             const solidStyle = block.solidStyle || 'solid';
@@ -207,7 +204,7 @@ const Hero = ({ showLightSectionEdge }) => {
                                 </Link>
                             );
                         })}
-                    </motion.div>
+                    </Motion.div>
                 );
             }
 
@@ -227,16 +224,17 @@ const Hero = ({ showLightSectionEdge }) => {
         >
 
             {/* Content Layer */}
-            <motion.div
+            <Motion.div
                 className={`container ${styles.container}`}
                 variants={staggerContainer}
                 initial="hidden"
                 animate="show"
             >
                 {heroBlocks.map((block) => {
-                    const align = resolveAlign(block.align);
-                    const isButtons = block.type === 'buttons';
-                    const gutter = '10%';
+                    // The approved redesign fixes the hero composition to the left.
+                    // CMS order/content remains intact; per-block alignment is retained in data for other editors.
+                    const align = 'left';
+                    const gutter = '5.75%';
                     const wrapperStyle = {
                         width: '100%',
                         display: 'flex',
@@ -247,21 +245,35 @@ const Hero = ({ showLightSectionEdge }) => {
                         textAlign: align
                     };
                     return (
-                        <motion.div key={block.id} variants={itemVariant} style={wrapperStyle}>
+                        <Motion.div key={block.id} variants={itemVariant} style={wrapperStyle}>
                             {renderBlock(block)}
-                        </motion.div>
+                        </Motion.div>
                     );
                 })}
-            </motion.div>
+            </Motion.div>
 
-            {/* Background with KL Skyline */}
-            <motion.div className={styles.background} style={{ y, opacity }}>
-                <img
-                    src={bgImage}
-                    alt="Hero Background"
-                    className={styles.bgImage}
-                    style={{ opacity: bgOpacity }}
-                />
+            {/* Dubai architecture interaction layer */}
+            <Motion.div className={styles.background} style={{ y, opacity }} aria-hidden="true">
+                <div className={styles.imageStage}>
+                    <img
+                        src={bgImage}
+                        alt=""
+                        className={styles.bgImage}
+                        style={{ opacity: bgOpacity }}
+                    />
+                    <div
+                        className={`${styles.imageSlice} ${styles.sliceOne}`}
+                        style={{ backgroundImage: `url("${bgImage}")` }}
+                    />
+                    <div
+                        className={`${styles.imageSlice} ${styles.sliceTwo}`}
+                        style={{ backgroundImage: `url("${bgImage}")` }}
+                    />
+                    <div
+                        className={`${styles.imageSlice} ${styles.sliceThree}`}
+                        style={{ backgroundImage: `url("${bgImage}")` }}
+                    />
+                </div>
                 <div
                     className={styles.overlay}
                     style={{
@@ -273,7 +285,25 @@ const Hero = ({ showLightSectionEdge }) => {
                     }}
                 />
                 <div className={styles.gradientOverlay}></div>
-            </motion.div>
+            </Motion.div>
+
+            <div className={styles.locationMark} aria-hidden="true">
+                <span>Dubai, UAE</span>
+                <span className={styles.locationPin}>◇</span>
+                <span className={styles.locationLine} />
+            </div>
+
+            <div className={styles.chapterRail} aria-hidden="true">
+                <span className={styles.activeChapter}>01</span>
+                <span className={styles.chapterLine}><i /></span>
+                <span>02</span>
+                <span>03</span>
+            </div>
+
+            <div className={styles.scrollCue} aria-hidden="true">
+                <span>Scroll to explore</span>
+                <span className={styles.scrollTrack}><span /></span>
+            </div>
         </section>
     );
 };

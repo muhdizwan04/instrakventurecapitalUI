@@ -38,7 +38,7 @@ const LatestNews = () => {
     const legacySections = Array.isArray(content?.sections) ? content.sections : null;
 
     return (
-        <div className="page-wrapper">
+        <div className="page-wrapper editorial-page editorial-page--news">
             <PageHero
                 title={hero?.title || defaultContent.hero.title}
                 subtitle={hero?.subtitle || defaultContent.hero.subtitle}
@@ -58,8 +58,8 @@ const LatestNews = () => {
                 ))
             ) : (
                 // Legacy fallback (old schema: markdown sections)
-                <div className={`container section-padding${isLight ? ' lm-band-b' : ''}`} style={isLight ? { background: 'transparent' } : undefined}>
-                    <div className="glass-card p-8">
+                <div className={`container section-padding editorial-news-legacy${isLight ? ' lm-band-b' : ''}`} style={isLight ? { background: 'transparent' } : undefined}>
+                    <div className="glass-card editorial-callout p-8">
                         {legacySections?.map((section, index) => (
                             <div key={index} className="mb-8 last:mb-0">
                                 {section.title && <h2 className="text-2xl font-bold mb-4 text-primary-dark">{section.title}</h2>}

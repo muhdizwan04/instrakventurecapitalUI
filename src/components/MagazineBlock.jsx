@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from './MagazineBlock.module.css';
+import ScrollReveal from './ScrollReveal';
 
 const isExternalLink = (href) => {
   if (!href) return false;
@@ -16,17 +17,17 @@ const formatDate = (iso) => {
   return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' });
 };
 
-const NavLink = ({ href, className, children }) => {
-  if (!href) return <span className={className} style={{ opacity: 0.5, pointerEvents: 'none' }}>{children}</span>;
+const NavLink = ({ href, className, children, style }) => {
+  if (!href) return <span className={className} style={{ ...style, opacity: 0.5, pointerEvents: 'none' }}>{children}</span>;
   if (isExternalLink(href)) {
     return (
-      <a className={className} href={href} target="_blank" rel="noopener noreferrer">
+      <a className={className} href={href} style={style} target="_blank" rel="noopener noreferrer">
         {children}
       </a>
     );
   }
   return (
-    <Link className={className} to={href}>
+    <Link className={className} style={style} to={href}>
       {children}
     </Link>
   );
@@ -69,6 +70,7 @@ const MagazineBlock = ({ block }) => {
       style={sectionStyle}
     >
       <div className="container">
+        <ScrollReveal>
         <div className={styles.header} style={{ textAlign: blockStyles.titleAlign || undefined }}>
           <div className={styles.titleWrap}>
             {block?.title && (
@@ -89,12 +91,13 @@ const MagazineBlock = ({ block }) => {
             </NavLink>
           )}
         </div>
+        </ScrollReveal>
 
         {items.length === 0 ? (
           <div className={styles.empty}>No news/events published yet.</div>
         ) : (
-          <div className={styles.grid}>
-            {items.map((it) => {
+          <div className={`${styles.grid} ${items.length === 1 ? styles.gridSingle : items.length === 2 ? styles.gridTwo : ''}`}>
+            {items.map((it, index) => {
               const isEvent = (it.type || '').toLowerCase() === 'event';
               const badgeClass = `${styles.badge} ${isEvent ? styles.badgeEvent : styles.badgeNews}`;
               const itemStyles = { ...blockStyles, ...(it.styles || {}) };
@@ -120,10 +123,12 @@ const MagazineBlock = ({ block }) => {
                 ...(itemStyles.itemBtnColor && { '--card-cta-color': itemStyles.itemBtnColor }),
               };
               return (
+                <ScrollReveal key={it.id} staggerIndex={index}>
                 <article key={it.id} className={styles.card} style={Object.keys(cardStyle).length ? cardStyle : undefined}>
                   <div className={styles.media}>
                     {it.image ? <img src={it.image} alt={it.title || 'news image'} /> : null}
                     <div className={badgeClass}>{isEvent ? 'Event' : 'News'}</div>
+                    <span className={styles.index}>{String(index + 1).padStart(2, '0')}</span>
                   </div>
 
                   <div className={styles.body}>
@@ -141,6 +146,7 @@ const MagazineBlock = ({ block }) => {
                     </div>
                   </div>
                 </article>
+                </ScrollReveal>
               );
             })}
           </div>
@@ -151,4 +157,3 @@ const MagazineBlock = ({ block }) => {
 };
 
 export default MagazineBlock;
-

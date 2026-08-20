@@ -7,21 +7,42 @@
   display: flex;
   align-items: center;
   z-index: 1000;
-  transition: var(--transition-slow);
-  /* Premium black–gold: black at logo (left) for contrast, gold accent right; overridden only when admin sets a custom color */
-  background: linear-gradient(90deg, #080808 0%, #0c0c0c 18%, #1a1610 38%, #2d2518 55%, #3d3220 72%, #2a2218 88%, #151210 100%);
+  transition: background 420ms ease, box-shadow 420ms ease, border-color 420ms ease, height 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  background: rgba(2, 6, 23, 0.88);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(184, 134, 11, 0.18);
-  border-bottom: 1px solid rgba(184, 134, 11, 0.25);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.22);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
   overflow: visible;
+}
+
+.nav.atTop {
+  background: linear-gradient(180deg, rgba(2, 5, 13, 0.78), rgba(2, 5, 13, 0));
+  box-shadow: none;
+  border-bottom-color: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.nav.scrolled {
+  height: 72px;
+  background: rgba(3, 7, 18, 0.9);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+  border-bottom-color: rgba(250, 204, 21, 0.14);
 }
 
 /* Light mode: clean white navbar */
 [data-theme="light"] .nav {
-  background: linear-gradient(90deg, #ffffff 0%, #ffffff 55%, #f6f7f9 100%);
+  background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(15, 23, 42, 0.06);
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+
+[data-theme="light"] .nav.atTop {
+  background: linear-gradient(180deg, rgba(2, 5, 13, 0.76), rgba(2, 5, 13, 0));
+  box-shadow: none;
+  border-bottom-color: transparent;
 }
 
 /* Light: soft diagonal wash only — no fine stripe / micro-grid */
@@ -45,14 +66,12 @@
   background-size: 200% 100%, 4px 4px;
 }
 
-/* .scrolled class removed as it is now default */
-
 .container {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 0 2rem;
+  padding: 0 clamp(1.25rem, 3vw, 3.5rem);
   position: relative;
   z-index: 1;
 }
@@ -107,16 +126,42 @@
 .links {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: clamp(1rem, 1.8vw, 2rem);
   margin-left: auto;
 }
 
 .links a {
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   font-weight: 500;
   color: var(--nav-link-color, #e5e7eb);
   transition: var(--transition-fast);
   position: relative;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.links > li:not(.themeToggle) > a:not(:global(.btn-primary))::before,
+.parentLink::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: -8px;
+  height: 1px;
+  background: linear-gradient(90deg, #facc15, #38bdf8);
+  transition: right 350ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.links > li:not(.themeToggle) > a:not(:global(.btn-primary)):hover::before,
+.parentLink:hover::before {
+  right: 0;
+}
+
+.atTop .links a,
+[data-theme="light"] .atTop .links a,
+.atTop .brand,
+[data-theme="light"] .atTop .brand {
+  color: #f8fafc;
 }
 
 [data-theme="light"] .links a {
@@ -178,7 +223,7 @@
   -webkit-backdrop-filter: blur(20px);
   min-width: 220px;
   padding: 0.5rem;
-  border-radius: 12px;
+  border-radius: 2px;
   border: 1px solid rgba(148, 163, 184, 0.35);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
   opacity: 0;
@@ -213,7 +258,7 @@
   display: block;
   width: 100%;
   padding: 0.8rem 1rem;
-  border-radius: 8px;
+  border-radius: 1px;
   transition: var(--transition-fast);
   color: #f1f5f9 !important;
   font-weight: 500;
@@ -264,6 +309,10 @@
   .mobileMenu {
     display: block;
     cursor: pointer;
+    padding: 12px 4px;
+    color: inherit;
+    background: transparent;
+    border: 0;
   }
 
   .hamburger {
@@ -291,6 +340,16 @@
   [data-theme="light"] .hamburger::before,
   [data-theme="light"] .hamburger::after {
     background: #0f172a;
+  }
+
+  [data-theme="light"] .atTop .hamburger,
+  [data-theme="light"] .atTop .hamburger::before,
+  [data-theme="light"] .atTop .hamburger::after {
+    background: #e5e7eb;
+  }
+
+  [data-theme="light"] .atTop .hamburger.open {
+    background: transparent;
   }
 
   .hamburger::before {

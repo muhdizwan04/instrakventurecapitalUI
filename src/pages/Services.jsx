@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { TrendingUp, Wallet, ShieldCheck, PieChart, ArrowRight, Briefcase, FileText, Building2, Landmark, Globe, Shield, Coins, Gem, Users, BarChart3 } from 'lucide-react';
 import { usePageContent } from '../hooks/usePageContent';
 import UniversalSection from '../components/UniversalSection';
+import ScrollReveal from '../components/ScrollReveal';
 import { useTheme } from '../context/ThemeContext';
 import { lightBandAt } from '../theme/lightBands';
 import { isLikelyLightTextColor } from '../theme/clientThemeDefaults';
@@ -202,9 +203,9 @@ const ServicesPage = () => {
         : [...PAGE_SECTION_IDS];
 
     return (
-        <div className="page-wrapper">
+        <div className="page-wrapper editorial-page editorial-page--services">
             {/* Enhanced Hero with CTA (from services_page content) */}
-            <div className={isLight ? 'lm-hero-edge' : undefined} style={{
+            <div className={['editorial-page-hero', isLight ? 'lm-hero-edge' : ''].filter(Boolean).join(' ')} style={{
                 background: heroBackgroundResolved,
                 color: heroTextResolved,
                 padding: '120px 20px 80px',
@@ -212,7 +213,7 @@ const ServicesPage = () => {
                 position: 'relative',
                 overflow: 'hidden'
             }}>
-                <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+                <div className="container editorial-page-hero__content" data-kicker="01 / Capital Solutions" style={{ position: 'relative', zIndex: 2 }}>
                     <h1 style={{ 
                         fontSize: p.heroTitleFontSize || '3.5rem', 
                         fontWeight: p.heroFontWeight || '700', 
@@ -238,7 +239,7 @@ const ServicesPage = () => {
                     }}>
                         {p.heroSubtitle}
                     </p>
-                    <div style={{ 
+                    <div className="editorial-page-hero__actions" style={{
                         display: 'flex', 
                         gap: '1rem', 
                         justifyContent: p.heroTextAlign === 'center' ? 'center' : (p.heroTextAlign === 'right' ? 'flex-end' : 'flex-start'), 
@@ -283,7 +284,7 @@ const ServicesPage = () => {
                             <section
                                 key="solutions"
                                 id="services-list"
-                                className={bandCls}
+                                className={['editorial-section', bandCls].filter(Boolean).join(' ')}
                                 style={{
                                     width: '100%',
                                     boxSizing: 'border-box',
@@ -291,16 +292,21 @@ const ServicesPage = () => {
                                 }}
                             >
                                 <div className="container" style={{ paddingLeft: '20px', paddingRight: '20px' }}>
-                                <h2 style={{ fontSize: p.sectionTitleFontSize || '2.5rem', marginBottom: '1rem', textAlign: p.sectionTitleAlign || 'center', fontFamily: p.sectionTitleFontFamily || 'var(--font-heading)', color: lightBodyText(p.sectionTitleColor, '#1A365D', '#0f172a'), fontWeight: p.sectionTitleFontWeight || '700' }}>{p.sectionSolutionsTitle}</h2>
-                                {p.sectionSolutionsSubtitle && (
-                                    <p style={{ maxWidth: '720px', margin: '0 auto 2.5rem', textAlign: p.sectionTitleAlign || 'center', color: lightBodyText(p.sectionSolutionsSubtitleColor, '#4A5568', '#475569'), fontSize: '1rem', lineHeight: 1.7 }}>
-                                        {p.sectionSolutionsSubtitle}
-                                    </p>
-                                )}
+                                <ScrollReveal>
+                                    <div className="editorial-section-heading" data-kicker="02 / Integrated Portfolio">
+                                        <h2 style={{ fontSize: p.sectionTitleFontSize || '2.5rem', marginBottom: '1rem', textAlign: p.sectionTitleAlign || 'center', fontFamily: p.sectionTitleFontFamily || 'var(--font-heading)', color: lightBodyText(p.sectionTitleColor, '#1A365D', '#0f172a'), fontWeight: p.sectionTitleFontWeight || '700' }}>{p.sectionSolutionsTitle}</h2>
+                                        {p.sectionSolutionsSubtitle && (
+                                            <p style={{ maxWidth: '720px', margin: '0 auto 2.5rem', textAlign: p.sectionTitleAlign || 'center', color: lightBodyText(p.sectionSolutionsSubtitleColor, '#4A5568', '#475569'), fontSize: '1rem', lineHeight: 1.7 }}>
+                                                {p.sectionSolutionsSubtitle}
+                                            </p>
+                                        )}
+                                    </div>
+                                </ScrollReveal>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', marginBottom: '100px' }}>
-                                    {orderedCategories.map((category) => (
-                                        <div key={category}>
-                                            <h3 style={{
+                                    {orderedCategories.map((category, categoryIndex) => (
+                                        <ScrollReveal key={category} delay={Math.min(categoryIndex * 0.05, 0.2)}>
+                                        <div className="editorial-category">
+                                            <h3 className="editorial-category__label" data-index={String(categoryIndex + 1).padStart(2, '0')} style={{
                                                 fontSize: '0.9rem',
                                                 letterSpacing: '0.16em',
                                                 textTransform: 'uppercase',
@@ -310,7 +316,7 @@ const ServicesPage = () => {
                                             }}>
                                                 {category}
                                             </h3>
-                                            <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
+                                            <div className="grid editorial-service-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
                                                 {grouped[category].map((s, i) => {
                         const IconComponent = ICON_MAP[s.icon] || Briefcase;
                         const link = s.link || p.tileButtonLink || `/services/${s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
@@ -325,7 +331,7 @@ const ServicesPage = () => {
                             <Link 
                                 to={link}
                                 key={i}
-                                className={isGlass ? 'glass-card service-card-hover' : 'service-card-hover'}
+                                className={`${isGlass ? 'glass-card service-card-hover' : 'service-card-hover'} editorial-service-card`}
                                 style={{ 
                                     border: cardBorderIdle,
                                     borderRadius: '16px',
@@ -382,6 +388,7 @@ const ServicesPage = () => {
                     })}
                                 </div>
                             </div>
+                            </ScrollReveal>
                         ))}
                                 </div>
                                 </div>
@@ -393,7 +400,7 @@ const ServicesPage = () => {
                         return (
                             <section
                                 key="leadMagnet"
-                                className={lmBand}
+                                className={['editorial-section', lmBand].filter(Boolean).join(' ')}
                                 style={{
                                     width: '100%',
                                     boxSizing: 'border-box',
@@ -401,7 +408,8 @@ const ServicesPage = () => {
                                 }}
                             >
                                 <div className="container" style={{ paddingLeft: '20px', paddingRight: '20px' }}>
-                                <div style={{ 
+                                <ScrollReveal>
+                                <div className="editorial-callout" style={{
                     background: isLight ? 'linear-gradient(135deg, #ffffff, #f1f5f9)' : 'linear-gradient(135deg, #F8FAFC, #EDF2F7)', 
                     borderRadius: '20px', 
                     padding: '4rem 2rem', 
@@ -430,6 +438,7 @@ const ServicesPage = () => {
                         {p.leadMagnetButtonText}
                     </Link>
                 </div>
+                                </ScrollReveal>
                                 </div>
                             </section>
                         );

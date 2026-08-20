@@ -156,7 +156,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
         : {};
 
     const renderHeader = () => (
-        <div style={{
+        <div className="universal-section-header" style={{
             marginBottom: '3rem',
             textAlign: styles.textAlign || 'center',
             maxWidth: '800px',
@@ -164,6 +164,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
         }}>
             {title && (
                 <motion.h2
+                    className="universal-section-title"
                     initial={{ opacity: 0, y: 20 }}
                     animate={isInitiallyVisible ? { opacity: 1, y: 0 } : undefined}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -208,6 +209,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
             {
                 subtitle && (
                     <motion.p
+                        className="universal-section-subtitle"
                         initial={{ opacity: 0, y: 20 }}
                         animate={isInitiallyVisible ? { opacity: 1, y: 0 } : undefined}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -229,6 +231,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
             }
             {/* Gold accent line */}
             <motion.div
+                className="universal-section-accent"
                 initial={{ scaleX: 0 }}
                 animate={isInitiallyVisible ? { scaleX: 1 } : undefined}
                 whileInView={{ scaleX: 1 }}
@@ -344,7 +347,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                         viewport={{ once: true, amount: 0.1 }}
                         className="luxury-border-gold"
                         style={{
-                            borderRadius: '24px',
+                            borderRadius: '2px',
                             padding: 'clamp(2.5rem, 5vw, 4rem)',
                             position: 'relative',
                             boxShadow: 'var(--shadow-lg)',
@@ -412,7 +415,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                                     background: cardBg,
                                     ...cardGlassStyle,
                                     border: `1px solid ${cardBorder}`,
-                                    borderRadius: '12px',
+                                    borderRadius: '2px',
                                     transition: 'all 0.3s ease',
                                     cursor: 'default'
                                 }}
@@ -421,7 +424,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                                 <div style={{
                                     width: '40px',
                                     height: '40px',
-                                    borderRadius: '10px',
+                                    borderRadius: '2px',
                                     background: isDarkBg ? 'rgba(201, 162, 39, 0.15)' : 'rgba(10, 61, 98, 0.06)',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -473,7 +476,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                                     background: cardBg,
                                     ...cardGlassStyle,
                                     border: `1px solid ${cardBorder}`,
-                                    borderRadius: '16px',
+                                    borderRadius: '2px',
                                     transition: 'all 0.4s cubic-bezier(0.23, 1, 0.32, 1)',
                                     position: 'relative',
                                     overflow: 'hidden'
@@ -490,7 +493,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                                 <div style={{
                                     width: '48px',
                                     height: '48px',
-                                    borderRadius: '12px',
+                                    borderRadius: '2px',
                                     background: isDarkBg ? 'rgba(201, 162, 39, 0.15)' : 'linear-gradient(135deg, rgba(10, 61, 98, 0.08), rgba(10, 61, 98, 0.04))',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -541,7 +544,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                                     background: cardBg,
                                     ...cardGlassStyle,
                                     border: `1px solid ${cardBorder}`,
-                                    borderRadius: '20px',
+                                    borderRadius: '2px',
                                     position: 'relative',
                                     overflow: 'hidden',
                                     transition: 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)'
@@ -566,7 +569,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                                 <div style={{
                                     width: '56px',
                                     height: '56px',
-                                    borderRadius: '16px',
+                                    borderRadius: '2px',
                                     background: isDarkBg ? 'rgba(201, 162, 39, 0.12)' : 'linear-gradient(135deg, rgba(10, 61, 98, 0.06), rgba(30, 111, 159, 0.06))',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -616,7 +619,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                                     background: cardBg,
                                     ...cardGlassStyle,
                                     border: `1px solid ${openItems[i] ? accentColor + '40' : cardBorder}`,
-                                    borderRadius: '14px',
+                                    borderRadius: '2px',
                                     overflow: 'hidden',
                                     transition: 'border-color 0.3s ease'
                                 }}
@@ -713,7 +716,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                                     background: cardBg,
                                     ...cardGlassStyle,
                                     border: `1px solid ${cardBorder}`,
-                                    borderRadius: '16px',
+                                    borderRadius: '2px',
                                     transition: 'all 0.3s ease'
                                 }}
                             >
@@ -836,7 +839,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                             style={{
                                 background: 'white',
                                 border: '1px solid rgba(10, 61, 98, 0.1)',
-                                borderRadius: '20px',
+                                borderRadius: '2px',
                                 overflow: 'hidden',
                                 boxShadow: '0 4px 30px rgba(10, 61, 98, 0.08)'
                             }}
@@ -858,7 +861,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                                     width: '36px',
                                     height: '36px',
                                     background: 'rgba(255,255,255,0.15)',
-                                    borderRadius: '8px',
+                                    borderRadius: '2px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center'
@@ -884,7 +887,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                                             padding: '1.25rem',
                                             background: '#F8FAFC',
                                             border: '1px solid rgba(10, 61, 98, 0.06)',
-                                            borderRadius: '12px',
+                                            borderRadius: '2px',
                                             display: 'flex',
                                             alignItems: 'flex-start',
                                             gap: '0.75rem',
@@ -954,7 +957,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                                 whileHover={{ y: -6, boxShadow: '0 15px 40px rgba(10, 61, 98, 0.15)' }}
                                 style={{
                                     background: 'white',
-                                    borderRadius: '16px',
+                                    borderRadius: '2px',
                                     overflow: 'hidden',
                                     border: '1px solid rgba(10, 61, 98, 0.06)',
                                     boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
@@ -1032,7 +1035,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                                     background: cardBg,
                                     ...cardGlassStyle,
                                     border: `1px solid ${cardBorder}`,
-                                    borderRadius: '20px',
+                                    borderRadius: '2px',
                                     boxShadow: isLight
                                         ? '0 2px 16px rgba(15, 23, 42, 0.06)'
                                         : (isDarkBg ? 'none' : '0 2px 15px rgba(0,0,0,0.04)')
@@ -1070,7 +1073,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                                 className="group"
                                 style={{
                                     overflow: 'hidden',
-                                    borderRadius: '24px',
+                                    borderRadius: '2px',
                                     background: cardBg,
                                     ...cardGlassStyle,
                                     border: `1px solid ${cardBorder}`,
@@ -1140,7 +1143,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                         style={{
                             position: 'relative',
                             background: isDarkBg ? 'rgba(255,255,255,0.06)' : '#FFFFFF',
-                            borderRadius: '24px',
+                            borderRadius: '2px',
                             padding: 'clamp(2.5rem, 5vw, 4rem)',
                             boxShadow: isDarkBg ? 'none' : '0 4px 40px rgba(0,0,0,0.06)',
                             border: isDarkBg ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(226,232,240,0.8)',
@@ -1301,7 +1304,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                                 minWidth: '250px',
                                 position: 'relative',
                                 background: bubbleBg,
-                                borderRadius: '20px',
+                                borderRadius: '2px',
                                 padding: 'clamp(1.5rem, 3vw, 2.5rem)',
                                 boxShadow: isDarkBg ? 'none' : '0 4px 30px rgba(0,0,0,0.06)',
                                 border: isDarkBg ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(226,232,240,0.8)',
@@ -1376,7 +1379,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
         <motion.section
             ref={sectionRef}
             id={section.id}
-            className={[containerClass, lightBandClass].filter(Boolean).join(' ')}
+            className={['universal-section-shell', containerClass, lightBandClass].filter(Boolean).join(' ')}
             initial={{ opacity: 0 }}
             animate={isInitiallyVisible ? { opacity: 1 } : undefined}
             whileInView={{ opacity: 1 }}
@@ -1406,7 +1409,7 @@ const UniversalSection = ({ section, containerClass = "", lightBandIndex }) => {
                 />
             )}
 
-            <div style={{
+            <div className="universal-section-inner" style={{
                 maxWidth: '1200px',
                 margin: '0 auto',
                 position: 'relative',

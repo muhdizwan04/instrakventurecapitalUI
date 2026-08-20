@@ -2,7 +2,7 @@ import React from 'react';
 import PageHero from '../components/PageHero';
 import { ShieldCheck, Eye, Scale, User, Shield, Handshake, Building2, Award, CheckCircle2 } from 'lucide-react';
 import { usePageContent } from '../hooks/usePageContent';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import UniversalSection from '../components/UniversalSection';
 import { useTheme } from '../context/ThemeContext';
 import { isDarkHexColor, isLikelyLightTextColor, BOARD_SECTION_LIGHT_TYPOGRAPHY } from '../theme/clientThemeDefaults';
@@ -251,7 +251,7 @@ const AboutUs = () => {
             ? (styles.textColor && !isLikelyLightTextColor(styles.textColor) ? styles.textColor : undefined)
             : styles.textColor;
         return (
-            <div key={section.id} className={bandCls} style={{
+            <div key={section.id} className={['editorial-about-hero', bandCls].filter(Boolean).join(' ')} style={{
                 backgroundColor: bandCls ? 'transparent' : heroBg,
                 backgroundImage: styles.backgroundImage ? `url(${styles.backgroundImage})` : undefined,
                 backgroundSize: styles.backgroundSize || 'cover',
@@ -294,10 +294,10 @@ const AboutUs = () => {
                 ? '#f8fafc'
                 : (styles.bgColor || 'transparent'));
         return (
-            <motion.section
+            <Motion.section
                 key={section.id}
                 id="mission"
-                className={bandCls}
+                className={['editorial-section', bandCls].filter(Boolean).join(' ')}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px", amount: 0.1 }}
@@ -321,7 +321,7 @@ const AboutUs = () => {
                 )}
                 <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: styles.textAlign || 'left' }}>
                     {section.title && (
-                        <div style={{ marginBottom: '2rem', textAlign: styles.textAlign || 'center' }}>
+                        <div className="editorial-section-heading" data-kicker="02 / Institutional Direction" style={{ marginBottom: '2rem', textAlign: styles.textAlign || 'center' }}>
                             <h2 className="section-title" style={{ color: titleColor, fontSize: styles.titleFontSize ? `${styles.titleFontSize}px` : undefined }}>{section.title}</h2>
                         </div>
                     )}
@@ -337,7 +337,7 @@ const AboutUs = () => {
                                 : (styles.cardColor || '#FFFFFF'));
                         const glassStyle = isLight ? {} : (isGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {});
                         return (
-                    <div className="luxury-border-gold overflow-hidden" style={{
+                    <div className="luxury-border-gold overflow-hidden editorial-mission-card" style={{
                         borderRadius: '24px',
                         padding: '4rem',
                         color: textColor,
@@ -372,7 +372,7 @@ const AboutUs = () => {
                         );
                     })()}
                 </div>
-            </motion.section>
+            </Motion.section>
         );
     };
 
@@ -397,10 +397,10 @@ const AboutUs = () => {
             ? L.bio
             : (boardStyleColors.bioColor || '#94a3b8');
         return (
-            <motion.section
+            <Motion.section
                 key={section.id}
                 id="board"
-                className={bandCls}
+                className={['editorial-section', bandCls].filter(Boolean).join(' ')}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px", amount: 0.1 }}
@@ -423,7 +423,7 @@ const AboutUs = () => {
                     }} />
                 )}
                 <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: styles.textAlign || 'center' }}>
-                    <div style={{ textAlign: styles.textAlign || 'center', marginBottom: '4rem' }}>
+                    <div className="editorial-section-heading" data-kicker="Leadership / Governance" style={{ textAlign: styles.textAlign || 'center', marginBottom: '4rem' }}>
                         {(section.sectionLabel || section.sectionLabel === undefined) && (
                             <h6 style={{ color: '#D4AF37', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
                                 {section.sectionLabel !== undefined ? section.sectionLabel : 'Leadership'}
@@ -458,7 +458,7 @@ const AboutUs = () => {
                         )}
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2.5rem' }}>
+                    <div className="editorial-card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2.5rem' }}>
                         {directors.map((d, i) => {
                             const cardStyle = boardStyleColors.cardStyle || 'glass';
                             const isGlass = cardStyle !== 'solid';
@@ -470,7 +470,7 @@ const AboutUs = () => {
                             return (
                             <div
                                 key={i}
-                                className="luxury-border-gold group"
+                                className="luxury-border-gold group editorial-person-card"
                                 style={{
                                     overflow: 'hidden',
                                     borderRadius: '24px',
@@ -519,7 +519,7 @@ const AboutUs = () => {
                         })}
                     </div>
                 </div>
-            </motion.section>
+            </Motion.section>
         );
     };
 
@@ -540,10 +540,10 @@ const AboutUs = () => {
         const subtitleSizePx = styles.subtitleFontSize || 17;
         const iconColor = styles.iconColor || '#D4AF37';
         return (
-            <motion.div
+            <Motion.div
                 key={section.id}
                 id="partners"
-                className={bandCls}
+                className={['editorial-section', bandCls].filter(Boolean).join(' ')}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px", amount: 0.1 }}
@@ -571,12 +571,12 @@ const AboutUs = () => {
                     {/* 3c. Banking & Insurance Partners - Transparent to show wrapper BG */}
                     <section style={{ padding: '100px 0', background: 'transparent' }}>
                         <div className="container">
-                            <div style={{ textAlign: styles.textAlign || 'center', marginBottom: '4rem' }}>
+                            <div className="editorial-section-heading" data-kicker="Network / Institutional Partners" style={{ textAlign: styles.textAlign || 'center', marginBottom: '4rem' }}>
                                 <h2 className="section-title" style={{ color: partnersHeadingTitleColor, fontSize: titleSizePx ? `${titleSizePx}px` : undefined }}>{section.title || 'Strategic Banking & Insurance'}</h2>
                                 {section.subtitle && <p className="mt-2" style={{ color: partnersHeadingSubtitleColor, opacity: isLight ? 1 : 0.9, fontSize: subtitleSizePx ? `${subtitleSizePx}px` : undefined }}>{section.subtitle}</p>}
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
+                            <div className="editorial-card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
                                 {partners.map((partner, i) => {
                                     const cardStyle = styles.cardStyle || 'glass';
                                     const isGlass = cardStyle !== 'solid';
@@ -586,7 +586,7 @@ const AboutUs = () => {
                                         : (styles.cardColor || '#FFFFFF');
                                     const glassStyle = isGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {};
                                     return (
-                                    <div key={partner.id || i} style={{ border: '1px solid rgba(226,232,240,0.8)', borderRadius: '16px', padding: '3rem', position: 'relative', background: cardBg, ...glassStyle }}>
+                                    <div key={partner.id || i} className="editorial-partner-card" style={{ border: '1px solid rgba(226,232,240,0.8)', borderRadius: '16px', padding: '3rem', position: 'relative', background: cardBg, ...glassStyle }}>
                                         {partner.logo ? (
                                             <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
                                                 <img src={partner.logo} alt={partner.name} style={{ maxHeight: '60px', maxWidth: '180px', objectFit: 'contain' }} />
@@ -616,7 +616,7 @@ const AboutUs = () => {
                                         : (styles.cardColor || '#FFFFFF');
                                     const glassStyle = isGlass ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {};
                                     return (
-                                    <div key={bank.id || i} style={{ border: '1px solid rgba(226,232,240,0.8)', borderRadius: '16px', padding: '3rem', position: 'relative', background: cardBg, ...glassStyle }}>
+                                    <div key={bank.id || i} className="editorial-partner-card" style={{ border: '1px solid rgba(226,232,240,0.8)', borderRadius: '16px', padding: '3rem', position: 'relative', background: cardBg, ...glassStyle }}>
                                         {bank.logo ? (
                                             <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
                                                 <img src={bank.logo} alt={bank.name} style={{ maxHeight: '60px', maxWidth: '180px', objectFit: 'contain' }} />
@@ -641,7 +641,7 @@ const AboutUs = () => {
                         </div>
                     </section>
                 </div>
-            </motion.div>
+            </Motion.div>
         );
     };
 
@@ -654,7 +654,7 @@ const AboutUs = () => {
         const iconColor = styles.iconColor || '#D4AF37';
         const badgeBg = bandCls && isLight ? '#f1f5f9' : bgBase;
         return (
-            <motion.div
+            <Motion.div
                 key={section.id}
                 initial="hidden"
                 whileInView="visible"
@@ -665,7 +665,7 @@ const AboutUs = () => {
                 }}
             >
                 {/* 3b. Investment Feature (Deal Tombstone Style) */}
-                <section className={bandCls} style={{
+                <section className={['editorial-section', bandCls].filter(Boolean).join(' ')} style={{
                     padding: '80px 0',
                     backgroundColor: bgBase,
                     color: textBase,
@@ -675,7 +675,7 @@ const AboutUs = () => {
                     backgroundPosition: 'center'
                 }}>
                     {styles.backgroundImage && (
-                        <div style={{
+                        <div className="editorial-milestone-card" style={{
                             position: 'absolute', inset: 0, background: 'black',
                             opacity: styles.overlayOpacity !== undefined ? styles.overlayOpacity : 0.4,
                             zIndex: 0, pointerEvents: 'none'
@@ -708,7 +708,7 @@ const AboutUs = () => {
                         </div>
                     </div>
                 </section>
-            </motion.div>
+            </Motion.div>
         );
     };
 
@@ -728,7 +728,7 @@ const AboutUs = () => {
     const renderCustom = (section, idx) => <UniversalSection key={section.id} section={section} lightBandIndex={idx} />;
 
     return (
-        <div className="page-wrapper">
+        <div className="page-wrapper editorial-page editorial-page--about">
             {sections.map((section, idx) => {
                 const RenderFn = renderers[section.type] || renderCustom;
                 return RenderFn(section, idx);
